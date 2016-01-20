@@ -1,0 +1,20 @@
+* rotate side chains of a residue and compare energies
+*
+stream check.str
+set ener1 @energy
+! now rotate instead !
+coor axis sele res .and. type @ax1 end sele res .and. type @ax2 end
+coor rota axis phi 180 sele flipatoms end
+! check new energy
+stream check.str
+set ener2 @energy
+
+if @ener2 lt @ener1 then 
+  write title unit 33 
+  * @sname @rname @resid @ax1--@ax2 @ener1 @ener2 YES
+else
+  write title unit 33 
+  * @sname @rname @resid @ax1--@ax2 @ener1 @ener2 NO
+  ! make reverse changes
+  coor rota axis phi 180 sele flipatoms end
+endif

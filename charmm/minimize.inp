@@ -1,0 +1,56 @@
+* gradually relax modeled crystal structure
+*
+
+set version 19
+
+set psffile rigor_prot19
+set corfile rigor_prot19
+
+stream readpsf.str
+
+!!!!!!!! eef1 setup 
+eef1 setup temp 298.15 unit 99 name ~/charmm/c33b1/test/data/solvpar.inp
+update ctonnb 7. ctofnb 9. cutnb 10. group rdie
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+cons fix select prop wmain .eq. 1 end ! these were the crystal coords
+
+set k 30
+label res1
+ cons harm force @k select prop wmain .eq. 0 end
+ minimize abnr nstep 100 nprint 10
+ calc k = @k - 5
+ if  @k .ge. 0 -
+goto res1
+
+write coor card name rigor@version_1.cor
+
+!!!!!!!!!!!!!!!!!!!!! now relax the fixed atoms !!!!!!!!
+cons fix select none end
+
+cons harm force 5 select prop wmain .eq. 1 end ! these were the crystal coords
+
+set k 5
+label res2
+ cons harm force @k select prop wmain .eq. 0 end
+ minimize abnr nstep 100 nprint 10
+ calc k = @k - 5
+ if  @k .ge. 0 -
+goto res2
+
+write coor card name rigor@version_2.cor
+
+!!!!!!!!!!!!!!!!!!!!! now relax the fixed atoms !!!!!!!!
+cons harm clear
+cons harm force 1 select all end
+minimize abnr nstep 100 nprint 10
+
+cons harm clear
+cons harm force 0.5 select prop wmain .eq. 1 end
+minimize abnr nstep 100 nprint 10
+
+
+write coor card name rigor@version_3.cor
+
+

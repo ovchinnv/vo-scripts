@@ -1,0 +1,10 @@
+#!/bin/bash
+
+grep -i "^ENERGY" $1 | awk \
+ ' BEGIN {n=0 ; eave=0; estd=0; } \
+   {print " "$2 " : " $14 ; \
+    eave = ( n * eave + $14 ) / (n+1) ;\
+    estd = ( n * estd + ($14)^2 ) / (n+1) ;\
+    n=n+1;
+   } \
+   END { print " AVG +/- STD: " eave"  +/-  " sqrt(estd-eave^2) }'

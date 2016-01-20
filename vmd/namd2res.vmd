@@ -1,0 +1,65 @@
+#!/bin/vmd
+
+# generates pdb files for fixed/restrained atoms
+
+#package require psfgen
+#################################
+#set toppar /home/ovchinnikov/c33a1/toppar
+#psfcontext reset
+#topology ${toppar}/top_all27_prot_na.rtf
+#topology ${toppar}/stream/toppar_all27_na_nad_ppi.str
+
+######## first VMD stuff #####################
+set psffile ../conv6pps
+set namdfile ../scratch/cpt_5
+set pdbfile ../conv6pps
+
+# read psf
+#readpsf  ${psffile}.psf;
+#coordpdb ${pdbfile}.pdb;
+
+########## LOAD INTO VMD ################################
+#mol delete all
+mol load psf ${psffile}.psf namdbin ${namdfile}.coor
+mol addfile ${pdbfile}.pdb type pdb
+
+#set xtal [atomselect top "beta 1.0"]; # beta values are 1 for atoms that had coordinates in the original PDB file
+atomselect macro Xtal { beta 1.0 };
+
+#converter macros
+atomselect macro SH2Loop   { segid CONV and (resid 691 to 692) } ;# ok
+atomselect macro SH1Helix  { segid CONV and (resid 693 to 703) } ;# ok
+atomselect macro SH1Loop   { segid CONV and (resid 704 to 706) } ;# ok
+atomselect macro SH1       { SH1Helix or SH1Loop }; #ok
+atomselect macro Converter { segid CONV and (resid 707 to 773) } ;# ok
+atomselect macro Cinsert   { segid CONV and (resid 774 to 788) } ;# ok
+### converter loops
+atomselect macro cloop1 { segid CONV and (resid 710 to 711) }
+atomselect macro cloop2 { segid CONV and (resid 742 to 748) }
+atomselect macro cloop3 { segid CONV and (resid 759 to 762) }
+atomselect macro cloop4 { segid CONV and (resid 771 to 773) }
+### converter helices
+atomselect macro hel1 { segid CONV and (resid 711 to 720) }
+atomselect macro hel2 { segid CONV and (resid 724 to 729) }
+atomselect macro hel3 { segid CONV and (resid 730 to 740) }
+atomselect macro hel4 { segid CONV and (resid 762 to 769) }
+atomselect macro bets { segid CONV and (( resid 748 to 751 ) or ( resid 754 to 758 ) or ( resid 706 to 710 )) }
+
+set all       [atomselect top all];
+set TMDorient [atomselect top " Xtal and hel3 and backbone" ];
+set TMDforce  [atomselect top " Xtal and hel4 and noh " ];
+
+
+$all set beta 0
+$all set occupancy 0
+
+$TMDorient set occupancy 1 ;# use this column to apply harmonic restraints
+#$TMDforce set beta 1
+
+#llength [$TMD get index] 
+
+#$all writepdb ${pdbfile}.res
+
+animate write pdb conv6pps_hel3.res beg 0 end 0 skip 1 sel [atomselect top all]
+
+

@@ -1,0 +1,79 @@
+* protein solvation component for SB simulations
+*
+
+set version 27
+
+set eps 1.0 ! dielectric constant
+
+if @?psffile eq 0 set psffile unknown
+if @?corfile eq 0 set corfile unknown_m
+if @?format eq 0 set format card 
+
+stream readpsf.str
+
+set buf 13  ! solvation radius
+
+define solute select segid BPGM .or. segid MG end ! .or. segid XWAT end ! exclude crystal waters from box dimensioning
+coor orie select solute end ! align 
+coor stat select solute end ! select the active site region
+
+! compute center of water box
+calc xmin = ?xmin
+calc ymin = ?ymin 
+calc zmin = ?zmin 
+calc xmax = ?xmax
+calc ymax = ?ymax 
+calc zmax = ?zmax 
+
+!include xwat in solvation
+define solute select segid BPGM .or. segid MG .or. segid XWAT end
+update atom cutnb 15 ctonnb 10 ctofnb 12 vdw vshift fshift cdie
+
+nobomb
+set overlap 2.8
+!stream wbox.str
+stream wcube.str
+rename segid wat select segid w* end ! rename all waters
+
+!goto write ! skip minimization
+
+cons harm force 30 select solute .and. .not. hydrogen end
+! cons fix select onlysolute .and. .not. hydrogen end
+! mini sd nstep 100
+mini conj nstep 10
+mini abnr nstep 10
+ 
+label unconstrained_mini ! no constraints in reaction zone 
+cons harm clear
+mini conj nstep 10
+minimize abnr nstep 10
+
+
+label skipmini
+energy
+
+label write
+
+write psf @format name @{psffile}_s.psf
+write coord @format name @{corfile}s.cor
+* solvated in a box of dimension
+* xmin=@xmi ymin=@ymi zmin=@zmi 
+* xmax=@xma ymax=@yma zmax=@zma 
+*
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+open write card unit 66 name boxsize.str
+write title unit 66
+** solvated in an orthorhombic box of the following dimensions
+* set a  @xl
+* set b  @yl
+* set c  @zl
+close unit 66
+
+!!!! STOP HERE !!!!!!!!!!!
+
+goto kill
+
+!!!!!!!!! FINISHED !!!!!!!!!!!!
+
+label kill
+stop

@@ -1,0 +1,37 @@
+* principal component analysis -- compute dot products
+* in this case the modes have been previously computed and are read from file
+*
+
+prnlev 3
+
+set which mde_mass
+!set which all
+
+set nmodes 1000
+
+!set psffile /bkp5/c2/myo/namd/rigor/scratch/rmsd/rigor_sn
+!set crdfile /bkp5/c2/myo/namd/rigor/scratch/rmsd/rigor_msn ! initial file
+set psffile /bkp5/rmsd/rigor/pca/daed/@which/rigor_pca_all
+set crdfile /bkp5/rmsd/rigor/pca/daed/@which/rigor_avg_all
+
+
+stream ../../readpsf.str
+!!!
+!delete atom select .not.( segid HC .or. segid LC .or. segid ATP .or. segid MG )  end
+!!!
+
+vibr nmod @nmodes ihbfrq 0 inbfrq 0
+
+open read file unit 23 name /bkp5/rmsd/rigor/pca/daed/@which/rigor_all.pca 
+read norm unit 23 mode 901 thru 1000
+! postrigor
+open read file unit 24 name /bkp5/rmsd/prigor1/pca/daed/@which/prigor1_all.pca
+read norm unit 24 append mode 901 thru 1000
+
+
+print norm dotproducts
+
+
+end
+
+stop

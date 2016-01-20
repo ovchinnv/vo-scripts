@@ -1,0 +1,29 @@
+#!/bin/bash
+# split a str file produced by paramchem into an rtf (topology) file and a prm (param) file
+#
+
+awk 'BEGIN \
+{ readtop=0 ; readpar=0 ;
+     outname=ARGV[1] ; i=match(outname, "\\.*[^\\.]*$",seg);    # split off extension 
+     topname=substr(outname,1,i-1)".rtf";
+     parname=substr(outname,1,i-1)".prm";
+#print outname
+#print topname
+#print parname
+#print ARGV[0] ;# awk
+#print ARGV[1] ;# file name
+outfile="/dev/null"
+}
+//
+{
+ if ($1 == "read") { 
+  if ($2 == "rtf") { 
+   readtop=1 ; readpar=0 ; outfile=topname;
+  } else if ($2 == "param") {
+   readtop=0 ; readpar=1 ; outfile=parname;
+  }
+ } else if (($1 == "RETURN") || ($1 == "return")) {
+ } else
+  print $0 > outfile
+}
+ ' $1 > /dev/null

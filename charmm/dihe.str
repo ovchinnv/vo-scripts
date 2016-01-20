@@ -1,0 +1,19 @@
+* apply restraints to remove cis peptide bonds
+*
+
+cons cldh
+
+set resid0  1637
+set resid1  1655
+set seg M5
+
+if @?kf eq 0  set kf 50 ! the restraints should be as weak as possible (but effective)
+
+set residi @resid0
+label rloop
+ calc residj = @residi + 1
+ cons dihe @seg @residi CA @seg @residi C @seg @residj N @seg @residj CA min 180 force @kf
+!
+ incr residi
+ if @residi .lt. @resid1 - 
+goto rloop

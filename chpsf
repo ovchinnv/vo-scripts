@@ -1,0 +1,26 @@
+#!/bin/bash
+#loop over lines in psf and sup up charge
+
+if [ -z $1 ]; then
+ echo " * USAGE: ./chpsf <psffile>";
+ exit 1
+fi
+
+awk 'BEGIN { 
+ q=0 ; qatom=0; 
+ print " *** Computing total charge in structure file '"$1"'...";
+};
+{ 
+ if ( $0 ~ /^\s*[0-9]+\s*!\s*[Nn][Aa][Tt][Oo][Mm]*/ ) {
+  qatom=1;
+#  print $0;
+ } else if ( $0 ~ /^\s*[0-9]+\s*!\s*[Nn][Bb][Oo][Nn][Dd]*/ ) {
+  exit
+ } else if ( NF>=7) {
+  q+=$7;
+ }
+}
+END { 
+ print " *** "q
+}
+' $1

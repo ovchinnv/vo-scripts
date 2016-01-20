@@ -1,0 +1,38 @@
+#!/bin/tcl
+# superpose all six subunits to see how they are different
+
+set id [ molinfo top ];
+set nf [molinfo $id get numframes];
+
+set cons "backbone and not loops"
+#set cons "backbone and not loops and large"
+#set cons "backbone and not loops and small"
+
+set template_ SA
+set orients_ { SB SC SD SE SF };
+
+set nucls_ {"segid DPB" "SC" "segid DPD" "segid DPE" "SF"} ; # contains a trick to have fewer than 6 ADPs
+
+set template [atomselect $id "$template_ and $cons" frame 0] 
+
+set orients {}
+set moves {}
+foreach orient_ $orients_ nucl_ $nucls_ {
+ lappend orients [atomselect $id "$orient_ and $cons"]
+ lappend moves [atomselect $id "same residue as ( $orient_ or $nucl_ ) "]
+}
+#
+
+set fout [open align_small.dat a+];
+puts $fout "SELECTION: $cons"
+
+for { set i 0 } { $i<$nf } { incr i } {
+ $template frame $i
+ foreach orient $orients moving $moves orient_ $orients_ { 
+  $orient frame $i
+  $moving frame $i
+  $moving move [measure fit $orient $template]
+  puts $fout "${template_} ${orient_} [measure rmsd $orient $template]"
+ }
+}
+close $fout

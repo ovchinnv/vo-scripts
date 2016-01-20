@@ -1,0 +1,52 @@
+* CaM pre-dynamics minimization test: based on ../ cam.inp
+*
+
+set version 27
+
+if @?psffile eq 0 set psffile unknown
+if @?corfile eq 0 set corfile unknown
+if @?format eq 0 set format card 
+
+stream readpsf.str
+
+!!!!!!!!!!!!!!!!!!! MINIMIZATION (BROOKS) !!!!!!!!!!!!!!!!!!!
+
+UPDAte atom cdie cutnb 14.0 ctofnb 12.0 vswitch shift  ! options for GETE; same thing that we run dynamics with
+
+coor copy comp
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!goto skipmini
+set k 30
+label minimize
+cons harm force @k select segid @ID .and. .not. hydrogen end
+
+mini sd nstep 20 tolenr 0.0001
+mini conj nstep 20 tolenr 0.0001
+mini abnr nstep 20 tolenr 0.0001
+
+coor orie rms
+
+decr k by 10.0
+if k ge 0.0 -
+goto minimize
+
+
+label final_mini
+cons harm clear  ! turn off constraints
+
+mini abnr nstep 100 - ! conjugate gradient minimization
+         tolenr 0.0001  ! if the energy change is less that tolenr, minimization routine will exit
+
+label skipmini
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+write coor @format name @{corfile}_m.cor
+write coor pdb name @{corfile}_m.pdb
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+coor orie rms mass sele .not. hydrogen end! RMSD to initial structure
+
+goto kill
+
+!!!! STOP HERE !!!!!!!!!!!
+label kill
+stop

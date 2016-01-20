@@ -1,0 +1,43 @@
+* SCRIPT TO replace some waters with ions
+*
+
+define replacement select @candidates .and. type OH2 end ! select num of water molecules
+set repl ?nsel ! number of replacement candidates
+if @repl .lt. @ionsneeded system "echo ADD_ION ERROR: SELECTION NOT BIG ENOUGH TO ACCOMODATE @IONSNEEDED IONS, SKIPPING..."
+if @repl .lt. @ionsneeded system goto skip_ion
+
+calc nion_int = INT ( @ionsneeded )
+
+if @ionsneeded .eq. 0 goto skip_ion   ! nothing to do: system is neutral
+if @{nion_int} .ne. @ionsneeded system "echo ADD_ION ERROR: SYSTEM CHARGE NOT AN INTEGER, SKIPPING..."
+if @{nion_int} .ne. @ionsneeded goto skip_ion
+
+define candidates select @candidates end ! save selection (in case it takes a while to compute)
+calc nwat = ( ?NSEL ) / 3
+read sequ tip3 @nwat
+generate wrpl noangle nodihe
+coor dupl sele @candidates end sele segid wrpl end
+delete atom sele @candidates end
+
+! generate ions
+read sequence @ion @ionsneeded ! generate @nion of @ion
+gene ion@ionseg
+coor set xdir 1.0 dist 0 select segid ion@ionseg end ! assign arbitrary positions to avoid bombing on atom selections
+
+set inum 1
+label add_ion
+ calc i = int ( ?rand * @repl ) + 1
+ coor dupl select atom wrpl @i OH2 end sele atom ion@ionseg @inum @ion end ! set ion coordinate
+ delete atom select atom wrpl @i * end ! delete that water residue 
+ 
+ incr repl by -1
+ incr inum by 1
+ join wrpl renumber ! renumber waters so there are no gaps
+ 
+ if @inum .le. @ionsneeded -
+goto add_ion
+
+if @repl .ne. 0 join WAT wrpl renu
+
+label skip_ion 
+

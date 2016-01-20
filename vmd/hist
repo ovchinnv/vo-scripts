@@ -1,0 +1,30 @@
+#!/usr/local/bin/vmd
+
+mol delete all
+
+mol load psf prigor19.psf cor prigor19.cor
+mol addfile prigor19_1.cor type cor
+mol addfile prigor19_2.cor type cor
+mol addfile prigor19_3.cor type cor
+
+set rig [molinfo top]
+mol delrep 0 top
+
+set segid HC
+set resid 552
+
+
+
+mol representation licorice
+mol selection "segid $segid and resid $resid"
+mol color name
+mol addrep $rig
+
+mol representation lines
+mol selection "within 15 of ( segid $segid and resid $resid ) "
+mol color name
+mol addrep $rig
+
+
+
+

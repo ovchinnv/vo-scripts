@@ -1,0 +1,53 @@
+* prepare c27 coordinates for solvation
+*
+
+if @?outname eq 0 set outname unknown
+if @?format eq 0 set format card
+
+set version 27
+stream readpsf.str
+
+set psffile bpgm_apo219
+set corfile bpgm_apo219_3
+
+read psf  card name @psffile.psf
+read coor card name @corfile.cor
+!
+! writeout all segments
+write coor pdb name bpgm.pdb select segid BPGM end
+! change histidine notation
+system "awk ' { sub(" HSD ", " HSE "); print $0 } ' bpgm.pdb  > bpgm_.pdb"
+system "awk ' { sub(" HIS ", " HSD "); print $0 } ' bpgm_.pdb > bpgm.pdb"
+!
+write coor pdb name mg.pdb select segid MG end
+!
+write coor pdb name xwat.pdb select segid XWAT end
+!
+delete atom select all end
+!
+!
+open unit 1 read card name bpgm.pdb
+read sequ pdb unit 1
+generate BPGM setup warn first nterm last cterm
+read coor pdb unit 1 resid
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+open unit 1 read card name mg.pdb
+read sequ pdb unit 1
+generate MG setup warn noangle nodihe
+read coor pdb unit 1 resid
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+open unit 1 read card name xwat.pdb
+read sequ pdb unit 1
+generate xwat setup warn noangle nodihe
+read coor pdb unit 1 resid
+join renu xwat ! not needed here
+!
+!
+coor print sele .not. ( init .or. hydrogen ) end ! noe
+!
+coor init sele hydrogen end
+hbuild
+!
+write psf  card name  @outname.psf
+write coor card name @outname.cor
+

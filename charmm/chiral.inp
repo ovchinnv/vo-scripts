@@ -1,0 +1,31 @@
+* check path for chirality and peptide bond errors
+*
+
+set version 27
+
+!stream ~/scripts/charmm/readpsf.str
+
+read psf card name ../hpin_27.psf
+
+! for chirality
+!***********************************
+define chi_selection select all end
+set chi_logfile = chi.dat
+set chiunit 200
+open unit @chiunit name @{chi_logfile} write card
+echu @chiunit
+set flip_hydrogen
+set chi_quiet
+!**********************************
+
+set i 1
+set nrep 128
+label loop
+ echo ================================ FRAME @{I} =======================================
+ read coor card name ../rtmd/hpin3_@{i}.cor
+ stream chirality.str
+ incr i
+ if @i lt @nrep -
+goto loop
+
+close unit @chiunit

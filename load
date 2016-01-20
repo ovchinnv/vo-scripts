@@ -1,0 +1,96 @@
+#!/bin/vmd
+
+
+color Display {Background} gray
+display stereo SideBySide
+axes location off
+set cons noh
+
+set path "../../../"
+source ${path}colors
+set conf dmx
+set conf2 exr
+
+set tags {0 1 2 3 4 5 6 7 8 9};
+set tags {9};
+#psf
+
+foreach tag $tags {
+
+mol delete all
+mol load psf ${path}exr_dry22c.psf
+mol addfile ../scratch/${conf}_k1000_localsum6#100${tag}.dcd waitfor all
+# comparison file
+mol addfile ${path}${conf2}_dry22cfacts_3.cor type cor     ;           # X-Ray
+#
+
+set cam [molinfo top];
+mol delrep 0 $cam
+#
+source ${path}/domains_cam
+#
+# add reps
+mol representation newcartoon
+mol selection noh
+mol color colorid $silver
+mol addrep $cam
+
+mol representation newcartoon
+mol selection AD
+mol color colorid $red
+mol addrep $cam
+#
+mol representation newcartoon
+mol selection BC
+mol color colorid $blue
+mol addrep $cam
+#
+mol representation newcartoon
+mol selection EH
+mol color colorid $green
+mol addrep $cam
+#
+mol representation newcartoon
+mol selection FG
+mol color colorid $magenta
+mol addrep $cam
+#
+#
+############################ view residues ##########################
+#
+#
+mol representation lines
+mol selection noh
+mol color name
+mol addrep $cam
+#
+
+
+############## align frames ###############
+set id [ molinfo top ];
+set nf [molinfo $cam get numframes];
+set selection "all"
+
+set all      [atomselect $cam all];
+set orient [atomselect $cam "$selection and $cons"]
+set template   [atomselect $cam "$selection and $cons" frame [expr {$nf-1}]] 
+#
+#
+set x0 [$template get x];
+set y0 [$template get y];
+set z0 [$template get z];
+set ind [$template get serial];
+#
+#
+for { set i 0 } { $i<$nf } { incr i } {
+#break; # aa
+ $orient frame $i
+ $orient update
+ $all frame $i
+ $all update
+ $all move [measure fit $orient $template]
+}
+# compute rmsd to last structure
+#play rmsd2
+
+};# over all tags

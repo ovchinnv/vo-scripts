@@ -1,0 +1,280 @@
+* script to create a water hexagonal cylinder of prescribed radius and orientation
+* NOTE: in this version I replaced wmain and wcomp with xref and yref, respectively
+* so that the former two are free
+*
+
+! NAMES WAT* must not be taken
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+if @?R eq 0 set R 25 ! outer radius
+if @?xref0 eq 0 set xref0 0 ! center of base 1
+if @?yref0 eq 0 set yref0 0
+if @?zref0 eq 0 set zref0 0
+!
+if @?xref1 eq 0 set xref1 0 ! center of base 2
+if @?yref1 eq 0 set yref1 0
+if @?zref1 eq 0 set zref1 @R
+if @?overlap eq 0 set overlap 2.8
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! read initial water box (216 molecules)
+!read sequ tip3 216
+!generate wat0 noangle nodihe
+!stream read-watbox.str ! this script written by nilssen
+!set box 18.856  ! size of cubic water box
+
+
+! read initial water box (216 molecules)
+read sequ tip3 125
+generate wat0 noangle nodihe
+stream read-smallbox.str ! this script written by nilssen
+set box 15.5516  ! size of cubic water box
+
+!!!!!! CALCULATE SMALLEST BOX THAT WILL CONTAIN THE CYLINDER
+! X
+if @xref0 le @xref1 then 
+ calc xmin = @xref0 - @R
+ calc xmax = @xref1 + @R
+else 
+ calc xmin = @xref1 - @R
+ calc xmax = @xref0 + @R
+endif
+! Y
+if @yref0 le @yref1 then 
+ calc ymin = @yref0 - @R
+ calc ymax = @yref1 + @R
+else 
+ calc ymin = @yref1 - @R
+ calc ymax = @yref0 + @R
+endif
+! Z
+if @zref0 le @zref1 then 
+ calc zmin = @zref0 - @R
+ calc zmax = @zref1 + @R
+else 
+ calc zmin = @zref1 - @R
+ calc zmax = @zref0 + @R
+endif
+
+calc xcen = 0.5 * (@xref0 + @xref1)
+calc ycen = 0.5 * (@yref0 + @yref1)
+calc zcen = 0.5 * (@zref0 + @zref1)
+! calculate number of boxes
+calc nx = int ( abs ( @xmin - @xmax ) / @box ) + 1
+calc ny = int ( abs ( @ymin - @ymax ) / @box ) + 1
+calc nz = int ( abs ( @zmin - @zmax ) / @box ) + 1
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+calc nbox = @nx*@ny*@nz - 1 ! total boxes
+replicate wat nrep @nbox select segid wat0 end ! duplicate waters
+! move boxes around
+
+set index 0
+set i 0
+label mx
+ set j 0
+ set k 0
+ label my
+  set k 0
+  label mz
+
+   calc xdisp = ( @i * @box + @xmin + @box/2 ) ! move 
+   calc ydisp = ( @j * @box + @ymin + @box/2 ) ! move 
+   calc zdisp = ( @k * @box + @zmin + @box/2 ) ! move 
+
+   scalar X add @xdisp select segid wat@index end
+   scalar Y add @ydisp select segid wat@index end
+   scalar Z add @zdisp select segid wat@index end
+  
+   incr index by 1
+   
+   incr k by 1
+   if @k lt @nz -
+  goto mz
+  incr j by 1
+  if @j lt @ny -
+ goto my
+ incr i by 1
+ if @i lt @nx -
+goto mx
+!
+!!!!!!!!!!!!!!!!!!! RANDOMLY ROTATE BOX ALONG CYLINDER AXIS -- ALLOWS REPEATED APPLICATION !!!!!!!!!!!!!!!!!!
+calc phi = ( ?rand * 360 ) - 180
+calc xdir = @xref1 - @xref0
+calc ydir = @yref1 - @yref0
+calc zdir = @zref1 - @zref0
+calc ndir = sqrt ( @xdir*@xdir + @ydir*@ydir + @zdir*@zdir )
+calc xdir = @xdir / @ndir 
+calc ydir = @ydir / @ndir 
+calc zdir = @zdir / @ndir 
+
+coor rota xdir @xdir ydir @ydir zdir @zdir xcen @xcen ycen @ycen zcen @zcen phi @phi select segid wat* end
+
+! delete molecules outside of the cylinder
+! 1) projection onto cylinder axis:
+scalar x store 1
+scalar sca1 add -@xref0
+scalar sca1 mult @xdir 
+!
+scalar y store 2
+scalar sca2 add -@yref0
+scalar sca2 mult @ydir 
+!
+scalar z store 3
+scalar sca3 add -@zref0
+scalar sca3 mult @zdir 
+
+scalar sca2 +store 1
+scalar sca3 +store 1 
+scalar xref = sca1 ! now xref contains the scalar product, which is the distance along the axis vector
+!!!
+! 2) distance to the axis
+scalar sca1 = xref
+scalar sca1 mult -@xdir
+scalar sca1 sum x
+scalar sca1 add -@xref0
+scalar sca1 ipow 2
+!
+scalar sca2 = xref
+scalar sca2 mult -@ydir
+scalar sca2 sum y
+scalar sca2 add -@yref0
+scalar sca2 ipow 2
+!
+scalar sca3 = xref
+scalar sca3 mult -@zdir
+scalar sca3 sum z
+scalar sca3 add -@zref0
+scalar sca3 ipow 2
+
+scalar yref = sca1
+scalar yref sum sca2
+scalar yref sum sca3
+scalar yref sqrt   ! now yref contains the distance to the cylinder axis
+! 
+
+!
+!stop
+! delete molecules outside the outer cylinder
+delete atom select .byres. (segid wat* .and. resname TIP3 .and. type OH2 .and. -
+                           ( prop xref .gt. @ndir .or. prop xref .lt. 0 .or. -
+			     prop yref .gt. @R ) ) end
+! optional:
+! delete CRYSTAL molecules outside the outer cylinder
+delete atom select .byres. (segid xwat* .and. resname TIP3 .and. type OH2 .and. -
+                           ( prop xref .gt. @ndir .or. prop xref .lt. 0 .or. -
+			     prop yref .gt. @R ) ) end
+
+! delete molecules overlapping with solute
+delete atom select .byres. (segid wat* .and. resname TIP3 .and. type OH2 .and. -
+                           ( (solute .and. .not. (hydrogen .or. lone) ) .around. @overlap ) ) end
+
+! delete molecules outside the hexagon
+
+calc rin = sqrt ( 3.0 ) / 2.0 * @R ! inner radius
+define test select prop yref .gt. @rin .and. segid wat* .and. type OH2 end
+if ?nsel .eq. 0 goto nothingtodo
+
+quick select atom ?selsegi ?selresi OH2 end
+set xre ?xval ! reference coords
+set yre ?yval
+set zre ?zval
+! project out axial component
+calc proj =   ( @xre - @xref0 ) * @xdir + ( @yre - @yref0 ) * @ydir + ( @zre - @zref0 ) * @zdir
+calc xre = @xre - @xdir * @proj - @xref0
+calc yre = @yre - @ydir * @proj - @yref0
+calc zre = @zre - @zdir * @proj - @zref0
+! normalize projected vector 
+calc nre = sqrt ( @xre*@xre + @yre*@yre + @zre*@zre )
+calc xre = @xre / @nre
+calc yre = @yre / @nre
+calc zre = @zre / @nre
+
+scalar sca1 set 0
+
+calc pio3 = ?PI / 3.0
+calc fact =  ( 6.0 / ?PI * ( sqrt ( 3.0 ) / 2 - 1 ) )
+
+! turn off messages
+set prn ?prnlev
+prnlev 0
+
+label hexagon
+! now loop over all water molecules between the inner and outer cylinders
+
+quick select atom ?selsegi ?selresi OH2 end
+set xte ?xval ! reference coords
+set yte ?yval
+set zte ?zval
+ 
+! project out axial component
+calc proj =   ( @xte - @xref0 ) * @xdir + ( @yte - @yref0 ) * @ydir + ( @zte - @zref0 ) * @zdir
+calc xte = @xte - @xdir * @proj - @xref0
+calc yte = @yte - @ydir * @proj - @yref0
+calc zte = @zte - @zdir * @proj - @zref0
+! normalize projected vector 
+calc nte = sqrt ( @xte*@xte + @yte*@yte + @zte*@zte ) ! this is also the radius
+calc xte = @xte / @nte
+calc yte = @yte / @nte
+calc zte = @zte / @nte
+
+! calculate angle -- trap roundoff error
+calc cosine = @xte*@xre + @yte*@yre + @zte*@zre
+if @cosine .gt. 1 set cosine 1.0
+if @cosine .lt. -1 set cosine -1.0
+
+calc th = acos ( @cosine )
+calc th = abs ( @th )
+calc th =  @th - int ( @th / @pio3) * @pio3 ! modulo pi/3, 60 deg
+calc th6 = 6.0*@th
+if @th6 .gt. ?PI calc th = @pio3 - @th ! if theta > pi/6, reverse direction!
+
+!scalar xref set @th select atom ?selsegi ?selresi * end
+
+!calc rmax = @R + @R * @th * ( 6.0 / ?PI * ( sqrt ( 3.0 ) / 2 - 1 ) ) 
+calc rmax = @R + @R * @th * @fact 
+
+if @nte .gt. @rmax then 
+ scalar sca1 set 1 select atom ?selsegi ?selresi * end ! mark for deletion
+endif
+ 
+define test select test .and. .not. atom ?selsegi ?selresi * end
+
+if ?nsel .gt. 0 -
+goto hexagon
+
+! turn messages back on
+prnlev @prn
+
+delete atom select prop sca1 .eq. 1 end
+
+label nothingtodo
+
+!renumber segments: the above tricks are necessary in case there are segments that have been deleted completely
+! goto debug
+bomblev -2
+calc ind1 @nbox + 1
+label renu1
+ decr ind1 by 1
+ if @ind1 lt 1 goto done
+
+ define seg1 select segid wat@ind1 end
+ if ?nsel .eq. 0 goto renu1
+ set ind2 @ind1
+ label renu2
+  decr ind2 by 1
+  if @ind2 lt 0 goto done
+  define seg2 select segid wat@ind2 end
+  if ?nsel .eq. 0 goto renu2
+  join wat@ind2 wat@ind1 renumber
+  set ind1 @ind2
+ goto renu2 
+label done 
+rename segid wat0 select segid wat* end
+!label debug
+
+! concatenate subsystems
+replica reset  ! NOTE this command is essential !
+
+

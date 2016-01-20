@@ -1,0 +1,74 @@
+#!/bin/bash
+
+# local install
+charmrun=~/usr/bin/charmrun
+namd2=~/usr/bin/namd2
+# binaries
+charmrun=~/src/NAMD_2.6_Linux-amd64/charmrun
+namd2=~/src/NAMD_2.6_Linux-amd64/namd2
+# TCP
+#charmrun=~/src/NAMD_2.6_Linux-amd64-TCP/charmrun
+#namd2=~/src/NAMD_2.6_Linux-amd64-TCP/namd2
+
+#daedalus/quantum
+nodes=( 017 018 019 )
+local=1
+ppn=8
+
+echo "group main">nodelist
+count=0
+
+if [ $local -eq 1 ]; then 
+ echo host `hostname`>nodelist; 
+ count=$(($count+1)); 
+fi ;# only if running locally too
+
+for i in ${nodes[@]}
+do
+ echo n$i>>NODES
+ echo "host n$i">>nodelist
+ count=$(($count+1))
+done
+
+nproc=$(($count*$ppn)) ; # 2 cpus per node
+################################################################
+
+name=m6ppstr
+template=minimize
+
+# minimize just once with the protein and crystal waters fixed
+
+ output=mini
+ flag=fixed
+ for nrun in `seq 1 1`
+ do
+   count=$(($nrun-1))
+   script=_mini$count$flag
+
+   echo '#!/bin/vmd' > $script
+   echo '#variable parameters (automatic)' >> $script
+   grep -i set boxsize.str | awk '{ print tolower($0)}' >> $script
+
+   echo set count $count >> $script 
+#   echo set cscale `echo 61-$count*10 |bc `  >> $script
+   echo set cscale 0 >>$script ;# turn off restraints
+   echo set nsteps 1000 >>   $script
+   
+   echo set fixedflag on >>$script
+   echo set consCol O >>$script
+
+   echo set name $name >> $script
+   echo set output $output$count$flag >>$script
+   echo set restart $output$(($count-1))$flag >>$script
+
+   cat $template >> $script
+  
+  $charmrun $namd2 +p$nproc $script  &>$output$count$flag
+
+######################
+ if [ $? -ne 0 ];  then
+   echo Execution interrupted due to errors during run $nrun.
+   exit
+ fi 
+ 
+done

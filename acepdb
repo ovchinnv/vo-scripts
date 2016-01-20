@@ -1,0 +1,21 @@
+#!/bin/vmd
+
+mol delete all
+
+set conf helix
+set conf sheet
+
+mol load psf hpin_${conf}-x.psf pdb hpin_${conf}.pdb
+
+set all [atomselect top all]
+set protein [atomselect top "protein"]
+set solvent [atomselect top "not protein"]
+
+$all set beta 0
+$protein set beta 1 ; # force constants
+$protein set occupancy 0 ; # type of restraint (0: XYZ directions)
+
+$solvent set beta 0
+
+animate write pdb hpin_${conf}-a.pdb
+

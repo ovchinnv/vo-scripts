@@ -1,0 +1,70 @@
+#!/bin/vmd
+
+# generates pdb files for fixed/restrained atoms
+
+package require psfgen
+#################################
+set toppar /home/taly/charmm/c34a2/toppar
+psfcontext reset
+topology ${toppar}/top_all27_prot_na.rtf
+topology ${toppar}/stream/toppar_all27_na_nad_ppi.str
+
+######## first VMD stuff #####################
+#set psffile prigornl-x
+set pdbfile prigor2_am
+
+# read psf
+#readpsf  ${psffile}.psf;
+#coordpdb ${pdbfile}.pdb;
+
+########## LOAD INTO VMD ################################
+#mol delete all
+#mol load psf ${psffile}.psf pdb ${pdbfile}.pdb
+mol load pdb ${pdbfile}.pdb
+
+set all      [atomselect top all]
+set fixed    [atomselect top "protein or resname ATP or resname MG"]
+set harmonic [atomselect top "backbone"]
+#set TMD      [atomselect top "backbone"]
+set TMD      [atomselect top "not ( hydrogen or water ) "]
+
+#set TMD      [atomselect top "(backbone or resname ATP or resname MG) and not ( hydrogen or residue 593 to 634 )"]
+
+atomselect macro Ploop   { segname HC and (residue 162 to 169 )}
+atomselect macro Switch1 { segname HC and (residue 207 to 219 )}
+atomselect macro MgATP     { resname ATP or resname MG }
+
+set TMDorient [atomselect top "( Ploop or Switch1 ) and not hydrogen"]
+#set TMD      [atomselect top "(protein or resname ATP or resname MG) and not hydrogen"]
+#set TMD      [atomselect top "(backbone and protein or resname ATP or resname MG) and not hydrogen"]
+set TMDforce  [atomselect top "(resname ATP or resname MG) and not hydrogen"]
+
+
+$all set beta 0
+$all set occupancy 0
+#$all set x 0
+#$all set y 0
+#$all set z 0
+
+#$fixed set x 1      ;# put fixed atom flag in x
+#$harmonic set y 1  ; # put restrained atom force constant in y (in kcal/mol)
+# use constraintScaling to scale up forces !!!!!!!!!!
+#$harmonic set z 10  ; #decreasing restraints
+#$harmonic set occupancy 5
+
+#$TMDorient set occupancy 1
+#$TMDforce set beta 1
+
+# force & orient the same atoms
+#$TMDorient set beta 1
+#$TMDforce set occupancy 1
+
+$TMD set beta 1
+$TMD set occupancy 1
+
+
+#$harmonic set occupancy 1
+#$all writepdb ${pdbfile}.res
+animate write pdb prigor2_all.tmd beg 0 skip 1 sel [atomselect top all]
+
+

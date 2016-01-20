@@ -1,0 +1,9 @@
+#!/bin/vmd
+
+mol delete all
+set len 100
+set r0 {}; lappend r0 -$len -$len -$len
+set r1 {}; lappend r1  $len  $len  $len
+set r12 {}; lappend r12 $r0 $r1
+solvate -o __box -spsf __solvent.psf -spdb __solvent.pdb -s W -ws 18.856 -minmax $r12
+

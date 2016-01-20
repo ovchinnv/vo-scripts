@@ -1,0 +1,4 @@
+* energy criterion for accepting/rejecting a rotation
+*
+energy
+set energy ?ENER

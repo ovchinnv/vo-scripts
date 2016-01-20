@@ -1,0 +1,10 @@
+#!/usr/bin/tclsh
+################### colors ##########################
+
+set blue 0; set red 1;  set gray 2; set orange 3; set yellow 4; set tan 5; set silver 6; set green 7;  
+set white 8; set pink 9; set cyan 10; set purple 11 ;set lime 12 ; set mauve 13 ;set ochre 14 ;set iceblue 15;
+set black 16; set yellow2 17 ;set yellow3 18; set green2 19 ;set green3 20 ;set cyan2 21 ; set cyan3 22 ;set blue2 23;
+set blue3 24; set violet 25; set violet2 26 ;set magenta 27 ;set magenta2 28 ;set red2 29 ;set red3 30; set orange2 31;
+set orange3 32;
+
+#####################################################

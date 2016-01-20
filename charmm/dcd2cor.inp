@@ -1,0 +1,30 @@
+* write out trajectory frames as separate coordinate files
+*
+
+set psffile ../hpin_27
+set dcdfile hpin0_0
+set outbasename cor/hpin0_
+
+!**************************************
+
+read psf card name @{psffile}.psf
+open read file name @{dcdfile}.dcd unit 1
+traj query unit 1
+
+set skip ?skip
+set begin ?start
+set nfile ?nfile
+
+traj iread 1 begin @begin skip @skip nfile @nfile
+
+set i 1
+label loop
+ traj read 
+ write coor card name @{outbasename}@{i}.cor
+ incr i by 1
+ if @i .le. @nfile -
+goto loop
+
+stop
+
+

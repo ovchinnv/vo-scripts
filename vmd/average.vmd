@@ -1,0 +1,66 @@
+#!/bin/vmd
+# compute average structure from a trajectory
+# assume that the frames are oriented properly
+#
+############################################################################
+set id  [molinfo top ];
+set nf  [molinfo $id get numframes];
+set all [atomselect $id all frame 0];
+
+set x [$all get x];
+set natom [llength $x] 
+
+if { [info exists xave] } {unset xave}
+if { [info exists yave] } {unset yave}
+if { [info exists zave] } {unset zave}
+#
+for { set i 0 } { $i<$natom } { incr i } {
+ set xave($i) 0;
+ set yave($i) 0;
+ set zave($i) 0;
+}
+#
+for { set i 0 } { $i<$nf } { incr i } {
+ puts $i ; # frame number
+#
+ $all frame $i ; #change frame
+ set x0 [$all get x];
+ set y0 [$all get y];
+ set z0 [$all get z];
+#
+ set j 0
+ foreach x1 $x0 y1 $y0 z1 $z0 {
+#
+  set xave($j) [expr {$xave($j)+$x1}];
+  set yave($j) [expr {$yave($j)+$y1}];
+  set zave($j) [expr {$zave($j)+$z1}];
+#
+  incr j
+ }  
+}
+# divide by number of frames and convert to list form
+#
+ set xavg {}
+ set yavg {}
+ set zavg {}
+#
+ set f [expr {1.0/$nf}];
+ for { set i 0 } { $i<$natom } { incr i } {
+#
+  lappend xavg [expr {$xave($i)*$f}] 
+  lappend yavg [expr {$yave($i)*$f}] 
+  lappend zavg [expr {$zave($i)*$f}] 
+#
+ }  
+# create a new frame by duplicating first and overwriting selected coordinates 
+# with the average cooridnates
+animate dup frame 0 $id
+#animate write pdb trash0.dat beg 0 end 0
+$all frame $nf ; # index of new frame is nf
+update
+$all set x $xavg
+$all set y $yavg
+$all set z $zavg
+#animate write pdb trash.dat beg $nf
+unset xave yave zave xavg yavg zavg
+#############################################################################

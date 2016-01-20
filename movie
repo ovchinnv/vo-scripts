@@ -1,0 +1,9 @@
+#!/bin/bash
+#mencoder "mf://*.ppm" -mf fps=30 -o output.avi -ovc lavc -lavcopts vcodec=mpeg2video:vbitrate=4900
+#mencoder "mf://*.jpg" -mf fps=30 -o PP2Along.mpg -of mpeg -ovc lavc -lavcopts vcodec=mpeg2video:vbitrate=4900
+#mencoder "mf://*.jpg" -mf fps=30 -o PP2Along.mpg -of mpeg -mpegopts format=mpeg1:vbitrate=4900 -ovc lavc
+#ffmpeg -r 10 -i m6path.%04d.ppm -r 15 -b 4000000 m6path.mp4
+ffmpeg -r 10 -i untitled.%05d.ppm -r 15 -b 4000000 m6path.mp4
+
+
+

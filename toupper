@@ -1,0 +1,9 @@
+#!/bin/bash
+
+for file in `ls` ; do
+
+ newfile=`echo $file | tr '[:lower:]' '[:upper:]'`
+
+ mv -f $file $newfile
+
+done

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+
+sed 's/^[Cc]/!/' $1 > temp_
+mv -f temp_ $1
+#awk '{ if (substr($0,1,1) != "!") { print "     ",$0} else { print $0} }' temp_
+#rm -f temp_
+

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ -z $1 ] ; then 
+ echo "USAGE : mol2pdb <mol2 file> <pdb file(optional)>"
+ exit 1;
+else
+ mol2file=$1
+fi
+#
+if [ -x $2 ] ; then
+ pdbfile=${mol2file%%.*}.pdb
+else
+ pdbfile=$2
+fi
+
+vmd -dispdev text <<EOF
+mol load mol2 $mol2file
+animate write pdb $pdbfile
+EOF

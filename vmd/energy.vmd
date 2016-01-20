@@ -1,0 +1,8 @@
+#!/bin/vmd
+
+set parfile "/home/taly/charmm/parameters/c36/acemd/par_all36_prot_na.prm"
+set output energy.dat
+set sel1 [atomselect top all];
+
+# self-energy
+namdenergy -all -sel ${sel1} -exe [pwd]/namd -diel 1.0 -cutoff 100 -switch 99 -ofile $output -par $parfile -debug

@@ -1,0 +1,68 @@
+* merge trajectory files; also remove waters;
+*
+
+set psffile ../m6ppstr
+set corfile ../m6ppstr
+
+stream readpsf.str
+
+set nfiles 8
+set basename ../tmd
+set flag Cleft_
+set outname tmd_m6ppstr_now
+
+! open source dcd files
+
+set file 21
+set i 0 ! file counter
+label fileloop
+ open read file unit @file name @basename@i@flag.dcd
+ incr i by 1
+ incr file by 1
+ if @i .lt. @nfiles -
+goto fileloop
+
+traj query unit 21
+set freq 10
+calc skip = ( ?skip * @freq )
+set begin ?start
+calc nfile =  ( ?nfile * @nfiles / @freq )
+
+!open target dcdfile
+open write file unit 77 name @outname@freq.dcd
+!define atoms that we keep
+define solute select ( segid HC .or. segid LC .or. segid ADP .or. segid MG .or. segid XWAT .or. segid PHOS) end
+define NBP select ( segid HC .and. ( resid 151 : 157 .or. resid 195 : 205 ) ) end 
+define nearatp select .byres. ( segid MG .around. 5) end
+define keep select solute .or. nearatp end 
+define orient select ( segid HC .or. segid LC .or. segid ADP .or. segid MG .or. segid PHOS ) end
+
+!load file for orientation
+!open read card unit 7 name 
+!read coor card unit 7 comp resid ! comment out coor comp below
+
+!goto skip_merge
+! merge & trim dcd
+coor copy comp ! put initial coordinates into comp for alignment (when doing rigor, align with this set, too!)
+merge firstu 21 nunit @nfiles nfile @nfile outputu 77 begin ?start skip @skip select keep end orie mass sele orient end
+label skip_merge
+
+! delete waters from PSF
+delete atom select .not. keep end
+write psf card name @psffile_nowat.psf
+
+!#####################################
+! open new files
+
+delete atom select all end
+read psf card name @psffile_nowat.psf
+
+open file read unit 1 name @outname@freq.dcd 
+coor dyna firstu 1 nunit 1 ! compute average structure
+write coor card name @outname@freq.avg.cor
+
+
+
+
+
+

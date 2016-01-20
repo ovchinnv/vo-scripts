@@ -1,0 +1,48 @@
+#!/bin/vmd
+
+cd ../
+source view
+cd sym
+
+set symfile ../symm.dat
+
+set fid [open $symfile r];
+
+puts "Reading symmetry operations:"
+
+set isym 0
+set ok [ gets $fid line ];
+while { $ok > -1 } {
+# read roto-translation matrix
+ set a {}
+ for {set i 0}  {$i<3}  {incr i } {
+puts $line
+  foreach {x y z d} $line { lappend a "$x $y $z $d" ; set ok [gets $fid line]; }
+ }
+ lappend a { 0. 0. 0. 1. }
+puts "----------"
+#
+ incr isym ; 
+ set all [atomselect top "all"];
+ $all move $a
+ $all writepdb sym$isym.pdb
+# undo rotation
+ $all move [measure inverse $a];
+}
+
+for {set j 1 } {$j<=$isym} {incr j} {
+ mol load pdb sym${j}.pdb
+ set m [molinfo top];
+ mol delrep 0 $m ;
+#
+ mol representation $style
+ mol selection rab and $cons
+ mol color colorid $j
+ mol addrep $m
+
+ mol representation lines
+ mol selection rab and $cons
+ mol color colorid $j
+ mol addrep $m
+
+}

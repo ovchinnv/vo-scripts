@@ -1,0 +1,46 @@
+#!/bin/vmd
+######### domains from rigid domain search #################
+########## domain definitions from Anne Houdusse; used my seq. alignment to go from 1VOM to 2MYS #############
+
+atomselect macro SH3     {resid 37 to 78 }
+atomselect macro Nterm   {resid 79 to 200 or resid 668 to 697 }
+
+
+atomselect macro Ploop   {resid 179 to 187}
+atomselect macro Loop1   {resid 201 to 208}
+
+atomselect macro Switch1 {resid 236 to 246}
+
+atomselect macro U50Lp2 {resid 625 to 648}
+atomselect macro U50 {resid 226 to 449 or resid 607 to 624 or U50Lp2}
+
+atomselect macro HCMLoop {resid 406 to 418}
+
+atomselect macro Switch2 {resid 464 to 475}
+atomselect macro L50 {resid 476 to 600 or resid 649 to 667}
+atomselect macro RelayH   {resid 476 to 508} ;# 484
+atomselect macro RelayL   {resid 509 to 521}
+atomselect macro Relay {RelayH or RelayL}
+
+atomselect macro Strut   {resid 601 to 606}
+
+atomselect macro SH2Loop {resid 698 to 700}
+atomselect macro SH1Helix {resid 700 to 710}
+atomselect macro SH1Loop {resid 711 to 713}
+
+
+atomselect macro Converter {resid 714 to 727 or resid 757 to 779 } ;# ok
+atomselect macro BBulge  {resid 247 to 268} ;#ok
+atomselect macro Linker  {resid 450 to 458} ;#ok
+atomselect macro Beta5   {resid 459 to 463} ;#ok
+atomselect macro HGHelix {resid 219 to 225}
+atomselect macro Transducer {Loop1 or HGHelix or BBulge or Linker or Beta5}
+
+############################## additional macros (mine) ###########
+
+
+atomselect macro TransHelix {resid 219 to 225}
+
+atomselect macro NtHelix {resid 188 to 200}
+
+###############################################################

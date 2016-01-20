@@ -1,0 +1,21 @@
+#!/bin/tcl
+# align frames for top molecule w.r.t. first frame
+#
+############################################################################
+set id [ molinfo top ];
+set nf [molinfo $id get numframes];
+
+if { ![info exists "selection"] } {
+ set selection "protein"
+}
+
+puts "Checking chirality of all amino acid backbone centers based on '$selection' ... "
+#
+for { set i 0 } { $i<$nf } { incr i } {
+ animate goto $i
+ puts "FRAME: $i"
+ puts "*********************************************************************"
+ chirality check -mol $id
+}
+
+#############################################################################

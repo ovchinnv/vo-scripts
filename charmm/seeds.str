@@ -1,0 +1,8 @@
+* compute random seeds
+*
+
+coor stat
+calc isd1 = abs ( int ( ?xmin ) * ( ?mynode + 1 ) ) + 10**1
+calc isd2 = abs ( int ( ?ymin ) * ( ?mynode + 1 ) ) + 10**2
+calc isd3 = abs ( int ( ?zmin ) * ( ?mynode + 1 ) ) + 10**3
+calc isd4 = abs ( int ( ?xmax ) * ( ?mynode + 1 ) ) + 10**4

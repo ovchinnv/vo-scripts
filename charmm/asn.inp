@@ -1,0 +1,14 @@
+* print out histidines
+*
+
+
+set version 19
+set psffile prigor19
+set corfile prigor19_3
+stream readpsf.str
+
+write coor pdb name asn.pdb select resname ASN .and. type CA end
+
+
+! try thr min dist command
+

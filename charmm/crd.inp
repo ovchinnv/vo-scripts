@@ -1,0 +1,79 @@
+* prepare for solvation
+*
+
+if @?outname eq 0 set outname unknown
+if @?format eq 0 set format card
+
+set version 27
+set modify
+
+stream readpsf.str
+
+open unit 1 read card name hc.pdb
+read sequ pdb unit 1
+generate HC setup warn first nter last cter
+read coor pdb unit 1 resid
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+open unit 1 read card name ec.pdb
+read sequ pdb unit 1
+generate EC setup warn first nter last cter
+
+if @?modify .ne. 0 then 
+ patch ASPP EC 159 setup warn
+! patch ASPP RC 16
+! patch ASPP RC 121
+endif
+read coor pdb unit 1 resid
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+open unit 1 read card name rc.pdb
+read sequ pdb unit 1
+generate RC setup warn first nterm last cterm
+
+if @?modify .ne. 0 then
+ patch ASPP RC 153
+! patch GLUP EC 84
+! patch GLUP EC 76
+ autogen angles dihe
+endif
+read coor pdb unit 1 resid
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+open unit 1 read card name cal.pdb
+read sequ pdb unit 1
+generate CAL setup warn noangle nodihe
+read coor pdb unit 1 resid
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+open unit 1 read card name xwat.pdb
+read sequ pdb unit 1
+generate xwat setup warn noangle nodihe
+read coor pdb unit 1 resid
+join renu xwat
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+open unit 1 read card name pot.pdb
+read sequ pdb unit 1
+generate ion1 setup warn noangle nodihe
+read coor pdb unit 1 resid
+join renu ion1
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+open unit 1 read card name cla.pdb
+read sequ pdb unit 1
+generate ion2 setup warn noangle nodihe
+read coor pdb unit 1 resid
+join renu ion2
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+open unit 1 read card name wat_1.pdb
+read sequ pdb unit 1
+generate wat1 setup warn noangle nodihe
+read coor pdb unit 1 resid
+join renu wat1
+rename segid wt select segid wat1 end
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+write psf card name lasq.psf
+write coor card name lasq.cor
+
+
+! done!
+
+
+

@@ -1,0 +1,138 @@
+##########################################
+CFLAGS	= mpif77 -r8 -O3 -tpp7 -132 -WB -W0 -DDOUBLE -DCRAY -DOUT -c -Dimmbnd  #-DLES#-Mvect=prefetch  
+LDFLAGS = mpif77 -O3 -tpp7 -Bstatic -o 
+
+CMD     = ../eddy_fstle
+
+##########################################################################
+.SUFFIXES:  .F 
+.F.o:
+	 $(CFLAGS) $<
+
+.f.o:
+	 $(CFLAGS) $<	
+OBJ = \
+main.o \
+eddy_bl_f_old.o\
+IO.o\
+probe.o\
+refreshbc.o\
+swap.o\
+presdp2p.o\
+ boundary_exp.o\
+ boundary_imp.o\
+ setup.o\
+ srcterms.o\
+ timeindeg.o\
+ timestep.o\
+ turvis.o\
+ rhs.o\
+ peter.o\
+ inout.o\
+ info.o\
+ tecplot.o\
+ plot.o\
+ numrec.o \
+ h3dcy2_fftw.o \
+ fft99.o\
+ slice.o\
+ spacedevel.o\
+ timedevel.o\
+ filter.o\
+ center.o\
+ multigrdset.o\
+ multigrdsolver.o\
+ tridag.o\
+ exasol.o\
+ massbal.o\
+ resid.o\
+ rescale.o\
+ lagrange.o\
+ poissx.o\
+ poistg.o\
+ direct.o\
+ cfftlib_4p.o\
+ peqinit.o\
+ nag_4p.o\
+ statistiche.o\
+forcing.o\
+scrivi.o\
+setup_ose.o\
+setinterp_ose.o\
+blas_ose.o\
+grid_ose.o\
+pentdiag.o\
+ose.o\
+rsbud3.o\
+blktri.o\
+pfft_yz.o\
+tridiag.o\
+2ptcorr.o
+
+$(CMD):		$(OBJ)
+		@echo Make_old: ... compiling $@
+		$(LDFLAGS) $(@) $(OBJ) $(LIBS)
+
+dep:
+	makedepend *.F *.f *.h
+# DO NOT DELETE
+main.o :*.h Make_old
+eddy_bl_f_old.o:*.h Make_old
+IO.o:*.h Make_old
+probe.o:*.h Make_old
+refreshbc.o:*.h Make_old
+swap.o:*.h Make_old
+presdp2p.o:*.h Make_old
+ boundary_exp.o:*.h Make_old
+ boundary_imp.o:*.h Make_old
+ setup.o:*.h Make_old
+ srcterms.o:*.h Make_old
+ timeindeg.o:*.h Make_old
+ timestep.o:*.h Make_old
+ turvis.o:*.h Make_old
+ rhs.o:*.h Make_old
+ peter.o:peter.F *.h Make_old
+ inout.o:*.h Make_old
+ info.o:*.h Make_old
+ tecplot.o:*.h Make_old
+ plot.o:*.h Make_old
+ numrec.o:*.h Make_old
+ h3dcy2_fftw.o:*.h Make_old
+ fft99.o:*.h Make_old
+ slice.o:*.h Make_old
+ spacedevel.o:*.h Make_old
+ timedevel.o:*.h Make_old
+ filter.o:*.h Make_old
+ center.o:*.h Make_old
+ multigrdset.o:*.h Make_old
+ multigrdsolver.o:*.h Make_old
+ tridag.o:*.h Make_old
+ exasol.o:*.h Make_old
+ massbal.o:*.h Make_old
+ resid.o:*.h Make_old
+ rescale.o:*.h Make_old
+ lagrange.o:*.h Make_old
+ h3dndc.o:*.h Make_old
+ poissx.o:*.h Make_old
+ poistg.o:*.h Make_old
+ direct.o:*.h direct.F Make_old
+ blktri.o:*.h Make_old
+ cfftlib_4p.o:*.h Make_old
+ peqinit.o:*.h Make_old
+ nag_4p.o:*.h Make_old
+ statistiche.o:*.h Make_old
+forcing.o:*.h Make_old
+scrivi.o:*.h Make_old
+ose.o:*.h Make_old
+setup_ose.o:*.h Make_old
+setinterp_ose.o:*.h Make_old
+blas_ose.o:*.h Make_old
+grid_ose.o:*.h Make_old
+pentdiag.o:*.h Make_old
+rsbud3.o:*.h rsbud3.F Make_old
+pfft_yz.o:*.h pfft_yz.F
+tridiag.o: tridiag.f Make_old
+2ptcorr.o: 2ptcorr.f dimension.h Make_old
+
+
+

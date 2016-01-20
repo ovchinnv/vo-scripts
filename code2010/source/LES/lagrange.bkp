@@ -1,0 +1,120 @@
+c---------------------------------------------------------------------
+      subroutine lagrange(vin1,vin2,vout1,vout2,
+     &                    uc,vc,wc,xc,yc,zc,dt,im,jm,km)
+c
+c     given intergal at i,j,k returns value at (n-1) along 
+c     fluid pathline
+c
+      include 'common.h'
+c
+      REAL vin1(im,jm,km),vout1(im,jm,km)
+      REAL vin2(im,jm,km),vout2(im,jm,km)
+      REAL uc(im,jm,km),vc(im,jm,km),wc(im,jm,km)
+      REAL xc(im),yc(jm),zc(km)
+      REAL dt
+c
+      REAL    xpar,ypar,zpar
+      REAL    csi,xni,eta
+      REAL    fn1,fn2,fn3,fn4,fn5,fn6,fn7,fn8
+      INTEGER ixpos,jypos,kzpos
+c
+      DO 10 i=2,ix2
+       DO 20 j=2,jy2
+        DO 30 k=2,kz2
+c...particle possition at t-dt
+      xpar=xc(i)-uc(i,j,k)*dt
+      ypar=yc(j)-vc(i,j,k)*dt
+      zpar=zc(k)-wc(i,j,k)*dt
+c...find lower corner of the cell containing the particle
+c....x-dir
+      if(xpar.le.xc(1).or.xpar.ge.xc(ix2+1)) then
+         write(6,*) 'x-uDt out of bounds',xpar
+      endif
+      if(ypar.le.yc(1).or.ypar.ge.yc(jy2+1)) then
+         write(6,*) 'y-uDt out of bounds',ypar
+       endif
+      if(zpar.le.zc(1).or.zpar.ge.zc(kz2+1)) then
+         write(6,*) 'z-uDt out of bounds',zpar
+      endif
+      
+c        ixpos=1
+c        xpar=0.0
+c      elseif(xpar.ge.xc(ix2)) then
+c        ixpos=ix2-1
+c        xpar=xc(ix2+1)
+c      else
+        call locate(xc,im,xpar,ixpos)
+c      endif
+c....y-dir
+c      if(ypar.le.yc(1)) then
+c        jypos=1
+c        ypar=0.0
+c      elseif(ypar.ge.yc(jy2)) then
+c        jypos=jy2-1
+c        ypar=yc(jy2+1)
+c      else
+        call locate(yc,jm,ypar,jypos)
+c      endif
+c....z-dir
+c      if(zpar.le.zc(1)) then
+c        kzpos=1
+c        zpar=0.0
+c      elseif(zpar.ge.zc(kz2)) then
+c        kzpos=kz2-1
+c        zpar=zc(kz2+1)
+c      else
+        call locate(zc,km,zpar,kzpos)
+c      endif
+c
+c....particle is located between ixpos and ixpos+1
+c                                jypos and jypos+1
+c                                kzpos and jypos+1
+c...interlopate between above values to find varout
+c....math scace coordinates
+         csi=(xpar-xc(ixpos))/(xc(ixpos+1)-xc(ixpos))
+         xni=(ypar-yc(jypos))/(yc(jypos+1)-yc(jypos))
+         eta=(zpar-zc(kzpos))/(zc(kzpos+1)-zc(kzpos))
+c....weights
+c     point 1: i,j,k
+         fn1=(1.-csi)*(1.-xni)*(1.-eta)
+c     point 2: i,j+1,k
+         fn2=(1.-csi)*    xni *(1.-eta)
+c     point 3: i,j+1,k+1  
+         fn3=(1.-csi)*    xni*     eta
+c     point 4: i,j,k+1
+         fn4=(1.-csi)*(1.-xni)*    eta
+c     point 5: i+1,j,k
+         fn5=    csi* (1.-xni)*(1.-eta)
+c     point 6: i+1,j+1,k
+         fn6=    csi*     xni *(1.-eta)
+c     point 7: i+1,j+1,k+1
+         fn7=    csi*     xni *    eta
+c     point 8: i+1,j,k+1
+         fn8=    csi* (1.-xni)*    eta
+c     values
+         vout1(i,j,k)=vin1(ixpos  ,jypos  ,kzpos  )*fn1+
+     &                vin1(ixpos  ,jypos+1,kzpos  )*fn2+
+     &                vin1(ixpos  ,jypos+1,kzpos+1)*fn3+
+     &                vin1(ixpos  ,jypos  ,kzpos+1)*fn4+
+     &                vin1(ixpos+1,jypos  ,kzpos  )*fn5+
+     &                vin1(ixpos+1,jypos+1,kzpos  )*fn6+
+     &                vin1(ixpos+1,jypos+1,kzpos+1)*fn7+
+     &                vin1(ixpos+1,jypos  ,kzpos+1)*fn8
+c
+         vout2(i,j,k)=vin2(ixpos  ,jypos  ,kzpos  )*fn1+
+     &                vin2(ixpos  ,jypos+1,kzpos  )*fn2+
+     &                vin2(ixpos  ,jypos+1,kzpos+1)*fn3+
+     &                vin2(ixpos  ,jypos  ,kzpos+1)*fn4+
+     &                vin2(ixpos+1,jypos  ,kzpos  )*fn5+
+     &                vin2(ixpos+1,jypos+1,kzpos  )*fn6+
+     &                vin2(ixpos+1,jypos+1,kzpos+1)*fn7+
+     &                vin2(ixpos+1,jypos  ,kzpos+1)*fn8
+
+ 30   CONTINUE
+ 20   CONTINUE
+ 10   CONTINUE
+
+         RETURN
+         END
+
+

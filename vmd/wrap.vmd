@@ -1,0 +1,12 @@
+#!/bin/vmd
+# wrap trajectory
+# assume lattice vectors loaded
+############################################################################
+set id [ molinfo top ];
+set nf [molinfo $id get numframes];
+
+puts "Wrapping coordinate frames..."
+
+for { set i 0 } { $i<$nf } { incr i } {
+}
+#############################################################################

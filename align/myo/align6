@@ -1,0 +1,86 @@
+#!/usr/bin/tclsh
+
+set fid  [open "0myo6" r];
+set fido [open "seqal6" w];
+
+set keyword "NULL";
+
+puts $fido "1VOM \t 2BKH \t 1OE9"
+
+set nseq 3;
+set counter1 0;
+set counter2 0;
+set counter3 0;
+#set counter4 0;
+#set counter5 0;
+#set counter6 0;
+
+while { [gets $fid line1] > -1} { 
+   set keyword [string range $line1 0 10]
+   while { ([lsearch -exact $keyword "MYS2_DICDI"] < 0) } {
+     gets $fid line1  
+     set keyword [string range $line1 0 10]
+   }
+# found !
+
+gets $fid line2
+gets $fid line3
+#gets $fid line4
+#gets $fid line5
+#gets $fid line6
+
+set l [string length $line1]
+
+set seq1 [string range $line1 17 $l]
+set seq2 [string range $line2 17 $l]
+set seq3 [string range $line3 17 $l]
+#set seq4 [string range $line4 18 $l]
+#set seq5 [string range $line5 18 $l]
+#set seq6 [string range $line6 18 $l]
+
+set n [string length $seq1];
+for { set i 0 } { $i<$n}  { incr i } {
+ set aa [string range $seq1 $i $i]
+ if { [string equal $aa "-"] } {
+  set out1 "$aa    "
+ } else {
+  set out1 "[incr counter1] $aa"
+ }
+ set aa [string range $seq2 $i $i]
+ if { [string equal $aa "-"] } {
+  set out2 "$aa    "
+ } else {
+  set out2 "[incr counter2] $aa"
+ }
+ set aa [string range $seq3 $i $i]
+ if { [string equal $aa "-"] } {
+  set out3 "$aa    "
+ } else {
+  set out3 "[incr counter3] $aa"
+ }
+# set aa [string range $seq4 $i $i]
+# if { [string equal $aa "-"] } {
+#  set out4 "$aa    "
+# } else {
+#  set out4 "[incr counter4] $aa"
+# }
+# set aa [string range $seq5 $i $i]
+# if { [string equal $aa "-"] } {
+#  set out5 "$aa    "
+# } else {
+#  set out5 "[incr counter5] $aa"
+# }
+# set aa [string range $seq6 $i $i]
+# if { [string equal $aa "-"] } {
+#  set out6 "$aa    "
+# } else {
+#  set out6 "[incr counter6] $aa"
+# }
+ puts $fido "$out1 \t $out2 \t $out3 " 
+# puts "$out1 \t $out2 \t $out3 \t $out4 \t $out5 \t $out6" 
+ }
+}
+ 
+ 
+ 
+ # use: a2ps --columns=4 --chars-per-line=40 -o mama seqhc

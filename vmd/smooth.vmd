@@ -1,0 +1,51 @@
+#!/usr/bin/vmd
+
+set id [expr {[molinfo top] - 1}];
+set nf [molinfo $id get numframes];
+
+set all [atomselect $id "all"];
+
+
+
+$all frame 1;
+set xm [$all get x];
+set ym [$all get y];
+set zm [$all get z];
+
+$all frame 2;
+set x [$all get x];
+set y [$all get y];
+set z [$all get z];
+
+for {set i 3} {$i<=$nf} {incr i} {
+
+ $all frame $i;
+
+ puts $i
+
+ set xp [$all get x];
+ set yp [$all get y];
+ set zp [$all get z];
+
+ set xnew {} ;
+ set ynew {} ;
+ set znew {} ;
+
+ foreach x1 $xm y1 $ym z1 $zm x2 $x y2 $y z2 $z x3 $xp y3 $yp z3 $zp {
+  lappend xnew [expr { 0.25 * ( $x1 + 2*$x2 + $x3 ) } ];
+  lappend ynew [expr { 0.25 * ( $y1 + 2*$y2 + $y3 ) } ];
+  lappend znew [expr { 0.25 * ( $z1 + 2*$z2 + $z3 ) } ];
+ }
+
+ $all frame [expr {$i-1}];
+
+ $all set x $xnew;
+ $all set y $ynew;
+ $all set z $znew;
+
+ set xm $x ;set ym $y;  set zm $z;
+ set x $xp ;set y $yp;  set z $zp;
+
+}
+
+

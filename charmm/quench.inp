@@ -1,0 +1,113 @@
+* equilibration dynamics of initial structures;
+*
+
+if @?shake .eq. 0 set shake 1
+if @?nsteps .eq. 0 set nsteps 50000
+
+set version 27
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+set psffile myo6prdp_tr27
+set corfile @{psffile}m
+
+read psf card name @psffile.psf
+read coor card name @corfile.cor
+
+stream readpsf.str
+
+! set up FACTS
+set eps 1.
+nbond nbxmod 5 atom cdie eps @eps shift vatom vdistance vswitch cutnb 14.0 ctofnb 12.0 ctonnb 10.0 e14fac wmin 1.5
+scalar wmain = radius 
+facts tcps 22 teps @eps gamm 0.015 tavw
+
+!DYNAMICS
+! add restraints on the backbone
+define backbone select type C .or. type CA .or. type N .or. type O end
+define other select segid MG .or. type OH2 .or. type P* .or. ( (segid PHOS .or. segid ADP) .and. .not. hydrogen) end
+
+! restraints
+cons harm force 10 select backbone .or. other end
+!
+! shake?
+if @shake .eq. 1 then 
+ shake bonh para ! check the fast shake algorithm for errors (e.g. OH distance, etc)
+ set tstep 0.002
+else
+ set tstep 0.001
+endif  
+!
+!set fbeta for langevin
+scalar fbeta set 0 select all end
+scalar fbeta set 0.25 select .not. hydrogen end ! do not apply langevin dynamics to hydrogens under shake
+! begin quenching cycles
+! define temperatures
+set runs 10
+set T1 500
+set T2 100
+set T3 500
+set T4 100
+set T5 500
+set T6 100
+set T7 500
+set T8 100
+set T9 500
+set T10 300
+!
+set nrun 1
+!set nsteps 100000
+label loop
+calc nold = @nrun - 1
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+set strt strt
+set iunrea -1
+!
+if @nrun .gt. 1 then 
+ open read card unit 66 name scratch/@{psffile}_@nold.rst 
+ set strt rest
+ set iunrea 66
+endif 
+!
+open write card unit 67 name scratch/@{psffile}_@nrun.dat 
+open write file unit 68 name scratch/@{psffile}_@nrun.dcd
+open write card unit 69 name scratch/@{psffile}_@nrun.rst
+!
+set Temp @T@@nrun
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+dyna leap lang tbath @Temp ilbfrq 0 rbuffer 0 -
+verlet - 
+@strt - ! 
+nstep @nsteps -
+timestep @tstep -
+iprfrq 1000 -
+ihtfrq 0 -
+ieqfrq 0 -
+ntrfrq 0 -
+iunrea 66 iunwri 69 iuncrd 68 iunvel -1 kunit 67 -
+nprint 1000 -
+nsavc 1000 -
+isvfrq 1000 - ! frequency for writing a restart file
+nsavv 0 -
+ihbfrq 0 -
+inbfrq -1 -                        ! frequency of nb list gneration
+firstt 0 -
+finalt 0 -
+teminc 30.0 -
+iasors 1 - ! velocity scaling option at ihtfrq & iefrq freq. ; 0 -- scaling; ne 0 ==> assign (iasvel); not used in assignmnt
+iasvel 1 - ! velocity assgn during heating/equil +  initial; >0 : Gaussian, <0 uniform, 0 from COMP set
+iscvel 0 - ! velocity scaling: 0 -- same factor for all atoms; >0 different factor for each atom based on KE.
+ichecw 0 - ! check if average temp is within the allowed window (twindh, twindl) every iefrq steps.
+twindh 10.0 -  ! temperature (high) deviation allowed -- useful during equilibration
+twindl -10.0 -  ! temperature (low) deviation allowed -- useful during equilibration
+echeck -1 ! turn off complaints about energy jumps
+
+
+set iunrea 66
+set strt rest
+incr nrun by 1
+if @nrun .le. @runs -
+goto loop
+
+!save
+!write coor card name scratch/@{corfile}q@nrun.cor
+write coor card name scratch/@{corfile}q.cor
+

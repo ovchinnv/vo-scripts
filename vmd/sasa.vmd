@@ -1,0 +1,35 @@
+#!/bin/vmd
+#
+############################################################################
+set id [ molinfo top ];
+set nf [molinfo $id get numframes];
+
+if { ![info exists "selection"] } {
+ set selection "all"
+}
+if { ![info exists "proberad"] } {
+ set proberad 1.4
+}
+puts "Computing SASA for $selection using probe radius $proberad ... "
+
+set all      [atomselect $id "all"];
+set sel      [atomselect $id $selection];
+set sasa {}
+#
+for { set i 0 } { $i<$nf } { incr i } {
+ $all frame $i
+ $all update
+ $sel frame $i
+ $sel update
+ lappend sasa [measure sasa $proberad $sel]
+}
+#############################################################################
+#
+# save to file
+if { ![info exists "sasaname"] } {
+ set d [exec date +%d-%m-%y];
+ set sasname "sasa$d.dat"
+}
+set fid [open "$sasaname" w+];
+foreach s $sasa { puts $fid "$s" }
+close $fid

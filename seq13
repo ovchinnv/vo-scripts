@@ -1,0 +1,32 @@
+#!/bin/bash
+# change 1-letter sequence to a 3-letter sequence
+
+echo "* three-letter amino acid sequence"
+echo "*"
+echo `wc $1 | awk '{print $3}'` ;# print sequence length
+
+awk 'BEGIN {
+
+        A1["ALA"]="A";A1["ARG"]="R";A1["ASP"]="D";A1["GLN"]="Q";A1["LEU"]="L";A1["THR"]="T";A1["GLU"]="E";A1["ILE"]="I";
+	A1["PHE"]="F";A1["LYS"]="K";A1["SER"]="S";A1["VAL"]="V";A1["MET"]="M";A1["ASN"]="N";A1["PRO"]="P";A1["TYR"]="Y";
+	A1["HIS"]="H";A1["HSD"]="H";A1["HSE"]="H";A1["GLY"]="G";A1["TRP"]="W";A1["CYS"]="C";
+
+        A3["A"]="ALA";A3["R"]="ARG";A3["D"]="ASP";A3["Q"]="GLN";A3["L"]="LEU";A3["T"]="THR";A3["E"]="GLU";A3["I"]="ILE";
+        A3["F"]="PHE";A3["K"]="LYS";A3["S"]="SER";A3["V"]="VAL";A3["M"]="MET";A3["N"]="ASN";A3["P"]="PRO";A3["Y"]="TYR";
+        A3["H"]="HIS";                           ;A3["G"]="GLY";A3["W"]="TRP";A3["C"]="CYS";
+        A3["H"]="HSD";
+        llen=0; maxaalen=20;
+        }
+{
+ seq=""
+ for ( i=1 ; i<=NF; i++ ) {
+  l=length($i);
+  for (j=1 ; j<=l; j++) {
+   aa=substr($i, j, 1)
+   seq=seq""A3[aa]" "
+   llen=llen+1;
+   if (llen > maxaalen) {seq=seq"\n"; llen=0 }
+  }
+ }
+ print seq
+} ' $1

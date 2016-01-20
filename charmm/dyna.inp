@@ -1,0 +1,98 @@
+* CAHRMM eef1 dynamics ;
+*
+
+!set nrun 2
+set Temp 300
+!if ?mynode .eq. 0  prnlev 5
+
+set version 22
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+if @?nsteps .eq. 0 set nsteps 500000
+if @?nrun   .eq. 0 set nrun 2
+if @?shake  .eq. 0 set shake 0
+
+set version 22
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+set psffile rig22vc
+set corfile @{conf}22cfacts_3
+
+read psf card name @psffile.psf
+read coor card name @corfile.cor
+
+set cmap
+stream readpsf.str
+
+!ace setup
+!stream ace.str
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! eef1 setup
+!eef1 setup temp 298.15 unit 93 name /home/ovchinnikov/charmm/c34a2/test/data/solvpar.inp
+!update ctonnb 7. ctofnb 9. cutnb 10. group rdie
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! scpism setup
+!open read card unit 9 name ~/charmm/c34a2/test/data/scpism.inp
+!scpi hydro uism 9
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! set up FACTS
+set eps 1.
+nbond nbxmod 5 atom cdie eps @eps shift vatom vdistance vswitch cutnb 14.0 ctofnb 12.0 ctonnb 10.0 e14fac wmin 1.5
+scalar wmain = radius 
+facts tcps 22 teps @eps gamm 0.015
+
+!DYNAMICS
+! add restraints on the backbone
+!cons harm force 0.5 sele type C .or. type CA .or. type N end
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+calc nres = ( @nrun - 1 ) 
+open read card unit 66 name scratch/@{conf}_@nres.rst ! restart file
+open write card unit 67 name scratch/@{conf}_@nrun.dat 
+open write file unit 68 name scratch/@{conf}_@nrun.dcd
+open write card unit 69 name scratch/@{conf}_@nrun.rst
+
+! real NVT dynamics
+!set fbeta for langevin
+scalar fbeta set 0 select all end
+scalar fbeta set 1 select .not. hydrogen end ! do not apply langevin dynamics to hydrogens under shake
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! shake?
+if @shake .eq. 1 then 
+ shake bonh para ! check the fast shake algorithm for errors (e.g. OH distance, etc)
+ set tstep 0.002
+else
+ set tstep 0.001
+endif  
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+dyna leap lang tbath @Temp ilbfrq 0 rbuffer 0 -
+verlet - 
+- ! strt - ! 
+restrt - ! strt: start from current coords; restrt: use restart file
+nstep @nsteps -
+timestep @tstep -
+iprfrq 1000 -
+ihtfrq 0 -
+ieqfrq 0 -
+ntrfrq 0 -
+iunrea 66 iunwri 69 iuncrd 68 iunvel -1 kunit 67 -
+nprint 1000 -
+nsavc 1000 -
+isvfrq 1000 - ! frequency for writing a restart file
+nsavv 0 -
+ihbfrq 0 -
+inbfrq -1 -                        ! frequency of nb list gneration
+firstt @Temp -
+finalt @Temp -
+teminc 30.0 -
+iasors 1 - ! velocity scaling option at ihtfrq & iefrq freq. ; 0 -- scaling; ne 0 ==> assign (iasvel); not used in assignmnt
+iasvel 1 - ! velocity assgn during heating/equil +  initial; >0 : Gaussian, <0 uniform, 0 from COMP set
+iscvel 0 - ! velocity scaling: 0 -- same factor for all atoms; >0 different factor for each atom based on KE.
+ichecw 0 - ! check if average temp is within the allowed window (twindh, twindl) every iefrq steps.
+twindh 10.0 -  ! temperature (high) deviation allowed -- useful during equilibration
+twindl -10.0   ! temperature (low) deviation allowed -- useful during equilibration
+
+!save
+write coor card name scratch/@{conf}_@nrun.cor
+

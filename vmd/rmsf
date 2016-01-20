@@ -1,0 +1,72 @@
+#!/bin/vmd
+
+mol delete all
+mol load psf ../rig22vc.psf
+set conf "pps"
+set conf "rig"
+mol addfile  ../${conf}_1_s.dcd type dcd waitfor all
+mol addfile  ../${conf}_2_s.dcd type dcd waitfor all
+mol addfile  ../${conf}_3_s.dcd type dcd waitfor all
+mol addfile  ../${conf}_4_s.dcd type dcd waitfor all
+mol addfile  ../${conf}_5_s.dcd type dcd waitfor all
+mol addfile  ../${conf}_6_s.dcd type dcd waitfor all
+
+# compute rmsf fluctuations & out it into beta
+atomselect macro Converter { segid CONV and (resid 707 to 773) } ;# ok
+atomselect macro Cinsert   { segid CONV and (resid 774 to 788) } ;# ok
+
+set id [molinfo top];
+set nf [molinfo top get numframes];
+set selection "Converter or Cinsert"
+
+# align wrt first frame
+set all      [atomselect top all];
+set template [atomselect top "($selection) and backbone " frame first] 
+set orient   [atomselect top "($selection) and backbone " frame first] 
+#set template [atomselect top "($selection) and name CA" frame first] 
+#set orient   [atomselect top "($selection) and name CA" frame first] 
+for { set i 1 } { $i<$nf } { incr i } {
+ $orient frame $i
+ $orient update
+ $all frame $i
+ $all update
+ $all move [measure fit $orient $template]
+}
+set rav [measure avpos $orient]
+set xav {};
+set yav {};
+set zav {};
+foreach r $rav {
+ foreach {xx yy zz} $r { lappend xav $xx ;  lappend yav $yy ; lappend zav $zz } 
+}
+animate dup frame 0 $id ;# put at the end
+# put average frame first
+$orient frame 0
+$orient set x $xav
+$orient set y $yav
+$orient set z $zav
+# align again, this time wrt average frame
+
+$template frame 0
+for {set j 0} {$j<$nf} {incr j} {
+  $orient frame $j
+  $all frame $j
+  $all move [measure fit $orient $template]
+}
+
+# compute rmsf
+$template set beta [measure rmsf $template];
+mol representation newcartoon
+mol color beta
+mol selection protein
+mol addrep $id
+
+color scale method BWR
+
+# output to a file
+set beta [$template get beta]
+set atomid [$template get serial] ;
+set resid [$template get resid];
+set fid [open "rmsf_c6${conf}.dat" w+];
+foreach b $beta a $atomid r $resid { puts $fid "$a $r $b" }
+close $fid

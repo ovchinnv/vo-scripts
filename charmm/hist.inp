@@ -1,0 +1,11 @@
+* print out histidines
+*
+
+
+set version 19
+set psffile prigor19
+set corfile prigor19_3
+stream readpsf.str
+
+write coor pdb name hist.pdb select resname H* .and. type CA end
+

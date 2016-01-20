@@ -1,0 +1,151 @@
+* protein solvation component for SB simulations
+*
+
+set version 27
+
+set eps 1.0 ! dielectric constant
+
+if @?psffile eq 0 set psffile unknown
+if @?corfile eq 0 set corfile unknown_m
+if @?format eq 0 set format card 
+
+stream readpsf.str
+
+set buf 10  ! solvation radius
+
+! compute size of largest cubic box
+! exclude crystal waters from box dimensioning
+define solute select segid HC .or. segid RC .or. segid EC end
+
+coor orie select solute end ! align 
+coor stat select solute end ! select the active site region
+
+! compute centers of cylinder bases
+calc xref0 = ?xmin - @buf
+calc yref0 = 0 
+calc zref0 = 0 
+calc xref1 = ?xmax + @buf
+calc yref1 = 0 
+calc zref1 = 0
+
+if ?ymax .gt. ?zmax then 
+ calc R = 2.0/sqrt(3.0)*( ?ymax + @buf ) 
+else
+ calc R = 2.0/sqrt(3.0)*( ?zmax + @buf ) 
+endif
+
+!include xwat in solvation
+define solute select segid HC .or. segid RC .or. segid EC .or. segid XWAT end
+
+update atom cutnb 15 ctonnb 10 ctofnb 12 vdw vshift fshift cdie
+
+nobomb
+set overlap 2.8
+stream whex.str
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!rotate box into standard reference frame: z-axis = cylinder axis; x-azis = major face axis
+! cylinder center
+calc xcen = @xref0 + 0.5*@ndir*@xdir
+calc ycen = @yref0 + 0.5*@ndir*@ydir
+calc zcen = @zref0 + 0.5*@ndir*@zdir
+
+! step 1: move to center
+coor trans xdir -@xcen ydir -@ycen zdir -@zcen select all end
+
+! step 2: rotate to align z-axis with z-axis   
+set  costh @zdir
+calc sinth = sqrt ( 1 - @costh*@costh ) 
+
+calc theta = acos ( @costh ) / ?pi * 180 ! convert to degrees
+calc xvec = -@ydir
+calc yvec = +@xdir
+calc zvec = 0 
+
+coor rota xdir @xvec ydir @yvec zdir @zvec xcen 0 ycen 0 zcen 0 phi @theta select all end
+
+! step 3: figure out how the face vector has rotated; use Rodriguez's formula
+
+calc norm = sqrt ( @xvec*@xvec + @yvec*@yvec + @zvec*@zvec )
+calc proj =  ( @xvec*@xre + @yvec*@yre + @zvec*@zre) / @norm 
+
+! need to split calc over two lines because of the 72 char limit
+calc xrenew = ( 1.0 - @costh ) * @xvec * @proj / @norm + @costh * @xre 
+calc xrenew = @xrenew - @sinth * ( @yvec * @zre - @zvec * @yre ) / @norm
+
+calc yrenew = ( 1.0 - @costh ) * @yvec * @proj / @norm + @costh * @yre 
+calc yrenew = @yrenew - @sinth * ( @zvec * @xre - @xvec * @zre ) / @norm
+
+calc zrenew = ( 1.0 - @costh ) * @zvec * @proj / @norm + @costh * @zre
+calc zrenew = @zrenew - @sinth * ( @xvec * @yre - @yvec * @xre ) / @norm
+!!!!!!!!!!!!!!!!
+! step 4 -- rotate about z axis so that the face vector concides with the x-axis
+!
+
+!calc theta =  acos ( @xrenew ) / ?pi * 180 ! note, rnew is a unit vector, so this is a direction cosine
+calc theta =  acos ( @xrenew ) / ?pi * 180 + 30 ! add 30 if you want the small radius to coincide with the x-axis
+calc xvec = 0
+calc yvec = -@zrenew
+calc zvec = @yrenew
+
+coor rota xdir @xvec ydir @yvec zdir @zvec xcen 0 ycen 0 zcen 0 phi @theta select all end
+!!!!!!!!!!!!!!!!!!! END ROTATE !!!!!!!!!!!!!!!
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+rename segid wat select segid w* end ! rename all waters
+! define the "correct" solute again
+define solute select segid H .or. segid A .or. segid B .or. segid C .or. segid D .or. segid E .or. segid F end
+
+goto write ! skip minimization
+
+cons harm force 30 select solute .and. .not. hydrogen end
+! cons fix select onlysolute .and. .not. hydrogen end
+! mini sd nstep 100
+mini conj nstep 10
+mini abnr nstep 10
+ 
+label unconstrained_mini ! no constraints in reaction zone 
+cons harm clear
+mini conj nstep 10
+minimize abnr nstep 10
+
+
+label skipmini
+energy
+
+label write
+
+write psf @format name @{psffile}_s.psf
+write coord @format name @{corfile}s.cor
+* solvated in a hexagonal cylinder:
+*
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+open write card unit 66 name hexsize.str
+write title unit 66
+** solvated in a hexagonal cylinder of the following parameters
+** 
+* set x0 0.0
+* set y0 0.0
+* set z0 0.0
+* set xh 0.0
+* set yh 0.0
+* set zh 1.0
+* set rh @ndir
+* set xf 1.0
+* set yf 0.0
+* set zf 0.0
+* set rf @R
+*
+
+close unit 66
+
+!!!! STOP HERE !!!!!!!!!!!
+
+goto kill
+
+!!!!!!!!! FINISHED !!!!!!!!!!!!
+
+label kill
+stop

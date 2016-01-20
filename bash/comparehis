@@ -1,0 +1,24 @@
+#!/bin/bash
+
+file1=hist.pdb
+file2=righist.pdb
+
+awk ' BEGIN {file2=ARGV[2]; ARGV[2]="";}
+{
+ if ($1 == "ATOM") {
+  resid=$5
+  segid=$11
+  prot=$12" "$13
+  
+  getline <file2
+
+  resid2=$5
+  segid2=$11
+  prot2=$12" "$13
+
+  print segid" "segid2" "resid" "resid2" "prot" "prot2
+ } else { 
+ getline <file2
+ }
+ 
+} ' $file1 $file2

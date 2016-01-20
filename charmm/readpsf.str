@@ -1,0 +1,80 @@
+* Reads psf file & sets up for dynamics or minimization
+*
+nobomb
+if @?version eq 0 set version 27
+if @?resid eq 0 set resid ""
+
+if @?toppar eq 0 set toppar   ~/charmm/c37a1/toppar
+if @?toppar1 eq 0 set toppar1 ~/charmm/c37a1/toppar/stream/
+if @?topparcgenff eq 0 set topparcgenff ~/charmm/c38a2/toppar
+if @?format eq 0 set format card
+if @?cmap eq 0 then 
+ set cmap
+else
+ set cmap _cmap
+endif
+!
+if @?string eq 0 then 
+ set string
+else
+ set string string
+endif
+
+!!!!!!!! TOPOLOGY/PARAMS
+if version eq 36 @string open unit 1 read form name "@TOPPAR/top_all36_prot.rtf"
+if version eq 27 @string open unit 1 read form name "@TOPPAR/top_all27_prot_na.rtf"
+if version eq 22 @string open unit 1 read form name "@TOPPAR/top_all22_prot@{CMAP}.inp"
+if version eq 19 @string open unit 1 read form name "@TOPPAR/toph19.inp"
+if version eq eef1 open unit 1 read form name "~/scripts/charmm/toph19_eef1_na.inp"
+read rtf card unit 1
+@string close unit 1
+!
+label cgenff
+if @?cgenff ne 0 then 
+ @string open unit 1 read form name "@TOPPARCGENFF/top_all36_cgenff.rtf"
+ read rtf card unit 1 append
+ @string close unit 1
+endif
+
+!
+if version eq 36 @string open unit 1 read form name "@TOPPAR/par_all36_prot.prm"
+if version eq 27 @string open unit 1 read form name "@TOPPAR/par_all27_prot_na.prm"
+if version eq 22 @string open unit 1 read form name "@TOPPAR/par_all22_prot@{CMAP}.inp"
+if version eq 19 @string open unit 1 read form name "@TOPPAR/param19.inp"
+if version eq eef1 open unit 1 read form name "~/scripts/charmm/param19_eef1_na.inp"
+read param card unit 1
+@string close unit 1
+
+! ATP parameters
+if @?toppar1 ne 0 if @version eq 27 stream @toppar1/toppar_all27_na_nad_ppi.str
+!
+! fix to read other c36 pars
+if version eq 36 then
+ @string open unit 1 read form name "@TOPPAR/top_all36_na.rtf"
+ read rtf card unit 1 append
+ @string open unit 1 read form name "@TOPPAR/par_all36_na.prm"
+ read param card append unit 1
+endif
+!
+label read_psf
+if @?psffile eq 0 return
+@string open unit 1 read @format name @psffile.psf
+read psf @format unit 1
+@string close unit 1
+if @?cor eq 0 set cor 1 
+if @?crd eq 0 set crd 1 
+if @?pdb eq 0 set pdb 1
+
+if @?corfile eq 0 set cor 0
+if @?crdfile eq 0 set crd 0
+if @?pdbfile eq 0 set pdb 0
+
+if @cor ne 0 @string open unit 1 card read @format name @corfile.cor
+if @cor ne 0 read coords @format unit 1
+!
+if @crd ne 0 @string open unit 1 card read @format name @corfile.crd
+if @crd ne 0 read coords @format unit 1
+!
+if @pdb ne 0 @string open unit 1 card read name @pdbfile.pdb
+if @pdb ne 0 read coords pdb unit 1 @resid
+@string close unit 1

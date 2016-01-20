@@ -1,0 +1,35 @@
+#!/bin/vmd
+
+#set topfile /home/taly/charmm/c37a1/toppar/top_all22_prot.inp
+
+set rad 100
+
+mol delete all
+set r0 {}; lappend r0 -$rad -$rad -$rad
+set r1 {}; lappend r1  $rad  $rad  $rad
+set r12 {}; lappend r12 $r0 $r1
+solvate -o __box -spsf __solvent.psf -spdb __solvent.pdb -s W -ws 18.856 -minmax $r12
+
+set outside [atomselect top " sqr(x) + sqr(y) + sqr(z) > [expr {$rad*$rad}] "];
+set seg [$outside get segid]
+set res [$outside get resid]
+
+package require psfgen
+resetpsf
+readpsf __box.psf
+coordpdb __box.pdb
+foreach s $seg 	r $res {
+ delatom $s $r
+}
+
+set fname __ball${rad}
+
+writepdb ${fname}.pdb
+writepsf ${fname}.psf
+file delete __box.psf
+file delete __box.pdb
+
+# reload sphere
+mol delete all
+mol load psf ${fname}.psf pdb ${fname}.pdb
+

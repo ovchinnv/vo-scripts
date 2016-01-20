@@ -1,0 +1,35 @@
+#!/bin/vmd
+mol delete all
+
+set fpath struc/27/namd/
+set psffile $fpath/../clpx-3hwsi-sn-x
+mol load psf ${psffile}.psf
+
+set solute  [atomselect top "protein or resname ADP or resname MG or segid XWAT"];
+set solvent [atomselect top "not (protein or resname ADP or resname MG or segid XWAT)"];
+
+set nowfile $fpath/clpx_npt_now
+set nowfiles {}
+set step 5
+set ifile 10
+set nfile 30
+for { set i $ifile } { $i <= $nfile } { incr i } {
+# read dcd
+ set dcdfile $fpath/clpx_npt${i}rd
+ animate read  dcd $dcdfile.dcd beg 0 skip $step waitfor all
+ animate write dcd ${dcdfile}_now.dcd beg 0 skip 1 waitfor all sel $solute
+ lappend nowfiles ${dcdfile}_now
+  animate delete all
+}
+
+foreach dcdfile $nowfiles {break;}
+puts "appending file $dcdfile ..."
+exec catdcd -o $nowfile.dcd $dcdfile.dcd
+#
+for { set i 1 } { $i < [llength $nowfiles] } { incr i } {
+ set dcdfile [lindex $nowfiles $i];
+ puts "appending file $dcdfile ..."
+ exec mv $nowfile.dcd temp
+ exec catdcd -o $nowfile.dcd temp $dcdfile.dcd
+ exec rm -f $dcdfile.dcd
+}

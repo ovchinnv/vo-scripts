@@ -1,0 +1,91 @@
+#!/bin/bash
+
+# on cyrus2
+#charmrun=~/namd/NAMD_2.6_Linux-amd64-TCP/charmrun
+#namd2=~/namd/NAMD_2.6_Linux-amd64-TCP/namd2
+
+# on daedlalus1
+#charmrun=~/namd/NAMD_2.6_Linux-amd64-TCP/charmrun
+#namd2=~/namd/NAMD_2.6_Linux-amd64-TCP/namd2
+
+jobid=0;
+
+name=m6ppstr
+template=minimize
+
+# minimize just once with the protein and crystal waters fixed
+
+ output=mini
+ flag=fixed
+ for nrun in `seq 1 1`
+ do
+   count=$(($nrun-1))
+   script=_mini$count$flag
+
+   echo '#!/bin/vmd' > $script
+   echo '#variable parameters (automatic)' >> $script
+   grep -i set boxsize.str | awk '{ print tolower($0)}' >> $script
+
+   echo set count $count >> $script 
+#   echo set cscale `echo 61-$count*10 |bc `  >> $script
+   echo set cscale 0 >>$script ;# turn off restraints
+   echo set nsteps 1000 >>   $script
+   
+   echo set fixedflag on >>$script
+   echo set consCol O >>$script
+
+   echo set name $name >> $script
+   echo set output $output$count$flag >>$script
+   echo set restart $output$(($count-1))$flag >>$script
+
+   cat $template >> $script
+  
+#use qsub:
+######################
+
+workdir=`pwd`
+
+queue=debug
+jname=$output
+nodes=64
+
+if [ $jobid != "0" ]; then
+
+echo "dependent job ($jobid)"
+ jobid=`qsub <<_job1
+#PBS -l mppwidth=$nodes,walltime=00:07:00
+#PBS -N $jname$count
+#PBS -o $jname.out
+#PBS -e $jname.err
+##PBS -m abe
+#PBS -q $queue
+#PBS -V
+#PBS -W depend=afterok:$jobid
+cd $workdir
+aprun -n $nodes namd2 $script >& $output$count$flag
+_job1`
+else
+ echo "independent job"
+ jobid=`qsub <<_job0
+#PBS -l mppwidth=$nodes,walltime=00:07:00
+#PBS -N $jname$count
+#PBS -o $jname.out
+#PBS -e $jname.err
+##PBS -m abe
+#PBS -q $queue
+#PBS -V
+cd $workdir
+aprun -n $nodes namd2 $script >& $output$count$flag
+_job0`
+fi
+
+ echo $jobid
+
+######################
+ if [ $? -ne 0 ];  then
+   echo Execution interrupted due to errors during run $nrun.
+   exit
+ fi 
+ 
+ done
+

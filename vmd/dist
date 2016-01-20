@@ -1,0 +1,60 @@
+#!/bin/vmd
+# assume that the trajectory has been loaded
+# assume that domains have been defined
+#set cons backbone
+set cons "noh"
+#
+set nf  [molinfo top get numframes];
+set all [atomselect top all];
+#
+# prepare atom selections
+#
+
+set ISA "fad and ( name C10 C2 C4 C4X C5X C6 C7 C7M C8 C8M C9A C9 H7M1 H7M2 H7M3 H8M1 H8M2 H8M3 HC6  HC9  HN4  N10  N1 N3 N5 O2 O4 )"
+
+set dist1 {"fre and resid 73" "fre and resid 72" "fre and resid 116" };
+set dist2 {};
+lappend dist2 "fad and $ISA" ;
+lappend dist2 "fad and $ISA" ;
+lappend dist2 "fad and $ISA" ;
+#
+#initialize arrays
+set k 0
+foreach s1 $dist1 s2 $dist2 {
+ set a($k) [ atomselect top "$s1 and $cons"];
+ set b($k) [ atomselect top "$s2 and $cons"]
+ set dst($k) {}; # initialize
+ incr k
+} ;# foreach
+#
+#
+for {set i 0} {$i<$nf} {incr i} {
+ puts "Processing frame: $i"
+ for {set j 0} {$j<$k} {incr j} {
+#
+  $a($j) frame $i
+  $a($j) update
+  $b($j) frame $i
+  $b($j) update
+#
+  set pos1 [measure center $a($j) weight mass];
+  set pos2 [measure center $b($j) weight mass];
+  set dpos [vecsub $pos1 $pos2];
+  foreach {x y z} $dpos {
+   lappend dst($j) [expr { sqrt($x*$x+$y*$y+$z*$z) } ];
+  }
+ } ; # j
+} ; # i
+#
+# save to file
+if { ![info exists "distname"] } {
+ set d [exec date +%d-%m-%y];
+ set dname "dist$d.dat"
+}
+
+set fid [ open $dname.dat w ];
+for {set j 0} {$j<$k} {incr j} {
+  puts $fid " [ string map {" " "_" "(" "_" ")" "_" } [lindex $dist1 $j]]_[ string map {" " "_" "(" "_" ")" "_"} [lindex $dist2 $j]] $dst($j)" ; # replace spaces with underscore
+}
+#
+close $fid

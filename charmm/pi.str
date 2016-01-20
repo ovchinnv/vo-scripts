@@ -1,0 +1,32 @@
+* CHARMM Parameters for inorganic phosphate; taken from Yang et al, 2003, PNAS
+* 9/28/07
+
+read rtf card append
+* c27 na model compounds
+*
+31  1
+
+
+RESI P_1        -1.00    ! phosphate, anionic
+GROUP                    ! 
+
+ATOM O1   ON4    -0.720  !                H1
+ATOM P1   P       1.250  !                 \
+ATOM O2   ON4    -0.720  !                 O1
+ATOM O3   ON3    -0.795  !                  |
+ATOM O4   ON3    -0.795  !          (-)O3--P1==O4(-)
+ATOM H1   HN4     0.390  !                  |
+ATOM H2   HN4     0.390  !                 O2
+                         !                   \
+                         !                    H2
+                         !                       
+BOND P1   O1     P1   O2    P1   O3    P1   O4    O1   H1  O2   H2
+
+! IC TABLE TAKEN FROM THAT OF A DIPHOSPHATE
+IC H1   O1  P1   O4  0.0000    000.00     60.0     000.00    0.0000
+IC H1   O1  P1   O3  0.0000    000.00    -60.0     000.00    0.0000
+IC O1   P1  O2   H2  0.0000    000.00    180.0     000.00    0.0000
+
+PATC  FIRS NONE LAST NONE
+
+END

@@ -1,0 +1,55 @@
+#!/usr/bin/tclsh
+
+set fid  [open "myo6" r];
+set fido [open "seqal_m6" w];
+
+set keyword "NULL";
+
+#puts $fido "1VOM \t 2BKH \t 1OE9"
+
+set nseq 18;
+
+for {set i 1} {$i<=$nseq} {incr i} {
+ set counter$i 0; # initialize
+}
+
+while { [gets $fid line1] > -1} { 
+ set keyword [string range $line1 0 7]
+ while { ([lsearch -exact $keyword "MYH6_RAT"] < 0) } {
+  gets $fid line1  
+  set keyword [string range $line1 0 7]
+ }
+# found !
+ set l [string length $line1]
+# get the other sequences
+ for {set i 2} {$i<=$nseq} {incr i} {
+  gets $fid line$i
+ }
+
+ for {set i 1} {$i<=$nseq} {incr i} {
+ set script "\[string range \$line$i 18 $l\]"
+#  puts $script
+  eval "set seq$i \[string range \$line$i 18 $l\]"
+#  eval "puts \"$i $l \$line$i\""
+ }
+#puts $seq3
+#puts $line3
+ set n [string length $seq1];
+
+ for { set j 0 } { $j<$n}  { incr j } {
+  set out "";
+  for {set i 1} {$i<=$nseq} {incr i} {
+   eval "set aa \[string range \$seq$i $j $j\]"
+   if { [string equal $aa "-"] } {
+    set out$i "$aa    "
+   }  else {
+    set out$i "[incr counter$i] $aa"
+   }
+   eval "set out \"$out \$out$i \t\""
+  }
+  puts $fido $out 
+#  puts $out 
+ }
+}
+ 
+ # use: a2ps --columns=4 --chars-per-line=40 -o mama seqhc

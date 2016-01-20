@@ -1,0 +1,22 @@
+#!/bin/vmd
+
+mol representation licorice
+mol selection "same residue as (within 2.85 of segid MG)"
+mol color name
+mol addrep [molinfo top]
+
+
+set mgcor [atomselect top "(within 2.85 of segid MG) and not (hydrogen or segid MG)"]
+set mgion [atomselect top "segid MG"]
+set mgid [$mgion list]
+set molecule [molinfo top]
+label add Atoms $molecule/$mgid
+
+foreach atomid [$mgcor list] {
+  puts "Adding a bond between $mgid and $atomid" 
+ label add Atoms $molecule/$atomid
+ label add Bonds $molecule/$mgid $molecule/$atomid
+} 
+ 
+
+

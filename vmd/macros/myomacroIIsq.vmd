@@ -1,0 +1,66 @@
+#!/bin/vmd
+######### domains from rigid domain search #################
+atomselect macro r1 {resid 19 20 21 22 23 24 25 39 40 41 45 46 70 72 76 77 78 79 80 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 123 126 127 128 129 130 141 142 143 144 145 146 147 148 149 152 153 154 155 156 157 158 159 160 161 162 169 170 171 172 173 174 175 177 178 179 182 183 184 185 195 216 218 220 221 222 224 226 227 229 230 231 232 233 240 283 284 285 354 355 357 358 363 364 365 366 429 430 431 432 433 434 435 436 437 438 442 443 444 445 446 447 448 449 450 451 452 453 454 455 456 457 458 459 460 461 462 463 464 465 466 467 468 469 470 471 472 473 474 475 476 477 478 479 480 481 482 483 484 485 486 490 491 519 520 521 522 523 524 525 549 550 551 552 553 558 559 561 562 563 564 565 566 567 586 633 634 637 638 639 640 641 642 643 644 645 646 647 648 649 653 656 657 658 659 660 661 662 663 664 665 666 667 668 669 670 671 672 673 676 677 678 679 680 681 685 686 687 690 691 692 693 694 695 696 697 698 699 700 741 742 743 744 745 746 747 748 749 750}
+atomselect macro r2 {resid 71 190 191 192 193 194 196 197 198 199 200 201 202 203 204 205 206 207 208 209 210 211 212 213 214 215 217 223 225 228 234 235 236 237 238 239 241 243 244 245 246 247 248 249 250 251 252 253 254 255 256 257 258 259 260 261 262 263 264 265 266 267 268 269 270 271 272 273 274 275 276 277 278 279 280 281 282 286 287 288 289 291 292 293 294 295 296 297 298 299 300 301 302 303 304 305 306 307 308 309 310 311 312 313 314 315 316 317 318 319 320 321 322 323 324 325 326 327 328 329 331 332 333 334 335 336 337 338 339 340 341 342 343 344 347 348 349 350 351 352 353 356 367 368 369 370 371 372 373 374 375 376 377 378 379 380 381 384 385 386 387 388 389 390 391 392 393 394 395 396 397 398 399 400 401 402 403 404 405 407 409 410 411 412 413 414 415 416 417 418 419 420 421 422 423 424 425 426 427 428 440 441 569 570 571 572 573 574 575 576 577 578 579 580 581 582 583 584 585 587 588 589 590 591 592 593 595 650 651 652 654 655}
+atomselect macro r3 {resid 4 74 75 150 151 701 702 703 704 705 706 707 708 709 710 711 712 713 714 715 716 717 718 719 720 722 723 724 725 726 727 728 729 730 731 732 733 734 735 736 737 738 739 740 751 752 753 754 755 756 757 758 759 760 761 762 763 764 765 766 767 768 769 770 771 772 773 774 775 776 777 778 779 780 781 782 783}
+atomselect macro r4 {resid 42 136 166 167 168 219 242 330 359 360 361 362 406 408 439 487 488 489 492 493 494 495 496 497 498 499 500 501 502 503 504 505 506 507 508 509 510 511 512 513 518 526 527 528 529 530 531 532 533 534 535 536 537 538 539 540 541 542 543 544 545 546 547 548 554 555 556 557 560 568 635 636}
+atomselect macro r5 {resid 2 3 5 6 7 8 9 10 11 12 13 14 15 26 27 28 29 30 31 32 33 34 35 36 37 38 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 73 81 82 83 84 85 86 87 674 675 688 689}
+atomselect macro r6 {resid 114 115 116 117 118 119 120 121 122 124 125 131 133 134 135 137 138 139 140 163 164 165 176 180 181 597 598}
+##############################################################
+########## domain definitions from Anne Houdusse #############
+
+atomselect macro SH3     {(resid 1 to 85 ) and segname HC }
+atomselect macro Nterm   {(resid 86 to 165 ) and segname HC }
+
+
+atomselect macro Ploop   {(resid 175 to 183) and segname HC }
+atomselect macro Loop1   {(resid 197 to 219) and segname HC }
+
+atomselect macro Switch1 {(resid 237 to 247) and segname HC }
+
+#atomselect macro U50Lp2 {(resid 613 to 628) and segname HC }
+atomselect macro U50 {(resid 217 to 452 or resid 607 to 625 ) and segname HC }
+
+atomselect macro HCMLoop {(resid 405 to 435) and segname HC }
+# show adjoining alpha helix
+
+atomselect macro Switch2 {(resid 463 to 474) and segname HC }
+atomselect macro L50 {(resid 466 to 598 or resid 643 to 666) and segname HC }
+atomselect macro RelayH   {(resid 475 to 507) and segname HC } 
+atomselect macro RelayL   {(resid 508 to 520) and segname HC }
+atomselect macro Relay {(RelayH or RelayL) and segname HC }
+
+atomselect macro Strut   {(resid 601 to 606) and segname HC }
+
+atomselect macro SH2Loop {(resid 695 to 696) and segname HC }
+atomselect macro SH1Helix {(resid 697 to 707) and segname HC }
+atomselect macro SH1Loop {(resid 708 to 710) and segname HC }
+atomselect macro SH1  {(SH1Loop or SH1Helix or SH2Loop ) and segname HC }
+
+
+atomselect macro Converter {(resid 711 to 775 ) and segname HC }
+atomselect macro Leverarm {(resid 776 to 839 ) and segname HC }
+atomselect macro BBulge  {(resid 248 to 269) and segname HC }
+atomselect macro Linker  {(resid 449 to 457) and segname HC } 
+atomselect macro Beta5   {(resid 458 to 462) and segname HC } 
+atomselect macro HGHelix {(resid 216 to 222) and segname HC }
+atomselect macro Transducer {(Loop1 or HGHelix or BBulge or Linker or Beta5) and segname HC }
+
+############################## additional macros (mine) ###########
+
+#atomselect macro SH3Loop {(resid 7 to 13) and segname HC }
+#atomselect macro U50Loop1 {(resid 295 to 301) and segname HC }
+#atomselect macro U50Loop2 {(resid 288 to 295) and segname HC } 
+#atomselect macro U50Loop3 {(resid 251 to 255) and segname HC }
+
+#atomselect macro NLoop1 {(resid 666 to 674) and segname HC }
+#atomselect macro NLoop2 {(resid 64 to 81) and segname HC }
+
+atomselect macro NtHelix {(resid 184 to 196) and segname HC }
+
+atomselect macro TransHelix {(resid 222 to 235) and segname HC }
+
+#atomselect macro Aloop {( resid 110 to 117 ) and segname HC } ;# coordinates the adenosine moiety
+
+# note the light chain is from resid 4 to 151
+###############################################################

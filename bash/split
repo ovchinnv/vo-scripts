@@ -1,0 +1,49 @@
+#!/bin/bash
+
+file=4ANJ.pdb
+
+# protein atoms:
+if  [ 1 == 1 ]; then
+./getchain ${file} A > temp
+./addsegid temp HC $chain > hc.pdb; echo >> hc.pdb
+
+./getchain ${file} B > temp
+./addsegid temp LC $chain > lc.pdb; echo >> lc.pdb
+
+fi
+#exit 1
+# ADP atoms
+if  [ 1 == 1 ]; then
+grep -i "HETATM" ${file} | grep "ADP" | sed -e 's/HETATM/ATOM  /' | sed -e 's/2230/   1/' > temp ;
+./addsegid temp ADP> adp.pdb;  echo >> adp.pdb
+fi
+
+# MG atom(s)
+#
+if  [ 1 == 1 ]; then
+grep -i "HETATM" ${file} | grep "MG" | sed -e 's/HETATM/ATOM  /' | sed -e 's/2231/   1/'> temp ;
+./addsegid temp MG> mg.pdb;  echo >> mg.pdb
+fi
+
+# Calcium atom(s)
+#
+if  [ 1 == 1 ]; then
+grep -i "HETATM" ${file} | grep " CA " | sed -e 's/HETATM/ATOM  /' | sed -e 's/CA /CAL/g'| sed -e 's/1147/   1/'| sed -e 's/1148/   2/'| sed -e 's/1149/   3/' > temp ;
+./addsegid temp CAL > cal.pdb;  echo >> cal.pdb
+fi
+
+# water
+if  [ 1 == 1 ]; then
+
+grep -i "HOH" ${file}  | sed -e 's/HETATM/ATOM  /' -e 's/O\s\s/OH2/' -e 's/HOH\s/TIP3/'  > temp ;
+./addsegid temp XWAT > xwat.pdb;  echo >> xwat.pdb
+
+fi
+
+# phosphate (possibly from analogs)
+if  [ 1 == 1 ]; then
+
+grep -i "HETATM" ${file} | grep -i "ALF" | sed -e 's/HETATM/ATOM  /' | sed -e 's/2232/   1/'> temp ;
+./addsegid temp PHOS > phos.pdb;  echo >> phos.pdb
+
+fi

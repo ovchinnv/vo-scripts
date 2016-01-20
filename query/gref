@@ -1,0 +1,54 @@
+#!/bin/bash
+# tools to retrieve citations from pubmed
+
+#declare -a authors=("beveridge" "dicapua");
+#year=1989
+
+if [ -z "$1" ]; then
+ echo "USAGE : <author1> [<author2> ... <authorN>] [<year>]"
+ exit
+fi
+
+nargs=${#@};
+# test for year :
+year=`echo ${@:$nargs:$nargs} | awk "/^[0-9]+$/" `;
+if [ ! -z $year ]; then
+ nargs=$(($nargs - 1)) ;# ast arg is a year, so remove it from author list
+fi
+#
+authors=${@:1:$nargs}
+#echo ${authors[@]}
+
+qbase="http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?&db=pubmed"
+qend="&retmode=xml&rettype=medline"
+
+query="&term=";
+# add authors
+for author in ${authors[@]}; do
+ query="${query}${author}[Author]+AND+"
+done
+# add year
+if [ ! -z $year ] ; then
+ query="${query}${year}[pdat]"
+fi
+
+# complete html request
+qhtml="${qbase}${query}${qend}"
+# submit query
+#echo $qhtml
+pubid=`curl --silent --globoff $qhtml | grep -i "<id>" | sed -e "s/[^>]*>//" -e "s/<\/.*>//"`
+#pubid=`curl  --globoff $qhtml | grep -i "<id>" | sed -e "s/[^>]*>//" -e "s/<\/.*>//"`
+numid=`echo "$pubid" | wc -w`
+echo "======================================================">&2
+if [ "$numid" -eq "0" ]; then
+ echo "ERROR : query \"${@}\" did not result in any hits." >&2
+ exit
+elif [ "$numid" -gt "1" ]; then
+ echo "NOTE : query \"${@}\" resulted in $numid hits : " >&2
+fi
+
+for pid in $pubid ; do
+ python2 pyP2B.py $pid
+done
+
+echo "======================================================">&2

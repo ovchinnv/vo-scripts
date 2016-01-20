@@ -1,0 +1,119 @@
+#!/bin/bash
+
+
+format=card
+charmm=./charmm
+mpirun=mpirun
+
+########################################################################
+echo '* wrapper for parallel runs '> wrapper
+echo '*' >> wrapper
+echo 'stream @a' >> wrapper
+#######################################################################
+#nodes=( 01 03 04 05 06 07 10 ) 
+#nodes=( 01 03 04 05 ) 
+#nodes=( 19 18)
+nodes=( )
+
+local=1 # run locally?
+count=0 # cpus
+flag="" # -nolocal
+
+echo>NODES
+
+if [ $local -eq 0 ]; then
+ flag="-nolocal"
+else
+ echo `hostname`>NODES
+ count=2
+fi 
+
+for i in ${nodes[@]}
+do
+ echo n$i>>NODES
+ count=$(($count+1))
+done
+
+np=$(($count*1))
+
+########################################################################
+toppar=~/charmm/c34a2/toppar
+toppar1=~/charmm/c34a2/toppar/stream/
+
+outname=bpgm_apo
+
+if test -z "$2"
+then
+
+if [ 1 -eq 0 ];then
+######### build system in vacuum 
+echo -n " * Creating structure file and coordinates in vacuum ... "
+$mpirun -np $np $flag -machinefile NODES \
+$charmm \
+ toppar=$toppar toppar1=$toppar1 outname=$outname format=$format \
+ a=build27.inp < wrapper >& build27.out
+echo "done"
+if [ $? -ne 0 ];  then
+   echo Execution interrupted due to errors
+   exit
+fi 
+fi
+#
+if [ 1 -eq 0 ];then
+######## minimize in vacuum (debump) ############################
+echo -n " * Running minimization in vacuum ... "
+$mpirun -np $np $flag -machinefile NODES \
+$charmm \
+ toppar=$toppar toppar1=$toppar1 psffile="$outname" corfile="$outname" format=$format\
+ a=mini.inp < wrapper >&mini.out
+echo "done"
+#
+if [ $? -ne 0 ];  then
+   echo Execution interrupted due to errors
+   exit
+fi 
+fi
+#
+if [ 1 -eq 0 ];then
+########## solvate  ###########
+echo -n " * Adding solvation box ... "
+$mpirun -np $np $flag -machinefile NODES \
+$charmm \
+ toppar=$toppar toppar1=$toppar1 psffile="$outname" corfile="$outname"_m format=$format\
+ a=boxsolv.inp < wrapper >& solvate.out
+echo "done"
+#
+if [ $? -ne 0 ];  then
+   echo Execution interrupted due to errors
+   exit
+fi 
+fi
+if [ 1 -eq 1 ];then
+######### neutralize by replacing waters with ions ###############
+echo -n " * Adding ions ... "
+$mpirun -np $np $flag -machinefile NODES \
+$charmm \
+ toppar=$toppar toppar1=$toppar1 psffile="$outname"_s corfile="$outname"_ms format=$format\
+ a=ionize.inp < wrapper #>& ionize.out
+echo "done"
+#
+if [ $? -ne 0 ];  then
+   echo Execution interrupted due to errors
+   exit
+fi
+fi
+exit #not enough memory for minimization & heap expansion causes crashes
+
+######### set up image centering for an orthorhombic box
+$mpirun -np $np $flag  \
+# -machinefile NODES \
+$charmm \
+ toppar=$toppar toppar1=$toppar1 psffile="$outname"_sn corfile="$outname"_msn format=$format\
+ a=myoimg.inp < ~/wrapper
+
+if [ $? -ne 0 ];  then
+   echo Execution interrupted due to errors
+   exit
+
+fi
+fi

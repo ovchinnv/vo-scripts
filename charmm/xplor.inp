@@ -1,0 +1,16 @@
+* read in a psf file
+
+nobomb
+set version 27
+
+set psffile lasq_sn
+set corfile lasqsn
+
+stream ./readpsf.str
+!mini abnr 100
+
+write psf card xplor name @{psffile}-x.psf
+if @?corfile .ne. 0 write coord pdb name @corfile.pdb
+
+!energy
+

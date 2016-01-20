@@ -1,0 +1,116 @@
+#!/bin/vmd
+
+set psffile        ${name}-x.psf 
+set pdbfile        ${name}.pdb
+set fixedfile      ${name}.res
+set resfile        ${name}.res
+
+
+structure          $psffile 
+coordinates        $pdbfile
+
+if {$count == 0} {
+#nothing
+bincoordinates     scratch/mini0fixed.coor
+extendedSystem     scratch/mini0fixed.xsc
+} else {
+ 
+bincoordinates     scratch/$restart.coor
+#binvelocities      scratch/prig1[expr $count-1].restart.vel
+extendedSystem     scratch/$restart.xsc
+}
+
+set sx $a ;# cell dimensions
+set sy $b
+set sz $c
+ 
+set temperature    298
+set outputname     scratch/$output
+
+firsttimestep      0
+##########################################################################
+paraTypeCharmm	    on
+parameters          /u0/o/ovchinnv/cparam/par_all27_prot_na.prm
+#parameters          /home/ovchinnikov/charmm/c34a2/toppar/par_all27_prot_na.prm
+temperature         $temperature
+
+# f-field
+exclude             scaled1-4
+1-4scaling          1.0
+cutoff              12.
+switching           on
+switchdist          10.
+pairlistdist        14.5
+
+# Integrator Parameters
+timestep            2  ;# 2fs/step
+rigidBonds          no ;# needed for 2fs steps
+nonbondedFreq       1
+fullElectFrequency  1  
+stepspercycle       10
+fixedAtoms          $fixedflag
+fixedAtomsCol       B
+fixedAtomsFile      $fixedfile
+constraints         on
+consref             $pdbfile
+conskfile           $resfile
+conskcol            $consCol
+constraintScaling   $cscale ;# multiplies the factor in the PDB file
+
+
+# Constant Temperature Control
+langevin            on    ;# do langevin dynamics
+langevinDamping     5     ;# damping coefficient (gamma) of 5/ps
+langevinTemp        $temperature
+langevinHydrogen    off    ;# don't couple langevin bath to hydrogens
+                                                                                
+# Constant Pressure Control (variable volume)
+useGroupPressure      no ;# needed for rigidBonds
+useFlexibleCell       no
+useConstantArea       no
+                                                                                
+langevinPiston        on
+langevinPistonTarget  1.01325 ;#  in bar -> 1 atm
+langevinPistonPeriod  100.
+langevinPistonDecay   50.
+langevinPistonTemp    $temperature ; # same temperature as the system target temp
+
+
+# Periodic Boundary Conditions
+cellBasisVector1     $sx   0.     0.
+cellBasisVector2     0.    $sy    0.
+cellBasisVector3     0.    0.     $sz
+cellOrigin           0.    0.     0. 
+
+wrapWater           on
+wrapAll             on
+wrapNearest         on
+
+# PME (for full-system periodic electrostatics)
+PME                 yes 
+PMEGridSizeX        144
+PMEGridSizeY        96
+PMEGridSizeZ        96
+
+
+# Output
+outputName          $outputname
+restartfreq         100     ;# 500steps = every 1ps APPLIES TO MINIMIZATION TOO
+dcdfreq             1000
+xstFreq             100
+outputEnergies      100
+outputPressure      100
+outputTiming        100
+
+## minimization
+minimize            $nsteps
+
+
+#reinitvels          $temperature
+
+# this should be > t libration and t diffusion over cavities 
+# ions equilibration takes longer
+# run for 80 ps
+
+#run 1000 ;# n timesteps
+

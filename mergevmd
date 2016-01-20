@@ -1,0 +1,40 @@
+#!/bin/bash
+
+if [ -z $1 ]; then 
+ echo "Error: filename missing..."
+ exit
+fi
+
+numarg=$#
+freq=${@:$numarg:$numarg}
+#
+# test if last argument is an integer
+#
+if [ $freq -eq $freq 2>/dev/null ]; then
+ freq=$freq
+ nfiles=$(($numarg-1));
+else
+ freq=10
+ nfiles=$numarg
+fi
+
+echo Merging $nfiles trajectory files in ${freq}-frame intervals...
+
+dcdin=${@:1:$nfiles}
+
+dcdout=${1%%.*}_merged.${1#*.}
+dcdout=${1%%.*}_small.${1#*.}
+
+script=vmdscript
+
+echo "#!/bin/tcl" > $script
+for dcd in ${dcdin}; do 
+ echo $dcd
+ echo animate read dcd ${dcd} beg 0 skip $freq waitfor all >> $script
+done
+echo animate write dcd $dcdout beg 0 skip 1 waitfor all sel [atomselect top all]>> $script
+echo >> $script
+
+#vmd -dispdev text < $script
+
+exit

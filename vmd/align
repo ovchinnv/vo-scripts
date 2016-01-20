@@ -1,0 +1,109 @@
+#!/bin/vmd
+
+mol delete all
+mol load psf rigor2_am-x.psf
+mol addfile tmd1nbp.dcd type dcd waitfor all
+
+set rig [molinfo top]
+
+axes location off
+set cons noh
+color Display {Background} gray
+axes location off
+
+source myomacro2.vmd
+mol delrep 0 $rig
+
+mol representation lines
+mol selection backbone
+mol color colorid $silver
+mol addrep $rig
+
+# load target PS structure
+
+
+mol load pdb prigor2_am_helix_NBP.tmd
+set pr [molinfo top]
+mol delrep 0 $pr
+
+set nfr [molinfo $rig get numframes];
+set template [atomselect $pr "NtHelix and backbone"];
+set orient [atomselect $rig "NtHelix and backbone" frame 0];
+set forced [atomselect $rig "(Ploop or Switch1 or resid MG or resid ATP ) and noh"]
+set forced_pr [atomselect $pr "(Ploop or Switch1 or resid MG or resid ATP ) and noh"]
+set all [atomselect $rig "not (water or ion)" frame 0];
+set all_pr [atomselect $pr "not (water or ion)" ];
+
+
+# orientation: standard method
+set rmsdf {}
+set rmsdo {}
+for {set i 0} {$i<$nfr} {incr i} {
+ $orient frame $i
+ $all frame $i
+ $forced frame $i
+ $all move [measure fit $orient $template]
+ lappend rmsdf [measure rmsd $forced $forced_pr]
+ lappend rmsdo [measure rmsd $orient $template]
+} 
+
+######## align based on all backbone
+for {set i 0} {$i<$nfr} {incr i} {
+ $all frame $i
+ $all move [measure fit $all $all_pr]
+} 
+
+############## repeat using my routine
+source tmdAux6.tcl
+
+set targetcoor {}
+set oweights {}
+set rweights {}
+# ref_coords
+foreach xx [$template get x] yy [$template get y] zz [$template get z] {
+ lappend targetcoor $xx $yy $zz
+ lappend oweights 1.0
+ lappend rweights 0.0
+}
+# forced ref_coords
+foreach xx [$forced_pr get x] yy [$forced_pr get y] zz [$forced_pr get z] {
+ lappend targetcoor $xx $yy $zz
+ lappend oweights 0.0
+ lappend rweights 1.0
+}
+
+set rmsdf1 {}
+set rmsdo1 {}
+set ind {}
+#for {set i 86} {$i<87} {incr i} {
+for {set i 0} {$i<$nfr} {incr i} {
+ set simcoor {}
+ $orient frame $i
+ $forced frame $i
+ foreach xx [$orient get x] yy [$orient get y] zz [$orient get z] {
+  lappend simcoor $xx $yy $zz
+ }
+ foreach xx [$forced get x] yy [$forced get y] zz [$forced get z] {
+  lappend simcoor $xx $yy $zz
+ }
+# do alignment
+ set fit [RMSBestFit $targetcoor $simcoor $oweights];
+ lappend rmsdo1 [rmsd $fit $simcoor $oweights];
+ lappend rmsdf1 [rmsd $fit $simcoor $rweights];
+
+ lappend ind $i
+
+}
+
+
+## save for comparison
+set fid [open rmsd.dat w];
+foreach ro1 $rmsdo ro2 $rmsdo1 rf1 $rmsdf rf2 $rmsdf1 i $ind {
+ puts $fid "$i $ro1 $ro2 $rf1 $rf2"
+}
+#foreach ro2 $rmsdo1 rf2 $rmsdf1 i $ind {
+# puts $fid "$i $ro2 $rf2"
+#}
+
+close $fid
+

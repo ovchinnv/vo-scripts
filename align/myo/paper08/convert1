@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ -z $1 ]; then
+ echo 'USAGE: convert1 <filename>';
+ exit 1
+else
+ file=$1
+ name=${file%%.*}
+# echo $name
+ echo -n "converting $file to $name.eps ..."
+ convert -density 150 -antialias -quality 100 $file $name.eps
+ echo 'done'
+fi
+ 

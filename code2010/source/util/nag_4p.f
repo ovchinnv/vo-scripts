@@ -1,0 +1,936 @@
+      SUBROUTINE D03EBF(N1,N2,N1M,A,B,C,D,E,Q,T,APARAM,ITMAX,ITCOUN,
+     *                  ITUSED,NDIR,IXN,IYN,CONRES,CONCHN,RESIDS,CHNGS,
+     *                  WRKSP1,WRKSP2,WRKSP3,IFAIL)
+C     MARK 7 RELEASE. NAG COPYRIGHT 1978.
+C     MARK 8C REVISED. IER-267 (OCT. 1980).
+C     MARK 11.5(F77) REVISED. (SEPT 1985.)
+C     *************************************************************
+C     D03EBF OBTAINS THE SOLUTION TO A SYSTEM OF SIMULTANEOUS
+C     ALGEBRAIC EQUATIONS OF FIVE POINT MOLECULE FORM ON A
+C     TOPOLOGICALLY RECTANGULAR MESH.
+C     IT IS THE DRIVING ROUTINE FOR D03UAF FOR STANDARD
+C     APPLICATIONS.
+C
+C
+C     INPUTS
+C
+C     N1      NUMBER OF NODES IN THE FIRST COORDINATE DIRECTION.
+C     N2      NUMBER OF NODES IN THE SECOND COORDINATE DIRECTION.
+C     N1M     FIRST DIMENSION OF ALL THE TWO-DIMENSIONAL ARRAYS.
+C     A       ARRAY OF DIMENSION (N1M,N2) STORES THE COEFFICIENT
+C             OF THE ITERATIVE UPDATE EQUATIONS AS SHOWN BELOW -
+C     B       DITTO ... DIMENSION (N1M,N2) ...
+C     C       DITTO ... DIMENSION (N1M,N2) ...
+C     D       DITTO ... DIMENSION (N1M,N2) ...
+C     E       DITTO ... DIMENSION (N1M,N2) ...
+C
+C        A(I,J)*T(I,J-1)+B(I,J)*T(I-1,J)+C(I,J)*T(I,J)+D(I,J)*
+C        T(I+1,J)+E(I,J)*T(I,J+1) = Q(I,J)
+C
+C             WITH I=1,2,...,N1 AND J=1,2,...,N2 AND WHERE T(I,J)
+C             IS THE ARRAY WHOSE VALUES ARE SOUGHT AND WHERE
+C             Q(I,J) IS THE ARRAY OF SOURCE TERMS. ANY VALUES OF
+C             T OUTSIDE THE PROBLEM AREA (1-N1,1-N2) ARE TAKEN
+C             AS ZERO.
+C     Q       IS THE ARRAY OF SOURCE TERMS DIMENSION (N1M,N2)
+C     T       ARRAY STORING THE APPROXIMATE SOLUTION OF T IN THE
+C             ABOVE EQUATION WHICH IS PASSED TO THE ROUTINE.
+C             IF NO BETTER APPROXIMATION IS KNOWN, AN ARRAY OF
+C             ZEROS CAN BE USED DIMENSIONED (N1M,N2).
+C     APARAM  IS AN ITERATION ACCELERATION PARAMETER FACTOR
+C             TYPICALLY SET TO 1.0. IF CONVERGENCE IS SLOW, IT
+C             CAN BE DECREASED. IF DIVERGENCE IS OBTAINED, IT
+C             SHOULD BE INCREASED. IN EITHER CASE IT MUST NOT
+C             GO OUTSIDE THE BOUNDS PRESCRIBED (SEE IFAIL
+C             PARAMETER FOR D03UAF).
+C     ITMAX   IS THE MAXIMUM NUMBER OF ITERATIONS TO BE USED.
+C     ITCOUN  IS AN INDICATOR SET EQUAL TO 0 ON THE FIRST CALL
+C             TO D03EBF. FOR SUBSEQUENT CALLS FOR THE SAME
+C             PROBLEM, I.E. SAME N1 N2,BUT POSSIBLY DIFFERENT
+C             COEFFICIENTS AND/OR SOURCE TERMS, AS OCCUR WITH NON
+C             LINEAR SYSTEMS OR TIME DEPENDENT SYSTEMS, ITCOUN
+C             SHOULD BE SET TO THE NUMBER OF ITERATIONS USED SO
+C             FAR ON SUBSEQUENT CALLS TO ENSURE SUITABLE CYCLING
+C             OF THE ITERATION ACCELERATION PARAMETERS IN D03UAF.
+C             CHANGED ON OUTPUT TO THE NUMBER OF ITERATIONS USED
+C             SO FAR I.E. ITCOUN ON RETURN = ITCOUN ON INPUT +
+C             ITUSED ON RETURN
+C     NDIR    IS AN INTEGER SET TO A NON-ZERO VALUE FOR SYSTEMS
+C             OF EQUATIONS WHICH HAVE A UNIQUE SOLUTION. FOR
+C             SYSTEMS DERIVED FROM, E.G. LAPLACES EQUATION WITH
+C             ALL NEUMANN BOUNDARY CONDITIONS, PROBLEMS WITH AN
+C             ARBITRARY CONSTANT CAN BE ADDED TO THE SOLUTION,
+C             NDIR SHOULD BE SET TO ZERO AND THE VALUES OF THE
+C             NEXT 2 PARAMETERS MUST BE SPECIFIED. FOR SUCH
+C             PROBLEMS THE ROUTINE SUBTRACTS THE VALUE OF THE
+C             FUNCTION DERIVED AT THE NODE (IXN,IYN) FROM THE
+C             WHOLE SOLUTION AFTER EACH ITERATION TO REDUCE THE
+C             POSSIBLITY OF LARGE ROUNDING ERRORS. THE USER MU
+C             ALSO ENSURE THAT FOR SUCH PROBLEMS THE APPROPRIATE
+C             CONSISTENCY CONDITION ON THE SOURCE TERMS IS
+C             SATISFIED.
+C     IXN,IYN NODAL INDECIES OF THE NODE AT WHICH THE SOLUTION IS
+C             TO BE REDUCED TO ZERO FOR PROBLEMS FOR WHICH NDIR IS
+C             SET TO ZERO THE NODE SHOULD NOT CORRESPOND TO A
+C             CORNER NODE OF THE REGION OF INTEREST.
+C
+C     CONVERGENCE CRITERIA
+C
+C     CONRES  CONVERGENCE CRITERION ON THE MAXIMUM ABSOLUTE VALUE
+C             OF THE NORMALIZED RESIDUAL, THE LATTER BEING
+C             DEFINED AS THE RESIDUAL OF THE EQUATION DIVIDED BY
+C             THE CENTRAL COEFFICIENT WHEN THE LATTER IS NOT
+C             EQUAL TO O.O, AND DEFINED AS THE RESIDUAL WHEN THE
+C             CENTRAL COEFFICIENT IS 0.0.
+C     CONCHN  CONVERGENCE CRITERION ON THE MAXIMUM ABSOLUTE VALUE
+C             OF THE CHANGE MADE AT EACH ITERATION OF THE ARRAY T
+C
+C     CONVERGENCE IS ACHIEVED WHEN BOTH THE CRITERIA ARE SATISFIED
+C
+C     RESIDS  ARRAY OF DIMENSION ITMAX ... SEE OUTPUT
+C     CHNGS   ARRAY OF DIMENSION ITMAX ... SEE OUTPUT
+C
+C     WRKSP1  WORKSPACE ARRAY OF DIMENSION (N1M,N2) USED BY D03UAF
+C     WRKSP2   ... DITTO ...
+C     WRKSP3  WORKSPACE ARRAY OF DIMENSION (N1M,N2) USED TO PASS
+C             THE RESIDUALS TO D03UAF, AND IN WHICH THE UPDATE
+C             VALUES ARE RETURNED FROM D03UAF TO THIS ROUTINE.
+C
+C     IFAIL   IS AN ERROR PARAMETER INDICATOR SET BY THE USER TO
+C             INDICATE THE TYPE OF FAILURE IF AN ERROR IS
+C             ENCOUNTERED.
+C
+C     PROCESS
+C
+C     SET ERROR PARAMETER
+C     CHECK INPUT INTEGERS
+C     COMMENCEMENT OF CALCULATIONAL PROCEDURE
+C     START OF ITERATIVE SOLUTION PROCEDURE
+C     SET CONVERGENCE PARAMETER ACCUMULATORS TO ZERO
+C     CALCULATE THE RESIDUALS AND STORE IN ARRAY WRKSP3
+C     CALL SUBROUTINE D03UAF TO PERFORM 1 ITERATION OF S.I.P
+C     AND WHICH RETURNS THE ARRAY OF UPDATES IN THE ARRAY WRKSP3
+C     COMBINE THE UPDATES WITH THE OLD SOLUTION
+C     CHECK FOR CONVERGENCE
+C     REPEAT TO CONVERGENCE OR UNTIL MAXIMUM NUMBER OF ITERATIONS
+C     HAVE BEEN USED
+C     SET ERROR INDICATOR ACCORDINGLY
+C     RETURN
+C
+C     OUTPUTS
+C
+C     T       ARRAY STORING THE SOLUTION OF THE SYSTEM OF EQUATIONS
+C             PROVIDED.
+C     ITUSED  NUMBER OF ITERATIONS ACTUALLY USED THIS CALL.
+C     ITCOUN  ACCUMULATED NUMBER OF ITERATIONS USED
+C             ITCOUN ON OUTPUT = ITCOUN ON INPUT + ITUSED ON OUTPUT
+C     RESIDS  VECTOR STORING THE MAXIMUM ABSOLUTE RESIDUALS OF EACH
+C             ITERATION, DIMENSION ITMAX. ONLY THE FIRST ITUSED
+C             VALUES ARE SET ON RETURN.
+C     CHNGS   ARRAY STORING THE MAXIMUM ABSOLUTE CHANGES OF EACH
+C             ITERATION, DIMENSION ITMAX. ONLY THE FIRST ITUSED
+C             VALUES ARE SET ON RETURN.
+C     IFAIL   ERROR INDICATOR
+C             =0 CORRECT RETURN
+C             =1 EITHER N1.LE.1 OR N2.LE.1
+C             =2 CONVERGENCE NOT ACHIEVED. REFER TO VALUES IN
+C                RESIDS AND CHNGS TO DETERMINE IF THE ITERATION
+C                WAS CONVERGING. REFER TO GUIDE ON SETTING APARAM
+C                IF CONVERGENCE IS VERY SLOW.
+C             =3 APARAM.LE.0.0
+C             =4 APARAM.GE.((N1-1)**2+(N2-1)**2)/2.0
+C
+C     ROUTINES USED
+C
+C     D03UAF  SINGLE ITERATION OF S.I.P. FOR A FIVE POINT MOLECULE
+C             SYSTEM.
+C     P01AAF  ERROR HANDLING ROUTINE.
+C
+C     **************************************************************
+C
+C
+C     SET ERROR PARAMETER
+C
+C     .. Parameters ..
+      CHARACTER*6       SRNAME
+      PARAMETER         (SRNAME='D03EBF')
+C     .. Scalar Arguments ..
+      DOUBLE PRECISION  APARAM, CONCHN, CONRES
+      INTEGER           IFAIL, ITCOUN, ITMAX, ITUSED, IXN, IYN, N1, N1M,
+     *                  N2, NDIR
+C     .. Array Arguments ..
+      DOUBLE PRECISION  A(N1M,N2), B(N1M,N2), C(N1M,N2), CHNGS(ITMAX),
+     *                  D(N1M,N2), E(N1M,N2), Q(N1M,N2), RESIDS(ITMAX),
+     *                  T(N1M,N2), WRKSP1(N1M,N2), WRKSP2(N1M,N2),
+     *                  WRKSP3(N1M,N2)
+C     .. Local Scalars ..
+      DOUBLE PRECISION  DELMAX, RES, RESMAX, TNEUM
+      INTEGER           I, IERROR, IFAIL1, ITNUM, J
+C     .. Local Arrays ..
+      CHARACTER*1       P01REC(1)
+C     .. External Functions ..
+      INTEGER           P01ABF
+      EXTERNAL          P01ABF
+C     .. External Subroutines ..
+      EXTERNAL          D03UAF
+C     .. Intrinsic Functions ..
+      INTRINSIC         ABS, MAX
+C     .. Executable Statements ..
+      IERROR = 0
+      ITUSED = 0
+C
+C     CHECK INPUT INTEGERS
+C
+      IF (N1.LE.1) GO TO 180
+      IF (N2.LE.1) GO TO 180
+C
+      IF (N1M.LT.N1) GO TO 200
+C
+C     SET VALUE OF TNEUM FOR CASE WHEN NDIR.NE.0
+C
+      TNEUM = 0.0D0
+C
+C     START ITERATION LOOP
+C
+      DO 140 ITNUM = 1, ITMAX
+C
+C        CALCULATE THE RESIDUALS
+C
+         RESMAX = 0.0D0
+         DO 80 J = 1, N2
+            DO 60 I = 1, N1
+               IF (C(I,J).EQ.0.0D0) GO TO 20
+C
+C              FIVE POINT MOLECULE FORMULA
+C
+               RES = Q(I,J) - C(I,J)*T(I,J)
+               IF (J-1.GE.1) RES = RES - A(I,J)*T(I,J-1)
+               IF (I-1.GE.1) RES = RES - B(I,J)*T(I-1,J)
+               IF (I+1.LE.N1) RES = RES - D(I,J)*T(I+1,J)
+               IF (J+1.LE.N2) RES = RES - E(I,J)*T(I,J+1)
+C
+               RESMAX = MAX(RESMAX,ABS(RES/C(I,J)))
+               WRKSP3(I,J) = RES
+C
+               GO TO 40
+   20          CONTINUE
+C
+C              EXPLICIT EQUATION
+C
+               WRKSP3(I,J) = Q(I,J) - T(I,J)
+               RESMAX = MAX(RESMAX,ABS(WRKSP3(I,J)))
+C
+   40          CONTINUE
+   60       CONTINUE
+   80    CONTINUE
+C
+C        INCREMENT ACCUMULATED ITERATION COUNTER
+C
+         ITCOUN = ITCOUN + 1
+C
+C        SET ERROR PARAMETER
+C
+C
+         IFAIL1 = 1
+C
+         CALL D03UAF(N1,N2,N1M,A,B,C,D,E,APARAM,ITCOUN,WRKSP3,WRKSP1,
+     *               WRKSP2,IFAIL1)
+C
+C        CHECK ERROR FLAG RETURN FROM D03UAF
+C
+         IF (IFAIL1.NE.0) GO TO 220
+C
+C        SET ITUSED
+C
+         ITUSED = ITNUM
+C
+C        UPDATE THE DEPENDENT VARIABLE
+C
+C        SET TNEUM FOR CASE  NDIR=0
+C
+         IF (NDIR.EQ.0) TNEUM = T(IXN,IYN)
+C
+         DELMAX = 0.0D0
+C
+         DO 120 J = 1, N2
+            DO 100 I = 1, N1
+               T(I,J) = T(I,J) + WRKSP3(I,J) - TNEUM
+               DELMAX = MAX(DELMAX,ABS(WRKSP3(I,J)))
+  100       CONTINUE
+  120    CONTINUE
+C
+         RESIDS(ITNUM) = RESMAX
+         CHNGS(ITNUM) = DELMAX
+C
+         IF ((RESMAX.LT.CONRES) .AND. (DELMAX.LT.CONCHN)) GO TO 160
+C
+  140 CONTINUE
+C
+C     NO CONVERGENCE
+C
+      GO TO 240
+C
+C     CORRECT RETURN
+C
+  160 CONTINUE
+      IFAIL = 0
+      RETURN
+C
+C     ERROR RETURNS
+C
+  180 CONTINUE
+      IERROR = 1
+      GO TO 260
+C
+  200 CONTINUE
+      IERROR = 2
+      GO TO 260
+C
+  220 CONTINUE
+      IERROR = IFAIL1
+      GO TO 260
+C
+  240 CONTINUE
+      IERROR = 5
+C
+  260 CONTINUE
+C
+C     ERROR CONDITION
+C
+      IFAIL = P01ABF(IFAIL,IERROR,SRNAME,0,P01REC)
+C
+      RETURN
+C
+      END
+      SUBROUTINE D03UAF(N1,N2,N1M,A,B,C,D,E,APARAM,IT,R,WRKSP1,WRKSP2,
+     *                  IFAIL)
+C     MARK 7 RELEASE. NAG COPYRIGHT 1978.
+C     MARK 10A REVISED. IER-386 (OCT 1982).
+C     MARK 11.5(F77) REVISED. (SEPT 1985.)
+C
+C     **************************************************************
+C     D03UAF PERFORMS 1 ITERATION OF THE STRONGLY IMPLICIT PROCEDURE
+C     AT EACH CALL TO CALCULATE THE SUCCESSIVE APPROXIMATE
+C     CORRECTIONS TO THE SOLUTION OF A SYSTEM OF SIMULTANEOUS
+C     ALGEBRAIC EQUATIONS FOR WHICH THE ITERATIVE UPDATE MATRIX IS
+C     OF THE FIVE POINT MOLECULE FORM ON A TOPOLOGICALLY TWO-
+C     DIMENSIONAL RECTANGULAR MESH.
+C
+C     STRONGLY IMPLICIT PROCEDURE ROUTINE FOR 2 DIMENSIONAL 05
+C     POINT MOLECULES.
+C
+C     INPUTS
+C
+C     N1      NUMBER OF NODES IN THE FIRST COORDINATE DIRECTION.
+C     N2      NUMBER OF NODES IN THE SECOND COORDINATE DIRECTION.
+C     N1M     FIRST DIMENSION OF ALL THE TWO-DIMENSIONAL ARRAYS.
+C     A       ARRAY OF DIMENSION (N1M,N2) STORING THE COEFFICIENT
+C             OF THE ITERATIVE UPDATE EQUATIONS AS SHOWN BELOW -
+C     B       ... DIMENSION (N1M,N2) ...
+C     C       ... DIMENSION (N1M,N2) ...
+C     D       ... DIMENSION (N1M,N2) ...
+C     E       ... DIMENSION (N1M,N2) ...
+C
+C     A(I,J)*S(I,J-1)+B(I,J)*S(I-1,J)+C(I,J)*S(I,J)+D(I,J)*
+C      S(I+1,J)+E(I,J)*S(I,J+1)=R(I,J)
+C
+C             WITH I=1,2,...,N1 AND J=1,2,...,N2 AND WHERE S(I,J)
+C             IS THE ARRAY WHOSE APPROXIMATE VALUES ARE SOUGHT
+C             (AND WHICH OVERWRITE THE RESIDUALS R(I,J) STORED ON
+C             INPUT IN THE ARRAY R). ANY VALUES OF S OUTSIDE THE
+C             (1-N1,1-N2) ARRAY WHICH DEFINES THE PROBLEM REGION
+C             ARE TAKEN AS ZERO.
+C     R       IS INPUT AS THE ARRAY OF RESIDUALS, CORRESPONDING
+C             TO R ABOVE, CHANGED ON OUTPUT TO THE VALUES OF THE
+C             UPDATE ARRAY CORRESPONDING TO S ABOVE, DIMENSIONED
+C             (N1M,N2).
+C     APARAM  IS AN ITERATION ACCELERATION PARAMETER FACTOR
+C             TYPICALLY SET TO 1.0. IF CONVERGENCE IS SLOW, IT
+C             CAN BE DECREASED. IF DIVERGENCE IS OBTAINED, IT
+C             SHOULD BE INCREASED. IN EITHER CASE IT MUST NOT GO
+C             OUTSIDE THE BOUNDS PRESCRIBED (SEE IFAIL PARAMETER
+C             FOR D03UAF).
+C     IT      IS THE ITERATION COUNTER SET AND INCREMENTED BY
+C             THE CALLING ROUTINE, IT IS USED TO DETERMINE THE
+C             APPROPRIATE ITERATION PARAMETERS.
+C     WRKSP1  IS A WORKSPACE ARRAY OF DIMENSION (N1M,N2).
+C     WRKSP2  ... DITTO ...
+C     IFAIL   IS AN ERROR PARAMETER INDICATOR SET BY THE USER TO
+C             INDICATE THE TYPE OF FAILURE IF AN ERROR IS
+C             ENCOUNTERED.
+C
+C     PROCESS
+C
+C     SET ERROR PARAMETER
+C     CHECK INPUT INTEGERS
+C     SET FREQUENTLY REQUIRED INTEGER VARIABLES
+C     COMMENCEMENT OF CALCULATIONAL PROCEDURE
+C     SET ODD/EVEN COUNTERS  KS=1 FOR ODD ITERATIONS
+C                            KS=2 FOR EVEN ITERATIONS
+C     DETERMINE THE NUMBER OF THE ACCELERATION PARAMETER TO BE USED
+C     (THE SAME PARAMETER IS USED FOR 2 ITERATIONS, THERE ARE 9
+C     PARAMETERS IN ALL).
+C     FIRST CALCULATE THE TERM, ALM, IN THE LARGEST PARAMETER
+C     CHECK THE VALUES OF ALM
+C     DETERMINE THE ITERATION PARAMETER
+C     START THE APPROXIMATE LU FACTORIZATION DETERMINING THE VALUES
+C     OF THE ELEMENTS SB,SC IN THE LOWER TRIANGULAR MATRIX L AND
+C     WRKSP1 AND WRKSP2 IN THE UPPER TRIANGULAR MATRIX U. PROGRESS
+C     FORWARDS FIRST AND INVERT THE LOWER TRIANGULAR MATRIX L AS
+C     ONE PROCEEDS SO THAT THE ELEMENTS SB,SC DO NOT HAVE TO BE
+C     STORED IN ARRAYS. THE ELEMENTS WRKSP1 AND WRKSP2 HAVE TO BE
+C     STORED FOR THE SUBSEQUENT INVERSION OF THE MATRIX U BY BACK
+C     SUBSTITUTION.
+C     DO JL = 1,N2
+C        (JL IS ONLY A COUNTER IN THE SECOND COORDINATE DIRECTION
+C         J IS THE INDEX OF THE SECOND COORDINATE AND ON
+C         ALTERNATE ITERATIONS SCANS FIRST INCREASING AND THEN
+C         DECREASING).
+C         DO I = 1,N1
+C            (I IS THE INDEX IN THE FIRST COORDINATE DIRECTION)
+C             STORE TH VALUE OF THE CENTRAL COEFFICIENT
+C             DETERMINE THE TYPE OF THE DIFFERENCE EQUATION
+C               FOR A FIVE POINT MOLECULE EQUATION -
+C                  SET VALUES OF ADJACENT ARRAY ELEMENTS DEPENDENT
+C                  ON NODAL POSITION
+C                  CALCULATE THE OFF-DIAGONAL ELEMENTS OF L,
+C                  NAMELY SB AND SC
+C                  CALCULATE THE OFTEN USED EXPRESSIONS
+C                  CALCULATE THE VALUE OF THE DIAGONAL ELEMENT OF L
+C                  CALCULATE AND STORE THE ELEMENTS OF U, NAMELY
+C                  WRKSP1 AND WRKSP2
+C                  CALCULATE THE ELEMENTS OF L**(-1) * RESIDUAL
+C                  ARRAY
+C               FOR THE EXPLICIT EQUATION DO THE SAME
+C     END OF SCAN FOR FORWARD ELIMINATION
+C     BACK SUBSTITUTION TO MULTIPLY BY U**(-1)
+C     DO JL = 1,N2
+C        J RUNS BACKWARDS AND FORWARDS ALTERNATELY
+C        DO I = N1,N1-1,....,2,1
+C           R IS INITIALLY L**(-1) * RESIDUAL, IT BECOMES
+C           (U**(-1) * (L**(-1) *RESIDUAL) = CHANGE
+C     END OF SCAN FOR BACK SUBSTITUTION
+C     RETURN
+C
+C     OUTPUTS
+C
+C     R       ARRAY STORING THE APPROXIMATE SOLUTION TO THE SYSTEM
+C             OF EQUATIONS PROVIDED, AFTER ONE ITERATION. NOTE
+C             THAT IT HAS OVERWRITTEN THE INPUT RESIDUAL.
+C     IFAIL   ERROR INDICATOR
+C             =0 CORRECT RETURN
+C             =1 EITHER N1.LE.1 OR N2.LE.1
+C             =2 N1M IS LESS THAN N1
+C             =3 APARAM.LE.0.0
+C             =4 APARAM.GT.((N1-1)**2+N2-1)**2)/2.
+C
+C     ROUTINES USED
+C
+C     P01AAF  ERROR HANDLING ROUTINE
+C
+C     **************************************************************
+C
+C     .. Parameters ..
+      CHARACTER*6       SRNAME
+      PARAMETER         (SRNAME='D03UAF')
+C     .. Scalar Arguments ..
+      DOUBLE PRECISION  APARAM
+      INTEGER           IFAIL, IT, N1, N1M, N2
+C     .. Array Arguments ..
+      DOUBLE PRECISION  A(N1M,N2), B(N1M,N2), C(N1M,N2), D(N1M,N2),
+     *                  E(N1M,N2), R(N1M,N2), WRKSP1(N1M,N2),
+     *                  WRKSP2(N1M,N2)
+C     .. Local Scalars ..
+      DOUBLE PRECISION  ALM, ALPHA, CS, RIBJL, RIJB, SB, SBSEIJ, SC,
+     *                  SCSFIJ, SD, SEIBJL, SEIJB, SFIBJL, SFIJB, XKS1,
+     *                  XKS2
+      INTEGER           I, IB, IERROR, IL, IS, J, JB, JL, KS, KS1, KS2,
+     *                  N1M1, N1P1, N2M1, N2P1
+C     .. Local Arrays ..
+      DOUBLE PRECISION  ALP(9)
+      CHARACTER*1       P01REC(1)
+C     .. External Functions ..
+      INTEGER           P01ABF
+      EXTERNAL          P01ABF
+C     .. Intrinsic Functions ..
+      INTRINSIC         MOD, DBLE
+C     .. Data statements ..
+      DATA              ALP(1), ALP(2), ALP(3), ALP(4), ALP(5), ALP(6),
+     *                  ALP(7), ALP(8), ALP(9)/1.0D0, 0.625D0, 0.25D0,
+     *                  0.875D0, 0.5D0, 0.125D0, 0.75D0, 0.375D0, 0.0D0/
+C     .. Executable Statements ..
+      IERROR = 0
+C
+C     CHECK INPUT INTEGERS
+C
+      IF (N1.LE.1) GO TO 220
+      IF (N2.LE.1) GO TO 220
+C
+      IF (N1M.LT.N1) GO TO 240
+C
+C     SET FREQUENTLY REQUIRED INTEGER VARIABLES
+C
+      N1M1 = N1 - 1
+      N2M1 = N2 - 1
+      N1P1 = N1 + 1
+      N2P1 = N2 + 1
+C
+C     COMMENCEMENT OF CALCULATIONAL PROCEDURE
+C     ---------------------------------------
+C
+C
+C     SET ODD/EVEN COUNTER    KS=1  FOR ODD ITERATIONS
+C     KS=2  FOR EVEN ITERATIONS
+      KS = MOD(IT-1,2) + 1
+      IF (KS.EQ.0) KS = 2
+C
+C
+C     SET FREQUENTLY USED ODD/EVEN PARAMETER DERIVATIVES
+C
+      KS1 = 2 - KS
+      XKS1 = DBLE(KS1)
+      KS2 = KS - 1
+      XKS2 = DBLE(KS2)
+C
+C     DETERMINE THE NUMBER OF THE ACCELERATION PARAMETER TO BE USED,
+C     THE SAME PARAMETER IS USED FOR 2 ITERATIONS, THERE ARE 9
+C     PARAMETERS IN ALL
+C
+      IS = MOD(IT-1,18)
+      IF (IS.LT.0) IS = IS + 18
+      IS = IS/2 + 1
+C
+C     CALCULATION OF THE ITERATION ACCELERATION PARAMETER
+C
+C     (1) CALCULATE THE TERM IN THE LARGEST PARAMETER
+C
+      ALM = 2.D0*APARAM/(DBLE(N1M1*N1M1+N2M1*N2M1))
+C
+C     (2) CHECK THE VALUES OF ALM
+C
+      IF (APARAM.LE.0.0D0) GO TO 260
+C
+      IF (ALM.GT.1.0D0) GO TO 280
+C
+C     (3) THEN DETERMINE THE ITERATION PARAMETER
+C
+      ALPHA = 1.D0 - ALM**ALP(IS)
+C
+C     START OF APPROXIMATE LU FACTORIZATION DETERMINING THE VALUES
+C     OF THE ELEMENTS SB,SC IN THE LOWER TRIANGULAR MATRIX L AND
+C     WRKSP1 AND WRKSP2 IN THE UPPER TRIANGULAR MATRIX U. PROGRESS
+C     FORWARDS FIRST AND INVERT THE LOWER TRIANGULAR MATRIX L AS ONE
+C     PROCEEDS SO THAT THE ELEMENTS SB,SC DO NOT HAVE TO BE STORED
+C     IN ARRAYS. THE ELEMENTS WRKSP1 AND WRKSP2 HAVE TO BE STORED
+C     FOR THE SUBSEQUENT INVERSION OF THE MATRIX U BY BACK
+C     SUBSTITUTION.
+C
+      DO 160 JL = 1, N2
+C
+C        JL IS ONLY A COUNTER IN THE SECOND COORDINATE DIRECTION
+C        J IS THE INDEX OF THE SECOND COORDINATE AND ON ALTERNATE
+C        ITERATIONS SCANS FIRST INCREASING AND THEN DECREASING
+C
+         J = KS1*JL + KS2*(N2P1-JL)
+         JB = J - KS1 + KS2
+C
+         DO 140 I = 1, N1
+C
+C           I IS THE INDEX IN THE FIRST COORDINATE DIRECTION
+C
+            IB = I - 1
+C
+C           STORE THE VALUE OF THE CENTRAL COEFFICIENT
+C
+            CS = C(I,J)
+C
+C           DETERMINE THE TYPE OF THE DIFFERENCE EQUATION
+C
+            IF (CS.EQ.0.0D0) GO TO 100
+C
+C           FIVE POINT MOLECULE EQUATION
+C
+C           SET VALUES OF ADJACENT ARRAY ELEMENTS DEPENDENT ON NODAL
+C           POSITION
+C
+            IF ((JB.EQ.0) .OR. (JB.EQ.N2P1)) GO TO 20
+C
+C           (1A) IF NOT ON  BOUNDARY  SO THAT JB.NE.0 OR N2P1
+C
+            SEIJB = WRKSP1(I,JB)
+            SFIJB = WRKSP2(I,JB)
+            RIJB = R(I,JB)
+            GO TO 40
+C
+   20       CONTINUE
+C
+C           (1B) THE VALUES EXTERIOR TO THE ARRAYS ARE SET TO ZERO
+C
+            SEIJB = 0.0D0
+            SFIJB = 0.0D0
+            RIJB = 0.0D0
+   40       CONTINUE
+C
+            IF (I.EQ.1) GO TO 60
+C
+C           (2A) IF NOT ON I=1  I-1.NE.0  SO THAT
+C
+            SEIBJL = WRKSP1(IB,J)
+            SFIBJL = WRKSP2(IB,J)
+            RIBJL = R(IB,J)
+            GO TO 80
+C
+   60       CONTINUE
+C
+C           (2B) ON  I=1  THE VALUES EXTERIOR TO THE ARRAY ARE SET TO 0
+C
+            SEIBJL = 0.0D0
+            SFIBJL = 0.0D0
+            RIBJL = 0.0D0
+   80       CONTINUE
+C
+C           CALCULATE THE ELEMENTS OF THE LOWER TRIANGULAR MATRIX
+C
+            SB = (XKS1*A(I,J)+XKS2*E(I,J))/(1.D0+ALPHA*SEIJB)
+            SC = B(I,J)/(1.D0+ALPHA*SFIBJL)
+C
+C           CALCULATE OFTEN USED EXPRESIONS
+C
+            SBSEIJ = SB*SEIJB
+            SCSFIJ = SC*SFIBJL
+C
+C           CALCULATE THE VALUE OF THE DIAGONAL ELEMENT OF L
+C
+            SD = 1.D0/(-SB*SFIJB-SC*SEIBJL+CS+ALPHA*(SBSEIJ+SCSFIJ))
+C
+C           CALCULATE AND STORE THE ELEMENTS OF THE UPPER TRIANGULAR
+C           MATRIX
+C
+            WRKSP1(I,J) = (D(I,J)-ALPHA*SBSEIJ)*SD
+            WRKSP2(I,J) = (XKS1*E(I,J)+XKS2*A(I,J)-ALPHA*SCSFIJ)*SD
+C
+C           CALCULATION OF THE ELEMENTS OF THE INVERSE OF L * RES VECTOR
+C
+            R(I,J) = (R(I,J)-SB*RIJB-SC*RIBJL)*SD
+C
+            GO TO 120
+C
+  100       CONTINUE
+C
+C           CALCULATION FOR THE EXPLICIT EQUATION
+C
+            WRKSP1(I,J) = 0.0D0
+            WRKSP2(I,J) = 0.0D0
+C
+  120       CONTINUE
+C
+  140    CONTINUE
+  160 CONTINUE
+C
+C     END OF SCAN IN THE TWO COORDINATE DIRECTIONS FOR THE FORWARD
+C     ELIMINATION
+C
+C     PROGRESS BACKWARDS TO MULTIPLY BY THE INVERSE OF THE MATRIX U
+C
+      DO 200 JL = 1, N2
+C
+C        J RUNS BACKWARDS AND FORWARDS ALTERNATELY
+C
+         J = KS1*(N2P1-JL) + KS2*JL
+         JB = J + KS1 - KS2
+C
+         DO 180 IL = 1, N1
+C
+C           THE INDEX FOR THE FIRST COORDINATE ALWAYS RUNS BACKWARDS
+C           SINCE IN THE FIRST LOOP IT ALWAYS RAN FORWARDS
+C
+            I = N1P1 - IL
+C
+C           R IS INITIALLY THE INVERSE OF L * RESIDUAL
+C           IT BECOMES THE INVERSE OF U * INVERSE OF L * RESIDUAL
+C           NAMELY THE CHANGE VECTOR
+C
+            IF ((JB.NE.0) .AND. (JB.NE.N2P1)) R(I,J) = R(I,J) -
+     *          WRKSP2(I,J)*R(I,JB)
+C
+            IF (I.NE.N1) R(I,J) = R(I,J) - WRKSP1(I,J)*R(I+1,J)
+C
+  180    CONTINUE
+  200 CONTINUE
+C
+C     CORRECT RETURN
+C
+      IFAIL = 0
+      RETURN
+C
+C     ERROR RETURNS
+C
+  220 CONTINUE
+      IERROR = 1
+      GO TO 300
+C
+  240 CONTINUE
+      IERROR = 2
+      GO TO 300
+C
+  260 CONTINUE
+      IERROR = 3
+      GO TO 300
+C
+  280 CONTINUE
+      IERROR = 4
+C
+C     ERROR CONDITION
+C
+  300 CONTINUE
+C
+      IFAIL = P01ABF(IFAIL,IERROR,SRNAME,0,P01REC)
+C
+      RETURN
+C
+      END
+C
+      SUBROUTINE F04EAF(N,D,DU,DL,B,IFAIL)
+C     MARK 11 RELEASE. NAG COPYRIGHT 1983.
+C     MARK 11.5(F77) REVISED. (SEPT 1985.)
+C     MARK 14A REVISED. IER-688 (DEC 1989).
+C
+C     F04EAF SOLVES THE EQUATIONS
+C
+C     T*X = B ,
+C
+C     WHERE T IS AN N BY N TRIDIAGONAL MATRIX, BY GAUSSIAN ELIMINATION
+C     WITH PARTIAL PIVOTING.
+C
+C     FOR A DESCRIPTION OF THE PARAMETERS AND USE OF THIS ROUTINE SEE
+C     THE NAG LIBRARY MANUAL.
+C
+C     -- WRITTEN ON 14-JANUARY-1983.  S.J.HAMMARLING.
+C
+C     NAG FORTRAN 66 BLACK BOX ROUTINE.
+C
+C     .. Parameters ..
+      CHARACTER*6       SRNAME
+      PARAMETER         (SRNAME='F04EAF')
+C     .. Scalar Arguments ..
+      INTEGER           IFAIL, N
+C     .. Array Arguments ..
+      DOUBLE PRECISION  B(*), D(*), DL(*), DU(*)
+C     .. Local Scalars ..
+      DOUBLE PRECISION  MULT, TEMP, ZERO
+      INTEGER           K, KK
+C     .. Local Arrays ..
+      CHARACTER*1       P01REC(1)
+C     .. External Functions ..
+      INTEGER           P01ABF
+      EXTERNAL          P01ABF
+C     .. Intrinsic Functions ..
+      INTRINSIC         ABS
+C     .. Data statements ..
+      DATA              ZERO/0.0e+0/
+C     .. Executable Statements ..
+C
+      IF (N.GT.0) GO TO 20
+      IFAIL = P01ABF(IFAIL,1,SRNAME,0,P01REC)
+      RETURN
+   20 CONTINUE
+C
+      IF (N.EQ.1) GO TO 140
+      DO 120 K = 2, N
+         IF (DL(K).NE.ZERO) GO TO 40
+         IF (D(K-1).EQ.ZERO) GO TO 220
+         GO TO 100
+   40    IF (ABS(D(K-1)).LT.ABS(DL(K))) GO TO 60
+         MULT = DL(K)/D(K-1)
+         D(K) = D(K) - MULT*DU(K)
+         B(K) = B(K) - MULT*B(K-1)
+         IF (K.LT.N) DL(K) = ZERO
+         GO TO 100
+   60    CONTINUE
+         MULT = D(K-1)/DL(K)
+         D(K-1) = DL(K)
+         TEMP = D(K)
+         D(K) = DU(K) - MULT*TEMP
+         IF (K.EQ.N) GO TO 80
+         DL(K) = DU(K+1)
+         DU(K+1) = -MULT*DL(K)
+   80    CONTINUE
+         DU(K) = TEMP
+         TEMP = B(K-1)
+         B(K-1) = B(K)
+         B(K) = TEMP - MULT*B(K)
+  100    CONTINUE
+  120 CONTINUE
+  140 CONTINUE
+C
+      IF (D(N).EQ.ZERO) GO TO 200
+      B(N) = B(N)/D(N)
+      IF (N.GT.1) B(N-1) = (B(N-1)-DU(N)*B(N))/D(N-1)
+      IF (N.LE.2) GO TO 180
+      K = N - 2
+      DO 160 KK = 3, N
+         B(K) = (B(K)-DU(K+1)*B(K+1)-DL(K+1)*B(K+2))/D(K)
+         K = K - 1
+  160 CONTINUE
+  180 CONTINUE
+C
+      IFAIL = 0
+      RETURN
+C
+  200 K = N + 1
+  220 IFAIL = P01ABF(IFAIL,K,SRNAME,0,P01REC)
+      RETURN
+C
+C     END OF F04EAF.
+C
+      END
+C
+C
+      INTEGER FUNCTION P01ABF(IFAIL,IERROR,SRNAME,NREC,REC)
+C     MARK 11.5(F77) RELEASE. NAG COPYRIGHT 1986.
+C     MARK 13 REVISED. IER-621 (APR 1988).
+C     MARK 13B REVISED. IER-668 (AUG 1988).
+C
+C     P01ABF is the error-handling routine for the NAG Library.
+C
+C     P01ABF either returns the value of IERROR through the routine
+C     name (soft failure), or terminates execution of the program
+C     (hard failure). Diagnostic messages may be output.
+C
+C     If IERROR = 0 (successful exit from the calling routine),
+C     the value 0 is returned through the routine name, and no
+C     message is output
+C
+C     If IERROR is non-zero (abnormal exit from the calling routine),
+C     the action taken depends on the value of IFAIL.
+C
+C     IFAIL =  1: soft failure, silent exit (i.e. no messages are
+C                 output)
+C     IFAIL = -1: soft failure, noisy exit (i.e. messages are output)
+C     IFAIL =-13: soft failure, noisy exit but standard messages from
+C                 P01ABF are suppressed
+C     IFAIL =  0: hard failure, noisy exit
+C
+C     For compatibility with certain routines included before Mark 12
+C     P01ABF also allows an alternative specification of IFAIL in which
+C     it is regarded as a decimal integer with least significant digits
+C     cba. Then
+C
+C     a = 0: hard failure  a = 1: soft failure
+C     b = 0: silent exit   b = 1: noisy exit
+C
+C     except that hard failure now always implies a noisy exit.
+C
+C     S.Hammarling, M.P.Hooper and J.J.du Croz, NAG Central Office.
+C
+C     .. Scalar Arguments ..
+      INTEGER                 IERROR, IFAIL, NREC
+      CHARACTER*(*)           SRNAME
+C     .. Array Arguments ..
+      CHARACTER*(*)           REC(*)
+C     .. Local Scalars ..
+      INTEGER                 I, NERR
+      CHARACTER*72            MESS
+C     .. External Subroutines ..
+      EXTERNAL                P01ABZ, X04AAF, X04BAF
+C     .. Intrinsic Functions ..
+      INTRINSIC               ABS, MOD
+C     .. Executable Statements ..
+      IF (IERROR.NE.0) THEN
+C        Abnormal exit from calling routine
+         IF (IFAIL.EQ.-1 .OR. IFAIL.EQ.0 .OR. IFAIL.EQ.-13 .OR.
+     *       (IFAIL.GT.0 .AND. MOD(IFAIL/10,10).NE.0)) THEN
+C           Noisy exit
+            CALL X04AAF(0,NERR)
+            DO 20 I = 1, NREC
+               CALL X04BAF(NERR,REC(I))
+   20       CONTINUE
+            IF (IFAIL.NE.-13) THEN
+               WRITE (MESS,FMT=99999) SRNAME, IERROR
+               CALL X04BAF(NERR,MESS)
+               IF (ABS(MOD(IFAIL,10)).NE.1) THEN
+C                 Hard failure
+                  CALL X04BAF(NERR,
+     *                     ' ** NAG hard failure - execution terminated'
+     *                        )
+                  CALL P01ABZ
+               ELSE
+C                 Soft failure
+                  CALL X04BAF(NERR,
+     *                        ' ** NAG soft failure - control returned')
+               END IF
+            END IF
+         END IF
+      END IF
+      P01ABF = IERROR
+      RETURN
+C
+99999 FORMAT (' ** ABNORMAL EXIT from NAG Library routine ',A,': IFAIL',
+     *  ' =',I6)
+      END
+      SUBROUTINE P01ABZ
+C     MARK 11.5(F77) RELEASE. NAG COPYRIGHT 1986.
+C
+C     Terminates execution when a hard failure occurs.
+C
+C     ******************** IMPLEMENTATION NOTE ********************
+C     The following STOP statement may be replaced by a call to an
+C     implementation-dependent routine to display a message and/or
+C     to abort the program.
+C     *************************************************************
+C     .. Executable Statements ..
+      STOP
+      END
+      SUBROUTINE X04AAF(I,NERR)
+C     MARK 7 RELEASE. NAG COPYRIGHT 1978
+C     MARK 7C REVISED IER-190 (MAY 1979)
+C     MARK 11.5(F77) REVISED. (SEPT 1985.)
+C     MARK 14 REVISED. IER-829 (DEC 1989).
+C     IF I = 0, SETS NERR TO CURRENT ERROR MESSAGE UNIT NUMBER
+C     (STORED IN NERR1).
+C     IF I = 1, CHANGES CURRENT ERROR MESSAGE UNIT NUMBER TO
+C     VALUE SPECIFIED BY NERR.
+C
+C     .. Scalar Arguments ..
+      INTEGER           I, NERR
+C     .. Local Scalars ..
+      INTEGER           NERR1
+C     .. Save statement ..
+      SAVE              NERR1
+C     .. Data statements ..
+      DATA              NERR1/6/
+C     .. Executable Statements ..
+      IF (I.EQ.0) NERR = NERR1
+      IF (I.EQ.1) NERR1 = NERR
+      RETURN
+      END
+      SUBROUTINE X04BAF(NOUT,REC)
+C     MARK 11.5(F77) RELEASE. NAG COPYRIGHT 1986.
+C
+C     X04BAF writes the contents of REC to the unit defined by NOUT.
+C
+C     Trailing blanks are not output, except that if REC is entirely
+C     blank, a single blank character is output.
+C     If NOUT.lt.0, i.e. if NOUT is not a valid Fortran unit identifier,
+C     then no output occurs.
+C
+C     .. Scalar Arguments ..
+      INTEGER           NOUT
+      CHARACTER*(*)     REC
+C     .. Local Scalars ..
+      INTEGER           I
+C     .. Intrinsic Functions ..
+      INTRINSIC         LEN
+C     .. Executable Statements ..
+      IF (NOUT.GE.0) THEN
+C        Remove trailing blanks
+         DO 20 I = LEN(REC), 2, -1
+            IF (REC(I:I).NE.' ') GO TO 40
+   20    CONTINUE
+C        Write record to external file
+   40    WRITE (NOUT,FMT=99999) REC(1:I)
+      END IF
+      RETURN
+C
+99999 FORMAT (A)
+      END

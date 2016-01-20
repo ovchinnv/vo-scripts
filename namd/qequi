@@ -1,0 +1,73 @@
+#!/bin/bash
+
+###################################################################
+if test -z "$1"
+then 
+ echo "USAGE: Nnve input_file output_file"
+ exit 1
+else
+ input=$1
+fi  
+############# job output file ####################################
+if test -z "$2"
+then 
+ echo "USAGE: Nnve input_file output_file"
+ exit 1
+else
+ output=$2
+fi  
+
+###################################################################
+
+psffile=prigor2_am.psf
+pdbfile=prigor2_am.pdb
+
+reffile=$pdbfile
+resfile=$reffile
+
+name=mead;
+
+T=298; # temperature
+
+###############################
+script=__equil
+
+echo '#!/bin/vmd' > $script
+echo '#variable parameters (automatic)'  >> $script
+grep -i SET boxsize.str | awk '{print tolower($0)}' >>$script 
+echo set restart 0        >>$script  # this is a default parameter, don't change
+echo set psffile $psffile >>$script
+echo set pdbfile $pdbfile >>$script
+echo set resfile $resfile >>$script
+echo set reffile $reffile >>$script
+echo set name    $name    >>$script
+echo set temperature $T   >>$script
+
+cat $input                >> $script
+###############################################################
+namd2=~/bin/namd2-cdie-openmpi ;
+
+workdir=`pwd`
+count=0
+nodes=64
+jname=mead
+queue=short_parallel
+queue=normal_parallel
+
+
+jobid=`bsub <<_job0
+#BSUB -u ovchinnv@MIT.edu
+#BSUB -n $nodes
+#BSUB -J $jname
+#BSUB -o $jname.out
+#BSUB -e $jname.err
+#BSUB -q $queue
+#BSUB -a openmpi
+#BSUB -R "span[ptile=2]"
+#!BSUB -w done(127446)
+#BSUB -B
+#!cd $workdir
+mpirun.lsf $namd2 $script &>$output$count.log
+_job0`
+
+echo $jobid

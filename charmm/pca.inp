@@ -1,0 +1,98 @@
+* PCA
+*
+
+set version 22
+!set psffile rig22vc
+
+set cmap
+stream readpsf.str
+!**********************************************************
+
+set nfile 6
+set conf pps
+set conf rig
+goto read
+! open files
+set i 1
+label loop
+ calc ii = @i + 10
+ set fname ../@{conf}_@{i}_s.dcd ! name of trajectory
+ open file name @fname read unit @ii 
+!
+ incr i by 1
+ if @i .le. @nfile -
+goto loop
+
+!define pcatoms select all end
+define pcatoms select .not. hydrogen end
+!!!!!!!!!!!!! trim dcd; no orientation necessary !!!!!!!!!!!!!!!!!!!!!!!
+bomblev -2 ! to avoid bombing on merge
+coor copy comp ! put reference coordinates into comp
+open write unit 2 file name @{conf}_pca.dcd
+merge firstu 11 nunit @nfile  outputu 2 sele pcatoms end orient mass sele pcatoms end 
+close unit 2
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! write new psf
+delete atom select .not. pcatoms end
+open unit 2 card write name conv_pca.psf
+write psf card unit 2
+close unit 2
+
+open unit 2 file name @{conf}_pca.dcd
+coor dyna firstu 2 nunit 1
+open write card unit 25 name @{conf}_pca.cor
+write coor card unit 25
+
+label read
+read psf card name conv_pca.psf
+
+set nmodes 100 ! number of lowest frequency modes
+define pcatoms select all end
+set natom ?nsel
+calc nmodes = 3*@natom
+calc offset = (3*@natom - @nmodes ) 
+
+
+open read unit 2 file name @{conf}_pca.dcd
+bomlev -2
+
+vibran nmod @nmodes ihbfrq 0 inbfrq 0
+!quasi nunits 1 firstu 1 nskip @skip begin @begin select vatoms end nfreq @nmodes temp 298.0 ! thermo resi
+quasi nunits 1 firstu 2 nfreq @nmodes nadd @offset temp 298.0 thermo resi entr
+!quasi nunits 1 firstu 1 nskip @skip begin @begin select vatoms end nfreq @nmodes temp 298.0 ! thermo resi
+!quasi nunits 1 firstu 1 nskip @skip begin @begin select vatoms end nfreq @nmodes nadd @offset temp 298.0 ! thermo resi
+
+
+! i understand that 'quasi' is analogous to 'diag'
+! note reference coordinates must be present in the main coordinate array
+! thermo computes entropy, enthalpy & Cv; resi uses the selected atoms in each residue
+! temp (real) is necessary to estimate frequencies from fluctuations
+  
+! write visualization trajectory:
+
+!open write unit 52 file name rigor.pca.dcd
+!open write unit 21 file name rigor.pca_.dcd
+!open write unit 21 file name rigor.pca_.dcd
+
+!print norm mode 1 thru 20 ! MRMS 1
+!open write unit 52 card name rigor.pca
+!write norm card unit 52
+	
+print norm select pcatoms end! mrms 1! mode 1 thru @nmodes ! MRMS 1
+open write unit 52 file name @{conf}.pca
+write norm unit 52  ! write does NOT perform any normalization
+
+!write trajectory unit 50 sequ modes 1 thru 10 sequ   ! temp 300; supe to superimpose
+!write trajectory unit 70 modes 1 thru 10 sequ select vatom end   ! temp 300; supe to superimpose
+
+end ! vibran
+
+stop
+
+
+
+
+
+
+

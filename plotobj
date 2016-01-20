@@ -1,0 +1,5 @@
+#!/bin/bash
+
+grep -i "current objective" $1 |  awk '{print $4}' > _temp
+echo 'set yrange [0:700]; plot "_temp" ; pause 5; ' | gnuplot
+

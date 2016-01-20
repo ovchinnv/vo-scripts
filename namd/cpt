@@ -1,0 +1,152 @@
+#!/bin/tcl
+################################################
+set psffile        ${name}-x.psf 
+set pdbfile        ${name}.pdb
+set fixedfile      ${name}.res
+set resfile        ${name}.res
+
+
+structure          $psffile 
+coordinates        $pdbfile
+
+set temperature    298
+
+if {$count == 0} {
+#nothing
+temperature 298 ;# for generating initial velocities
+bincoordinates     scratch/mini2cons.coor
+extendedSystem     scratch/mini2cons.xsc
+} else {
+ 
+bincoordinates     scratch/$restart.coor
+binvelocities      scratch/$restart.vel
+#binvelocities      scratch/prig1[expr $count-1].restart.vel
+extendedSystem     scratch/$restart.xsc
+}
+
+set sx $a ;# cell dimensions
+set sy $b
+set sz $c
+ 
+set outputname     scratch/$output
+firsttimestep      $firstTstep
+
+
+#############################################################
+## SIMULATION PARAMETERS                                   ##
+#############################################################
+margin 4.5
+# Input
+paraTypeCharmm	    on
+parameters          /u0/o/ovchinnv/cparam/par_all27_prot_na.prm
+#parameters          /home/ovchinnikov/charmm/c34a2/toppar/par_all27_prot_na.prm
+
+# Force-Field Parameters
+exclude             scaled1-4
+1-4scaling          1.0
+cutoff              12.
+switching           on
+switchdist          10.
+pairlistdist        14.5
+
+# Integrator Parameters
+timestep            $dt  ;# 2fs/step
+rigidBonds          $shake  ;# needed for 2fs steps
+nonbondedFreq       1
+fullElectFrequency  1  
+stepspercycle       $stepspercycle
+fixedAtoms          $fixedflag
+fixedAtomsCol       B
+fixedAtomsFile      $fixedfile
+
+constraints         $cswitch
+consref             $pdbfile
+conskfile           $resfile
+conskcol            $consCol
+constraintScaling   $cscale ;# multiplies the factor in the PDB file
+
+# Constant Temperature Control
+langevin            on    ;# do langevin dynamics
+langevinDamping     2     ;# damping coefficient (gamma) units of 1/ps
+langevinTemp        $temperature
+langevinHydrogen    off    ;# don't couple langevin bath to hydrogens
+                                                                                
+# Constant Pressure Control (variable volume)
+if { ($shake == "all" ) || ($shake == "water" ) } {
+useGroupPressure      yes ;# needed for rigidBonds
+} else {
+usegroupPressure      no
+}
+useFlexibleCell       no
+useConstantArea       no
+                                                                                
+langevinPiston        on
+langevinPistonTarget  1.01325 ;#  in bar -> 1 atm
+langevinPistonPeriod  100.
+langevinPistonDecay   50.
+langevinPistonTemp    $temperature ; # same temperature as the system target temp
+
+
+# Periodic Boundary Conditions
+cellBasisVector1     $sx   0.     0.
+cellBasisVector2     0.    $sy    0.
+cellBasisVector3     0.    0.     $sz
+cellOrigin           0.    0.     0. 
+
+wrapWater           on
+wrapAll             on
+wrapNearest         on
+
+# PME (for full-system periodic electrostatics)
+PME                 yes 
+PMEGridSizeX        144
+PMEGridSizeY        96
+PMEGridSizeZ        96
+
+
+# Output
+outputName          $outputname
+
+#############################################################
+## EXTRA PARAMETERS                                        ##
+#############################################################
+set freq 1000
+
+restartfreq         $freq     ;# 500steps = every 1ps APPLIES TO MINIMIZATION TOO
+dcdfreq             $freq
+xstFreq             $freq
+outputEnergies      $freq
+outputPressure      $freq
+outputTiming        $freq
+
+#############################################################
+## EXECUTION SCRIPT                                        ##
+#############################################################
+
+#reinitvels          $temperature
+
+# this should be > t libration and t diffusion over cavities 
+# ions equilibration takes longer
+# run for 80 ps
+
+# if this the first run, then heat slowly
+if { $count == 0 } {
+ reinitvels 0
+ set ftemp $temperature
+ set ncycle 10 ;# 10 increments
+ set nsubsteps [expr { int($nsteps/$ncycle) }]; # break up into 10 runs
+ set dtemp [expr {1.00*$ftemp/$ncycle}];
+ for { set temp $dtemp } { $temp <=$ftemp } { set temp [expr $temp + $dtemp]} { 
+#  reinitvels $temp
+  langevinTemp $temp
+  langevinPistonTemp $temp  
+  run $nsubsteps
+ }
+} else {
+
+# regular run
+ run $nsteps
+}  
+
+
+

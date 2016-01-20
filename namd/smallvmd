@@ -1,0 +1,29 @@
+#!/bin/bash
+
+if [ -z $1 ]; then 
+ echo "Error: filename missing..."
+ exit
+fi
+if [ -z $2 ]; then
+ freq=10
+else
+ freq=$2
+fi
+
+
+psffile=m6rigtr.psf
+dcdin=$1
+dcdout=${1%%.*}_s.${1#*.}
+
+script=vmdscript
+
+echo "#!/bin/tcl" > $script
+echo >> $script
+echo mol load psf $psffile ;# dcd $dcdin waitforall >> $script
+echo animate read dcd $dcdin beg 0 skip $freq waitfor all >> $script
+echo animate write dcd $dcdout beg 0 skip 1 waitfor all sel [atomselect top all]>> $script
+echo >> $script
+
+vmd<$script
+
+exit

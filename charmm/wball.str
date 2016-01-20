@@ -1,0 +1,118 @@
+* script to create a water ball of prescribed radius
+*
+! NAMES WAT* must not be taken
+! modified last on 12.30.08
+!
+if @?toppar .ne. 0 goto skiptop ! skip topology reading
+
+if @?toppar  eq 0 set toppar ~/charmm/c33b1/toppar
+open unit 1 read form name @toppar/top_all27_prot_na.rtf        ! topology 
+open unit 3 read form name @toppar/par_all27_prot_na.prm        ! parameter
+read rtf card unit 1
+read param card unit 3
+label skiptop
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+if @?R eq 0 set R 25 ! radius
+if @?xcen eq 0 set xcen 0 ! center
+if @?ycen eq 0 set ycen 0
+if @?zcen eq 0 set zcen 0
+if @?overlap eq 0 set overlap 2.8
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! read initial water box (216 molecules)
+read sequ tip3 216
+generate wat0 noangle nodihe
+stream read-watbox.str ! this script written by nilssen
+set box 18.856  ! size of cubic water box
+
+!read small water box (125 molecules)
+!read sequ tip3 125
+!generate wat0 noangle nodihe
+!stream read-smallbox.str ! this script written by nilssen
+!set box 15.5516  ! size of cubic water box
+
+calc D = 2*@R ! diameter
+
+calc nx = int (@D/@box + 1 )
+calc ny = int (@D/@box + 1 )
+calc nz = int (@D/@box + 1 )
+
+calc nbox = @nx*@ny*@nz - 1
+replicate wat nrep @nbox select segid wat0 end ! duplicate waters
+! move boxes around
+
+set index 0
+set i 0
+label mx
+ set j 0
+ set k 0
+ label my
+  set k 0
+  label mz
+
+   calc xdisp = (@i*@box-(@R-@{box}/2)) + @xcen ! move 
+   calc ydisp = (@j*@box-(@R-@{box}/2)) + @ycen ! move 
+   calc zdisp = (@k*@box-(@R-@{box}/2)) + @zcen ! move 
+
+   scalar X add @xdisp select segid wat@index end
+   scalar Y add @ydisp select segid wat@index end
+   scalar Z add @zdisp select segid wat@index end
+  
+   incr index by 1
+   
+   incr k by 1
+   if @k lt @nz -
+  goto mz
+  incr j by 1
+  if @j lt @ny -
+ goto my
+ incr i by 1
+ if @i lt @nx -
+goto mx
+!
+
+!!!!!!!!!!!!!!!!!!! IMPORTANT : RANDOMLY ROTATE SPHERE -- ALLOWS REPEATED APPLICATION !!!!!!!!!!!!!!!!!!
+calc phi = ( ?rand * 360 ) - 180
+calc psi = ( ?rand * 360 ) - 180
+coor rota xdir 1.00 ydir 0.00 zdir 0.00 xcen @xcen ycen @ycen zcen @zcen phi @phi select segid wat* end !x-dir
+coor rota xdir 0.00 ydir 1.00 zdir 0.00 xcen @xcen ycen @ycen zcen @zcen phi @psi select segid wat* end !y-dir
+! delete water molecules outside of the sphere
+delete atom select .byres. (segid wat* .and. resname TIP3 .and. type OH2 .and. .not. point @xcen @ycen @zcen CUT @R ) end
+! delete crystal water molecules outside sphere (optional)
+delete atom select .byres. (segid xwat* .and. resname TIP3 .and. type OH2 .and. .not. point @xcen @ycen @zcen CUT @R ) end
+! delete molecules overlapping with solute
+delete atom select .byres. (segid wat* .and. resname TIP3 .and. type OH2 .and. -
+                           ( (solute .and. .not. (hydrogen .or. lone) ) .around. @overlap ) ) end
+
+!renumber segments: the above tricks are necessary in case there are segments that have been deleted completely
+! goto debug
+bomblev -2
+calc ind1 @nbox + 1
+label renu1
+ decr ind1 by 1
+ if @ind1 lt 1 goto done
+
+ define seg1 select segid wat@ind1 end
+ if ?nsel .eq. 0 goto renu1
+ set ind2 @ind1
+ label renu2
+  decr ind2 by 1
+  if @ind2 lt 0 goto done
+  define seg2 select segid wat@ind2 end
+  if ?nsel .eq. 0 goto renu2
+  join wat@ind2 wat@ind1 renumber
+  set ind1 @ind2
+ goto renu2 
+label done 
+rename segid wat0 select segid wat* end
+!label debug
+
+
+! concatenate subsystems
+replica reset  ! NOTE this command is essential !
+
+!write psf card name watball.psf
+!write coor card name watball.crd
+
+

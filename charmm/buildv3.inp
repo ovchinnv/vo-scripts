@@ -1,0 +1,71 @@
+* 7/25/07 build after all consistency checks (use files in rotate)
+* 7.21.07 prepare myosinV postrigor pdb files from crystal structures
+* now that I have determined the histidine states & GLN ASN flips, rebuild the model
+* I have manually generated the prigor files using makepdb.inp & modhis scripts
+* based on buildv.inp
+*
+
+set version 19
+
+stream ../readpsf.str
+
+! HC
+open card read unit 1 name hc_mod.pdb
+read sequ pdb unit 1
+generate HC setup warn first nter last cter 
+!!!!!!!!!!!!!!!!!!!!!!!!!
+! LC
+open card read unit 1 name lc_mod.pdb
+read sequ pdb unit 1
+generate LC setup warn first nter last cter
+    
+
+! ATP
+open card read unit 1 name atp.pdb
+read sequ pdb unit 1
+generate ATP setup warn 
+read coor pdb unit 1 resid 
+! MG
+open card read unit 1 name mg.pdb
+read sequ pdb unit 1
+generate MG setup warn 
+read coor pdb unit 1 resid 
+! crystal waters
+
+!set offset ?nres
+read sequ TIP3 525
+generate XWAT nodihe noangle
+!open card read unit 1 name xwat.pdb
+!read coor pdb unit 1 offset @offset
+!
+open card read unit 2 name ../rotate/prig_fin.pdb
+read coor pdb unit 2 resid
+
+! NEED TO KEEP ARGININE HYDROGENS
+!coor init select hydrogen end
+!hbuild
+
+define unknown select .not. init end
+if ?nsel .ne. 0 stop
+
+!!!!!!!!!!!!!!!!!!!!! now relax a little more !!!!!!!!
+!!!!!!!! eef1 setup 
+eef1 setup temp 298.15 unit 99 name ~/charmm/c33a1/test/data/solvpar.inp
+update ctonnb 7. ctofnb 9. cutnb 10. group rdie
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+cons harm clear
+cons harm force 1 select all end
+minimize abnr nstep 100 nprint 10
+
+cons harm clear
+cons harm force 0.5 select prop wmain .eq. 1 end
+minimize abnr nstep 100 nprint 10
+
+write psf card name prigor_final@version.psf
+write coor card name prigor_final@version.cor
+
+
+
+
+
+

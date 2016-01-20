@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if [ -z $1 ]; then
+ echo 0
+ exit
+fi
+
+mapfiles=$@
+for mapfile in $mapfiles; do
+
+if [ -f $mapfile ] ; then
+ l1=`head -n1 $mapfile`;
+ l2=`tail -n1 $mapfile`;
+#
+ if [ "${l1}" == "${l2}" ]; then
+  echo "$mapfile : Map OK "
+ else
+  echo "$mapfile : Map not OK "
+ fi
+fi
+
+done

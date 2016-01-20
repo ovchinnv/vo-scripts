@@ -1,0 +1,125 @@
+*********************** fix chirality errors **********************
+*
+! for quiet output (beware, you might miss something)
+set prnlev = ?prnlev
+if @?{chi_quiet} ne 0 then
+ set pquiet = 0
+else
+ set pquiet @prnlev
+endif
+prnlev @pquiet
+!
+! loop over all residues in a selection and compute dihedral N-C-CB-HA; it's value is negative for D- centers
+!
+define done sele none end
+if @?errnum eq 0 set errnum 0 ! cumulative count
+
+label chi_loop
+define notdone select chi_selection .and. .not. done end
+if ?NSEL eq 0 goto break
+set resid = ?selresi
+set segid = ?selsegi
+set resname = ?selresn
+
+define done sele done .or. ( resid ?selresi .and. segid ?selsegi ) end
+! skip glycines
+if @resname .eq. GLY goto chi_loop
+
+!* dihedrals below possible interpretations of arnaud's email: both 
+!quick sele atom @segid @resid HA end sele atom @segid @resid C end sele atom @segid @resid CA end sele atom @segid @resid CB end ! wrong
+!quick sele atom @segid @resid HA end sele atom @segid @resid CB end sele atom @segid @resid C end sele atom @segid @resid CA end ! wrong
+!quick sele atom @segid @resid N end sele atom @segid @resid HA end sele atom @segid @resid C end sele atom @segid @resid CA end ! wrong
+quick sele atom @segid @resid N end sele atom @segid @resid C end sele atom @segid @resid CB end sele atom @segid @resid HA end
+
+if ?PHI ge 0 then ! chirality error
+ incr errnum
+ prnlev @prnlev
+ echo @{errnum}: Dihedral N-C-CB-CA in residue @RESNAME @RESID segid @SEGID is positive ( = ?PHI )
+ prnlev @pquiet
+ if @?flip_hydrogen .ne. 0 then 
+  goto flip_hydrogen
+  label return
+  prnlev @prnlev
+  quick sele atom @segid @resid N end sele atom @segid @resid C end sele atom @segid @resid CB end sele atom @segid @resid HA end
+  echo  ===== Moving proton HA to fix chirality
+  echo  ===== New dihedral angle is ?PHI
+  prnlev @pquiet
+ endif
+endif
+
+! also check threonine, if needed
+if @resname .eq. THR then
+ quick sele atom @segid @resid OG1 end sele atom @segid @resid CA end sele atom @segid @resid CG2 end sele atom @segid @resid HB end
+ if ?PHI le 0 then ! chirality error
+  incr errnum
+  prnlev @prnlev
+  echo @{errnum}: Dihedral OG1-CA-CG2-HB  in residue @RESNAME @RESID segid @SEGID is negative ( = ?PHI )
+  prnlev @pquiet
+  if @?flip_hydrogen .ne. 0 then 
+   goto flip_hydrogen_thr
+   label return_thr
+   prnlev @prnlev
+   quick sele atom @segid @resid OG1 end sele atom @segid @resid CA end sele atom @segid @resid CG2 end sele atom @segid @resid HB end
+   echo  ===== Moving proton HB to fix chirality
+   echo  ===== New dihedral angle is ?PHI
+   prnlev @pquiet
+  endif
+ endif
+endif
+!stop
+goto chi_loop
+ 
+label break
+
+prnlev @prnlev
+
+return
+!
+label flip_hydrogen
+! invert hydrogen coordinate
+coor stat sele atom @segid @resid HA end
+!
+set xh ?xave
+set yh ?yave
+set zh ?zave
+!
+coor stat sele atom @segid @resid CA end
+!
+set xc ?xave
+set yc ?yave
+set zc ?zave
+!
+calc xhnew = 2 * @xc - @xh
+calc yhnew = 2 * @yc - @yh
+calc zhnew = 2 * @zc - @zh
+!
+scalar X set @xhnew sele atom @segid @resid HA end
+scalar Y set @yhnew sele atom @segid @resid HA end
+scalar Z set @zhnew sele atom @segid @resid HA end
+!
+goto return
+!
+label flip_hydrogen_thr
+! invert hydrogen coordinate
+coor stat sele atom @segid @resid HB end
+!
+set xh ?xave
+set yh ?yave
+set zh ?zave
+!
+coor stat sele atom @segid @resid CB end
+!
+set xc ?xave
+set yc ?yave
+set zc ?zave
+!
+calc xhnew = 2 * @xc - @xh
+calc yhnew = 2 * @yc - @yh
+calc zhnew = 2 * @zc - @zh
+!
+scalar X set @xhnew sele atom @segid @resid HB end
+scalar Y set @yhnew sele atom @segid @resid HB end
+scalar Z set @zhnew sele atom @segid @resid HB end
+!
+goto return_thr
+!

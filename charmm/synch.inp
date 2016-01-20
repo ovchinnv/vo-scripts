@@ -1,0 +1,98 @@
+* process mII structures for visualization
+*
+
+set version 19
+stream readpsf.str
+
+open read card unit 1 name 2oy6_hc_.pdb
+read sequ pdb unit 1
+generate HC setup warn first nterm last cterm
+
+open read card unit 1 name 2oy6_ec_.pdb
+read sequ pdb unit 1
+generate EC setup warn first nterm last cterm
+
+open read card unit 1 name 2oy6_rc_.pdb
+read sequ pdb unit 1
+generate RC setup warn first nterm last cterm
+
+open read card unit 1 name 2oy6_atp_.pdb
+read sequ pdb unit 1
+generate ADP setup warn
+
+open read card unit 1 name 2oy6_mg_.pdb
+read sequ pdb unit 1
+generate MG setup warn
+
+write psf card name msq_19.psf
+
+!!!!!!!!!!!! now read coordinates & build pdbs !!!!!!!!!!
+
+read coor pdb name 2oy6_hc_.pdb  resid
+read coor pdb name 2oy6_ec_.pdb  resid
+read coor pdb name 2oy6_rc_.pdb  resid
+read coor pdb name 2oy6_atp_.pdb resid
+read coor pdb name 2oy6_mg_.pdb  resid
+ 
+hbuild
+ic param
+ic fill preserve
+ic build
+hbuild
+
+define unknown select .not. init end
+
+print coor select unknown end
+if ?nsel .ne. 0 stop
+coor orie select segid HC end
+write coor pdb name 2oy619.pdb
+
+!!!!!!!!!!!! now read coordinates & build pdbs !!!!!!!!!!
+coor swap
+coor init 
+
+read coor pdb name 2ovk_hc_.pdb  resid
+read coor pdb name 2ovk_ec_.pdb  resid
+read coor pdb name 2ovk_rc_.pdb  resid
+ 
+hbuild
+ic param
+ic fill preserve
+ic build
+hbuild
+
+scalar X set 0 select segid ADP .or. segid MG end
+scalar Y set 0 select segid ADP .or. segid MG end
+scalar Z set 0 select segid ADP .or. segid MG end
+
+define unknown select .not. ( init .or. segid ADP .or. segid MG )  end
+
+print coor select unknown end
+if ?nsel .ne. 0 stop
+coor orie rms select segid HC end
+write coor pdb name 2ovk19.pdb
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!! now read coordinates & build pdbs !!!!!!!!!!
+coor swap
+coor init 
+
+read coor pdb name 1kk8_hc__.pdb  resid
+read coor pdb name 1kk8_ec__.pdb  resid
+read coor pdb name 1kk8_rc__.pdb  resid
+read coor pdb name 1kk8_adp_.pdb resid
+read coor pdb name 1kk8_mg_.pdb  resid
+ 
+hbuild
+ic param
+ic fill preserve
+ic build
+hbuild
+
+define unknown select .not. init end
+
+print coor select unknown end
+if ?nsel .ne. 0 stop
+coor orie select segid HC end
+write coor pdb name 1kk819.pdb
+

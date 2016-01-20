@@ -1,0 +1,193 @@
+#!/bin/bash
+#1 ############### RUNNING AT 1FS TO SE I THIS IS THE CAUSE OF TEMP INCREASE
+#2 decrease pairlist freq keeping dt at 2
+#3 apply elec force every step (everything else the same)
+#4 combine all 1-3 above
+
+charmrun=~/namd/NAMD_2.6_Linux-i686-TCP/charmrun
+namd2=~/namd/NAMD_2.6_Linux-i686-TCP/namd2
+
+nodes=( 01 04 05 06 07 08 10 12 )
+local=0
+ppn=2; # processors per node
+
+#daedalus
+#nodes=( )
+#local=1
+#ppn=8
+
+#echo "group main">nodelist
+#count=0
+
+#if [ $local -eq 1 ]; then 
+# echo host `hostname`>nodelist; 
+# count=$(($count+1)); 
+#fi ;# only if running locally too
+
+#for i in ${nodes[@]}
+#do
+# echo n$i>>NODES
+# echo "host n$i">>nodelist
+# count=$(($count+1))
+#done
+
+#nproc=$(($count*$ppn)) ; # 2 cpus per node
+###################################################################
+if test -z "$1"
+then 
+ echo "USAGE: Nnve input_file output_file"
+ exit 1
+else
+ input=$1
+fi  
+############# job output file ####################################
+if test -z "$2"
+then 
+ echo "USAGE: Nnve input_file output_file"
+ exit 1
+else
+ output=$2
+fi  
+###################################################################
+###################################################################
+
+psffile=m6rigtr-x.psf
+pdbfile=m6rigtr.pdb
+resfile=m6rigtr.res
+reffile=$pdbfile
+
+restartName=scratch/nve1
+outputName=scratch/nve
+
+dt=2.0 ; #timestep
+freq=1000;
+
+numrun=15;
+nsteps=600000
+firstTstep=1200000
+
+count=2;
+flag="";
+T=298; # temperature
+
+jobid=0;
+
+for nrun in `seq 3 $numrun`
+ do
+#  count=$(($nrun-1))
+  script=__nve$count$flag
+
+  echo '#!/bin/vmd' > $script
+  echo '#variable parameters (automatic)'  >> $script
+  grep -i SET boxsize.str | awk '{print tolower($0)}' >>$script 
+  echo set restart 1                       >>$script  # this is a default parameter, don't change
+  echo set resetTemp 0      >>$script
+  echo set psffile $psffile >>$script
+  echo set pdbfile $pdbfile >>$script
+  echo set resfile $resfile >>$script
+  echo set reffile $reffile >>$script
+
+  echo set count $count                    >> $script 
+
+  echo set shake all                       >> $script
+  echo set dt $dt                          >> $script
+  echo set firstTstep $firstTstep          >> $script
+  echo set stepspercycle 10                >> $script
+
+  echo set fixedAtoms off                  >> $script
+  echo set cswitch off                     >> $script
+  echo set cscale `echo 10-$count*5 |bc`   >> $script # this is the way to do arithmetic in bash
+
+  
+  echo set nsteps $nsteps                  >> $script
+  echo set freq $freq                      >> $script  ;# frequency for restrt files
+
+  echo set outputName $outputName$count$flag         >> $script
+  echo set restartName $restartName       >> $script
+# for subsequent runs
+  restartName=$outputName$count$flag
+
+  echo set temperature $T                >> $script
+  echo set lang off                      >> $script
+
+############################### TMD-TCL ####################
+  echo "############################### TMD-TCL ####################" >>$script
+  echo TclForces off                 >> $script;
+  echo TclForcesScript {             >> $script;
+  echo set TMDforcesOn 0             >> $script; # turn off if you just want to monitor the RMSD             
+  echo set TMDfile rigornl_atpout_tmd_all.pdb       >> $script;# PDB file with target positions
+  echo set TMDorient 1               >> $script;# should the structures be oriented periodically?
+  echo set TMDorientFreq 100         >> $script;# frequency of orientation
+  echo set TMDBMD 0                  >> $script;# is BMD on?
+  echo set TMDdRMS -0.00             >> $script;# how fast is the TMD target value changing (A/ps for TMD; A for BMD)
+  echo set TMDtargetRMS 0.1           >> $script;# -1: computed at the beginning
+  echo set TMDfinalRMS 0.1           >> $script;# desired final RMSD from the target structure 
+  echo set TMDk  0.0                 >> $script;# force constant
+  echo set TMDfinalK 0.0             >> $script;# for increasing/decreasing force constant during a simulation 
+  echo set TMDdK -0.1                >> $script;# increase/decrease in force constant (kcal/mol/A/A/ps)
+  echo set TMDprintFreq 100          >> $script;# output frequency
+  echo set TMDlogFile "TMD_$count$flag.log" >> $script;# TMD output file
+  echo set TMDdistanceLimit 0.0      >> $script;# the maximum force on any atom will be no larger than if the distance
+                                                # between the current & target coordinates were at most THIS; i.e. cap the
+                                                # force for large deviations between endpoint structures; value 0 turns off;
+######### DO NOT MODIFY BELOW #############################
+  echo "######### DO NOT MODIFY BELOW #############################" >>$script
+  echo set TMDfirstTstep $firstTstep >> $script
+  echo set TMDdt         '$dt'       >> $script
+  echo source tmd3.tcl               >> $script
+  echo }                             >> $script
+
+  cat $input                         >> $script
+###############################################################
+
+#use qsub:
+###############################################################
+workdir=`pwd`
+queue=regular
+jname=$output
+nodes=256
+
+if [ $jobid != "0" ]; then
+echo dependent job
+ jobid=`qsub <<_job1
+#PBS -l mppwidth=$nodes,walltime=04:30:00
+#PBS -N $jname$count
+#PBS -o $jname.out
+#PBS -e $jname.err
+#PBS -m abe
+#PBS -q $queue
+#PBS -V
+#PBS -W depend=afterok:$jobid
+cd $workdir
+aprun -n $nodes namd2 $script >& $output$count$flag
+_job1`
+else
+ echo indepenent job
+ jobid=`qsub <<_job0
+#PBS -l mppwidth=$nodes,walltime=04:30:00
+#PBS -N $jname$count
+#PBS -o $jname.out
+#PBS -e $jname.err
+#PBS -m abe
+#PBS -q $queue
+#PBS -V
+cd $workdir
+aprun -n $nodes namd2 $script >& $output$count$flag
+_job0`
+fi
+
+echo $jobid
+
+#  $charmrun $namd2 +p$nproc $script  &>$output$count$flag
+
+######################
+ if [ $? -ne 0 ];  then
+   echo Execution interrupted due to errors during run $nrun.
+   exit
+ fi 
+ 
+# increment firstTstep
+ firstTstep=$(($firstTstep+$nsteps)) 
+ count=$(($count+1 ))
+
+done

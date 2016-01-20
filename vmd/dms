@@ -1,0 +1,10 @@
+#!/bin/vmd
+# write structure file to Desmond
+
+#mol load psf bpgm_apo_vmd.psf pdb bpgm_apo_vmd.pdb
+#animate write dms bpgm_apo_vmd.dms
+
+mol load psf ../bpgm_apo_sn-x.psf pdb ../bpgm_apo_msn.pdb
+animate write dms bpgm_apo_chm.dms
+
+

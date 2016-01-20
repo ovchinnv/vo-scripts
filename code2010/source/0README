@@ -1,0 +1,62 @@
+C-----------------------------------------------------------------------
+C     ***************************                         
+C     *         E D D Y         *                        
+C     ***************************                       
+C-----------------------------------------------------------------------
+C     
+C     THREEDIMENSIONAL INCOMPRESSIBLE NAVIER-STOKES SOLVER
+C     (LARGE EDDY SIMULATION)                                              
+C     ----------------------------
+C     
+C     PURPOSE:            - TIME ACCURATE NAVIER-STOKES SOLVER FOR 
+C     TURBULENT FLOW FIELDS
+C     - FINITE DIFFERENCE SCHEMES
+C     
+C     SUBGRID MODELS:     - SMAGORINSKI
+C     - DYNAMIC MODEL
+C     
+C     
+C     GRID:               - CARTESIAN RECTANGULAR GRID (SINGLE BLOCK)         
+C     
+C     SCHEMES:            - ADAMS-BASHFORTH (FRACTIONAL STEP)
+C     - DIRECT POISSON SOLVER
+C     - MULTIGRID POISSON SOLVER
+C     
+C     NON-DIMENSIONAL:    - BOUNDARY LAYER: 
+C     U_INFTY, DISPLACEMENT THICKNESS
+C     DENSITY = 1.
+C     - CHANNEL:
+C     U_TAU, HALF DIAMETER
+C     - DUCT:
+C     U_TAU, HALF DIAMETER
+C     
+C     INCLUDES:           - common.h
+C     
+C     INPUT:              - <dir>:    ../calc/
+C     - <dir>:    ../init/
+C     - NAMELIST
+C     
+C     OUTPUT:             - <dir>:    ../calc/
+C     - RESTART-FILE
+C     - STATISTICS
+C     - INST. FLOW FIELD
+C     
+C     
+C-----------------------------------------------------------------------
+C     
+C     (C) I. BALARAS
+C     VON KARMAN INSTITUTE FOR FLUID DYNAMICS
+C     CHAUSSEE DE WATERLOO, 72
+C     B-1640 RHODE-ST-GENESE
+C     
+C     DATE OF CREATION :  20/10/1993                                
+C     LAST UPDATE      :  05/10/2000
+C
+C     PARALLELIZATION
+C
+C     (C) A. SCOTTI 2002
+C
+C     (C) V. OVCHINNIKOV 2003 -- present
+C
+C
+C     

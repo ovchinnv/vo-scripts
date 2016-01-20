@@ -1,0 +1,95 @@
+* 7.21.07 prepare myosinV postrigor pdb files from crystal structures
+*
+
+set version 19
+
+stream readpsf.str
+
+! HC
+open card read unit 1 name marco/prigor_hc_i.pdb
+read sequ pdb unit 1
+generate HC setup warn first nter last cter 
+read coor pdb unit 1 resid comp
+open card read unit 1 name xray/hc3.pdb
+read coor pdb unit 1 resid
+!!!!!!!!!!!!!!!!!!!!!!!!!11
+! LC
+open card read unit 1 name marco/prigor_lc_i.pdb
+read sequ pdb unit 1
+generate LC setup warn first nter last cter
+read coor pdb unit 1 resid comp
+open card read unit 1 name xray/lc3.pdb
+read coor pdb unit 1 resid
+! ATP
+open card read unit 1 name marco/prigor_atp.pdb
+read sequ pdb unit 1
+generate ATP setup warn 
+read coor pdb unit 1 resid comp
+open card read unit 1 name xray/atp3.pdb
+read coor pdb unit 1 resid
+! MG
+open card read unit 1 name marco/prigor_mg.pdb
+read sequ pdb unit 1
+generate MG setup warn 
+read coor pdb unit 1 resid comp
+open card read unit 1 name xray/mg.pdb
+read coor pdb unit 1 resid
+! crystal waters
+
+set offset ?nres
+read sequ TIP3 525
+generate XWAT nodihe noangle
+open card read unit 1 name xray/xwat.pdb
+read coor pdb unit 1 offset @offset
+!
+! flag  xray atoms -- these will be fixed later;
+
+scalar wmain set 0 select all end
+scalar wmain set 1 select init end
+
+!!!!!!!!!!! now go residue by residue & copy coordinates !!!!!!!!
+define unknown select .byres. ( .not. ( init .or. segid XWAT ) ) end
+
+!goto skipfit
+set counter 0
+label fit
+set resnum ?selires
+set resid  ?selresi
+define withinres select ires @resnum .and. init end
+if  ?nsel .ge. 3 then 
+ coor orie rms select withinres end
+ coor copy select ires @resnum .and. .not. init end
+endif
+define unknown select unknown .and. .not. ires @resnum end
+incr counter by 1
+if ?nsel .gt. 0 -
+goto fit 
+!if @counter .le. 1 goto fit
+label skipfit
+
+! do the rest
+!goto skipcopy
+coor orie rms select segid HC end
+coor copy select segid HC .and. .not. init end ! simply copy them
+coor orie rms select segid LC end
+coor copy select segid LC .and. .not. init end ! 
+coor orie rms select segid ATP end
+coor copy select segid ATP .and. .not. init end ! 
+coor orie rms select segid MG end
+coor copy select segid MG .and. .not. init end ! 
+label skipcopy
+!
+!coor init select hydrogen end
+hbuild
+
+
+write coor pdb name marco.pdb comp  select init end
+write coor pdb name xray.pdb select init end
+
+write psf card name prigor@version.psf
+write coor card name prigor@version.cor
+
+
+
+
+

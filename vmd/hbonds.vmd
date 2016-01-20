@@ -1,0 +1,36 @@
+#!/bin/vmd
+#
+############################################################################
+set id [ molinfo top ];
+set nf [molinfo $id get numframes];
+
+if { ![info exists "selection1"] } {
+ set selection1 "all"
+}
+if { ![info exists "selection2"] } {
+ set selection2 "all"
+}
+if { ![info exists "hcutoff"] } {
+ set hcutoff 3.0
+}
+if { ![info exists "hangle"] } {
+ set hangle 20
+}
+puts "Computing H-Bonds between ${selection1} and ${selection2} using cutoff $hcutoff and angle $hangle ..."
+
+set all      [atomselect $id "all"];
+set sel1      [atomselect $id $selection1];
+set sel2      [atomselect $id $selection2];
+set hbondlist {}
+#
+for { set i 0 } { $i<$nf } { incr i } {
+ $all  frame $i
+ $all  update
+ $sel1 frame $i
+ $sel1 update
+ $sel2 frame $i
+ $sel2 update
+# lappend hbondlist [measure hbonds $hcutoff $hangle ${sel1} ${sel2}]; # buggy for iverlapping selections !
+ lappend hbondlist [measure hbonds $hcutoff $hangle ${sel1}];
+}
+#############################################################################

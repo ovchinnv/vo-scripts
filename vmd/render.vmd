@@ -1,0 +1,15 @@
+#!/bin/vmd
+# change default parameters for optimized images
+
+# change default representation
+mol default material Diffuse
+mol default style {newcartoon 0.3 12 4 2}
+light 0 on
+light 1 on
+light 2 on
+light 3 on
+color Display {Background} white
+axes location off
+# tachyon renderer
+render default Tachyon
+render options Tachyon "/usr/local/lib/vmd/tachyon_LINUXAMD64" -aasamples 32 -trans_vmd -fullshade %s -format TARGA -o %s.tga

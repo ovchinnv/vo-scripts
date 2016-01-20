@@ -1,0 +1,38 @@
+#!/bin/bash
+# this script adds atomic element labels to the end of a pdb file
+# so that the atom types are recognized by fftk
+#
+
+awk ' BEGIN { space="                                                                                     " }
+{
+     if (substr($1,1,6) == "HETATM") {sub("HETATM","ATOM  ")}
+     if (substr($1,1,4) == "ATOM"){
+      sub(" "$5" ",substr(space,1,length($5))"1 ")
+      l=length($0)
+      if (l<72) { # need to append segid
+        linelen=72;
+        segid=$4 # use resid
+        ldiff = 4 - length($4)
+        if (ldiff < 0) {
+         segid=substr(segid,1,4); # truncate to 4 chars
+        } else {
+         segid = segid""substr(space,1,ldiff) # this is the segid padded to 4 chars (if needed)
+        }
+
+        ldiff=linelen-length($0)
+        if ( ldiff < 0 ) { ldiff=0 }
+        print substr($0,1,linelen)""substr(space,1,ldiff)""segid" "$3
+     } else { # assume segid is present
+        linelen=76;
+        ldiff=linelen-length($0)
+        if ( ldiff < 0 ) { ldiff=0 }
+         el=$3
+         gsub(/[0-9]/," ",el);
+         print el > "temp"
+         print substr($0,1,linelen)""substr(space,1,ldiff)""el
+     }
+    }
+}
+' $1 > _temp_ ; echo END >> _temp_
+mv _temp_ $1
+rm -f _temp_

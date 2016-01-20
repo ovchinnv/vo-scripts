@@ -1,0 +1,42 @@
+#!/bin/bash
+
+file=myo5A-rab11a.pdb
+
+# protein atoms:
+if  [ 1 == 1 ]; then
+./getchain ${file} A > rab.pdb
+./addsegid rab.pdb RAB ; echo >> rab.pdb
+
+./getchain ${file} B > m5.pdb
+./addsegid m5.pdb M5 ; echo >> m5.pdb
+
+fi
+# GDP atoms
+if  [ 1 == 1 ]; then
+./getchain $file F | grep "GDP" | sed -e 's/HETATM/ATOM  /' | sed -e 's/202/  1/' > gdp.pdb ;
+./addsegid gdp.pdb GDP;  echo >> gdp.pdb
+fi
+#
+# MG
+#
+if  [ 1 == 1 ]; then
+./getchain $file F | grep "MG" | sed -e 's/HETATM/ATOM  /' | sed -e 's/201/  1/' | sed 's/+2/  /' > mg.pdb ;
+./addsegid mg.pdb MG;  echo >> mg.pdb
+fi
+#
+# PHOSPHATE
+#
+if  [ 1 == 1 ]; then
+./getchain $file F | grep "BEF" | sed -e 's/HETATM/ATOM  /' | sed -e 's/2231/   1/'> phos.pdb ;
+./addsegid phos.pdb PIH;  echo >> phos.pdb
+fi
+
+
+# water
+if  [ 1 == 1 ]; then
+
+grep -i "HOH" ${file}  | sed -e 's/HETATM/ATOM  /' -e 's/O\s\s/OH2/' -e 's/HOH\s/TIP3/'  > xwat.pdb ;
+./addsegid xwat.pdb XWAT;  echo >> xwat.pdb
+
+fi
+

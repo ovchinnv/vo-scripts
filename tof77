@@ -1,0 +1,40 @@
+#!/bin/bash
+
+#couldn't get awk to work; using sed
+#awk '{ sub("/\cM/","", $0); print($0) }' $1 
+
+awk '{ if (substr($0,1,1) != "!") { 
+    
+        prefix=""
+        i=6
+        while ( (substr($0, i, i) != " ") && (i > 0) ){
+         prefix=prefix" "
+         i=i-1
+        }
+#        print i
+        gsub("==",".eq.");
+        gsub(">=",".ge.");
+        gsub("<=",".le.");
+        gsub(">" ,".gt.");
+        gsub("<" ,".lt.");
+        gsub("/=",".ne.");
+        
+        while (index($0, "&") > 0) {
+#        k=index($0,"&")
+#        print k
+         gsub ("&","");
+         print prefix""$0
+         prefix="     &"
+         getline
+#         print $1
+#         sub($1,"     *"$1);
+
+        }
+         
+        print prefix""$0
+        
+        } 
+         else { print $0} 
+        }' $1
+
+

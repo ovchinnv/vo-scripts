@@ -1,0 +1,27 @@
+* Flip ASN residues and choose the rconformation that
+* results in the lowest energy
+*
+
+open write card unit 33 name flip.asn
+write title unit 33
+* LOG OF ASN FLIPS
+* SEGNAME, RESNAME, RESID, AXIS, ENERGY BEFORE ROTATION, ENERGY AFTER ROTATION, ROTATED?
+
+define backbone sele type C .or. type CA .or. type N .or. type O .or. type HN end
+define resdone select none end
+label asn
+define notdone sele ( ( resname ASN ) .and. .not. resdone ) .and. solute end
+if ?nsel eq 0 goto done_asn
+define res sele ires ?selires end ! first resid in selection
+set resid ?selresi
+set rname ?selresn
+set sname ?selsegi
+! define rotation parameters
+define flipatoms sele res .and. .not. ( backbone .or. type CB .or. type CG )  end
+set ax1 cb
+set ax2 cg
+!
+stream rotate.str
+define resdone select resdone .or. res end
+goto asn
+label done_asn

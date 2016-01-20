@@ -1,0 +1,154 @@
+* protein solvation component for SB simulations
+*
+
+set version 27
+
+set eps 1.0 ! dielectric constant
+
+if @?psffile eq 0 set psffile unknown
+if @?corfile eq 0 set corfile unknown_m
+if @?format eq 0 set format card 
+
+stream readpsf.str
+
+set buf 22
+
+define solute select segid HC .or. segid RC .or. segid EC end
+
+coor orie select solute end ! align 
+coor stat select solute end ! select the active site region
+
+! compute center of water box
+calc xcen = ?xave 
+calc ycen = ?yave 
+calc zcen = ?zave 
+!
+calc rx = 0.5 * ( ?xmax - ?xmin ) + @buf
+calc ry = 0.5 * ( ?ymax - ?ymin ) + @buf
+calc rz = 0.5 * ( ?zmax - ?zmin ) + @buf
+! set solvation radius
+set R @rx 
+if @ry .gt. @R set R @ry
+if @rz .gt. @R set R @rz
+
+
+! add "crystal" waters (in several loops)
+open write card unit 88 name sbwaters.dat
+write title unit 88 
+* number of waters added in each trial
+*
+
+update atom cutnb 15 ctonnb 10 ctofnb 12 vdw vshift fshift cdie
+
+nobomb
+set overlap 2.8
+set nloop 1 ! # of attempts to add water
+set iloop 0
+label waterloo
+
+ define solute select segid HC .or. segid RC .or. segid EC .or. segid XWAT .or. segid WT .or. segid CAL .or. segid ION* end
+
+ stream wball.str
+ define watez select segid wat0 end
+ write title unit 88
+ * @iloop ?nsel ! how many waters were added in this loop
+ 
+ define watez select segid WT end
+ if ?nsel gt 0  join wt wat0 renumber ! rename all waters
+ if ?nsel eq 0  rename segid wt select segid wat0 end ! rename all waters
+
+goto skipmini
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!! now apply the boundary potential !!!!!!!!!
+ open read form unit 1 name wat25.pot ! open file
+ sbound read unit 1
+ sbound set xref @xcen yref @ycen zref @zcen assign 1 sele segid WT .and. type OH2 end
+! set up solvent friction for Langevin Dynamics
+! scalar fbeta set 0 select all end  ! reset 
+! scalar fbeta set 65.5 select segid WT .and. type OH2 end
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!include xwat in solvation
+ define solute select segid HC .or. segid RC .or. segid EC .or. segid XWAT end
+ cons harm force 30 select solute .and. .not. hydrogen end
+!  cons fix select onlysolute .and. .not. hydrogen end
+! mini sd nstep 100
+ mini conj nstep 10
+ mini abnr nstep 10
+ 
+! now do dynamics on the water !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!open write card unit 60 name sb@iloop.res
+!open write file unit 61 name sb@iloop.dcd
+
+dynamics leap verlet start nstep 500 timestep 0.001 iprfrq 5000 -
+         firstt 30 finalt 300 teminc 30 ihtfrq 50 ieqfrq 200 -
+	 iunwri -1 iuncrd -1 nprint 100 nsavc 100 -
+	 atom cutnb 15 ctonnb 10 ctofnb 12 vdw vshift fshift cdie
+
+
+
+ label unconstrained_mini ! no constraints in reaction zone 
+! cons harm force 30 select onlysolute .and. .not. hydrogen .and. .not. point @xcen @ycen @zcen cut @R end 
+!mini sd nstep 100
+ mini conj nstep 10
+ minimize abnr nstep 10 - ! conjugate gradient minimization
+
+! more dynamics
+ dynamics leap verlet start nstep 500 timestep 0.001 iprfrq 5000 -
+         firstt 30 finalt 300 teminc 30 ihtfrq 50 ieqfrq 200 -
+	 iunwri -1 iuncrd -1 nprint 100 nsavc 100 -
+	 atom cutnb 15 ctonnb 10 ctofnb 12 vdw vshift fshift cdie
+ 
+!!!!!!!!!!!!!! final minimization !!!!!!!!!!!!!!!!!!!!!
+
+! mini conj nstep 10
+ minimize abnr nstep 20 - ! conjugate gradient minimization
+
+! remove waters that moved out of the sb area (if any)
+! delete atom select .byres. ( segid WT .and. resname TIP3 .and. type OH2 .and. .not. point @xcen @ycen @zcen cut @R ) end
+
+
+!!!!!!!!! output energy terms
+!calc eang = ?angl + ?dihe + ?impr
+!calc ebond = ?bond
+!calc enbond = ?vdw + ?elec
+!calc ehbond = ?hbon
+ label skipmini
+
+!!!! write intermediate files
+! write psf card name @iloop.psf
+! write coor card name @iloop.crd
+
+ incr iloop by 1
+ if @iloop lt @nloop -
+goto waterloo
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+rename segid wat select segid w* end ! rename all waters
+
+!energy
+
+label write
+
+write psf @format name @{psffile}_s.psf
+write coord @format name @{corfile}s.cor
+* solvated in sphere of radius
+* R = @R; xcen=@xcen, ycen=@ycen, zcen=@zcen
+*
+open write card unit 1 name ballsize.str
+write title unit 1
+** Sphere radius and center
+* set R @R
+* set xcen @xcen
+* set ycen @ycen
+* set zcen @zcen
+close unit 1
+
+!!!! STOP HERE !!!!!!!!!!!
+
+goto kill
+
+!!!!!!!!! FINISHED !!!!!!!!!!!!
+
+label kill
+stop

@@ -1,0 +1,2091 @@
+%!PS-Adobe-3.0
+%%Title: seqhc1i
+%%For: V.Ovchinnikov
+%%Creator: a2ps version 4.13
+%%CreationDate: Wed Jan 30 14:39:26 2008
+%%BoundingBox: 24 24 588 768
+%%DocumentData: Clean7Bit
+%%Orientation: Landscape
+%%Pages: 5
+%%PageOrder: Ascend
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: font Courier
+%%+ font Courier-Bold
+%%+ font Courier-BoldOblique
+%%+ font Courier-Oblique
+%%+ font Helvetica
+%%+ font Helvetica-Bold
+%%+ font Symbol
+%%+ font Times-Bold
+%%+ font Times-Roman
+%%DocumentProcessColors: Black 
+%%DocumentSuppliedResources: procset a2ps-a2ps-hdr
+%%+ procset a2ps-black+white-Prolog
+%%+ encoding ISO-8859-1Encoding
+%%EndComments
+/a2psdict 200 dict def
+a2psdict begin
+%%BeginProlog
+%%Copyright: (c) 1988, 89, 90, 91, 92, 93 Miguel Santana
+%%Copyright: (c) 1995, 96, 97, 98 Akim Demaille, Miguel Santana
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+
+% EPSF import as in the Red Book
+/BeginInclude {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack 
+  userdict begin
+    0 setgray 0 setlinecap
+    1 setlinewidth 0 setlinejoin
+    10 setmiterlimit [ ] 0 setdash newpath
+    gs_languagelevel 1 ne {
+      false setstrokeadjust false setoverprint 
+    } if
+} bind def
+
+/EndInclude {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+/BeginEPSF {
+  BeginInclude
+  /showpage { } def
+} bind def
+
+/EndEPSF {
+  EndInclude
+} bind def
+
+% Page prefeed
+/page_prefeed {         % bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} bind def
+
+/deffont {
+  findfont exch scalefont def
+} bind def
+
+/reencode_font {
+  findfont reencode 2 copy definefont pop def
+} bind def
+
+% Function c-show (str => -)
+% centers text only according to x axis.
+/c-show { 
+  dup stringwidth pop
+  2 div neg 0 rmoveto
+  show
+} bind def
+
+% Function l-show (str => -)
+% prints texts so that it ends at currentpoint
+/l-show {
+  dup stringwidth pop neg 
+  0 
+  rmoveto show
+} bind def
+
+% center-fit show (str w => -)
+% show centered, and scale currentfont so that the width is less than w
+/cfshow {
+  exch dup stringwidth pop
+  % If the title is too big, try to make it smaller
+  3 2 roll 2 copy
+  gt
+  { % if, i.e. too big
+    exch div
+    currentfont exch scalefont setfont
+  } { % ifelse
+    pop pop 
+  }
+  ifelse
+  c-show			% center title
+} bind def
+
+% Return the y size of the current font
+% - => fontsize
+/currentfontsize {
+  currentfont /FontType get 0 eq {
+    currentfont /FontMatrix get 3 get
+  }{
+    currentfont /FontMatrix get 3 get 1000 mul
+  } ifelse
+} bind def
+
+% reencode the font
+% <encoding-vector> <fontdict> -> <newfontdict>
+/reencode { %def
+  dup length 5 add dict begin
+    { %forall
+      1 index /FID ne 
+      { def }{ pop pop } ifelse
+    } forall
+    /Encoding exch def
+
+    % Use the font's bounding box to determine the ascent, descent,
+    % and overall height; don't forget that these values have to be
+    % transformed using the font's matrix.
+    % We use `load' because sometimes BBox is executable, sometimes not.
+    % Since we need 4 numbers an not an array avoid BBox from being executed
+    /FontBBox load aload pop
+    FontMatrix transform /Ascent exch def pop
+    FontMatrix transform /Descent exch def pop
+    /FontHeight Ascent Descent sub def
+
+    % Define these in case they're not in the FontInfo (also, here
+    % they're easier to get to.
+    /UnderlinePosition 1 def
+    /UnderlineThickness 1 def
+    
+    % Get the underline position and thickness if they're defined.
+    currentdict /FontInfo known {
+      FontInfo
+      
+      dup /UnderlinePosition known {
+	dup /UnderlinePosition get
+	0 exch FontMatrix transform exch pop
+	/UnderlinePosition exch def
+      } if
+      
+      dup /UnderlineThickness known {
+	/UnderlineThickness get
+	0 exch FontMatrix transform exch pop
+	/UnderlineThickness exch def
+      } if
+      
+    } if
+    currentdict 
+  end 
+} bind def
+
+% composite fonts for ASCII-EUC mixed string
+% Version 1.2 1/31/1990
+% Orignal Ken'ichi HANDA (handa@etl.go.jp)
+% Modified Norio Katayama (katayama@rd.nacsis.ac.jp),1998
+% Extend & Fix Koji Nakamaru (maru@on.cs.keio.ac.jp), 1999
+% Anyone can freely copy, modify, distribute this program.
+
+/copyfont {	% font-dic extra-entry-count  copyfont  font-dic
+	1 index maxlength add dict begin
+	{	1 index /FID ne 2 index /UniqueID ne and
+		{def} {pop pop} ifelse
+	} forall
+	currentdict
+	end
+} bind def
+
+/compositefont { % ASCIIFontName EUCFontName RomanScale RomanOffset Rot(T/F) compositefont font
+    /RomanRotation exch def
+    /RomanOffset exch def
+    /RomanScale exch def
+    userdict /fixeucfont_dict known not {
+	userdict begin
+	    /fixeucfont_dict 2 dict begin
+		/UpperByteEncoding [
+		    16#00 1 16#20 { pop 0 } for
+		    16#21 1 16#28 { 16#20 sub } for
+		    16#29 1 16#2F { pop 0 } for
+		    16#30 1 16#74 { 16#27 sub } for
+		    16#75 1 16#FF { pop 0 } for
+		] def
+	        /LowerByteEncoding [
+		    16#00 1 16#A0 { pop /.notdef } for
+		    16#A1 1 16#FE { 16#80 sub 16 2 string cvrs
+				    (cXX) dup 1 4 -1 roll
+				    putinterval cvn } for
+		    /.notdef
+		] def
+		currentdict
+	    end def
+	end
+    } if
+    findfont dup /FontType get 0 eq {
+	14 dict begin
+	    %
+	    % 7+8 bit EUC font
+	    %
+	    12 dict begin
+		/EUCFont exch def
+		/FontInfo (7+8 bit EUC font) readonly def
+		/PaintType 0 def
+		/FontType 0 def
+		/FontMatrix matrix def
+		% /FontName
+		/Encoding fixeucfont_dict /UpperByteEncoding get def
+		/FMapType 2 def
+		EUCFont /WMode known
+		{ EUCFont /WMode get /WMode exch def }
+		{ /WMode 0 def } ifelse
+		/FDepVector [
+		    EUCFont /FDepVector get 0 get
+		    [ 16#21 1 16#28 {} for 16#30 1 16#74 {} for ]
+		    {
+			13 dict begin
+			    /EUCFont EUCFont def
+			    /UpperByte exch 16#80 add def	
+			    % /FontName
+			    /FontInfo (EUC lower byte font) readonly def
+			    /PaintType 0 def
+			    /FontType 3 def
+			    /FontMatrix matrix def
+			    /FontBBox {0 0 0 0} def
+			    /Encoding
+				fixeucfont_dict /LowerByteEncoding get def
+			    % /UniqueID
+			    % /WMode
+			    /BuildChar {
+				gsave
+				exch dup /EUCFont get setfont
+				/UpperByte get
+				2 string
+				dup 0 4 -1 roll put
+				dup 1 4 -1 roll put
+				dup stringwidth setcharwidth
+				0 0 moveto show
+				grestore
+			    } bind def
+			    currentdict
+			end
+			/lowerbytefont exch definefont
+		    } forall
+		] def
+		currentdict
+	    end
+	    /eucfont exch definefont
+	    exch
+	    findfont 1 copyfont dup begin
+		RomanRotation {
+			/FontMatrix FontMatrix
+			[ 0 RomanScale neg RomanScale 0 RomanOffset neg 0 ]
+			matrix concatmatrix def
+		}{
+			/FontMatrix FontMatrix
+			[ RomanScale 0 0 RomanScale 0 RomanOffset ] matrix concatmatrix
+			def
+			/CDevProc
+			    {pop pop pop pop 0 exch -1000 exch 2 div 880} def
+		} ifelse
+	    end
+	    /asciifont exch definefont
+	    exch
+	    /FDepVector [ 4 2 roll ] def
+	    /FontType 0 def
+	    /WMode 0 def
+	    /FMapType 4 def
+	    /FontMatrix matrix def
+	    /Encoding [0 1] def
+	    /FontBBox {0 0 0 0} def
+%	    /FontHeight 1.0 def % XXXX
+	    /FontHeight RomanScale 1.0 ge { RomanScale }{ 1.0 } ifelse def
+	    /Descent -0.3 def   % XXXX
+	    currentdict
+	end
+	/tmpfont exch definefont
+	pop
+	/tmpfont findfont
+    }{
+	pop findfont 0 copyfont
+    } ifelse
+} def	
+
+/slantfont {	% FontName slant-degree  slantfont  font'
+    exch findfont 1 copyfont begin
+    [ 1 0 4 -1 roll 1 0 0 ] FontMatrix exch matrix concatmatrix
+    /FontMatrix exch def
+    currentdict
+    end
+} def
+
+% Function print line number (<string> # -)
+/# {
+  gsave
+    sx cw mul neg 2 div 0 rmoveto
+    f# setfont
+    c-show
+  grestore
+} bind def
+
+% -------- Some routines to enlight plain b/w printings ---------
+
+% Underline
+% width --
+/dounderline {
+  currentpoint
+  gsave
+    moveto
+    0 currentfont /Descent get currentfontsize mul rmoveto
+    0 rlineto
+    stroke
+  grestore
+} bind def
+
+% Underline a string
+% string --
+/dounderlinestring {
+  stringwidth pop
+  dounderline
+} bind def
+
+/UL {
+  /ul exch store
+} bind def
+
+% Draw a box of WIDTH wrt current font
+% width --
+/dobox {
+  currentpoint
+  gsave
+    newpath
+    moveto
+    0 currentfont /Descent get currentfontsize mul rmoveto
+    dup 0 rlineto
+    0 currentfont /FontHeight get currentfontsize mul rlineto
+    neg 0 rlineto
+    closepath
+    stroke
+  grestore
+} bind def
+
+/BX {
+  /bx exch store
+} bind def
+
+% Box a string
+% string --
+/doboxstring {
+  stringwidth pop
+  dobox
+} bind def
+
+%
+% ------------- Color routines ---------------
+%
+/FG /setrgbcolor load def
+
+% Draw the background
+% width --
+/dobackground {
+  currentpoint
+  gsave
+    newpath
+    moveto
+    0 currentfont /Descent get currentfontsize mul rmoveto
+    dup 0 rlineto
+    0 currentfont /FontHeight get currentfontsize mul rlineto
+    neg 0 rlineto
+    closepath
+    bgcolor aload pop setrgbcolor
+    fill
+  grestore
+} bind def
+
+% Draw bg for a string
+% string --
+/dobackgroundstring {
+  stringwidth pop
+  dobackground
+} bind def
+
+
+/BG {
+  dup /bg exch store
+  { mark 4 1 roll ] /bgcolor exch store } if
+} bind def
+
+
+/Show {
+  bg { dup dobackgroundstring } if
+  ul { dup dounderlinestring } if
+  bx { dup doboxstring } if
+  show
+} bind def
+
+% Function T(ab), jumps to the n-th tabulation in the current line
+/T {
+  cw mul x0 add
+  bg { dup currentpoint pop sub dobackground } if
+  ul { dup currentpoint pop sub dounderline } if
+  bx { dup currentpoint pop sub dobox } if
+  y0 moveto
+} bind def
+
+% Function n: move to the next line
+/n {
+  /y0 y0 bfs sub store
+  x0 y0 moveto
+} bind def
+
+% Function N: show and move to the next line
+/N {
+  Show
+  /y0 y0 bfs sub store
+  x0 y0 moveto
+} bind def
+
+/S {
+  Show
+} bind def
+
+%%BeginResource: procset a2ps-a2ps-hdr 2.0 2
+%%Copyright: (c) 1988, 89, 90, 91, 92, 93 Miguel Santana
+%%Copyright: (c) 1995, 96, 97, 98 Akim Demaille, Miguel Santana
+% Function title: prints page header.
+% <ct> <rt> <lt> are passed as argument
+/title { 
+  % 1. Draw the background
+  x v get y v get moveto
+  gsave
+    0 th 2 div neg rmoveto 
+    th setlinewidth
+    0.95 setgray
+    pw 0 rlineto stroke
+  grestore
+  % 2. Border it
+  gsave
+    0.7 setlinewidth
+    pw 0 rlineto
+    0 th neg rlineto
+    pw neg 0 rlineto
+    closepath stroke
+  grestore
+  % stk: ct rt lt
+  x v get y v get th sub 1 add moveto
+%%IncludeResource: font Helvetica
+  fHelvetica fnfs 0.8 mul scalefont setfont
+  % 3. The left title
+  gsave
+    dup stringwidth pop fnfs 0.8 mul add exch % leave space took on stack
+    fnfs 0.8 mul hm rmoveto
+    show			% left title
+  grestore
+  exch
+  % stk: ct ltw rt
+  % 4. the right title
+  gsave
+    dup stringwidth pop fnfs 0.8 mul add exch % leave space took on stack
+    dup
+    pw exch stringwidth pop fnfs 0.8 mul add sub
+    hm
+    rmoveto
+    show			% right title
+  grestore
+  % stk: ct ltw rtw
+  % 5. the center title
+  gsave
+    pw 3 1 roll
+    % stk: ct pw ltw rtw
+    3 copy 
+    % Move to the center of the left room
+    sub add 2 div hm rmoveto
+    % What is the available space in here?
+    add sub fnfs 0.8 mul sub fnfs 0.8 mul sub
+    % stk: ct space_left
+%%IncludeResource: font Helvetica-Bold
+  fHelvetica-Bold fnfs scalefont setfont
+    cfshow
+  grestore
+} bind def
+
+% Function border: prints virtual page border
+/border { %def
+  gsave				% print four sides
+    0 setgray
+    x v get y v get moveto
+    0.7 setlinewidth		% of the square
+    pw 0 rlineto
+    0 ph neg rlineto
+    pw neg 0 rlineto
+    closepath stroke
+  grestore
+} bind def
+
+% Function water: prints a water mark in background
+/water { %def
+  gsave
+    scx scy moveto rotate
+%%IncludeResource: font Times-Bold
+  fTimes-Bold 100 scalefont setfont
+    .97 setgray
+    dup stringwidth pop 2 div neg -50 rmoveto
+    show
+  grestore
+} bind def
+
+% Function rhead: prints the right header
+/rhead {  %def
+  lx ly moveto
+  fHelvetica fnfs 0.8 mul scalefont setfont
+  l-show
+} bind def
+
+% Function footer (cf rf lf -> -)
+/footer {
+  fHelvetica fnfs 0.8 mul scalefont setfont
+  dx dy moveto
+  show
+
+  snx sny moveto
+  l-show
+  
+  fnx fny moveto
+  c-show
+} bind def
+%%EndResource
+%%BeginResource: procset a2ps-black+white-Prolog 2.0 1
+
+% Function T(ab), jumps to the n-th tabulation in the current line
+/T { 
+  cw mul x0 add y0 moveto
+} bind def
+
+% Function n: move to the next line
+/n { %def
+  /y0 y0 bfs sub store
+  x0 y0 moveto
+} bind def
+
+% Function N: show and move to the next line
+/N {
+  Show
+  /y0 y0 bfs sub store
+  x0 y0 moveto
+}  bind def
+
+/S {
+  Show
+} bind def
+
+/p {
+  false UL
+  false BX
+  fCourier bfs scalefont setfont
+  Show
+} bind def
+
+/sy {
+  false UL
+  false BX
+  fSymbol bfs scalefont setfont
+  Show
+} bind def
+
+/k {
+  false UL
+  false BX
+  fCourier-Oblique bfs scalefont setfont
+  Show
+} bind def
+
+/K {
+  false UL
+  false BX
+  fCourier-Bold bfs scalefont setfont
+  Show
+} bind def
+
+/c {
+  false UL
+  false BX
+  fCourier-Oblique bfs scalefont setfont
+  Show
+} bind def
+
+/C {
+  false UL
+  false BX
+  fCourier-BoldOblique bfs scalefont setfont
+  Show 
+} bind def
+
+/l {
+  false UL
+  false BX
+  fHelvetica bfs scalefont setfont
+  Show
+} bind def
+
+/L {
+  false UL
+  false BX
+  fHelvetica-Bold bfs scalefont setfont
+  Show 
+} bind def
+
+/str{
+  false UL
+  false BX
+  fTimes-Roman bfs scalefont setfont
+  Show
+} bind def
+
+/e{
+  false UL
+  true BX
+  fHelvetica-Bold bfs scalefont setfont
+  Show
+} bind def
+
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier
+%%IncludeResource: font Courier-Oblique
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Times-Roman
+%%IncludeResource: font Symbol
+%%IncludeResource: font Courier-BoldOblique
+%%BeginResource: encoding ISO-8859-1Encoding
+/ISO-8859-1Encoding [
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/space /exclam /quotedbl /numbersign /dollar /percent /ampersand /quoteright 
+/parenleft /parenright /asterisk /plus /comma /minus /period /slash 
+/zero /one /two /three /four /five /six /seven 
+/eight /nine /colon /semicolon /less /equal /greater /question 
+/at /A /B /C /D /E /F /G 
+/H /I /J /K /L /M /N /O 
+/P /Q /R /S /T /U /V /W 
+/X /Y /Z /bracketleft /backslash /bracketright /asciicircum /underscore 
+/quoteleft /a /b /c /d /e /f /g 
+/h /i /j /k /l /m /n /o 
+/p /q /r /s /t /u /v /w 
+/x /y /z /braceleft /bar /braceright /asciitilde /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/space /exclamdown /cent /sterling /currency /yen /brokenbar /section 
+/dieresis /copyright /ordfeminine /guillemotleft /logicalnot /hyphen /registered /macron 
+/degree /plusminus /twosuperior /threesuperior /acute /mu /paragraph /bullet 
+/cedilla /onesuperior /ordmasculine /guillemotright /onequarter /onehalf /threequarters /questiondown 
+/Agrave /Aacute /Acircumflex /Atilde /Adieresis /Aring /AE /Ccedilla 
+/Egrave /Eacute /Ecircumflex /Edieresis /Igrave /Iacute /Icircumflex /Idieresis 
+/Eth /Ntilde /Ograve /Oacute /Ocircumflex /Otilde /Odieresis /multiply 
+/Oslash /Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn /germandbls 
+/agrave /aacute /acircumflex /atilde /adieresis /aring /ae /ccedilla 
+/egrave /eacute /ecircumflex /edieresis /igrave /iacute /icircumflex /idieresis 
+/eth /ntilde /ograve /oacute /ocircumflex /otilde /odieresis /divide 
+/oslash /ugrave /uacute /ucircumflex /udieresis /yacute /thorn /ydieresis 
+] def
+%%EndResource
+% Initialize page description variables.
+/sh 612 def
+/sw 792 def
+/llx 24 def
+/urx 768 def
+/ury 588 def
+/lly 24 def
+/#copies 1 def
+/th 15.000000 def
+/fnfs 11 def
+/bfs 5.322862 def
+/cw 3.193717 def
+
+% Dictionary for ISO-8859-1 support
+/iso1dict 8 dict begin
+  /fCourier ISO-8859-1Encoding /Courier reencode_font
+  /fCourier-Bold ISO-8859-1Encoding /Courier-Bold reencode_font
+  /fCourier-BoldOblique ISO-8859-1Encoding /Courier-BoldOblique reencode_font
+  /fCourier-Oblique ISO-8859-1Encoding /Courier-Oblique reencode_font
+  /fHelvetica ISO-8859-1Encoding /Helvetica reencode_font
+  /fHelvetica-Bold ISO-8859-1Encoding /Helvetica-Bold reencode_font
+  /fTimes-Bold ISO-8859-1Encoding /Times-Bold reencode_font
+  /fTimes-Roman ISO-8859-1Encoding /Times-Roman reencode_font
+currentdict end def
+/bgcolor [ 0 0 0 ] def
+/bg false def
+/ul false def
+/bx false def
+% The font for line numbering
+/f# /Helvetica findfont bfs .6 mul scalefont def
+/fSymbol /Symbol findfont def
+/hm fnfs 0.25 mul def
+/pw
+   cw 76.400000 mul
+def
+/ph
+   520.043632 th add
+def
+/pmw urx llx sub pw 3 mul sub 2 div def
+/pmh 0 def
+/v 0 def
+/x [
+  0
+  dup pmw add pw add
+  dup pmw add pw add
+] def
+/y [
+  pmh ph add 0 mul ph add
+  dup
+  dup
+] def
+/scx sw 2 div def
+/scy sh 2 div def
+/snx urx def
+/sny lly 2 add def
+/dx llx def
+/dy sny def
+/fnx scx def
+/fny dy def
+/lx snx def
+/ly ury fnfs 0.8 mul sub def
+/sx 0 def
+/tab 8 def
+/x0 0 def
+/y0 0 def
+%%EndSetup
+
+%%Page: (1-3) 1
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 2.235602 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(1KK7 ) p 8 T ( 2OS8 ) S 16 T ( 2OVK ) S 24 T ( 2MYS ) S 32 T ( 1VOM ) S 40 T ( 1OE9) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( 1 M ) S 32 T ( -     ) S 40 T ( -    ) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( 2 A ) S 32 T ( -     ) S 40 T ( -    ) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( 3 S ) S 32 T ( -     ) S 40 T ( -    ) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( 4 P ) S 32 T ( 1 M ) S 40 T ( -    ) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( 5 D ) S 32 T ( 2 N ) S 40 T ( -    ) N
+(1 M ) S 8 T ( 1 M ) S 16 T ( 1 M ) S 24 T ( 6 A ) S 32 T ( 3 P ) S 40 T ( -    ) N
+(2 N ) S 8 T ( 2 N ) S 16 T ( 2 T ) S 24 T ( 7 E ) S 32 T ( 4 I ) S 40 T ( -    ) N
+(3 I ) S 8 T ( 3 I ) S 16 T ( 3 M ) S 24 T ( 8 M ) S 32 T ( 5 H ) S 40 T ( -    ) N
+(4 D ) S 8 T ( 4 D ) S 16 T ( 4 D ) S 24 T ( 9 A ) S 32 T ( 6 D ) S 40 T ( -    ) N
+(5 F ) S 8 T ( 5 F ) S 16 T ( 5 F ) S 24 T ( 10 A ) S 32 T ( 7 R ) S 40 T ( -    ) N
+(6 S ) S 8 T ( 6 N ) S 16 T ( 6 S ) S 24 T ( 11 F ) S 32 T ( 8 T ) S 40 T ( -    ) N
+(7 D ) S 8 T ( 7 D ) S 16 T ( 7 D ) S 24 T ( 12 G ) S 32 T ( 9 S ) S 40 T ( -    ) N
+(8 P ) S 8 T ( 8 P ) S 16 T ( 8 P ) S 24 T ( 13 E ) S 32 T ( 10 D ) S 40 T ( -    ) N
+(9 D ) S 8 T ( 9 D ) S 16 T ( 9 D ) S 24 T ( 14 A ) S 32 T ( 11 Y ) S 40 T ( -    ) N
+(10 F ) S 8 T ( 10 F ) S 16 T ( 10 M ) S 24 T ( 15 A ) S 32 T ( 12 H ) S 40 T ( -    ) N
+(11 Q ) S 8 T ( 11 Q ) S 16 T ( 11 E ) S 24 T ( 16 P ) S 32 T ( 13 K ) S 40 T ( -    ) N
+(12 Y ) S 8 T ( 12 Y ) S 16 T ( 12 F ) S 24 T ( 17 Y ) S 32 T ( 14 Y ) S 40 T ( -    ) N
+(13 L ) S 8 T ( 13 L ) S 16 T ( 13 L ) S 24 T ( 18 L ) S 32 T ( 15 L ) S 40 T ( -    ) N
+(14 A ) S 8 T ( 14 A ) S 16 T ( 14 C ) S 24 T ( 19 R ) S 32 T ( 16 K ) S 40 T ( -    ) N
+(15 V ) S 8 T ( 15 V ) S 16 T ( 15 L ) S 24 T ( 20 K ) S 32 T ( 17 V ) S 40 T ( -    ) N
+(16 D ) S 8 T ( 16 D ) S 16 T ( 16 T ) S 24 T ( 21 S ) S 32 T ( 18 K ) S 40 T ( -    ) N
+(17 R ) S 8 T ( 17 R ) S 16 T ( 17 R ) S 24 T ( 22 E ) S 32 T ( 19 Q ) S 40 T ( -    ) N
+(18 K ) S 8 T ( 18 K ) S 16 T ( 18 Q ) S 24 T ( 23 K ) S 32 T ( 20 G ) S 40 T ( -    ) N
+(19 K ) S 8 T ( 19 K ) S 16 T ( 19 K ) S 24 T ( 24 E ) S 32 T ( 21 D ) S 40 T ( -    ) N
+(20 L ) S 8 T ( 20 M ) S 16 T ( 20 L ) S 24 T ( 25 R ) S 32 T ( 22 S ) S 40 T ( -    ) N
+(21 M ) S 8 T ( 21 M ) S 16 T ( 21 M ) S 24 T ( 26 I ) S 32 T ( 23 D ) S 40 T ( -    ) N
+(22 K ) S 8 T ( 22 K ) S 16 T ( 22 E ) S 24 T ( 27 E ) S 32 T ( 24 L ) S 40 T ( 1 M) N
+(23 E ) S 8 T ( 23 E ) S 16 T ( 23 A ) S 24 T ( 28 A ) S 32 T ( 25 F ) S 40 T ( 2 A) N
+(24 Q ) S 8 T ( 24 Q ) S 16 T ( 24 T ) S 24 T ( 29 Q ) S 32 T ( 26 K ) S 40 T ( 3 A) N
+(25 T ) S 8 T ( 25 T ) S 16 T ( 25 S ) S 24 T ( 30 N ) S 32 T ( 27 L ) S 40 T ( 4 S) N
+(26 A ) S 8 T ( 26 A ) S 16 T ( 26 I ) S 24 T ( 31 K ) S 32 T ( 28 T ) S 40 T ( 5 E) N
+(27 A ) S 8 T ( 27 P ) S 16 T ( 27 P ) S 24 T ( 32 P ) S 32 T ( 29 V ) S 40 T ( 6 L) N
+(28 F ) S 8 T ( 28 F ) S 16 T ( 28 F ) S 24 T ( 33 F ) S 32 T ( 30 S ) S 40 T ( 7 Y) N
+(29 D ) S 8 T ( 29 D ) S 16 T ( 29 D ) S 24 T ( 34 D ) S 32 T ( 31 D ) S 40 T ( 8 T) N
+(30 G ) S 8 T ( 30 G ) S 16 T ( 30 G ) S 24 T ( 35 A ) S 32 T ( 32 K ) S 40 T ( 9 K) N
+(31 K ) S 8 T ( 31 K ) S 16 T ( 31 K ) S 24 T ( 36 K ) S 32 T ( 33 R ) S 40 T ( 10 Y) N
+(32 K ) S 8 T ( 32 K ) S 16 T ( 32 K ) S 24 T ( 37 S ) S 32 T ( 34 Y ) S 40 T ( 11 A) N
+(33 N ) S 8 T ( 33 N ) S 16 T ( 33 N ) S 24 T ( 38 S ) S 32 T ( 35 I ) S 40 T ( 12 R) N
+(34 C ) S 8 T ( 34 C ) S 16 T ( 34 C ) S 24 T ( 39 V ) S 32 T ( 36 W ) S 40 T ( 13 V) N
+(35 W ) S 8 T ( 35 W ) S 16 T ( 35 W ) S 24 T ( 40 F ) S 32 T ( 37 Y ) S 40 T ( 14 W) N
+(36 V ) S 8 T ( 36 V ) S 16 T ( 36 V ) S 24 T ( 41 V ) S 32 T ( 38 N ) S 40 T ( 15 I) N
+(37 P ) S 8 T ( 37 P ) S 16 T ( 37 P ) S 24 T ( 42 V ) S 32 T ( 39 P ) S 40 T ( 16 P) N
+(38 D ) S 8 T ( 38 D ) S 16 T ( 38 D ) S 24 T ( 43 H ) S 32 T ( 40 D ) S 40 T ( 17 D) N
+(39 E ) S 8 T ( 39 P ) S 16 T ( 39 P ) S 24 T ( 44 P ) S 32 T ( 41 P ) S 40 T ( 18 P) N
+(40 K ) S 8 T ( 40 K ) S 16 T ( 40 D ) S 24 T ( 45 K ) S 32 T ( 42 K ) S 40 T ( 19 E) N
+(41 E ) S 8 T ( 41 E ) S 16 T ( 41 F ) S 24 T ( 46 E ) S 32 T ( 43 E ) S 40 T ( 20 E) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( 44 R ) S 40 T ( 21 V) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( 45 D ) S 40 T ( 22 W) N
+(42 G ) S 8 T ( 42 G ) S 16 T ( 42 G ) S 24 T ( 47 S ) S 32 T ( 46 S ) S 40 T ( 23 K) N
+(43 F ) S 8 T ( 43 F ) S 16 T ( 43 F ) S 24 T ( 48 F ) S 32 T ( 47 Y ) S 40 T ( 24 S) N
+(44 A ) S 8 T ( 44 A ) S 16 T ( 44 V ) S 24 T ( 49 V ) S 32 T ( 48 E ) S 40 T ( 25 A) N
+(45 S ) S 8 T ( 45 S ) S 16 T ( 45 G ) S 24 T ( 50 K ) S 32 T ( 49 C ) S 40 T ( 26 E) N
+(46 A ) S 8 T ( 46 A ) S 16 T ( 46 A ) S 24 T ( 51 G ) S 32 T ( 50 G ) S 40 T ( 27 L) N
+(47 E ) S 8 T ( 47 E ) S 16 T ( 47 E ) S 24 T ( 52 T ) S 32 T ( 51 E ) S 40 T ( 28 L) N
+(48 I ) S 8 T ( 48 I ) S 16 T ( 48 I ) S 24 T ( 53 I ) S 32 T ( 52 I ) S 40 T ( 29 K) N
+(49 Q ) S 8 T ( 49 Q ) S 16 T ( 49 Q ) S 24 T ( 54 Q ) S 32 T ( 53 V ) S 40 T ( 30 D) N
+(50 S ) S 8 T ( 50 S ) S 16 T ( 50 S ) S 24 T ( 55 S ) S 32 T ( 54 S ) S 40 T ( 31 Y) N
+(51 S ) S 8 T ( 51 S ) S 16 T ( 51 T ) S 24 T ( 56 K ) S 32 T ( 55 E ) S 40 T ( 32 K) N
+(52 K ) S 8 T ( 52 K ) S 16 T ( 52 K ) S 24 T ( 57 E ) S 32 T ( 56 T ) S 40 T ( 33 P) N
+(53 G ) S 8 T ( 53 G ) S 16 T ( 53 G ) S 24 T ( 58 G ) S 32 T ( 57 S ) S 40 T ( 34 G) N
+(54 D ) S 8 T ( 54 E ) S 16 T ( 54 D ) S 24 T ( 59 G ) S 32 T ( 58 D ) S 40 T ( 35 D) N
+(55 E ) S 8 T ( 55 E ) S 16 T ( 55 E ) S 24 T ( 60 K ) S 32 T ( 59 S ) S 40 T ( 36 K) N
+(56 I ) S 8 T ( 56 I ) S 16 T ( 56 V ) S 24 T ( 61 V ) S 32 T ( 60 F ) S 40 T ( 37 V) N
+(57 T ) S 8 T ( 57 T ) S 16 T ( 57 T ) S 24 T ( 62 T ) S 32 T ( 61 T ) S 40 T ( 38 L) N
+(58 V ) S 8 T ( 58 V ) S 16 T ( 58 V ) S 24 T ( 63 V ) S 32 T ( 62 F ) S 40 T ( 39 Q) N
+(59 K ) S 8 T ( 59 K ) S 16 T ( 59 K ) S 24 T ( 64 K ) S 32 T ( 63 K ) S 40 T ( 40 L) N
+(60 I ) S 8 T ( 60 I ) S 16 T ( 60 T ) S 24 T ( 65 T ) S 32 T ( 64 T ) S 40 T ( 41 R) N
+(61 V ) S 8 T ( 61 V ) S 16 T ( 61 D ) S 24 T ( 66 E ) S 32 T ( 65 V ) S 40 T ( 42 L) N
+(62 A ) S 8 T ( 62 S ) S 16 T ( 62 K ) S 24 T ( 67 G ) S 32 T ( 66 D ) S 40 T ( 43 E) N
+(63 D ) S 8 T ( 63 D ) S 16 T ( 63 T ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 44 E) N
+(64 S ) S 8 T ( 64 N ) S 16 T ( 64 Q ) S 24 T ( 68 G ) S 32 T ( 67 G ) S 40 T ( 45 G) N
+(65 S ) S 8 T ( 65 S ) S 16 T ( 65 E ) S 24 T ( 69 E ) S 32 T ( 68 Q ) S 40 T ( 46 K) N
+(66 T ) S 8 T ( 66 T ) S 16 T ( 66 T ) S 24 T ( 70 T ) S 32 T ( 69 D ) S 40 T ( 47 D) N
+(67 R ) S 8 T ( 67 R ) S 16 T ( 67 R ) S 24 T ( 71 L ) S 32 T ( 70 R ) S 40 T ( 48 L) N
+(68 T ) S 8 T ( 68 T ) S 16 T ( 68 V ) S 24 T ( 72 T ) S 32 T ( 71 Q ) S 40 T ( 49 E) N
+(69 V ) S 8 T ( 69 V ) S 16 T ( 69 V ) S 24 T ( 73 V ) S 32 T ( 72 V ) S 40 T ( 50 Y) N
+(70 K ) S 8 T ( 70 K ) S 16 T ( 70 K ) S 24 T ( 74 K ) S 32 T ( 73 K ) S 40 T ( 51 C) N
+(71 K ) S 8 T ( 71 K ) S 16 T ( 71 K ) S 24 T ( 75 E ) S 32 T ( 74 K ) S 40 T ( 52 L) N
+(72 D ) S 8 T ( 72 D ) S 16 T ( 72 D ) S 24 T ( 76 D ) S 32 T ( 75 D ) S 40 T ( 53 D) N
+(73 D ) S 8 T ( 73 D ) S 16 T ( 73 D ) S 24 T ( 77 Q ) S 32 T ( 76 D ) S 40 T ( 54 P) N
+(74 I ) S 8 T ( 74 I ) S 16 T ( 74 I ) S 24 T ( 78 V ) S 32 T ( 77 A ) S 40 T ( 55 K) N
+(75 Q ) S 8 T ( 75 Q ) S 16 T ( 75 G ) S 24 T ( 79 F ) S 32 T ( 78 N ) S 40 T ( 56 T) N
+(76 S ) S 8 T ( 76 Q ) S 16 T ( 76 Q ) S 24 T ( 80 S ) S 32 T ( 79 Q ) S 40 T ( 57 K) N
+(77 M ) S 8 T ( 77 M ) S 16 T ( 77 R ) S 24 T ( 81 M ) S 32 T ( 80 R ) S 40 T ( 58 E) N
+(78 N ) S 8 T ( 78 N ) S 16 T ( 78 N ) S 24 T ( 82 N ) S 32 T ( 81 N ) S 40 T ( 59 L) N
+(79 P ) S 8 T ( 79 P ) S 16 T ( 79 P ) S 24 T ( 83 P ) S 32 T ( 82 P ) S 40 T ( 60 P SH3) N
+(---------------------------------------------) N
+(80 P ) S 8 T ( 80 P ) S 16 T ( 80 P ) S 24 T ( 84 P ) S 32 T ( 83 I ) S 40 T ( 61 P) N
+(81 K ) S 8 T ( 81 K ) S 16 T ( 81 K ) S 24 T ( 85 K ) S 32 T ( 84 K ) S 40 T ( 62 L) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 63 R) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 64 N) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 65 P) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 66 D) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 67 I) N
+(82 F ) S 8 T ( 82 F ) S 16 T ( 82 F ) S 24 T ( 86 Y ) S 32 T ( 85 F ) S 40 T ( 68 L) N
+(83 E ) S 8 T ( 83 E ) S 16 T ( 83 E ) S 24 T ( 87 D ) S 32 T ( 86 D ) S 40 T ( 69 V) N
+(seqhc1i) (Page 1/13) (Jan 30, 08 14:38) title
+border
+/v 1 store
+/x0 x v get 2.235602 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(84 K ) p 8 T ( 84 K ) S 16 T ( 84 M ) S 24 T ( 88 K ) S 32 T ( 87 G ) S 40 T ( 70 G) N
+(85 L ) S 8 T ( 85 L ) S 16 T ( 85 N ) S 24 T ( 89 I ) S 32 T ( 88 V ) S 40 T ( 71 E) N
+(86 E ) S 8 T ( 86 E ) S 16 T ( 86 M ) S 24 T ( 90 E ) S 32 T ( 89 E ) S 40 T ( 72 N) N
+(87 D ) S 8 T ( 87 D ) S 16 T ( 87 D ) S 24 T ( 91 D ) S 32 T ( 90 D ) S 40 T ( 73 D) N
+(88 M ) S 8 T ( 88 M ) S 16 T ( 88 M ) S 24 T ( 92 M ) S 32 T ( 91 M ) S 40 T ( 74 L) N
+(89 A ) S 8 T ( 89 A ) S 16 T ( 89 A ) S 24 T ( 93 A ) S 32 T ( 92 S ) S 40 T ( 75 T) N
+(90 N ) S 8 T ( 90 N ) S 16 T ( 90 N ) S 24 T ( 94 M ) S 32 T ( 93 E ) S 40 T ( 76 A) N
+(91 M ) S 8 T ( 91 M ) S 16 T ( 91 L ) S 24 T ( 95 M ) S 32 T ( 94 L ) S 40 T ( 77 L) N
+(92 T ) S 8 T ( 92 T ) S 16 T ( 92 T ) S 24 T ( 96 T ) S 32 T ( 95 S ) S 40 T ( 78 S) N
+(93 Y ) S 8 T ( 93 Y ) S 16 T ( 93 F ) S 24 T ( 97 H ) S 32 T ( 96 Y ) S 40 T ( 79 Y) N
+(94 L ) S 8 T ( 94 L ) S 16 T ( 94 L ) S 24 T ( 98 L ) S 32 T ( 97 L ) S 40 T ( 80 L) N
+(95 N ) S 8 T ( 95 N ) S 16 T ( 95 N ) S 24 T ( 99 H ) S 32 T ( 98 N ) S 40 T ( 81 H) N
+(96 E ) S 8 T ( 96 E ) S 16 T ( 96 E ) S 24 T ( 100 E ) S 32 T ( 99 E ) S 40 T ( 82 E) N
+(97 A ) S 8 T ( 97 A ) S 16 T ( 97 A ) S 24 T ( 101 P ) S 32 T ( 100 P ) S 40 T ( 83 P) N
+(98 S ) S 8 T ( 98 S ) S 16 T ( 98 S ) S 24 T ( 102 A ) S 32 T ( 101 A ) S 40 T ( 84 A) N
+(99 V ) S 8 T ( 99 V ) S 16 T ( 99 I ) S 24 T ( 103 V ) S 32 T ( 102 V ) S 40 T ( 85 V) N
+(100 L ) S 8 T ( 100 L ) S 16 T ( 100 L ) S 24 T ( 104 L ) S 32 T ( 103 F ) S 40 T ( 86 L) N
+(101 Y ) S 8 T ( 101 N ) S 16 T ( 101 H ) S 24 T ( 105 Y ) S 32 T ( 104 H ) S 40 T ( 87 H) N
+(102 N ) S 8 T ( 102 N ) S 16 T ( 102 N ) S 24 T ( 106 N ) S 32 T ( 105 N ) S 40 T ( 88 N) N
+(103 L ) S 8 T ( 103 L ) S 16 T ( 103 L ) S 24 T ( 107 L ) S 32 T ( 106 L ) S 40 T ( 89 L) N
+(104 R ) S 8 T ( 104 R ) S 16 T ( 104 R ) S 24 T ( 108 K ) S 32 T ( 107 R ) S 40 T ( 90 K) N
+(105 S ) S 8 T ( 105 G ) S 16 T ( 105 S ) S 24 T ( 109 E ) S 32 T ( 108 V ) S 40 T ( 91 V) N
+(106 R ) S 8 T ( 106 R ) S 16 T ( 106 R ) S 24 T ( 110 R ) S 32 T ( 109 R ) S 40 T ( 92 R) N
+(107 Y ) S 8 T ( 107 Y ) S 16 T ( 107 Y ) S 24 T ( 111 Y ) S 32 T ( 110 Y ) S 40 T ( 93 F) N
+(108 T ) S 8 T ( 108 T ) S 16 T ( 108 E ) S 24 T ( 112 A ) S 32 T ( 111 N ) S 40 T ( 94 I) N
+(109 S ) S 8 T ( 109 A ) S 16 T ( 109 S ) S 24 T ( 113 A ) S 32 T ( 112 Q ) S 40 T ( 95 D) N
+(110 G ) S 8 T ( 110 G ) S 16 T ( 110 G ) S 24 T ( 114 W ) S 32 T ( 113 D ) S 40 T ( 96 S) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 97 K) N
+(111 L ) S 8 T ( 111 L ) S 16 T ( 111 F ) S 24 T ( 115 M ) S 32 T ( 114 L ) S 40 T ( 98 L) N
+(112 I ) S 8 T ( 112 I ) S 16 T ( 112 I ) S 24 T ( 116 I ) S 32 T ( 115 I ) S 40 T ( 99 I) N
+(113 Y ) S 8 T ( 113 Y ) S 16 T ( 113 Y ) S 24 T ( 117 Y ) S 32 T ( 116 Y ) S 40 T ( 100 Y) N
+(114 T ) S 8 T ( 114 T ) S 16 T ( 114 T ) S 24 T ( 118 T ) S 32 T ( 117 T ) S 40 T ( 101 T) N
+(115 Y ) S 8 T ( 115 Y ) S 16 T ( 115 Y ) S 24 T ( 119 Y ) S 32 T ( 118 Y ) S 40 T ( 102 Y) N
+(116 S ) S 8 T ( 116 S ) S 16 T ( 116 S ) S 24 T ( 120 S ) S 32 T ( 119 S ) S 40 T ( 103 C) N
+(117 G ) S 8 T ( 117 G ) S 16 T ( 117 G ) S 24 T ( 121 G ) S 32 T ( 120 G ) S 40 T ( 104 G) N
+(118 L ) S 8 T ( 118 L ) S 16 T ( 118 L ) S 24 T ( 122 L ) S 32 T ( 121 L ) S 40 T ( 105 I) N
+(119 F ) S 8 T ( 119 F ) S 16 T ( 119 F ) S 24 T ( 123 F ) S 32 T ( 122 F ) S 40 T ( 106 V) N
+(120 C ) S 8 T ( 120 C ) S 16 T ( 120 C ) S 24 T ( 124 C ) S 32 T ( 123 L ) S 40 T ( 107 L) N
+(121 I ) S 8 T ( 121 I ) S 16 T ( 121 I ) S 24 T ( 125 V ) S 32 T ( 124 V ) S 40 T ( 108 V) N
+(122 A ) S 8 T ( 122 A ) S 16 T ( 122 A ) S 24 T ( 126 T ) S 32 T ( 125 A ) S 40 T ( 109 A) N
+(123 V ) S 8 T ( 123 V ) S 16 T ( 123 I ) S 24 T ( 127 V ) S 32 T ( 126 V ) S 40 T ( 110 I) N
+(124 N ) S 8 T ( 124 N ) S 16 T ( 124 N ) S 24 T ( 128 N ) S 32 T ( 127 N ) S 40 T ( 111 N) N
+(125 P ) S 8 T ( 125 P ) S 16 T ( 125 P ) S 24 T ( 129 P ) S 32 T ( 128 P ) S 40 T ( 112 P) N
+(126 Y ) S 8 T ( 126 Y ) S 16 T ( 126 Y ) S 24 T ( 130 Y ) S 32 T ( 129 F ) S 40 T ( 113 Y) N
+(127 R ) S 8 T ( 127 R ) S 16 T ( 127 R ) S 24 T ( 131 K ) S 32 T ( 130 K ) S 40 T ( 114 E) N
+(128 R ) S 8 T ( 128 R ) S 16 T ( 128 R ) S 24 T ( 132 W ) S 32 T ( 131 R ) S 40 T ( 115 Q) N
+(129 L ) S 8 T ( 129 L ) S 16 T ( 129 L ) S 24 T ( 133 L ) S 32 T ( 132 I ) S 40 T ( 116 L) N
+(130 P ) S 8 T ( 130 P ) S 16 T ( 130 P ) S 24 T ( 134 P ) S 32 T ( 133 P ) S 40 T ( 117 P) N
+(131 I ) S 8 T ( 131 I ) S 16 T ( 131 I ) S 24 T ( 135 V ) S 32 T ( 134 I ) S 40 T ( 118 I) N
+(132 Y ) S 8 T ( 132 Y ) S 16 T ( 132 Y ) S 24 T ( 136 Y ) S 32 T ( 135 Y ) S 40 T ( 119 Y) N
+(133 T ) S 8 T ( 133 T ) S 16 T ( 133 T ) S 24 T ( 137 N ) S 32 T ( 136 T ) S 40 T ( 120 G) N
+(134 D ) S 8 T ( 134 D ) S 16 T ( 134 Q ) S 24 T ( 138 P ) S 32 T ( 137 Q ) S 40 T ( 121 E) N
+(135 S ) S 8 T ( 135 S ) S 16 T ( 135 G ) S 24 T ( 139 E ) S 32 T ( 138 E ) S 40 T ( 122 D) N
+(136 V ) S 8 T ( 136 V ) S 16 T ( 136 L ) S 24 T ( 140 V ) S 32 T ( 139 M ) S 40 T ( 123 I) N
+(137 I ) S 8 T ( 137 I ) S 16 T ( 137 V ) S 24 T ( 141 V ) S 32 T ( 140 V ) S 40 T ( 124 I) N
+(138 A ) S 8 T ( 138 A ) S 16 T ( 138 D ) S 24 T ( 142 L ) S 32 T ( 141 D ) S 40 T ( 125 N) N
+(139 K ) S 8 T ( 139 K ) S 16 T ( 139 K ) S 24 T ( 143 A ) S 32 T ( 142 I ) S 40 T ( 126 A) N
+(140 Y ) S 8 T ( 140 Y ) S 16 T ( 140 Y ) S 24 T ( 144 Y ) S 32 T ( 143 F ) S 40 T ( 127 Y) N
+(141 R ) S 8 T ( 141 R ) S 16 T ( 141 R ) S 24 T ( 145 R ) S 32 T ( 144 K ) S 40 T ( 128 S) N
+(142 G ) S 8 T ( 142 G ) S 16 T ( 142 G ) S 24 T ( 146 G ) S 32 T ( 145 G ) S 40 T ( 129 G) N
+(143 K ) S 8 T ( 143 K ) S 16 T ( 143 K ) S 24 T ( 147 K ) S 32 T ( 146 R ) S 40 T ( 130 Q) N
+(144 R ) S 8 T ( 144 R ) S 16 T ( 144 R ) S 24 T ( 148 K ) S 32 T ( 147 R ) S 40 T ( 131 N) N
+(145 K ) S 8 T ( 145 K ) S 16 T ( 145 R ) S 24 T ( 149 R ) S 32 T ( 148 R ) S 40 T ( 132 M) N
+(146 T ) S 8 T ( 146 T ) S 16 T ( 146 A ) S 24 T ( 150 Q ) S 32 T ( 149 N ) S 40 T ( 133 G) N
+(147 E ) S 8 T ( 147 E ) S 16 T ( 147 E ) S 24 T ( 151 E ) S 32 T ( 150 E ) S 40 T ( 134 D) N
+(148 I ) S 8 T ( 148 I ) S 16 T ( 148 M ) S 24 T ( 152 A ) S 32 T ( 151 V ) S 40 T ( 135 M) N
+(149 P ) S 8 T ( 149 P ) S 16 T ( 149 P ) S 24 T ( 153 P ) S 32 T ( 152 A ) S 40 T ( 136 D) N
+(150 P ) S 8 T ( 150 P ) S 16 T ( 150 P ) S 24 T ( 154 P ) S 32 T ( 153 P ) S 40 T ( 137 P) N
+(151 H ) S 8 T ( 151 H ) S 16 T ( 151 H ) S 24 T ( 155 H ) S 32 T ( 154 H ) S 40 T ( 138 H) N
+(152 L ) S 8 T ( 152 L ) S 16 T ( 152 L ) S 24 T ( 156 I ) S 32 T ( 155 I ) S 40 T ( 139 I) N
+(153 F ) S 8 T ( 153 F ) S 16 T ( 153 F ) S 24 T ( 157 F ) S 32 T ( 156 F ) S 40 T ( 140 F) N
+(154 S ) S 8 T ( 154 S ) S 16 T ( 154 S ) S 24 T ( 158 S ) S 32 T ( 157 A ) S 40 T ( 141 A) N
+(155 V ) S 8 T ( 155 V ) S 16 T ( 155 I ) S 24 T ( 159 I ) S 32 T ( 158 I ) S 40 T ( 142 V) N
+(156 A ) S 8 T ( 156 A ) S 16 T ( 156 A ) S 24 T ( 160 S ) S 32 T ( 159 S ) S 40 T ( 143 A) N
+(157 D ) S 8 T ( 157 D ) S 16 T ( 157 D ) S 24 T ( 161 D ) S 32 T ( 160 D ) S 40 T ( 144 E) N
+(158 N ) S 8 T ( 158 N ) S 16 T ( 158 N ) S 24 T ( 162 N ) S 32 T ( 161 V ) S 40 T ( 145 E) N
+(159 A ) S 8 T ( 159 A ) S 16 T ( 159 A ) S 24 T ( 163 A ) S 32 T ( 162 A ) S 40 T ( 146 A) N
+(160 Y ) S 8 T ( 160 Y ) S 16 T ( 160 Y ) S 24 T ( 164 Y ) S 32 T ( 163 Y ) S 40 T ( 147 Y) N
+(161 Q ) S 8 T ( 161 Q ) S 16 T ( 161 Q ) S 24 T ( 165 Q ) S 32 T ( 164 R ) S 40 T ( 148 K) N
+(162 N ) S 8 T ( 162 N ) S 16 T ( 162 Y ) S 24 T ( 166 F ) S 32 T ( 165 S ) S 40 T ( 149 Q) N
+(163 M ) S 8 T ( 163 M ) S 16 T ( 163 M ) S 24 T ( 167 M ) S 32 T ( 166 M ) S 40 T ( 150 M) N
+(164 V ) S 8 T ( 164 V ) S 16 T ( 164 L ) S 24 T ( 168 L ) S 32 T ( 167 L ) S 40 T ( 151 A) N
+(165 T ) S 8 T ( 165 T ) S 16 T ( 165 Q ) S 24 T ( 169 T ) S 32 T ( 168 D ) S 40 T ( 152 R) N
+(166 D ) S 8 T ( 166 D ) S 16 T ( 166 D ) S 24 T ( 170 D ) S 32 T ( 169 D ) S 40 T ( 153 D) N
+(167 R ) S 8 T ( 167 R ) S 16 T ( 167 R ) S 24 T ( 171 R ) S 32 T ( 170 R ) S 40 T ( 154 E) N
+(168 E ) S 8 T ( 168 E ) S 16 T ( 168 E ) S 24 T ( 172 E ) S 32 T ( 171 Q ) S 40 T ( 155 R) N
+(169 N ) S 8 T ( 169 N ) S 16 T ( 169 N ) S 24 T ( 173 N ) S 32 T ( 172 N ) S 40 T ( 156 N) N
+(170 Q ) S 8 T ( 170 Q ) S 16 T ( 170 Q ) S 24 T ( 174 Q ) S 32 T ( 173 Q ) S 40 T ( 157 Q) N
+(171 S ) S 8 T ( 171 S ) S 16 T ( 171 S ) S 24 T ( 175 S ) S 32 T ( 174 S ) S 40 T ( 158 S) N
+(172 C ) S 8 T ( 172 C ) S 16 T ( 172 M ) S 24 T ( 176 I ) S 32 T ( 175 L ) S 40 T ( 159 I) N
+(173 L ) S 8 T ( 173 L ) S 16 T ( 173 L ) S 24 T ( 177 L ) S 32 T ( 176 L ) S 40 T ( 160 I) N
+(174 I ) S 8 T ( 174 I ) S 16 T ( 174 I ) S 24 T ( 178 I ) S 32 T ( 177 I ) S 40 T ( 161 V) N
+(----------------------------------------------) N
+(175 T ) S 8 T ( 175 T ) S 16 T ( 175 T ) S 24 T ( 179 T ) S 32 T ( 178 T ) S 40 T ( 162 S Ploop) N
+(176 G ) S 8 T ( 176 G ) S 16 T ( 176 G ) S 24 T ( 180 G ) S 32 T ( 179 G ) S 40 T ( 163 G) N
+(177 E ) S 8 T ( 177 E ) S 16 T ( 177 E ) S 24 T ( 181 E ) S 32 T ( 180 E ) S 40 T ( 164 E) N
+(178 S ) S 8 T ( 178 S ) S 16 T ( 178 S ) S 24 T ( 182 S ) S 32 T ( 181 S ) S 40 T ( 165 S) N
+(seqhc1i) (Page 2/13) (Jan 30, 08 14:38) title
+border
+/v 2 store
+/x0 x v get 2.235602 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(179 G ) p 8 T ( 179 G ) S 16 T ( 179 G ) S 24 T ( 183 G ) S 32 T ( 182 G ) S 40 T ( 166 G) N
+(180 A ) S 8 T ( 180 A ) S 16 T ( 180 A ) S 24 T ( 184 A ) S 32 T ( 183 A ) S 40 T ( 167 A) N
+(181 G ) S 8 T ( 181 G ) S 16 T ( 181 G ) S 24 T ( 185 G ) S 32 T ( 184 G ) S 40 T ( 168 G) N
+(182 K ) S 8 T ( 182 K ) S 16 T ( 182 K ) S 24 T ( 186 K ) S 32 T ( 185 K ) S 40 T ( 169 K) N
+(183 T ) S 8 T ( 183 T ) S 16 T ( 183 T ) S 24 T ( 187 T ) S 32 T ( 186 T ) S 40 T ( 170 T) N
+(---------------------------------------------- Ploop) N
+(184 E ) S 8 T ( 184 E ) S 16 T ( 184 E ) S 24 T ( 188 V ) S 32 T ( 187 E ) S 40 T ( 171 V) N
+(185 N ) S 8 T ( 185 S ) S 16 T ( 185 N ) S 24 T ( 189 N ) S 32 T ( 188 N ) S 40 T ( 172 S) N
+(186 T ) S 8 T ( 186 T ) S 16 T ( 186 T ) S 24 T ( 190 T ) S 32 T ( 189 T ) S 40 T ( 173 A) N
+(187 K ) S 8 T ( 187 K ) S 16 T ( 187 K ) S 24 T ( 191 K ) S 32 T ( 190 K ) S 40 T ( 174 K) N
+(188 K ) S 8 T ( 188 K ) S 16 T ( 188 K ) S 24 T ( 192 R ) S 32 T ( 191 K ) S 40 T ( 175 Y) N
+(189 V ) S 8 T ( 189 V ) S 16 T ( 189 V ) S 24 T ( 193 V ) S 32 T ( 192 V ) S 40 T ( 176 A) N
+(190 I ) S 8 T ( 190 I ) S 16 T ( 190 I ) S 24 T ( 194 I ) S 32 T ( 193 I ) S 40 T ( 177 M) N
+(191 M ) S 8 T ( 191 M ) S 16 T ( 191 Q ) S 24 T ( 195 Q ) S 32 T ( 194 Q ) S 40 T ( 178 R) N
+(192 Y ) S 8 T ( 192 Y ) S 16 T ( 192 Y ) S 24 T ( 196 Y ) S 32 T ( 195 Y ) S 40 T ( 179 Y) N
+(193 L ) S 8 T ( 193 F ) S 16 T ( 193 F ) S 24 T ( 197 F ) S 32 T ( 196 L ) S 40 T ( 180 F) N
+(194 A ) S 8 T ( 194 A ) S 16 T ( 194 A ) S 24 T ( 198 A ) S 32 T ( 197 A ) S 40 T ( 181 A) N
+(195 K ) S 8 T ( 195 R ) S 16 T ( 195 L ) S 24 T ( 199 T ) S 32 T ( 198 S ) S 40 T ( 182 T) N
+(196 V ) S 8 T ( 196 V ) S 16 T ( 196 V ) S 24 T ( 200 I ) S 32 T ( 199 V ) S 40 T ( 183 V) N
+(----------------------------------------------) N
+(197 A ) S 8 T ( 197 A ) S 16 T ( 197 A ) S 24 T ( 201 A ) S 32 T ( 200 A ) S 40 T ( 184 S TRANS) N
+(198 C ) S 8 T ( 198 A ) S 16 T ( 198 A ) S 24 T ( 202 A ) S 32 T ( 201 G ) S 40 T ( 185 G) N
+(199 A ) S 8 T ( 199 N ) S 16 T ( 199 S ) S 24 T ( 203 S ) S 32 T ( 202 R ) S 40 T ( 186 S) N
+(200 V ) S 8 T ( 200 L ) S 16 T ( 200 L ) S 24 T ( 204 G ) S 32 T ( 203 N ) S 40 T ( 187 A) N
+(201 K ) S 8 T ( 201 Y ) S 16 T ( 201 A ) S 24 T ( 205 E ) S 32 T ( 204 Q ) S 40 T ( 188 S) N
+(-     ) S 8 T ( -     ) S 16 T ( 202 G ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( -    ) N
+(-     ) S 8 T ( -     ) S 16 T ( 203 K ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( -    ) N
+(-     ) S 8 T ( -     ) S 16 T ( 204 K ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( -    ) N
+(-     ) S 8 T ( -     ) S 16 T ( 205 D ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( -    ) N
+(202 K ) S 8 T ( 202 K ) S 16 T ( 206 K ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( -    ) N
+(203 K ) S 8 T ( 203 Q ) S 16 T ( 207 K ) S 24 T ( 206 K ) S 32 T ( -     ) S 40 T ( -    ) N
+(204 D ) S 8 T ( 204 K ) S 16 T ( 208 E ) S 24 T ( 207 K ) S 32 T ( -     ) S 40 T ( -    ) N
+(205 E ) S 8 T ( 205 E ) S 16 T ( 209 E ) S 24 T ( 208 K ) S 32 T ( -     ) S 40 T ( -    ) N
+(206 E ) S 8 T ( 206 E ) S 16 T ( 210 E ) S 24 T ( 209 E ) S 32 T ( -     ) S 40 T ( -    ) N
+(-     ) S 8 T ( 207 P ) S 16 T ( 211 K ) S 24 T ( 210 E ) S 32 T ( -     ) S 40 T ( -    ) N
+(207 A ) S 8 T ( 208 V ) S 16 T ( 212 K ) S 24 T ( 211 Q ) S 32 T ( -     ) S 40 T ( -    ) N
+(208 S ) S 8 T ( 209 P ) S 16 T ( 213 K ) S 24 T ( 212 S ) S 32 T ( -     ) S 40 T ( -    ) N
+(209 D ) S 8 T ( 210 N ) S 16 T ( 214 D ) S 24 T ( 213 G ) S 32 T ( 205 A ) S 40 T ( -    ) N
+(210 K ) S 8 T ( 211 L ) S 16 T ( 215 E ) S 24 T ( 214 K ) S 32 T ( 206 N ) S 40 T ( -    ) N
+(211 K ) S 8 T ( 212 R ) S 16 T ( 216 K ) S 24 T ( 215 M ) S 32 T ( 207 G ) S 40 T ( -    ) N
+(212 E ) S 8 T ( 213 A ) S 16 T ( 217 K ) S 24 T ( 216 Q ) S 32 T ( 208 S ) S 40 T ( 189 E) N
+(213 G ) S 8 T ( 214 S ) S 16 T ( 218 G ) S 24 T ( 217 G ) S 32 T ( 209 G ) S 40 T ( 190 A) N
+(214 S ) S 8 T ( 215 N ) S 16 T ( 219 T ) S 24 T ( 218 T ) S 32 T ( 210 V ) S 40 T ( 191 N TRANS) N
+(----------------------------------------------) N
+(215 L ) S 8 T ( 216 L ) S 16 T ( 220 L ) S 24 T ( 219 L ) S 32 T ( 211 L ) S 40 T ( 192 V HG HELIX, TRANS) N
+(216 E ) S 8 T ( 217 E ) S 16 T ( 221 E ) S 24 T ( 220 E ) S 32 T ( 212 E ) S 40 T ( 193 E) N
+(217 D ) S 8 T ( 218 D ) S 16 T ( 222 D ) S 24 T ( 221 D ) S 32 T ( 213 Q ) S 40 T ( 194 E) N
+(218 Q ) S 8 T ( 219 Q ) S 16 T ( 223 Q ) S 24 T ( 222 Q ) S 32 T ( 214 Q ) S 40 T ( 195 K) N
+(219 I ) S 8 T ( 220 I ) S 16 T ( 224 I ) S 24 T ( 223 I ) S 32 T ( 215 I ) S 40 T ( 196 V) N
+(220 I ) S 8 T ( 221 I ) S 16 T ( 225 V ) S 24 T ( 224 I ) S 32 T ( 216 L ) S 40 T ( 197 L) N
+(221 Q ) S 8 T ( 222 E ) S 16 T ( 226 Q ) S 24 T ( 225 S ) S 32 T ( 217 Q ) S 40 T ( 198 A HG HELIX, TRANS) N
+(----------------------------------------------) N
+(222 A ) S 8 T ( 223 A ) S 16 T ( 227 C ) S 24 T ( 226 A ) S 32 T ( 218 A ) S 40 T ( 199 S) N
+(223 N ) S 8 T ( 224 N ) S 16 T ( 228 N ) S 24 T ( 227 N ) S 32 T ( 219 N ) S 40 T ( 200 N Helix Breaker) N
+(224 P ) S 8 T ( 225 P ) S 16 T ( 229 P ) S 24 T ( 228 P ) S 32 T ( 220 P ) S 40 T ( 201 P Helix Breaker) N
+(225 V ) S 8 T ( 226 V ) S 16 T ( 230 V ) S 24 T ( 229 L ) S 32 T ( 221 I ) S 40 T ( 202 I) N
+(226 L ) S 8 T ( 227 L ) S 16 T ( 231 L ) S 24 T ( 230 L ) S 32 T ( 222 L ) S 40 T ( 203 M) N
+(227 E ) S 8 T ( 228 E ) S 16 T ( 232 E ) S 24 T ( 231 E ) S 32 T ( 223 E ) S 40 T ( 204 E) N
+(228 A ) S 8 T ( 229 A ) S 16 T ( 233 A ) S 24 T ( 232 A ) S 32 T ( 224 A ) S 40 T ( 205 S) N
+(229 Y ) S 8 T ( 230 F ) S 16 T ( 234 Y ) S 24 T ( 233 F ) S 32 T ( 225 F ) S 40 T ( 206 I) N
+(230 G ) S 8 T ( 231 G ) S 16 T ( 235 G ) S 24 T ( 234 G ) S 32 T ( 226 G ) S 40 T ( 207 G) N
+(231 N ) S 8 T ( 232 N ) S 16 T ( 236 N ) S 24 T ( 235 N ) S 32 T ( 227 N ) S 40 T ( 208 N) N
+(----------------------------------------------) N
+(232 A ) S 8 T ( 233 A ) S 16 T ( 237 A ) S 24 T ( 236 A ) S 32 T ( 228 A ) S 40 T ( 209 A Switch I) N
+(233 K ) S 8 T ( 234 K ) S 16 T ( 238 E ) S 24 T ( 237 K ) S 32 T ( 229 K ) S 40 T ( 210 K) N
+(234 T ) S 8 T ( 235 T ) S 16 T ( 239 T ) S 24 T ( 238 T ) S 32 T ( 230 T ) S 40 T ( 211 T) N
+(235 T ) S 8 T ( 236 V ) S 16 T ( 240 T ) S 24 T ( 239 V ) S 32 T ( 231 T ) S 40 T ( 212 T) N
+(236 R ) S 8 T ( 237 R ) S 16 T ( 241 R ) S 24 T ( 240 R ) S 32 T ( 232 R ) S 40 T ( 213 R) N
+(237 N ) S 8 T ( 238 N ) S 16 T ( 242 N ) S 24 T ( 241 N ) S 32 T ( 233 N ) S 40 T ( 214 N) N
+(238 N ) S 8 T ( 239 N ) S 16 T ( 243 N ) S 24 T ( 242 D ) S 32 T ( 234 N ) S 40 T ( 215 D) N
+(239 N ) S 8 T ( 240 N ) S 16 T ( 244 N ) S 24 T ( 243 N ) S 32 T ( 235 N ) S 40 T ( 216 N) N
+(240 S ) S 8 T ( 241 S ) S 16 T ( 245 S ) S 24 T ( 244 S ) S 32 T ( 236 S ) S 40 T ( 217 S) N
+(241 S ) S 8 T ( 242 S ) S 16 T ( 246 S ) S 24 T ( 245 S ) S 32 T ( 237 S ) S 40 T ( 218 S) N
+(242 R ) S 8 T ( 243 R ) S 16 T ( 247 R ) S 24 T ( 246 R ) S 32 T ( 238 R ) S 40 T ( 219 R Switch I) N
+(----------------------------------------------) N
+(243 F ) S 8 T ( 244 F ) S 16 T ( 248 F ) S 24 T ( 247 F ) S 32 T ( 239 F ) S 40 T ( 220 F Beta bulge, TRANS) N
+(244 G ) S 8 T ( 245 G ) S 16 T ( 249 G ) S 24 T ( 248 G ) S 32 T ( 240 G ) S 40 T ( 221 G) N
+(245 K ) S 8 T ( 246 K ) S 16 T ( 250 K ) S 24 T ( 249 K ) S 32 T ( 241 K ) S 40 T ( 222 K) N
+(246 F ) S 8 T ( 247 F ) S 16 T ( 251 F ) S 24 T ( 250 F ) S 32 T ( 242 F ) S 40 T ( 223 Y) N
+(247 I ) S 8 T ( 248 I ) S 16 T ( 252 I ) S 24 T ( 251 I ) S 32 T ( 243 I ) S 40 T ( 224 I) N
+(248 R ) S 8 T ( 249 R ) S 16 T ( 253 R ) S 24 T ( 252 R ) S 32 T ( 244 E ) S 40 T ( 225 E) N
+(249 I ) S 8 T ( 250 I ) S 16 T ( 254 I ) S 24 T ( 253 I ) S 32 T ( 245 I ) S 40 T ( 226 I) N
+(250 H ) S 8 T ( 251 H ) S 16 T ( 255 H ) S 24 T ( 254 H ) S 32 T ( 246 Q ) S 40 T ( 227 G) N
+(251 F ) S 8 T ( 252 F ) S 16 T ( 256 F ) S 24 T ( 255 F ) S 32 T ( 247 F ) S 40 T ( 228 F) N
+(252 G ) S 8 T ( 253 G ) S 16 T ( 257 G ) S 24 T ( 256 G ) S 32 T ( 248 N ) S 40 T ( 229 D) N
+(253 P ) S 8 T ( 254 P ) S 16 T ( 258 T ) S 24 T ( 257 A ) S 32 T ( 249 S ) S 40 T ( 230 K) N
+(254 T ) S 8 T ( 255 T ) S 16 T ( 259 Q ) S 24 T ( 258 T ) S 32 T ( 250 A ) S 40 T ( 231 R) N
+(255 G ) S 8 T ( 256 G ) S 16 T ( 260 G ) S 24 T ( 259 G ) S 32 T ( 251 G ) S 40 T ( 232 Y) N
+(256 K ) S 8 T ( 257 K ) S 16 T ( 261 K ) S 24 T ( 260 K ) S 32 T ( 252 F ) S 40 T ( 233 R) N
+(257 I ) S 8 T ( 258 I ) S 16 T ( 262 I ) S 24 T ( 261 L ) S 32 T ( 253 I ) S 40 T ( 234 I) N
+(258 A ) S 8 T ( 259 A ) S 16 T ( 263 A ) S 24 T ( 262 A ) S 32 T ( 254 S ) S 40 T ( 235 I) N
+(259 G ) S 8 T ( 260 G ) S 16 T ( 264 G ) S 24 T ( 263 S ) S 32 T ( 255 G ) S 40 T ( 236 G) N
+(260 A ) S 8 T ( 261 A ) S 16 T ( 265 A ) S 24 T ( 264 A ) S 32 T ( 256 A ) S 40 T ( 237 A) N
+(261 D ) S 8 T ( 262 D ) S 16 T ( 266 D ) S 24 T ( 265 D ) S 32 T ( 257 S ) S 40 T ( 238 N) N
+(262 I ) S 8 T ( 263 I ) S 16 T ( 267 I ) S 24 T ( 266 I ) S 32 T ( 258 I ) S 40 T ( 239 M) N
+(263 E ) S 8 T ( 264 E ) S 16 T ( 268 E ) S 24 T ( 267 E ) S 32 T ( 259 Q ) S 40 T ( 240 R) N
+(264 T ) S 8 T ( 265 T ) S 16 T ( 269 T ) S 24 T ( 268 T ) S 32 T ( 260 S ) S 40 T ( 241 T Beta bulge, TRANS) N
+(seqhc1i) (Page 3/13) (Jan 30, 08 14:38) title
+border
+grestore
+(Printed by V.Ovchinnikov) rhead
+(seqhc1i) (1/5) (Wednesday January 30, 2008) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (4-6) 2
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 2.235602 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(----------------------------------------------) p n
+(265 Y ) S 8 T ( 266 Y ) S 16 T ( 270 Y ) S 24 T ( 269 Y ) S 32 T ( 261 Y ) S 40 T ( 242 Y) N
+(266 L ) S 8 T ( 267 L ) S 16 T ( 271 L ) S 24 T ( 270 L ) S 32 T ( 262 L ) S 40 T ( 243 L) N
+(267 L ) S 8 T ( 268 L ) S 16 T ( 272 L ) S 24 T ( 271 L ) S 32 T ( 263 L ) S 40 T ( 244 L) N
+(268 E ) S 8 T ( 269 E ) S 16 T ( 273 E ) S 24 T ( 272 E ) S 32 T ( 264 E ) S 40 T ( 245 E) N
+(269 K ) S 8 T ( 270 K ) S 16 T ( 274 K ) S 24 T ( 273 K ) S 32 T ( 265 K ) S 40 T ( 246 K) N
+(270 S ) S 8 T ( 271 S ) S 16 T ( 275 S ) S 24 T ( 274 S ) S 32 T ( 266 S ) S 40 T ( 247 S) N
+(271 R ) S 8 T ( 272 R ) S 16 T ( 276 R ) S 24 T ( 275 R ) S 32 T ( 267 R ) S 40 T ( 248 R) N
+(272 V ) S 8 T ( 273 V ) S 16 T ( 277 V ) S 24 T ( 276 V ) S 32 T ( 268 V ) S 40 T ( 249 V) N
+(273 T ) S 8 T ( 274 T ) S 16 T ( 278 T ) S 24 T ( 277 T ) S 32 T ( 269 V ) S 40 T ( 250 V) N
+(274 Y ) S 8 T ( 275 Y ) S 16 T ( 279 Y ) S 24 T ( 278 F ) S 32 T ( 270 F ) S 40 T ( 251 F) N
+(275 Q ) S 8 T ( 276 Q ) S 16 T ( 280 Q ) S 24 T ( 279 Q ) S 32 T ( 271 Q ) S 40 T ( 252 Q) N
+(276 Q ) S 8 T ( 277 Q ) S 16 T ( 281 Q ) S 24 T ( 280 L ) S 32 T ( 272 S ) S 40 T ( 253 A) N
+(277 S ) S 8 T ( 278 S ) S 16 T ( 282 S ) S 24 T ( 281 P ) S 32 T ( 273 E ) S 40 T ( 254 E) N
+(278 A ) S 8 T ( 279 A ) S 16 T ( 283 A ) S 24 T ( 282 A ) S 32 T ( 274 T ) S 40 T ( 255 E) N
+(279 E ) S 8 T ( 280 E ) S 16 T ( 284 E ) S 24 T ( 283 E ) S 32 T ( 275 E ) S 40 T ( 256 E) N
+(280 R ) S 8 T ( 281 R ) S 16 T ( 285 R ) S 24 T ( 284 R ) S 32 T ( 276 R ) S 40 T ( 257 R) N
+(281 N ) S 8 T ( 282 N ) S 16 T ( 286 N ) S 24 T ( 285 S ) S 32 T ( 277 N ) S 40 T ( 258 N) N
+(282 Y ) S 8 T ( 283 Y ) S 16 T ( 287 Y ) S 24 T ( 286 Y ) S 32 T ( 278 Y ) S 40 T ( 259 Y) N
+(283 H ) S 8 T ( 284 H ) S 16 T ( 288 H ) S 24 T ( 287 H ) S 32 T ( 279 H ) S 40 T ( 260 H) N
+(284 I ) S 8 T ( 285 I ) S 16 T ( 289 I ) S 24 T ( 288 I ) S 32 T ( 280 I ) S 40 T ( 261 I) N
+(285 F ) S 8 T ( 286 F ) S 16 T ( 290 F ) S 24 T ( 289 F ) S 32 T ( 281 F ) S 40 T ( 262 F) N
+(286 Y ) S 8 T ( 287 Y ) S 16 T ( 291 Y ) S 24 T ( 290 Y ) S 32 T ( 282 Y ) S 40 T ( 263 Y) N
+(287 Q ) S 8 T ( 288 Q ) S 16 T ( 292 Q ) S 24 T ( 291 Q ) S 32 T ( 283 Q ) S 40 T ( 264 Q) N
+(288 I ) S 8 T ( 289 I ) S 16 T ( 293 L ) S 24 T ( 292 I ) S 32 T ( 284 L ) S 40 T ( 265 L) N
+(289 C ) S 8 T ( 290 C ) S 16 T ( 294 L ) S 24 T ( 293 M ) S 32 T ( 285 L ) S 40 T ( 266 C) N
+(290 S ) S 8 T ( 291 S ) S 16 T ( 295 S ) S 24 T ( 294 S ) S 32 T ( 286 A ) S 40 T ( 267 A) N
+(291 N ) S 8 T ( 292 N ) S 16 T ( 296 P ) S 24 T ( 295 N ) S 32 T ( 287 G ) S 40 T ( 268 S) N
+(292 A ) S 8 T ( 293 A ) S 16 T ( 297 A ) S 24 T ( 296 K ) S 32 T ( 288 A ) S 40 T ( 269 A) N
+(293 I ) S 8 T ( 294 I ) S 16 T ( 298 F ) S 24 T ( 297 K ) S 32 T ( 289 T ) S 40 T ( 270 A) N
+(294 P ) S 8 T ( 295 P ) S 16 T ( 299 P ) S 24 T ( 298 P ) S 32 T ( 290 A ) S 40 T ( 271 L) N
+(295 E ) S 8 T ( 296 E ) S 16 T ( 300 E ) S 24 T ( 299 E ) S 32 T ( 291 E ) S 40 T ( 272 P) N
+(296 L ) S 8 T ( 297 L ) S 16 T ( 301 N ) S 24 T ( 300 L ) S 32 T ( 292 E ) S 40 T ( 273 E) N
+(297 N ) S 8 T ( 298 N ) S 16 T ( 302 I ) S 24 T ( 301 I ) S 32 T ( 293 K ) S 40 T ( 274 F) N
+(298 D ) S 8 T ( 299 E ) S 16 T ( 303 E ) S 24 T ( 302 D ) S 32 T ( 294 K ) S 40 T ( 275 K) N
+(299 V ) S 8 T ( 300 V ) S 16 T ( 304 K ) S 24 T ( 303 M ) S 32 T ( 295 A ) S 40 T ( 276 T) N
+(300 M ) S 8 T ( 301 M ) S 16 T ( 305 I ) S 24 T ( 304 L ) S 32 T ( 296 L ) S 40 T ( 277 L) N
+(301 L ) S 8 T ( 302 L ) S 16 T ( 306 L ) S 24 T ( 305 L ) S 32 T ( 297 H ) S 40 T ( 278 R) N
+(302 V ) S 8 T ( 303 I ) S 16 T ( 307 A ) S 24 T ( 306 I ) S 32 T ( 298 L ) S 40 T ( 279 L) N
+(303 T ) S 8 T ( 304 T ) S 16 T ( 308 V ) S 24 T ( 307 T ) S 32 T ( 299 A ) S 40 T ( 280 G) N
+(304 P ) S 8 T ( 305 P ) S 16 T ( 309 P ) S 24 T ( 308 T ) S 32 T ( 300 G ) S 40 T ( 281 N) N
+(305 D ) S 8 T ( 306 D ) S 16 T ( 310 D ) S 24 T ( 309 N ) S 32 T ( 301 P ) S 40 T ( 282 A) N
+(306 S ) S 8 T ( 307 S ) S 16 T ( 311 P ) S 24 T ( 310 P ) S 32 T ( 302 E ) S 40 T ( 283 N) N
+(307 G ) S 8 T ( 308 G ) S 16 T ( 312 G ) S 24 T ( 311 Y ) S 32 T ( 303 S ) S 40 T ( 284 Y) N
+(308 L ) S 8 T ( 309 L ) S 16 T ( 313 L ) S 24 T ( 312 D ) S 32 T ( 304 F ) S 40 T ( 285 F) N
+(309 Y ) S 8 T ( 310 Y ) S 16 T ( 314 Y ) S 24 T ( 313 Y ) S 32 T ( 305 N ) S 40 T ( 286 H) N
+(310 S ) S 8 T ( 311 S ) S 16 T ( 315 G ) S 24 T ( 314 H ) S 32 T ( 306 Y ) S 40 T ( 287 Y) N
+(311 F ) S 8 T ( 312 F ) S 16 T ( 316 F ) S 24 T ( 315 Y ) S 32 T ( 307 L ) S 40 T ( 288 T) N
+(312 I ) S 8 T ( 313 I ) S 16 T ( 317 I ) S 24 T ( 316 V ) S 32 T ( 308 N ) S 40 T ( 289 K) N
+(313 N ) S 8 T ( 314 N ) S 16 T ( 318 N ) S 24 T ( 317 S ) S 32 T ( 309 Q ) S 40 T ( 290 Q) N
+(314 Q ) S 8 T ( 315 Q ) S 16 T ( 319 Q ) S 24 T ( 318 Q ) S 32 T ( 310 S ) S 40 T ( 291 G) N
+(315 G ) S 8 T ( 316 G ) S 16 T ( 320 G ) S 24 T ( 319 G ) S 32 T ( 311 G ) S 40 T ( 292 G) N
+(316 C ) S 8 T ( 317 C ) S 16 T ( 321 T ) S 24 T ( 320 E ) S 32 T ( 312 C ) S 40 T ( 293 S) N
+(317 L ) S 8 T ( 318 L ) S 16 T ( 322 L ) S 24 T ( 321 I ) S 32 T ( 313 V ) S 40 T ( 294 P) N
+(318 T ) S 8 T ( 319 T ) S 16 T ( 323 T ) S 24 T ( 322 T ) S 32 T ( 314 D ) S 40 T ( 295 V) N
+(319 V ) S 8 T ( 320 V ) S 16 T ( 324 V ) S 24 T ( 323 V ) S 32 T ( 315 I ) S 40 T ( 296 I) N
+(320 D ) S 8 T ( 321 D ) S 16 T ( 325 D ) S 24 T ( 324 P ) S 32 T ( 316 K ) S 40 T ( 297 D) N
+(321 N ) S 8 T ( 322 N ) S 16 T ( 326 G ) S 24 T ( 325 S ) S 32 T ( 317 G ) S 40 T ( 298 G) N
+(322 I ) S 8 T ( 323 I ) S 16 T ( 327 I ) S 24 T ( 326 I ) S 32 T ( 318 V ) S 40 T ( 299 I) N
+(323 D ) S 8 T ( 324 D ) S 16 T ( 328 D ) S 24 T ( 327 D ) S 32 T ( 319 S ) S 40 T ( 300 D) N
+(324 D ) S 8 T ( 325 D ) S 16 T ( 329 D ) S 24 T ( 328 D ) S 32 T ( 320 D ) S 40 T ( 301 D) N
+(325 V ) S 8 T ( 326 V ) S 16 T ( 330 E ) S 24 T ( 329 Q ) S 32 T ( 321 S ) S 40 T ( 302 A) N
+(326 E ) S 8 T ( 327 E ) S 16 T ( 331 E ) S 24 T ( 330 E ) S 32 T ( 322 E ) S 40 T ( 303 K) N
+(327 E ) S 8 T ( 328 E ) S 16 T ( 332 E ) S 24 T ( 331 E ) S 32 T ( 323 E ) S 40 T ( 304 E) N
+(328 F ) S 8 T ( 329 F ) S 16 T ( 333 M ) S 24 T ( 332 L ) S 32 T ( 324 F ) S 40 T ( 305 M) N
+(329 K ) S 8 T ( 330 K ) S 16 T ( 334 G ) S 24 T ( 333 M ) S 32 T ( 325 K ) S 40 T ( 306 V) N
+(330 L ) S 8 T ( 331 L ) S 16 T ( 335 L ) S 24 T ( 334 A ) S 32 T ( 326 I ) S 40 T ( 307 N) N
+(331 C ) S 8 T ( 332 C ) S 16 T ( 336 T ) S 24 T ( 335 T ) S 32 T ( 327 T ) S 40 T ( 308 T) N
+(332 D ) S 8 T ( 333 D ) S 16 T ( 337 D ) S 24 T ( 336 D ) S 32 T ( 328 R ) S 40 T ( 309 R) N
+(333 E ) S 8 T ( 334 E ) S 16 T ( 338 T ) S 24 T ( 337 S ) S 32 T ( 329 Q ) S 40 T ( 310 Q) N
+(334 A ) S 8 T ( 335 A ) S 16 T ( 339 A ) S 24 T ( 338 A ) S 32 T ( 330 A ) S 40 T ( 311 A) N
+(335 F ) S 8 T ( 336 F ) S 16 T ( 340 F ) S 24 T ( 339 I ) S 32 T ( 331 M ) S 40 T ( 312 C) N
+(336 D ) S 8 T ( 337 D ) S 16 T ( 341 D ) S 24 T ( 340 D ) S 32 T ( 332 D ) S 40 T ( 313 T) N
+(337 I ) S 8 T ( 338 I ) S 16 T ( 342 V ) S 24 T ( 341 I ) S 32 T ( 333 I ) S 40 T ( 314 L) N
+(338 L ) S 8 T ( 339 L ) S 16 T ( 343 L ) S 24 T ( 342 L ) S 32 T ( 334 V ) S 40 T ( 315 L) N
+(339 G ) S 8 T ( 340 G ) S 16 T ( 344 G ) S 24 T ( 343 G ) S 32 T ( 335 G ) S 40 T ( 316 G) N
+(340 F ) S 8 T ( 341 F ) S 16 T ( 345 F ) S 24 T ( 344 F ) S 32 T ( 336 F ) S 40 T ( 317 I) N
+(341 T ) S 8 T ( 342 T ) S 16 T ( 346 T ) S 24 T ( 345 S ) S 32 T ( 337 S ) S 40 T ( 318 S) N
+(342 K ) S 8 T ( 343 K ) S 16 T ( 347 D ) S 24 T ( 346 A ) S 32 T ( 338 Q ) S 40 T ( 319 D) N
+(343 E ) S 8 T ( 344 E ) S 16 T ( 348 E ) S 24 T ( 347 D ) S 32 T ( 339 E ) S 40 T ( 320 S) N
+(344 E ) S 8 T ( 345 E ) S 16 T ( 349 E ) S 24 T ( 348 E ) S 32 T ( 340 E ) S 40 T ( 321 Y) N
+(345 K ) S 8 T ( 346 K ) S 16 T ( 350 K ) S 24 T ( 349 K ) S 32 T ( 341 Q ) S 40 T ( 322 Q) N
+(346 Q ) S 8 T ( 347 T ) S 16 T ( 351 L ) S 24 T ( 350 T ) S 32 T ( 342 M ) S 40 T ( 323 M) N
+(347 S ) S 8 T ( 348 S ) S 16 T ( 352 S ) S 24 T ( 351 A ) S 32 T ( 343 S ) S 40 T ( 324 G) N
+(348 M ) S 8 T ( 349 M ) S 16 T ( 353 M ) S 24 T ( 352 I ) S 32 T ( 344 I ) S 40 T ( 325 I) N
+(349 F ) S 8 T ( 350 F ) S 16 T ( 354 Y ) S 24 T ( 353 Y ) S 32 T ( 345 F ) S 40 T ( 326 F) N
+(350 K ) S 8 T ( 351 K ) S 16 T ( 355 K ) S 24 T ( 354 K ) S 32 T ( 346 K ) S 40 T ( 327 R) N
+(351 C ) S 8 T ( 352 C ) S 16 T ( 356 C ) S 24 T ( 355 L ) S 32 T ( 347 I ) S 40 T ( 328 I) N
+(352 T ) S 8 T ( 353 T ) S 16 T ( 357 T ) S 24 T ( 356 T ) S 32 T ( 348 I ) S 40 T ( 329 L) N
+(353 A ) S 8 T ( 354 A ) S 16 T ( 358 G ) S 24 T ( 357 G ) S 32 T ( 349 A ) S 40 T ( 330 A) N
+(354 S ) S 8 T ( 355 S ) S 16 T ( 359 C ) S 24 T ( 358 A ) S 32 T ( 350 G ) S 40 T ( 331 G) N
+(355 I ) S 8 T ( 356 I ) S 16 T ( 360 I ) S 24 T ( 359 V ) S 32 T ( 351 I ) S 40 T ( 332 I) N
+(356 L ) S 8 T ( 357 L ) S 16 T ( 361 L ) S 24 T ( 360 M ) S 32 T ( 352 L ) S 40 T ( 333 L) N
+(357 H ) S 8 T ( 358 H ) S 16 T ( 362 H ) S 24 T ( 361 H ) S 32 T ( 353 H ) S 40 T ( 334 H) N
+(358 M ) S 8 T ( 359 M ) S 16 T ( 363 L ) S 24 T ( 362 Y ) S 32 T ( 354 L ) S 40 T ( 335 L) N
+(359 G ) S 8 T ( 360 G ) S 16 T ( 364 G ) S 24 T ( 363 G ) S 32 T ( 355 G ) S 40 T ( 336 G) N
+(360 E ) S 8 T ( 361 E ) S 16 T ( 365 E ) S 24 T ( 364 N ) S 32 T ( 356 N ) S 40 T ( 337 N) N
+(seqhc1i) (Page 4/13) (Jan 30, 08 14:38) title
+border
+/v 1 store
+/x0 x v get 2.235602 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(361 M ) p 8 T ( 362 M ) S 16 T ( 366 M ) S 24 T ( 365 L ) S 32 T ( 357 I ) S 40 T ( 338 V) N
+(362 K ) S 8 T ( 363 K ) S 16 T ( 367 K ) S 24 T ( 366 K ) S 32 T ( 358 K ) S 40 T ( 339 E) N
+(363 F ) S 8 T ( 364 F ) S 16 T ( 368 W ) S 24 T ( 367 F ) S 32 T ( 359 F ) S 40 T ( 340 F) N
+(364 K ) S 8 T ( 365 K ) S 16 T ( 369 K ) S 24 T ( 368 K ) S 32 T ( 360 E ) S 40 T ( 341 A) N
+(365 Q ) S 8 T ( 366 Q ) S 16 T ( 370 Q ) S 24 T ( 369 Q ) S 32 T ( 361 K ) S 40 T ( 342 S) N
+(366 R ) S 8 T ( 367 R ) S 16 T ( -     ) S 24 T ( 370 K ) S 32 T ( 362 G ) S 40 T ( 343 R) N
+(367 P ) S 8 T ( 368 P ) S 16 T ( -     ) S 24 T ( 371 Q ) S 32 T ( -     ) S 40 T ( 344 D) N
+(368 R ) S 8 T ( 369 R ) S 16 T ( 371 R ) S 24 T ( 372 R ) S 32 T ( 363 A ) S 40 T ( 345 S) N
+(369 E ) S 8 T ( 370 E ) S 16 T ( 372 G ) S 24 T ( 373 E ) S 32 T ( 364 G ) S 40 T ( 346 D) N
+(370 E ) S 8 T ( 371 E ) S 16 T ( 373 E ) S 24 T ( 374 E ) S 32 T ( 365 E ) S 40 T ( 347 S) N
+(371 Q ) S 8 T ( 372 Q ) S 16 T ( 374 Q ) S 24 T ( 375 Q ) S 32 T ( 366 G ) S 40 T ( 348 C) N
+(372 A ) S 8 T ( 373 A ) S 16 T ( 375 A ) S 24 T ( 376 A ) S 32 T ( 367 A ) S 40 T ( 349 A) N
+(373 E ) S 8 T ( 374 E ) S 16 T ( 376 E ) S 24 T ( 377 E ) S 32 T ( 368 V ) S 40 T ( 350 I) N
+(374 S ) S 8 T ( 375 S ) S 16 T ( 377 A ) S 24 T ( 378 P ) S 32 T ( 369 L ) S 40 T ( 351 P) N
+(375 D ) S 8 T ( 376 D ) S 16 T ( 378 D ) S 24 T ( 379 D ) S 32 T ( 370 K ) S 40 T ( 352 P) N
+(376 G ) S 8 T ( 377 G ) S 16 T ( 379 G ) S 24 T ( 380 G ) S 32 T ( 371 D ) S 40 T ( 353 K) N
+(377 T ) S 8 T ( 378 T ) S 16 T ( 380 T ) S 24 T ( 381 T ) S 32 T ( 372 K ) S 40 T ( 354 H) N
+(378 A ) S 8 T ( 379 A ) S 16 T ( 381 A ) S 24 T ( 382 E ) S 32 T ( 373 T ) S 40 T ( 355 D) N
+(379 E ) S 8 T ( 380 E ) S 16 T ( 382 E ) S 24 T ( 383 V ) S 32 T ( 374 A ) S 40 T ( 356 P) N
+(380 A ) S 8 T ( 381 A ) S 16 T ( 383 A ) S 24 T ( 384 A ) S 32 T ( 375 L ) S 40 T ( 357 L) N
+(381 E ) S 8 T ( 382 E ) S 16 T ( 384 E ) S 24 T ( 385 D ) S 32 T ( 376 N ) S 40 T ( 358 T) N
+(382 K ) S 8 T ( 383 K ) S 16 T ( 385 K ) S 24 T ( 386 K ) S 32 T ( 377 A ) S 40 T ( 359 I) N
+(383 V ) S 8 T ( 384 V ) S 16 T ( 386 V ) S 24 T ( 387 A ) S 32 T ( 378 A ) S 40 T ( 360 F) N
+(384 A ) S 8 T ( 385 A ) S 16 T ( 387 A ) S 24 T ( 388 A ) S 32 T ( 379 S ) S 40 T ( 361 C) N
+(385 F ) S 8 T ( 386 F ) S 16 T ( 388 F ) S 24 T ( 389 Y ) S 32 T ( 380 T ) S 40 T ( 362 D) N
+(386 L ) S 8 T ( 387 L ) S 16 T ( 389 L ) S 24 T ( 390 L ) S 32 T ( 381 V ) S 40 T ( 363 L) N
+(387 C ) S 8 T ( 388 C ) S 16 T ( 390 L ) S 24 T ( 391 M ) S 32 T ( 382 F ) S 40 T ( 364 M) N
+(388 G ) S 8 T ( 389 G ) S 16 T ( 391 G ) S 24 T ( 392 G ) S 32 T ( 383 G ) S 40 T ( 365 G) N
+(389 I ) S 8 T ( 390 I ) S 16 T ( 392 V ) S 24 T ( 393 L ) S 32 T ( 384 V ) S 40 T ( 366 V) N
+(390 N ) S 8 T ( 391 N ) S 16 T ( 393 N ) S 24 T ( 394 N ) S 32 T ( 385 N ) S 40 T ( 367 D) N
+(391 A ) S 8 T ( 392 A ) S 16 T ( 394 A ) S 24 T ( 395 S ) S 32 T ( 386 P ) S 40 T ( 368 Y) N
+(392 G ) S 8 T ( 393 G ) S 16 T ( 395 G ) S 24 T ( 396 A ) S 32 T ( 387 S ) S 40 T ( 369 E) N
+(393 D ) S 8 T ( 394 D ) S 16 T ( 396 D ) S 24 T ( 397 E ) S 32 T ( 388 V ) S 40 T ( 370 E) N
+(394 L ) S 8 T ( 395 L ) S 16 T ( 397 L ) S 24 T ( 398 L ) S 32 T ( 389 L ) S 40 T ( 371 M) N
+(395 L ) S 8 T ( 396 L ) S 16 T ( 398 L ) S 24 T ( 399 L ) S 32 T ( 390 E ) S 40 T ( 372 A) N
+(396 K ) S 8 T ( 397 K ) S 16 T ( 399 K ) S 24 T ( 400 K ) S 32 T ( 391 K ) S 40 T ( 373 H) N
+(397 A ) S 8 T ( 398 A ) S 16 T ( 400 C ) S 24 T ( 401 A ) S 32 T ( 392 A ) S 40 T ( 374 W) N
+(398 L ) S 8 T ( 399 L ) S 16 T ( 401 L ) S 24 T ( 402 L ) S 32 T ( 393 L ) S 40 T ( 375 L) N
+(399 L ) S 8 T ( 400 L ) S 16 T ( 402 L ) S 24 T ( 403 C ) S 32 T ( 394 M ) S 40 T ( 376 C) N
+(400 K ) S 8 T ( 401 K ) S 16 T ( 403 K ) S 24 T ( 404 Y ) S 32 T ( 395 E ) S 40 T ( 377 H) N
+(401 P ) S 8 T ( 402 P ) S 16 T ( 404 P ) S 24 T ( 405 P ) S 32 T ( 396 P ) S 40 T ( 378 R) N
+(----------------------------------------------) N
+(402 K ) S 8 T ( 403 K ) S 16 T ( 405 K ) S 24 T ( 406 R ) S 32 T ( 397 R ) S 40 T ( 379 K HCM LOOP) N
+(403 V ) S 8 T ( 404 V ) S 16 T ( 406 I ) S 24 T ( 407 V ) S 32 T ( 398 I ) S 40 T ( 380 L) N
+(404 K ) S 8 T ( 405 K ) S 16 T ( 407 K ) S 24 T ( 408 K ) S 32 T ( 399 L ) S 40 T ( 381 A) N
+(405 V ) S 8 T ( 406 V ) S 16 T ( 408 V ) S 24 T ( 409 V ) S 32 T ( 400 A ) S 40 T ( 382 T) N
+(406 G ) S 8 T ( 407 G ) S 16 T ( 409 G ) S 24 T ( 410 G ) S 32 T ( 401 G ) S 40 T ( 383 A) N
+(407 T ) S 8 T ( 408 T ) S 16 T ( 410 T ) S 24 T ( 411 N ) S 32 T ( 402 R ) S 40 T ( 384 T) N
+(408 E ) S 8 T ( 409 E ) S 16 T ( 411 E ) S 24 T ( 412 E ) S 32 T ( 403 D ) S 40 T ( 385 E) N
+(409 M ) S 8 T ( 410 M ) S 16 T ( 412 Y ) S 24 T ( 413 F ) S 32 T ( 404 L ) S 40 T ( 386 T) N
+(410 V ) S 8 T ( 411 V ) S 16 T ( 413 V ) S 24 T ( 414 V ) S 32 T ( 405 V ) S 40 T ( 387 Y) N
+(411 T ) S 8 T ( 412 T ) S 16 T ( 414 T ) S 24 T ( 415 T ) S 32 T ( 406 A ) S 40 T ( 388 I) N
+(412 K ) S 8 T ( 413 K ) S 16 T ( 415 Q ) S 24 T ( 416 K ) S 32 T ( 407 Q ) S 40 T ( 389 K) N
+(413 G ) S 8 T ( 414 G ) S 16 T ( 416 G ) S 24 T ( 417 G ) S 32 T ( 408 H ) S 40 T ( 390 P) N
+(414 Q ) S 8 T ( 415 Q ) S 16 T ( 417 R ) S 24 T ( 418 Q ) S 32 T ( 409 L ) S 40 T ( 391 I HCM loop) N
+(----------------------------------------------) N
+(415 N ) S 8 T ( 416 N ) S 16 T ( 418 N ) S 24 T ( 419 T ) S 32 T ( 410 N ) S 40 T ( 392 S) N
+(416 M ) S 8 T ( 417 L ) S 16 T ( 419 K ) S 24 T ( 420 V ) S 32 T ( 411 V ) S 40 T ( 393 K) N
+(417 N ) S 8 T ( 418 Q ) S 16 T ( 420 D ) S 24 T ( 421 S ) S 32 T ( 412 E ) S 40 T ( 394 L) N
+(418 Q ) S 8 T ( 419 Q ) S 16 T ( 421 Q ) S 24 T ( 422 Q ) S 32 T ( 413 K ) S 40 T ( 395 H) N
+(419 V ) S 8 T ( 420 V ) S 16 T ( 422 V ) S 24 T ( 423 V ) S 32 T ( 414 S ) S 40 T ( 396 A) N
+(420 V ) S 8 T ( 421 I ) S 16 T ( 423 T ) S 24 T ( 424 H ) S 32 T ( 415 S ) S 40 T ( 397 I) N
+(421 N ) S 8 T ( 422 N ) S 16 T ( 424 N ) S 24 T ( 425 N ) S 32 T ( 416 S ) S 40 T ( 398 N) N
+(422 S ) S 8 T ( 423 S ) S 16 T ( 425 S ) S 24 T ( 426 S ) S 32 T ( 417 S ) S 40 T ( 399 A) N
+(423 V ) S 8 T ( 424 V ) S 16 T ( 426 I ) S 24 T ( 427 V ) S 32 T ( 418 R ) S 40 T ( 400 R) N
+(424 G ) S 8 T ( 425 G ) S 16 T ( 427 A ) S 24 T ( 428 G ) S 32 T ( 419 D ) S 40 T ( 401 D) N
+(425 A ) S 8 T ( 426 A ) S 16 T ( 428 A ) S 24 T ( 429 A ) S 32 T ( 420 A ) S 40 T ( 402 A) N
+(426 L ) S 8 T ( 427 L ) S 16 T ( 429 L ) S 24 T ( 430 L ) S 32 T ( 421 L ) S 40 T ( 403 L) N
+(427 A ) S 8 T ( 428 S ) S 16 T ( 430 A ) S 24 T ( 431 A ) S 32 T ( 422 V ) S 40 T ( 404 A) N
+(428 K ) S 8 T ( 429 K ) S 16 T ( 431 K ) S 24 T ( 432 K ) S 32 T ( 423 K ) S 40 T ( 405 K) N
+(429 S ) S 8 T ( 430 S ) S 16 T ( 432 S ) S 24 T ( 433 A ) S 32 T ( 424 A ) S 40 T ( 406 H) N
+(430 L ) S 8 T ( 431 L ) S 16 T ( 433 L ) S 24 T ( 434 V ) S 32 T ( 425 L ) S 40 T ( 407 I) N
+(431 Y ) S 8 T ( 432 Y ) S 16 T ( 434 Y ) S 24 T ( 435 Y ) S 32 T ( 426 Y ) S 40 T ( 408 Y) N
+(432 D ) S 8 T ( 433 D ) S 16 T ( 435 D ) S 24 T ( 436 E ) S 32 T ( 427 G ) S 40 T ( 409 A) N
+(433 R ) S 8 T ( 434 R ) S 16 T ( 436 R ) S 24 T ( 437 K ) S 32 T ( 428 R ) S 40 T ( 410 N) N
+(434 M ) S 8 T ( 435 M ) S 16 T ( 437 M ) S 24 T ( 438 M ) S 32 T ( 429 L ) S 40 T ( 411 L) N
+(435 F ) S 8 T ( 436 F ) S 16 T ( 438 F ) S 24 T ( 439 F ) S 32 T ( 430 F ) S 40 T ( 412 F) N
+(436 N ) S 8 T ( 437 N ) S 16 T ( 439 N ) S 24 T ( 440 L ) S 32 T ( 431 L ) S 40 T ( 413 N) N
+(437 W ) S 8 T ( 438 W ) S 16 T ( 440 W ) S 24 T ( 441 W ) S 32 T ( 432 W ) S 40 T ( 414 W) N
+(438 L ) S 8 T ( 439 L ) S 16 T ( 441 L ) S 24 T ( 442 M ) S 32 T ( 433 L ) S 40 T ( 415 I) N
+(439 V ) S 8 T ( 440 V ) S 16 T ( 442 V ) S 24 T ( 443 V ) S 32 T ( 434 V ) S 40 T ( 416 V) N
+(440 R ) S 8 T ( 441 K ) S 16 T ( 443 R ) S 24 T ( 444 I ) S 32 T ( 435 K ) S 40 T ( 417 D) N
+(441 R ) S 8 T ( 442 R ) S 16 T ( 444 R ) S 24 T ( 445 R ) S 32 T ( 436 K ) S 40 T ( 418 H) N
+(442 V ) S 8 T ( 443 V ) S 16 T ( 445 V ) S 24 T ( 446 I ) S 32 T ( 437 I ) S 40 T ( 419 V) N
+(443 N ) S 8 T ( 444 N ) S 16 T ( 446 N ) S 24 T ( 447 N ) S 32 T ( 438 N ) S 40 T ( 420 N) N
+(444 K ) S 8 T ( 445 R ) S 16 T ( 447 Q ) S 24 T ( 448 Q ) S 32 T ( 439 N ) S 40 T ( 421 K) N
+(445 T ) S 8 T ( 446 T ) S 16 T ( 448 T ) S 24 T ( 449 Q ) S 32 T ( 440 V ) S 40 T ( 422 A) N
+(446 L ) S 8 T ( 447 L ) S 16 T ( 449 L ) S 24 T ( 450 L ) S 32 T ( 441 L ) S 40 T ( 423 L) N
+(447 D ) S 8 T ( 448 D ) S 16 T ( 450 D ) S 24 T ( 451 D ) S 32 T ( 442 C ) S 40 T ( 424 H) N
+(448 T ) S 8 T ( 449 T ) S 16 T ( 451 T ) S 24 T ( 452 T ) S 32 T ( 443 Q ) S 40 T ( 425 S) N
+(449 K ) S 8 T ( 450 K ) S 16 T ( 452 K ) S 24 T ( 453 K ) S 32 T ( 444 E ) S 40 T ( 426 T) N
+(450 A ) S 8 T ( 451 A ) S 16 T ( 453 A ) S 24 T ( 454 Q ) S 32 T ( -     ) S 40 T ( 427 V) N
+(451 K ) S 8 T ( 452 K ) S 16 T ( 454 K ) S 24 T ( 455 P ) S 32 T ( 445 R ) S 40 T ( 428 K) N
+(452 R ) S 8 T ( 453 R ) S 16 T ( 455 R ) S 24 T ( 456 R ) S 32 T ( 446 K ) S 40 T ( 429 Q) N
+(453 N ) S 8 T ( 454 N ) S 16 T ( 456 Q ) S 24 T ( 457 Q ) S 32 T ( 447 A ) S 40 T ( 430 H) N
+(454 Y ) S 8 T ( 455 Y ) S 16 T ( 457 F ) S 24 T ( 458 Y ) S 32 T ( 448 Y ) S 40 T ( 431 S) N
+(455 Y ) S 8 T ( 456 Y ) S 16 T ( 458 F ) S 24 T ( 459 F ) S 32 T ( 449 F ) S 40 T ( 432 F) N
+(seqhc1i) (Page 5/13) (Jan 30, 08 14:38) title
+border
+/v 2 store
+/x0 x v get 2.235602 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(456 I ) p 8 T ( 457 I ) S 16 T ( 459 I ) S 24 T ( 460 I ) S 32 T ( 450 I ) S 40 T ( 433 I) N
+(457 G ) S 8 T ( 458 G ) S 16 T ( 460 G ) S 24 T ( 461 G ) S 32 T ( 451 G ) S 40 T ( 434 G) N
+(458 V ) S 8 T ( 459 V ) S 16 T ( 461 V ) S 24 T ( 462 V ) S 32 T ( 452 V ) S 40 T ( 435 V) N
+(459 L ) S 8 T ( 460 L ) S 16 T ( 462 L ) S 24 T ( 463 L ) S 32 T ( 453 L ) S 40 T ( 436 L) N
+(----------------------------------------------) N
+(460 D ) S 8 T ( 461 D ) S 16 T ( 463 D ) S 24 T ( 464 D ) S 32 T ( 454 D ) S 40 T ( 437 D Switch II) N
+(461 I ) S 8 T ( 462 I ) S 16 T ( 464 I ) S 24 T ( 465 I ) S 32 T ( 455 I ) S 40 T ( 438 I) N
+(462 A ) S 8 T ( 463 A ) S 16 T ( 465 A ) S 24 T ( 466 A ) S 32 T ( 456 S ) S 40 T ( 439 Y) N
+(463 G ) S 8 T ( 464 G ) S 16 T ( 466 G ) S 24 T ( 467 G ) S 32 T ( 457 G ) S 40 T ( 440 G) N
+(464 F ) S 8 T ( 465 F ) S 16 T ( 467 F ) S 24 T ( 468 F ) S 32 T ( 458 F ) S 40 T ( 441 F) N
+(465 E ) S 8 T ( 466 E ) S 16 T ( 468 E ) S 24 T ( 469 E ) S 32 T ( 459 E ) S 40 T ( 442 E) N
+(466 I ) S 8 T ( 467 I ) S 16 T ( 469 I ) S 24 T ( 470 I ) S 32 T ( 460 I ) S 40 T ( 443 T) N
+(467 F ) S 8 T ( 468 F ) S 16 T ( 470 F ) S 24 T ( 471 F ) S 32 T ( 461 F ) S 40 T ( 444 F) N
+(468 D ) S 8 T ( 469 D ) S 16 T ( 471 D ) S 24 T ( 472 D ) S 32 T ( 462 K ) S 40 T ( 445 E) N
+(469 F ) S 8 T ( 470 F ) S 16 T ( 472 F ) S 24 T ( 473 F ) S 32 T ( 463 V ) S 40 T ( 446 I) N
+(470 N ) S 8 T ( 471 N ) S 16 T ( 473 N ) S 24 T ( 474 N ) S 32 T ( 464 N ) S 40 T ( 447 N) N
+(471 S ) S 8 T ( 472 S ) S 16 T ( 474 S ) S 24 T ( 475 S ) S 32 T ( 465 S ) S 40 T ( 448 S Switch II) N
+(----------------------------------------------) N
+(472 F ) S 8 T ( 473 F ) S 16 T ( 475 F ) S 24 T ( 476 F ) S 32 T ( 466 F ) S 40 T ( 449 F) N
+(473 E ) S 8 T ( 474 E ) S 16 T ( 476 E ) S 24 T ( 477 E ) S 32 T ( 467 E ) S 40 T ( 450 E) N
+(474 Q ) S 8 T ( 475 Q ) S 16 T ( 477 Q ) S 24 T ( 478 Q ) S 32 T ( 468 Q ) S 40 T ( 451 Q) N
+(475 L ) S 8 T ( 476 L ) S 16 T ( 478 L ) S 24 T ( 479 L ) S 32 T ( 469 L ) S 40 T ( 452 F) N
+(476 C ) S 8 T ( 477 C ) S 16 T ( 479 C ) S 24 T ( 480 C ) S 32 T ( 470 C ) S 40 T ( 453 C) N
+(477 I ) S 8 T ( 478 I ) S 16 T ( 480 I ) S 24 T ( 481 I ) S 32 T ( 471 I ) S 40 T ( 454 I) N
+(478 N ) S 8 T ( 479 N ) S 16 T ( 481 N ) S 24 T ( 482 N ) S 32 T ( 472 N ) S 40 T ( 455 N) N
+(479 Y ) S 8 T ( 480 Y ) S 16 T ( 482 Y ) S 24 T ( 483 F ) S 32 T ( 473 Y ) S 40 T ( 456 Y) N
+(480 T ) S 8 T ( 481 T ) S 16 T ( 483 T ) S 24 T ( 484 T ) S 32 T ( 474 T ) S 40 T ( 457 A) N
+(481 N ) S 8 T ( 482 N ) S 16 T ( 484 N ) S 24 T ( 485 N ) S 32 T ( 475 N ) S 40 T ( 458 N) N
+(482 E ) S 8 T ( 483 E ) S 16 T ( 485 E ) S 24 T ( 486 E ) S 32 T ( 476 E ) S 40 T ( 459 E) N
+(483 R ) S 8 T ( 484 R ) S 16 T ( 486 R ) S 24 T ( 487 K ) S 32 T ( 477 K ) S 40 T ( 460 K) N
+(484 L ) S 8 T ( 485 L ) S 16 T ( 487 L ) S 24 T ( 488 L ) S 32 T ( 478 L ) S 40 T ( 461 L) N
+(485 Q ) S 8 T ( 486 Q ) S 16 T ( 488 Q ) S 24 T ( 489 Q ) S 32 T ( 479 Q ) S 40 T ( 462 Q) N
+(486 Q ) S 8 T ( 487 Q ) S 16 T ( 489 Q ) S 24 T ( 490 Q ) S 32 T ( 480 Q ) S 40 T ( 463 Q) N
+(487 F ) S 8 T ( 488 F ) S 16 T ( 490 F ) S 24 T ( 491 F ) S 32 T ( 481 F ) S 40 T ( 464 Q) N
+(488 F ) S 8 T ( 489 F ) S 16 T ( 491 F ) S 24 T ( 492 F ) S 32 T ( 482 F ) S 40 T ( 465 F) N
+(489 N ) S 8 T ( 490 N ) S 16 T ( 492 N ) S 24 T ( 493 N ) S 32 T ( 483 N ) S 40 T ( 466 N) N
+(----------------------------------------------) N
+(490 H ) S 8 T ( 491 H ) S 16 T ( 493 H ) S 24 T ( 494 H ) S 32 T ( 484 H ) S 40 T ( 467 M Relay Helix) N
+(491 H ) S 8 T ( 492 H ) S 16 T ( 494 H ) S 24 T ( 495 H ) S 32 T ( 485 H ) S 40 T ( 468 H) N
+(492 M ) S 8 T ( 493 M ) S 16 T ( 495 M ) S 24 T ( 496 M ) S 32 T ( 486 M ) S 40 T ( 469 V) N
+(493 F ) S 8 T ( 494 F ) S 16 T ( 496 F ) S 24 T ( 497 F ) S 32 T ( 487 F ) S 40 T ( 470 F) N
+(494 I ) S 8 T ( 495 V ) S 16 T ( 497 V ) S 24 T ( 498 V ) S 32 T ( 488 K ) S 40 T ( 471 K) N
+(495 L ) S 8 T ( 496 L ) S 16 T ( 498 L ) S 24 T ( 499 L ) S 32 T ( 489 L ) S 40 T ( 472 L) N
+(496 E ) S 8 T ( 497 E ) S 16 T ( 499 E ) S 24 T ( 500 E ) S 32 T ( 490 E ) S 40 T ( 473 E) N
+(497 Q ) S 8 T ( 498 Q ) S 16 T ( 500 Q ) S 24 T ( 501 Q ) S 32 T ( 491 Q ) S 40 T ( 474 Q) N
+(498 E ) S 8 T ( 499 E ) S 16 T ( 501 E ) S 24 T ( 502 E ) S 32 T ( 492 E ) S 40 T ( 475 E) N
+(499 E ) S 8 T ( 500 E ) S 16 T ( 502 E ) S 24 T ( 503 E ) S 32 T ( 493 E ) S 40 T ( 476 E) N
+(500 Y ) S 8 T ( 501 Y ) S 16 T ( 503 Y ) S 24 T ( 504 Y ) S 32 T ( 494 Y ) S 40 T ( 477 Y) N
+(501 K ) S 8 T ( 502 K ) S 16 T ( 504 K ) S 24 T ( 505 K ) S 32 T ( 495 L ) S 40 T ( 478 M) N
+(502 K ) S 8 T ( 503 K ) S 16 T ( 505 K ) S 24 T ( 506 K ) S 32 T ( 496 K ) S 40 T ( 479 K) N
+(503 E ) S 8 T ( 504 E ) S 16 T ( 506 E ) S 24 T ( 507 E ) S 32 T ( 497 E ) S 40 T ( 480 E) N
+(504 G ) S 8 T ( 505 G ) S 16 T ( 507 G ) S 24 T ( 508 G ) S 32 T ( 498 K ) S 40 T ( 481 Q Relay Helix) N
+(----------------------------------------------) N
+(505 I ) S 8 T ( 506 I ) S 16 T ( 508 I ) S 24 T ( 509 I ) S 32 T ( 499 I ) S 40 T ( 482 I Relay loop) N
+(506 A ) S 8 T ( 507 Q ) S 16 T ( 509 V ) S 24 T ( 510 E ) S 32 T ( 500 N ) S 40 T ( 483 P) N
+(507 W ) S 8 T ( 508 W ) S 16 T ( 510 W ) S 24 T ( 511 W ) S 32 T ( 501 W ) S 40 T ( 484 W) N
+(508 E ) S 8 T ( 509 E ) S 16 T ( 511 E ) S 24 T ( 512 E ) S 32 T ( 502 T ) S 40 T ( 485 T) N
+(509 F ) S 8 T ( 510 F ) S 16 T ( 512 F ) S 24 T ( 513 F ) S 32 T ( 503 F ) S 40 T ( 486 L) N
+(510 I ) S 8 T ( 511 I ) S 16 T ( 513 I ) S 24 T ( 514 I ) S 32 T ( 504 I ) S 40 T ( 487 I) N
+(511 D ) S 8 T ( 512 D ) S 16 T ( 514 D ) S 24 T ( 515 D ) S 32 T ( 505 D ) S 40 T ( 488 D) N
+(512 F ) S 8 T ( 513 F ) S 16 T ( 515 F ) S 24 T ( 516 F ) S 32 T ( 506 F ) S 40 T ( 489 F) N
+(513 G ) S 8 T ( 514 G ) S 16 T ( 516 G ) S 24 T ( 517 G ) S 32 T ( 507 G ) S 40 T ( -    ) N
+(514 M ) S 8 T ( 515 M ) S 16 T ( 517 L ) S 24 T ( 518 M ) S 32 T ( 508 L ) S 40 T ( 490 Y) N
+(515 D ) S 8 T ( 516 D ) S 16 T ( 518 D ) S 24 T ( 519 D ) S 32 T ( 509 D ) S 40 T ( 491 D) N
+(516 L ) S 8 T ( 517 L ) S 16 T ( 519 L ) S 24 T ( 520 L ) S 32 T ( 510 S ) S 40 T ( 492 N) N
+(517 Q ) S 8 T ( 518 Q ) S 16 T ( 520 Q ) S 24 T ( 521 A ) S 32 T ( 511 Q ) S 40 T ( 493 Q Relay Loop) N
+(----------------------------------------------) N
+(518 M ) S 8 T ( 519 M ) S 16 T ( 521 A ) S 24 T ( 522 A ) S 32 T ( 512 A ) S 40 T ( 494 P) N
+(519 C ) S 8 T ( 520 C ) S 16 T ( 522 C ) S 24 T ( 523 C ) S 32 T ( 513 T ) S 40 T ( 495 C) N
+(520 I ) S 8 T ( 521 I ) S 16 T ( 523 I ) S 24 T ( 524 I ) S 32 T ( 514 I ) S 40 T ( 496 I) N
+(521 D ) S 8 T ( 522 D ) S 16 T ( 524 E ) S 24 T ( 525 E ) S 32 T ( 515 D ) S 40 T ( 497 N) N
+(522 L ) S 8 T ( 523 L ) S 16 T ( 525 L ) S 24 T ( 526 L ) S 32 T ( 516 L ) S 40 T ( 498 L) N
+(523 I ) S 8 T ( 524 I ) S 16 T ( 526 I ) S 24 T ( 527 I ) S 32 T ( 517 I ) S 40 T ( 499 I) N
+(524 E ) S 8 T ( 525 E ) S 16 T ( 527 E ) S 24 T ( 528 E ) S 32 T ( 518 D ) S 40 T ( 500 E) N
+(525 K ) S 8 T ( 526 K ) S 16 T ( 528 K ) S 24 T ( 529 K ) S 32 T ( 519 G ) S 40 T ( 501 A) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( 520 R ) S 40 T ( -    ) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( 521 Q ) S 40 T ( -    ) N
+(526 P ) S 8 T ( 527 P ) S 16 T ( 529 P ) S 24 T ( 530 P ) S 32 T ( 522 P ) S 40 T ( 502 K) N
+(527 M ) S 8 T ( 528 M ) S 16 T ( 530 M ) S 24 T ( 531 M ) S 32 T ( 523 P ) S 40 T ( 503 M) N
+(528 G ) S 8 T ( 529 G ) S 16 T ( 531 G ) S 24 T ( 532 G ) S 32 T ( 524 G ) S 40 T ( 504 G) N
+(529 I ) S 8 T ( 530 I ) S 16 T ( 532 I ) S 24 T ( 533 I ) S 32 T ( 525 I ) S 40 T ( 505 V) N
+(530 L ) S 8 T ( 531 L ) S 16 T ( 533 L ) S 24 T ( 534 F ) S 32 T ( 526 L ) S 40 T ( 506 L) N
+(531 S ) S 8 T ( 532 S ) S 16 T ( 534 S ) S 24 T ( 535 S ) S 32 T ( 527 A ) S 40 T ( 507 D) N
+(532 I ) S 8 T ( 533 I ) S 16 T ( 535 I ) S 24 T ( 536 I ) S 32 T ( 528 L ) S 40 T ( 508 L) N
+(533 L ) S 8 T ( 534 L ) S 16 T ( 536 L ) S 24 T ( 537 L ) S 32 T ( 529 L ) S 40 T ( 509 L) N
+(534 E ) S 8 T ( 535 E ) S 16 T ( 537 E ) S 24 T ( 538 E ) S 32 T ( 530 D ) S 40 T ( 510 D) N
+(535 E ) S 8 T ( 536 E ) S 16 T ( 538 E ) S 24 T ( 539 E ) S 32 T ( 531 E ) S 40 T ( 511 E) N
+(536 E ) S 8 T ( 537 E ) S 16 T ( 539 E ) S 24 T ( 540 E ) S 32 T ( 532 Q ) S 40 T ( 512 E) N
+(537 C ) S 8 T ( 538 C ) S 16 T ( 540 C ) S 24 T ( 541 C ) S 32 T ( 533 S ) S 40 T ( 513 C) N
+(538 M ) S 8 T ( 539 M ) S 16 T ( 541 M ) S 24 T ( 542 M ) S 32 T ( 534 V ) S 40 T ( 514 K) N
+(539 F ) S 8 T ( 540 F ) S 16 T ( 542 F ) S 24 T ( 543 F ) S 32 T ( 535 F ) S 40 T ( 515 M) N
+(540 P ) S 8 T ( 541 P ) S 16 T ( 543 P ) S 24 T ( 544 P ) S 32 T ( 536 P ) S 40 T ( 516 P) N
+(541 K ) S 8 T ( 542 K ) S 16 T ( 544 K ) S 24 T ( 545 K ) S 32 T ( 537 N ) S 40 T ( 517 K) N
+(542 A ) S 8 T ( 543 A ) S 16 T ( 545 A ) S 24 T ( 546 A ) S 32 T ( 538 A ) S 40 T ( 518 G) N
+(543 D ) S 8 T ( 544 D ) S 16 T ( 546 S ) S 24 T ( 547 T ) S 32 T ( 539 T ) S 40 T ( 519 S) N
+(544 D ) S 8 T ( 545 D ) S 16 T ( 547 D ) S 24 T ( 548 D ) S 32 T ( 540 D ) S 40 T ( 520 D) N
+(545 K ) S 8 T ( 546 K ) S 16 T ( 548 T ) S 24 T ( 549 T ) S 32 T ( 541 N ) S 40 T ( 521 D) N
+(seqhc1i) (Page 6/13) (Jan 30, 08 14:38) title
+border
+grestore
+(Printed by V.Ovchinnikov) rhead
+(seqhc1i) (2/5) (Wednesday January 30, 2008) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (7-9) 3
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 2.235602 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(546 S ) p 8 T ( 547 S ) S 16 T ( 549 S ) S 24 T ( 550 S ) S 32 T ( 542 T ) S 40 T ( 522 T) N
+(547 F ) S 8 T ( 548 F ) S 16 T ( 550 F ) S 24 T ( 551 F ) S 32 T ( 543 L ) S 40 T ( 523 W) N
+(548 Q ) S 8 T ( 549 Q ) S 16 T ( 551 K ) S 24 T ( 552 K ) S 32 T ( 544 I ) S 40 T ( 524 A) N
+(549 D ) S 8 T ( 550 D ) S 16 T ( 552 N ) S 24 T ( 553 N ) S 32 T ( 545 T ) S 40 T ( 525 Q) N
+(550 K ) S 8 T ( 551 Y ) S 16 T ( 553 K ) S 24 T ( 554 K ) S 32 T ( 546 K ) S 40 T ( 526 K) N
+(551 L ) S 8 T ( 552 S ) S 16 T ( 554 L ) S 24 T ( 555 L ) S 32 T ( 547 L ) S 40 T ( 527 L) N
+(552 Y ) S 8 T ( 553 Y ) S 16 T ( 555 Y ) S 24 T ( 556 Y ) S 32 T ( 548 H ) S 40 T ( 528 Y) N
+(553 Q ) S 8 T ( 554 Q ) S 16 T ( 556 D ) S 24 T ( 557 D ) S 32 T ( 549 S ) S 40 T ( 529 N) N
+(554 N ) S 8 T ( 555 N ) S 16 T ( 557 N ) S 24 T ( 558 Q ) S 32 T ( 550 H ) S 40 T ( 530 T) N
+(555 H ) S 8 T ( 556 H ) S 16 T ( 558 H ) S 24 T ( 559 H ) S 32 T ( 551 F ) S 40 T ( 531 H) N
+(556 M ) S 8 T ( 557 I ) S 16 T ( 559 L ) S 24 T ( 560 L ) S 32 T ( 552 S ) S 40 T ( 532 L) N
+(557 G ) S 8 T ( 558 G ) S 16 T ( 560 G ) S 24 T ( 561 G ) S 32 T ( 553 K ) S 40 T ( 533 N) N
+(558 K ) S 8 T ( 559 K ) S 16 T ( 561 K ) S 24 T ( 562 K ) S 32 T ( 554 K ) S 40 T ( 534 K) N
+(559 N ) S 8 T ( 560 N ) S 16 T ( 562 N ) S 24 T ( 563 S ) S 32 T ( 555 N ) S 40 T ( 535 C) N
+(560 R ) S 8 T ( 561 R ) S 16 T ( 563 P ) S 24 T ( 564 N ) S 32 T ( 556 A ) S 40 T ( 536 A) N
+(561 M ) S 8 T ( 562 M ) S 16 T ( 564 M ) S 24 T ( 565 N ) S 32 T ( 557 K ) S 40 T ( 537 L) N
+(562 F ) S 8 T ( 563 F ) S 16 T ( 565 F ) S 24 T ( 566 F ) S 32 T ( 558 Y ) S 40 T ( 538 F) N
+(563 T ) S 8 T ( 564 T ) S 16 T ( 566 G ) S 24 T ( 567 Q ) S 32 T ( 559 E ) S 40 T ( 539 E) N
+(564 K ) S 8 T ( 565 K ) S 16 T ( 567 K ) S 24 T ( 568 K ) S 32 T ( 560 E ) S 40 T ( 540 K) N
+(565 P ) S 8 T ( 566 P ) S 16 T ( 568 P ) S 24 T ( 569 P ) S 32 T ( 561 P ) S 40 T ( 541 P) N
+(566 G ) S 8 T ( 567 G ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( -    ) N
+(567 K ) S 8 T ( 568 K ) S 16 T ( 569 K ) S 24 T ( 570 K ) S 32 T ( -     ) S 40 T ( -    ) N
+(568 P ) S 8 T ( 569 P ) S 16 T ( 570 P ) S 24 T ( 571 P ) S 32 T ( -     ) S 40 T ( -    ) N
+(569 T ) S 8 T ( 570 T ) S 16 T ( 571 P ) S 24 T ( 572 A ) S 32 T ( -     ) S 40 T ( -    ) N
+(570 R ) S 8 T ( 571 R ) S 16 T ( 572 K ) S 24 T ( 573 K ) S 32 T ( -     ) S 40 T ( -    ) N
+(571 P ) S 8 T ( 572 P ) S 16 T ( 573 A ) S 24 T ( 574 G ) S 32 T ( -     ) S 40 T ( -    ) N
+(572 N ) S 8 T ( 573 N ) S 16 T ( 574 G ) S 24 T ( -     ) S 32 T ( 562 R ) S 40 T ( 542 R) N
+(573 Q ) S 8 T ( 574 Q ) S 16 T ( 575 C ) S 24 T ( 575 K ) S 32 T ( 563 F ) S 40 T ( 543 L) N
+(574 G ) S 8 T ( 575 G ) S 16 T ( 576 A ) S 24 T ( 576 A ) S 32 T ( 564 S ) S 40 T ( 544 S) N
+(575 P ) S 8 T ( 576 H ) S 16 T ( 577 E ) S 24 T ( 577 E ) S 32 T ( 565 K ) S 40 T ( 545 N) N
+(576 A ) S 8 T ( 577 A ) S 16 T ( 578 A ) S 24 T ( 578 A ) S 32 T ( 566 T ) S 40 T ( 546 K) N
+(----------------------------------------------) N
+(577 H ) S 8 T ( 578 H ) S 16 T ( 579 H ) S 24 T ( 579 H ) S 32 T ( 567 E ) S 40 T ( 547 A Loop 3) N
+(578 F ) S 8 T ( 579 F ) S 16 T ( 580 F ) S 24 T ( 580 F ) S 32 T ( 568 F ) S 40 T ( 548 F) N
+(579 E ) S 8 T ( 580 E ) S 16 T ( 581 C ) S 24 T ( 581 S ) S 32 T ( 569 G ) S 40 T ( 549 I) N
+(580 L ) S 8 T ( 581 L ) S 16 T ( 582 L ) S 24 T ( 582 L ) S 32 T ( 570 V ) S 40 T ( 550 I) N
+(581 H ) S 8 T ( 582 H ) S 16 T ( 583 H ) S 24 T ( 583 V ) S 32 T ( 571 T ) S 40 T ( 551 K) N
+(582 H ) S 8 T ( 583 H ) S 16 T ( 584 H ) S 24 T ( 584 H ) S 32 T ( 572 H ) S 40 T ( 552 H) N
+(583 Y ) S 8 T ( 584 Y ) S 16 T ( 585 Y ) S 24 T ( 585 Y ) S 32 T ( 573 Y ) S 40 T ( 553 F) N
+(584 A ) S 8 T ( 585 A ) S 16 T ( 586 A ) S 24 T ( 586 A ) S 32 T ( 574 A ) S 40 T ( 554 A) N
+(585 G ) S 8 T ( 586 G ) S 16 T ( 587 G ) S 24 T ( 587 G ) S 32 T ( 575 G ) S 40 T ( 555 D) N
+(586 N ) S 8 T ( 587 N ) S 16 T ( 588 S ) S 24 T ( 588 T ) S 32 T ( 576 Q ) S 40 T ( 556 K) N
+(587 V ) S 8 T ( 588 V ) S 16 T ( 589 V ) S 24 T ( 589 V ) S 32 T ( 577 V ) S 40 T ( 557 V) N
+(588 P ) S 8 T ( 589 P ) S 16 T ( 590 S ) S 24 T ( 590 D ) S 32 T ( 578 M ) S 40 T ( 558 E) N
+(589 Y ) S 8 T ( 590 Y ) S 16 T ( 591 Y ) S 24 T ( 591 Y ) S 32 T ( 579 Y ) S 40 T ( 559 Y) N
+(590 S ) S 8 T ( 591 S ) S 16 T ( 592 S ) S 24 T ( 592 N ) S 32 T ( 580 E ) S 40 T ( 560 Q) N
+(591 I ) S 8 T ( 592 I ) S 16 T ( 593 I ) S 24 T ( 593 I ) S 32 T ( 581 I ) S 40 T ( 561 C) N
+(592 T ) S 8 T ( 593 A ) S 16 T ( 594 A ) S 24 T ( 594 S ) S 32 T ( 582 Q ) S 40 T ( 562 E) N
+(593 G ) S 8 T ( 594 G ) S 16 T ( 595 G ) S 24 T ( 595 G ) S 32 T ( 583 D ) S 40 T ( 563 G) N
+(594 W ) S 8 T ( 595 W ) S 16 T ( 596 W ) S 24 T ( 596 W ) S 32 T ( 584 W ) S 40 T ( 564 F) N
+(595 L ) S 8 T ( 596 L ) S 16 T ( 597 L ) S 24 T ( 597 L ) S 32 T ( 585 L ) S 40 T ( 565 L) N
+(596 E ) S 8 T ( 597 D ) S 16 T ( 598 D ) S 24 T ( 598 E ) S 32 T ( 586 E ) S 40 T ( 566 E) N
+(597 K ) S 8 T ( 598 K ) S 16 T ( 599 K ) S 24 T ( 599 K ) S 32 T ( 587 K ) S 40 T ( 567 K) N
+(598 N ) S 8 T ( 599 N ) S 16 T ( 600 N ) S 24 T ( 600 N ) S 32 T ( 588 N ) S 40 T ( 568 N Loop3, L50) N
+(----------------------------------------------) N
+(599 K ) S 8 T ( 600 K ) S 16 T ( 601 K ) S 24 T ( 601 K ) S 32 T ( 589 K ) S 40 T ( 569 K Strut) N
+(600 D ) S 8 T ( 601 D ) S 16 T ( 602 D ) S 24 T ( 602 D ) S 32 T ( 590 D ) S 40 T ( 570 D) N
+(601 P ) S 8 T ( 602 P ) S 16 T ( 603 P ) S 24 T ( 603 P ) S 32 T ( 591 P ) S 40 T ( 571 T) N
+(602 I ) S 8 T ( 603 I ) S 16 T ( 604 I ) S 24 T ( 604 L ) S 32 T ( 592 L ) S 40 T ( 572 V) N
+(603 N ) S 8 T ( 604 N ) S 16 T ( 605 N ) S 24 T ( 605 N ) S 32 T ( 593 Q ) S 40 T ( 573 Y) N
+(604 E ) S 8 T ( 605 E ) S 16 T ( 606 E ) S 24 T ( 606 E ) S 32 T ( 594 Q ) S 40 T ( 574 E Strut) N
+(----------------------------------------------) N
+(605 N ) S 8 T ( 606 N ) S 16 T ( 607 N ) S 24 T ( 607 T ) S 32 T ( 595 D ) S 40 T ( 575 E) N
+(606 V ) S 8 T ( 607 V ) S 16 T ( 608 V ) S 24 T ( 608 V ) S 32 T ( 596 L ) S 40 T ( 576 Q) N
+(607 V ) S 8 T ( 608 V ) S 16 T ( 609 V ) S 24 T ( 609 I ) S 32 T ( 597 E ) S 40 T ( 577 I) N
+(608 A ) S 8 T ( 609 S ) S 16 T ( 610 E ) S 24 T ( 610 G ) S 32 T ( 598 L ) S 40 T ( 578 K) N
+(609 L ) S 8 T ( 610 L ) S 16 T ( 611 L ) S 24 T ( 611 L ) S 32 T ( 599 C ) S 40 T ( 579 V) N
+(610 L ) S 8 T ( 611 L ) S 16 T ( 612 L ) S 24 T ( 612 Y ) S 32 T ( 600 F ) S 40 T ( 580 L) N
+(611 G ) S 8 T ( 612 A ) S 16 T ( 613 Q ) S 24 T ( 613 Q ) S 32 T ( 601 K ) S 40 T ( 581 K) N
+(612 A ) S 8 T ( 613 V ) S 16 T ( 614 N ) S 24 T ( 614 K ) S 32 T ( 602 D ) S 40 T ( 582 S) N
+(613 S ) S 8 T ( 614 S ) S 16 T ( 615 S ) S 24 T ( 615 S ) S 32 T ( 603 S ) S 40 T ( 583 S) N
+(614 K ) S 8 T ( 615 K ) S 16 T ( 616 K ) S 24 T ( 616 S ) S 32 T ( 604 S ) S 40 T ( 584 K) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 585 K) N
+(615 E ) S 8 T ( 616 E ) S 16 T ( 617 E ) S 24 T ( 617 V ) S 32 T ( 605 D ) S 40 T ( 586 F) N
+(616 P ) S 8 T ( 617 P ) S 16 T ( 618 P ) S 24 T ( 618 K ) S 32 T ( 606 N ) S 40 T ( 587 K) N
+(617 L ) S 8 T ( 618 L ) S 16 T ( 619 I ) S 24 T ( 619 T ) S 32 T ( 607 V ) S 40 T ( 588 L) N
+(618 V ) S 8 T ( 619 V ) S 16 T ( 620 V ) S 24 T ( 620 L ) S 32 T ( 608 V ) S 40 T ( 589 L) N
+(619 A ) S 8 T ( 620 A ) S 16 T ( 621 K ) S 24 T ( 621 A ) S 32 T ( 609 T ) S 40 T ( 590 P) N
+(620 E ) S 8 T ( 621 E ) S 16 T ( 622 M ) S 24 T ( 622 L ) S 32 T ( 610 K ) S 40 T ( 591 E) N
+(621 L ) S 8 T ( 622 L ) S 16 T ( 623 L ) S 24 T ( 623 L ) S 32 T ( 611 L ) S 40 T ( 592 L) N
+(622 F ) S 8 T ( 623 F ) S 16 T ( 624 F ) S 24 T ( 624 F ) S 32 T ( 612 F ) S 40 T ( 593 F) N
+(623 K ) S 8 T ( 624 R ) S 16 T ( 625 T ) S 24 T ( 625 A ) S 32 T ( 613 N ) S 40 T ( 594 Q) N
+(624 A ) S 8 T ( 625 A ) S 16 T ( 626 P ) S 24 T ( 626 T ) S 32 T ( 614 D ) S 40 T ( 595 D) N
+(625 P ) S 8 T ( 626 P ) S 16 T ( 627 P ) S 24 T ( 627 Y ) S 32 T ( 615 P ) S 40 T ( 596 E) N
+(626 E ) S 8 T ( 627 D ) S 16 T ( 628 R ) S 24 T ( 628 G ) S 32 T ( 616 N ) S 40 T ( 597 E) N
+(627 E ) S 8 T ( 628 E ) S 16 T ( 629 I ) S 24 T ( 629 G ) S 32 T ( 617 I ) S 40 T ( 598 K) N
+(628 P ) S 8 T ( 629 P ) S 16 T ( 630 L ) S 24 T ( 630 E ) S 32 T ( 618 A ) S 40 T ( 599 A) N
+(629 A ) S 8 T ( 630 A ) S 16 T ( 631 T ) S 24 T ( 631 A ) S 32 T ( 619 S ) S 40 T ( 600 I) N
+(630 G ) S 8 T ( 631 G ) S 16 T ( 632 P ) S 24 T ( 632 E ) S 32 T ( 620 R ) S 40 T ( 601 S) N
+(-     ) S 8 T ( 632 G ) S 16 T ( -     ) S 24 T ( 633 G ) S 32 T ( -     ) S 40 T ( 602 P) N
+(631 G ) S 8 T ( 633 A ) S 16 T ( 633 G ) S 24 T ( 634 G ) S 32 T ( -     ) S 40 T ( 603 T) N
+(632 G ) S 8 T ( 634 G ) S 16 T ( 634 G ) S 24 T ( 635 G ) S 32 T ( -     ) S 40 T ( 604 S) N
+(633 K ) S 8 T ( 635 G ) S 16 T ( 635 K ) S 24 T ( 636 G ) S 32 T ( -     ) S 40 T ( 605 A) N
+(634 K ) S 8 T ( 636 K ) S 16 T ( 636 K ) S 24 T ( 637 K ) S 32 T ( -     ) S 40 T ( 606 T) N
+(635 K ) S 8 T ( 637 K ) S 16 T ( 637 K ) S 24 T ( 638 K ) S 32 T ( -     ) S 40 T ( 607 P) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( 639 G ) S 32 T ( -     ) S 40 T ( 608 S) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( 640 G ) S 32 T ( -     ) S 40 T ( 609 G) N
+(seqhc1i) (Page 7/13) (Jan 30, 08 14:38) title
+border
+/v 1 store
+/x0 x v get 2.235602 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(-     ) p 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 610 R) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 611 V) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 612 P) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 613 L) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 614 S) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 615 R) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 616 T) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 617 P) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 618 V) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 619 K) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 620 P) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 621 A) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 622 K) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 623 A) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 624 R) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 625 P) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -     ) S 32 T ( -     ) S 40 T ( 626 G) N
+(636 K ) S 8 T ( 638 K ) S 16 T ( 638 K ) S 24 T ( 641 K ) S 32 T ( 621 A ) S 40 T ( 627 Q) N
+(637 G ) S 8 T ( 639 K ) S 16 T ( 639 G ) S 24 T ( 642 K ) S 32 T ( 622 K ) S 40 T ( 628 T) N
+(638 K ) S 8 T ( 640 K ) S 16 T ( 640 K ) S 24 T ( 643 K ) S 32 T ( 623 K ) S 40 T ( 629 S) N
+(639 S ) S 8 T ( 641 S ) S 16 T ( 641 S ) S 24 T ( 644 G ) S 32 T ( 624 G ) S 40 T ( 630 K) N
+(640 S ) S 8 T ( 642 S ) S 16 T ( 642 A ) S 24 T ( 645 S ) S 32 T ( 625 A ) S 40 T ( 631 E) N
+(641 A ) S 8 T ( 643 A ) S 16 T ( 643 A ) S 24 T ( 646 S ) S 32 T ( 626 N ) S 40 T ( 632 H) N
+(642 F ) S 8 T ( 644 F ) S 16 T ( 644 F ) S 24 T ( 647 F ) S 32 T ( 627 F ) S 40 T ( 633 K) N
+(643 Q ) S 8 T ( 645 Q ) S 16 T ( 645 Q ) S 24 T ( 648 Q ) S 32 T ( 628 I ) S 40 T ( 634 K) N
+(644 T ) S 8 T ( 646 T ) S 16 T ( 646 T ) S 24 T ( 649 T ) S 32 T ( 629 T ) S 40 T ( 635 T) N
+(645 I ) S 8 T ( 647 I ) S 16 T ( 647 I ) S 24 T ( 650 V ) S 32 T ( 630 V ) S 40 T ( 636 V) N
+(646 S ) S 8 T ( 648 S ) S 16 T ( 648 S ) S 24 T ( 651 S ) S 32 T ( 631 A ) S 40 T ( 637 G) N
+(647 A ) S 8 T ( 649 A ) S 16 T ( 649 S ) S 24 T ( 652 A ) S 32 T ( 632 A ) S 40 T ( 638 H) N
+(648 V ) S 8 T ( 650 V ) S 16 T ( 650 V ) S 24 T ( 653 L ) S 32 T ( 633 Q ) S 40 T ( 639 Q) N
+(649 H ) S 8 T ( 651 H ) S 16 T ( 651 H ) S 24 T ( 654 F ) S 32 T ( 634 Y ) S 40 T ( 640 F) N
+(650 R ) S 8 T ( 652 R ) S 16 T ( 652 K ) S 24 T ( 655 R ) S 32 T ( 635 K ) S 40 T ( 641 R) N
+(651 E ) S 8 T ( 653 E ) S 16 T ( 653 E ) S 24 T ( 656 E ) S 32 T ( 636 E ) S 40 T ( 642 N) N
+(652 S ) S 8 T ( 654 S ) S 16 T ( 654 S ) S 24 T ( 657 N ) S 32 T ( 637 Q ) S 40 T ( 643 S) N
+(653 L ) S 8 T ( 655 L ) S 16 T ( 655 L ) S 24 T ( 658 L ) S 32 T ( 638 L ) S 40 T ( 644 L) N
+(654 N ) S 8 T ( 656 N ) S 16 T ( 656 N ) S 24 T ( 659 N ) S 32 T ( 639 A ) S 40 T ( 645 H) N
+(655 K ) S 8 T ( 657 K ) S 16 T ( 657 K ) S 24 T ( 660 K ) S 32 T ( 640 S ) S 40 T ( 646 L) N
+(656 L ) S 8 T ( 658 L ) S 16 T ( 658 L ) S 24 T ( 661 L ) S 32 T ( 641 L ) S 40 T ( 647 L) N
+(657 M ) S 8 T ( 659 M ) S 16 T ( 659 M ) S 24 T ( 662 M ) S 32 T ( 642 M ) S 40 T ( 648 M) N
+(658 K ) S 8 T ( 660 C ) S 16 T ( 660 K ) S 24 T ( 663 A ) S 32 T ( 643 A ) S 40 T ( 649 E) N
+(659 N ) S 8 T ( 661 N ) S 16 T ( 661 N ) S 24 T ( 664 N ) S 32 T ( 644 T ) S 40 T ( 650 T) N
+(660 L ) S 8 T ( 662 L ) S 16 T ( 662 L ) S 24 T ( 665 L ) S 32 T ( 645 L ) S 40 T ( 651 L) N
+(661 Y ) S 8 T ( 663 R ) S 16 T ( 663 Y ) S 24 T ( 666 R ) S 32 T ( 646 E ) S 40 T ( 652 N) N
+(662 S ) S 8 T ( 664 R ) S 16 T ( 664 S ) S 24 T ( 667 S ) S 32 T ( 647 T ) S 40 T ( 653 A) N
+(663 T ) S 8 T ( 665 T ) S 16 T ( 665 T ) S 24 T ( 668 T ) S 32 T ( 648 T ) S 40 T ( 654 T) N
+(664 H ) S 8 T ( 666 N ) S 16 T ( 666 H ) S 24 T ( 669 H ) S 32 T ( 649 N ) S 40 T ( 655 T) N
+(665 P ) S 8 T ( 667 P ) S 16 T ( 667 P ) S 24 T ( 670 P ) S 32 T ( 650 P ) S 40 T ( 656 P) N
+(666 H ) S 8 T ( 668 H ) S 16 T ( 668 H ) S 24 T ( 671 H ) S 32 T ( 651 H ) S 40 T ( 657 H) N
+(667 F ) S 8 T ( 669 F ) S 16 T ( 669 F ) S 24 T ( 672 F ) S 32 T ( 652 F ) S 40 T ( 658 Y) N
+(668 V ) S 8 T ( 670 V ) S 16 T ( 670 V ) S 24 T ( 673 V ) S 32 T ( 653 V ) S 40 T ( 659 V) N
+(669 R ) S 8 T ( 671 R ) S 16 T ( 671 R ) S 24 T ( 674 R ) S 32 T ( 654 R ) S 40 T ( 660 R) N
+(670 C ) S 8 T ( 672 C ) S 16 T ( 672 C ) S 24 T ( 675 C ) S 32 T ( 655 C ) S 40 T ( 661 C) N
+(671 I ) S 8 T ( 673 I ) S 16 T ( 673 I ) S 24 T ( 676 I ) S 32 T ( 656 I ) S 40 T ( 662 I) N
+(672 I ) S 8 T ( 674 I ) S 16 T ( 674 I ) S 24 T ( 677 I ) S 32 T ( 657 I ) S 40 T ( 663 K) N
+(673 P ) S 8 T ( 675 P ) S 16 T ( 675 P ) S 24 T ( 678 P ) S 32 T ( 658 P ) S 40 T ( 664 P) N
+(674 N ) S 8 T ( 676 N ) S 16 T ( 676 N ) S 24 T ( 679 N ) S 32 T ( 659 N ) S 40 T ( 665 N) N
+(675 E ) S 8 T ( 677 L ) S 16 T ( 677 E ) S 24 T ( 680 E ) S 32 T ( 660 N ) S 40 T ( 666 D) N
+(676 L ) S 8 T ( 678 E ) S 16 T ( 678 L ) S 24 T ( 681 T ) S 32 T ( 661 K ) S 40 T ( 667 F) N
+(677 K ) S 8 T ( 679 K ) S 16 T ( 679 K ) S 24 T ( 682 K ) S 32 T ( 662 Q ) S 40 T ( 668 K) N
+(678 Q ) S 8 T ( 680 D ) S 16 T ( 680 T ) S 24 T ( 683 T ) S 32 T ( 663 L ) S 40 T ( 669 F) N
+(679 P ) S 8 T ( 681 P ) S 16 T ( 681 P ) S 24 T ( 684 P ) S 32 T ( 664 P ) S 40 T ( 670 P) N
+(680 G ) S 8 T ( 682 G ) S 16 T ( 682 G ) S 24 T ( 685 G ) S 32 T ( 665 A ) S 40 T ( 671 F) N
+(681 L ) S 8 T ( 683 L ) S 16 T ( 683 L ) S 24 T ( 686 A ) S 32 T ( 666 K ) S 40 T ( 672 T) N
+(682 V ) S 8 T ( 684 V ) S 16 T ( 684 I ) S 24 T ( 687 M ) S 32 T ( 667 L ) S 40 T ( 673 F) N
+(683 D ) S 8 T ( 685 D ) S 16 T ( 685 D ) S 24 T ( 688 E ) S 32 T ( 668 E ) S 40 T ( 674 D) N
+(684 A ) S 8 T ( 686 A ) S 16 T ( 686 A ) S 24 T ( 689 H ) S 32 T ( 669 D ) S 40 T ( 675 E) N
+(685 E ) S 8 T ( 687 E ) S 16 T ( 687 A ) S 24 T ( 690 E ) S 32 T ( 670 K ) S 40 T ( 676 K) N
+(686 L ) S 8 T ( 688 L ) S 16 T ( 688 L ) S 24 T ( 691 L ) S 32 T ( 671 V ) S 40 T ( 677 R) N
+(687 V ) S 8 T ( 689 V ) S 16 T ( 689 V ) S 24 T ( 692 V ) S 32 T ( 672 V ) S 40 T ( 678 A) N
+(688 L ) S 8 T ( 690 L ) S 16 T ( 690 L ) S 24 T ( 693 L ) S 32 T ( 673 L ) S 40 T ( 679 V) N
+(689 H ) S 8 T ( 691 H ) S 16 T ( 691 H ) S 24 T ( 694 H ) S 32 T ( 674 D ) S 40 T ( 680 Q) N
+(690 Q ) S 8 T ( 692 Q ) S 16 T ( 692 Q ) S 24 T ( 695 Q ) S 32 T ( 675 Q ) S 40 T ( 681 Q) N
+(691 L ) S 8 T ( 693 L ) S 16 T ( 693 L ) S 24 T ( 696 L ) S 32 T ( 676 L ) S 40 T ( 682 L) N
+(692 Q ) S 8 T ( 694 Q ) S 16 T ( 694 R ) S 24 T ( 697 R ) S 32 T ( 677 R ) S 40 T ( 683 R) N
+(----------------------------------------------) N
+(693 C ) S 8 T ( 695 C ) S 16 T ( 695 C ) S 24 T ( 698 C ) S 32 T ( 678 C ) S 40 T ( 684 A SH2 loop) N
+(694 N ) S 8 T ( 696 N ) S 16 T ( 696 N ) S 24 T ( 699 N ) S 32 T ( 679 N ) S 40 T ( 685 C SH2 loop) N
+(----------------------------------------------) N
+(695 G ) S 8 T ( 697 G ) S 16 T ( 697 G ) S 24 T ( 700 G ) S 32 T ( 680 G ) S 40 T ( 686 G SH1 helix) N
+(696 V ) S 8 T ( 698 V ) S 16 T ( 698 V ) S 24 T ( 701 V ) S 32 T ( 681 V ) S 40 T ( 687 V) N
+(697 L ) S 8 T ( 699 L ) S 16 T ( 699 L ) S 24 T ( 702 L ) S 32 T ( 682 L ) S 40 T ( 688 L) N
+(698 E ) S 8 T ( 700 E ) S 16 T ( 700 E ) S 24 T ( 703 E ) S 32 T ( 683 E ) S 40 T ( 689 E) N
+(699 G ) S 8 T ( 701 G ) S 16 T ( 701 G ) S 24 T ( 704 G ) S 32 T ( 684 G ) S 40 T ( 690 T) N
+(700 I ) S 8 T ( 702 I ) S 16 T ( 702 I ) S 24 T ( 705 I ) S 32 T ( 685 I ) S 40 T ( 691 I) N
+(701 R ) S 8 T ( 703 R ) S 16 T ( 703 R ) S 24 T ( 706 R ) S 32 T ( 686 R ) S 40 T ( 692 R) N
+(702 I ) S 8 T ( 704 I ) S 16 T ( 704 I ) S 24 T ( 707 I ) S 32 T ( 687 I ) S 40 T ( 693 I) N
+(703 C ) S 8 T ( 705 C ) S 16 T ( 705 C ) S 24 T ( 708 C ) S 32 T ( 688 T ) S 40 T ( 694 S) N
+(704 R ) S 8 T ( 706 R ) S 16 T ( 706 R ) S 24 T ( 709 R ) S 32 T ( 689 R ) S 40 T ( 695 A) N
+(705 K ) S 8 T ( 707 K ) S 16 T ( 707 K ) S 24 T ( 710 K ) S 32 T ( 690 K ) S 40 T ( 696 A SH1 helix) N
+(----------------------------------------------) N
+(706 G ) S 8 T ( 708 G ) S 16 T ( 708 G ) S 24 T ( 711 G ) S 32 T ( 691 G ) S 40 T ( 697 G SH1 loop) N
+(707 F ) S 8 T ( 709 F ) S 16 T ( 709 F ) S 24 T ( 712 F ) S 32 T ( 692 F ) S 40 T ( 698 F) N
+(708 P ) S 8 T ( 710 P ) S 16 T ( 710 P ) S 24 T ( 713 P ) S 32 T ( 693 P ) S 40 T ( 699 P SH1 loop) N
+(----------------------------------------------) N
+(709 S ) S 8 T ( 711 S ) S 16 T ( 711 N ) S 24 T ( 714 S ) S 32 T ( 694 N ) S 40 T ( 700 S Converter) N
+(710 R ) S 8 T ( 712 R ) S 16 T ( 712 R ) S 24 T ( 715 R ) S 32 T ( 695 R ) S 40 T ( 701 R) N
+(711 L ) S 8 T ( 713 L ) S 16 T ( 713 I ) S 24 T ( 716 V ) S 32 T ( 696 I ) S 40 T ( 702 W) N
+(seqhc1i) (Page 8/13) (Jan 30, 08 14:38) title
+border
+/v 2 store
+/x0 x v get 2.235602 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(712 I ) p 8 T ( 714 I ) S 16 T ( 714 I ) S 24 T ( 717 L ) S 32 T ( 697 I ) S 40 T ( 703 T) N
+(713 Y ) S 8 T ( 715 Y ) S 16 T ( 715 Y ) S 24 T ( 718 Y ) S 32 T ( 698 Y ) S 40 T ( 704 Y) N
+(714 S ) S 8 T ( 716 S ) S 16 T ( 716 S ) S 24 T ( 719 A ) S 32 T ( 699 A ) S 40 T ( 705 Q) N
+(715 E ) S 8 T ( 717 E ) S 16 T ( 717 E ) S 24 T ( 720 D ) S 32 T ( 700 D ) S 40 T ( 706 E) N
+(716 F ) S 8 T ( 718 F ) S 16 T ( 718 F ) S 24 T ( 721 F ) S 32 T ( 701 F ) S 40 T ( 707 F) N
+(717 K ) S 8 T ( 719 K ) S 16 T ( 719 K ) S 24 T ( 722 K ) S 32 T ( 702 V ) S 40 T ( 708 F) N
+(718 Q ) S 8 T ( 720 Q ) S 16 T ( 720 Q ) S 24 T ( 723 Q ) S 32 T ( 703 K ) S 40 T ( 709 S) N
+(719 R ) S 8 T ( 721 R ) S 16 T ( 721 R ) S 24 T ( 724 R ) S 32 T ( 704 R ) S 40 T ( 710 R) N
+(720 Y ) S 8 T ( 722 Y ) S 16 T ( 722 Y ) S 24 T ( 725 Y ) S 32 T ( 705 Y ) S 40 T ( 711 Y) N
+(721 S ) S 8 T ( 723 S ) S 16 T ( 723 S ) S 24 T ( 726 R ) S 32 T ( 706 Y ) S 40 T ( 712 R) N
+(722 I ) S 8 T ( 724 I ) S 16 T ( 724 I ) S 24 T ( 727 V ) S 32 T ( 707 L ) S 40 T ( 713 V) N
+(723 L ) S 8 T ( 725 L ) S 16 T ( 725 L ) S 24 T ( 728 L ) S 32 T ( 708 L ) S 40 T ( 714 L) N
+(724 A ) S 8 T ( 726 A ) S 16 T ( 726 A ) S 24 T ( 729 N ) S 32 T ( 709 A ) S 40 T ( 715 M) N
+(725 P ) S 8 T ( 727 P ) S 16 T ( 727 P ) S 24 T ( 730 A ) S 32 T ( 710 P ) S 40 T ( 716 K) N
+(726 N ) S 8 T ( 728 N ) S 16 T ( 728 N ) S 24 T ( 731 S ) S 32 T ( 711 N ) S 40 T ( 717 Q) N
+(727 A ) S 8 T ( 729 A ) S 16 T ( 729 A ) S 24 T ( 732 A ) S 32 T ( 712 V ) S 40 T ( 718 K) N
+(728 I ) S 8 T ( 730 I ) S 16 T ( 730 V ) S 24 T ( 733 I ) S 32 T ( 713 P ) S 40 T ( 719 D) N
+(729 P ) S 8 T ( 731 P ) S 16 T ( 731 P ) S 24 T ( 734 P ) S 32 T ( 714 R ) S 40 T ( 720 V) N
+(730 Q ) S 8 T ( 732 Q ) S 16 T ( 732 S ) S 24 T ( 735 E ) S 32 T ( 715 D ) S 40 T ( 721 L) N
+(731 G ) S 8 T ( 733 G ) S 16 T ( 733 G ) S 24 T ( 736 G ) S 32 T ( 716 A ) S 40 T ( 722 S) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( 737 Q ) S 32 T ( -     ) S 40 T ( -    ) N
+(732 F ) S 8 T ( 734 F ) S 16 T ( 734 F ) S 24 T ( 738 F ) S 32 T ( -     ) S 40 T ( -    ) N
+(733 V ) S 8 T ( 735 V ) S 16 T ( 735 A ) S 24 T ( 739 M ) S 32 T ( 717 E ) S 40 T ( -    ) N
+(734 D ) S 8 T ( 736 D ) S 16 T ( 736 D ) S 24 T ( 740 D ) S 32 T ( 718 D ) S 40 T ( 723 D) N
+(735 G ) S 8 T ( 737 G ) S 16 T ( 737 G ) S 24 T ( 741 S ) S 32 T ( 719 S ) S 40 T ( 724 R) N
+(736 K ) S 8 T ( 738 K ) S 16 T ( 738 K ) S 24 T ( 742 K ) S 32 T ( 720 Q ) S 40 T ( 725 K) N
+(737 T ) S 8 T ( 739 T ) S 16 T ( 739 V ) S 24 T ( 743 K ) S 32 T ( 721 K ) S 40 T ( 726 Q) N
+(738 V ) S 8 T ( 740 V ) S 16 T ( 740 V ) S 24 T ( 744 A ) S 32 T ( 722 A ) S 40 T ( 727 T) N
+(739 S ) S 8 T ( 741 S ) S 16 T ( 741 T ) S 24 T ( 745 S ) S 32 T ( 723 T ) S 40 T ( 728 C) N
+(740 E ) S 8 T ( 742 E ) S 16 T ( 742 D ) S 24 T ( 746 E ) S 32 T ( 724 D ) S 40 T ( 729 K) N
+(741 K ) S 8 T ( 743 K ) S 16 T ( 743 K ) S 24 T ( 747 K ) S 32 T ( 725 A ) S 40 T ( 730 N) N
+(742 I ) S 8 T ( 744 I ) S 16 T ( 744 V ) S 24 T ( 748 L ) S 32 T ( 726 V ) S 40 T ( 731 V) N
+(743 L ) S 8 T ( 745 L ) S 16 T ( 745 L ) S 24 T ( 749 L ) S 32 T ( 727 L ) S 40 T ( 732 L) N
+(744 A ) S 8 T ( 746 T ) S 16 T ( 746 S ) S 24 T ( 750 G ) S 32 T ( 728 K ) S 40 T ( 733 E) N
+(745 G ) S 8 T ( 747 G ) S 16 T ( 747 A ) S 24 T ( 751 S ) S 32 T ( 729 H ) S 40 T ( 734 K) N
+(746 L ) S 8 T ( 748 L ) S 16 T ( 748 L ) S 24 T ( 752 I ) S 32 T ( 730 L ) S 40 T ( 735 L) N
+(747 Q ) S 8 T ( 749 Q ) S 16 T ( 749 Q ) S 24 T ( 753 D ) S 32 T ( 731 N ) S 40 T ( 736 I) N
+(748 M ) S 8 T ( 750 M ) S 16 T ( 750 L ) S 24 T ( 754 V ) S 32 T ( 732 I ) S 40 T ( 737 L) N
+(749 D ) S 8 T ( 751 D ) S 16 T ( 751 D ) S 24 T ( 755 D ) S 32 T ( 733 D ) S 40 T ( 738 D) N
+(750 P ) S 8 T ( 752 P ) S 16 T ( 752 P ) S 24 T ( 756 H ) S 32 T ( 734 P ) S 40 T ( 739 K) N
+(751 A ) S 8 T ( 753 S ) S 16 T ( 753 N ) S 24 T ( 757 T ) S 32 T ( 735 E ) S 40 T ( 740 D) N
+(752 E ) S 8 T ( 754 E ) S 16 T ( 754 E ) S 24 T ( 758 Q ) S 32 T ( 736 Q ) S 40 T ( 741 K) N
+(753 Y ) S 8 T ( 755 Y ) S 16 T ( 755 Y ) S 24 T ( 759 Y ) S 32 T ( 737 Y ) S 40 T ( 742 Y) N
+(754 R ) S 8 T ( 756 R ) S 16 T ( 756 R ) S 24 T ( 760 R ) S 32 T ( 738 R ) S 40 T ( 743 Q) N
+(755 L ) S 8 T ( 757 L ) S 16 T ( 757 L ) S 24 T ( 761 F ) S 32 T ( 739 F ) S 40 T ( 744 F) N
+(756 G ) S 8 T ( 758 G ) S 16 T ( 758 G ) S 24 T ( 762 G ) S 32 T ( 740 G ) S 40 T ( 745 G) N
+(757 T ) S 8 T ( 759 T ) S 16 T ( 759 N ) S 24 T ( 763 H ) S 32 T ( 741 I ) S 40 T ( 746 K) N
+(758 T ) S 8 T ( 760 T ) S 16 T ( 760 T ) S 24 T ( 764 T ) S 32 T ( 742 T ) S 40 T ( 747 T) N
+(759 K ) S 8 T ( 761 K ) S 16 T ( 761 K ) S 24 T ( 765 K ) S 32 T ( 743 K ) S 40 T ( 748 K) N
+(760 V ) S 8 T ( 762 V ) S 16 T ( 762 V ) S 24 T ( 766 V ) S 32 T ( 744 I ) S 40 T ( 749 I) N
+(761 F ) S 8 T ( 763 F ) S 16 T ( 763 F ) S 24 T ( 767 F ) S 32 T ( 745 F ) S 40 T ( 750 F) N
+(762 F ) S 8 T ( 764 F ) S 16 T ( 764 F ) S 24 T ( 768 F ) S 32 T ( 746 F ) S 40 T ( 751 F) N
+(763 K ) S 8 T ( 765 K ) S 16 T ( 765 K ) S 24 T ( 769 K ) S 32 T ( 747 R ) S 40 T ( 752 R) N
+(764 A ) S 8 T ( 766 A ) S 16 T ( 766 A ) S 24 T ( 770 A ) S 32 T ( 748 A ) S 40 T ( 753 A) N
+(765 G ) S 8 T ( 767 G ) S 16 T ( 767 G ) S 24 T ( 771 G ) S 32 T ( 749 G ) S 40 T ( 754 G) N
+(766 V ) S 8 T ( 768 V ) S 16 T ( 768 V ) S 24 T ( 772 L ) S 32 T ( 750 Q ) S 40 T ( 755 Q) N
+(767 L ) S 8 T ( 769 L ) S 16 T ( 769 L ) S 24 T ( 773 L ) S 32 T ( 751 L ) S 40 T ( 756 V) N
+(768 G ) S 8 T ( 770 G ) S 16 T ( 770 G ) S 24 T ( 774 G ) S 32 T ( 752 A ) S 40 T ( 757 A) N
+(769 N ) S 8 T ( 771 N ) S 16 T ( 771 M ) S 24 T ( 775 L ) S 32 T ( 753 R ) S 40 T ( 758 Y) N
+(770 L ) S 8 T ( 772 L ) S 16 T ( 772 L ) S 24 T ( 776 L ) S 32 T ( 754 I ) S 40 T ( 759 L) N
+(771 E ) S 8 T ( 773 E ) S 16 T ( 773 E ) S 24 T ( 777 E ) S 32 T ( 755 E ) S 40 T ( 760 E) N
+(772 E ) S 8 T ( 774 E ) S 16 T ( 774 D ) S 24 T ( 778 E ) S 32 T ( 756 E ) S 40 T ( 761 K) N
+(773 M ) S 8 T ( 775 M ) S 16 T ( 775 M ) S 24 T ( 779 M ) S 32 T ( 757 A ) S 40 T ( 762 I Converter) N
+(----------------------------------------------) N
+(774 R ) S 8 T ( 776 R ) S 16 T ( 776 R ) S 24 T ( 780 R ) S 32 T ( 758 R ) S 40 T ( 763 R) N
+(775 D ) S 8 T ( 777 D ) S 16 T ( 777 D ) S 24 T ( 781 D ) S 32 T ( 759 E ) S 40 T ( 764 A) N
+(776 E ) S 8 T ( 778 E ) S 16 T ( 778 E ) S 24 T ( 782 D ) S 32 T ( 760 Q ) S 40 T ( 765 D) N
+(777 R ) S 8 T ( 779 R ) S 16 T ( 779 R ) S 24 T ( 783 K ) S 32 T ( 761 R ) S 40 T ( 766 K) N
+(778 L ) S 8 T ( 780 L ) S 16 T ( 780 L ) S 24 T ( 784 L ) S 32 T ( 762 I ) S 40 T ( 767 L) N
+(779 S ) S 8 T ( 781 S ) S 16 T ( 781 S ) S 24 T ( 785 A ) S 32 T ( 763 S ) S 40 T ( 768 R) N
+(780 K ) S 8 T ( 782 K ) S 16 T ( 782 K ) S 24 T ( 786 E ) S 32 T ( 764 E ) S 40 T ( 769 A) N
+(781 I ) S 8 T ( 783 I ) S 16 T ( 783 I ) S 24 T ( 787 I ) S 32 T ( 765 I ) S 40 T ( 770 A) N
+(782 I ) S 8 T ( 784 I ) S 16 T ( 784 I ) S 24 T ( 788 I ) S 32 T ( 766 I ) S 40 T ( 771 C) N
+(783 S ) S 8 T ( 785 S ) S 16 T ( 785 S ) S 24 T ( 789 T ) S 32 T ( 767 K ) S 40 T ( 772 I) N
+(784 M ) S 8 T ( 786 M ) S 16 T ( 786 M ) S 24 T ( 790 R ) S 32 T ( 768 A ) S 40 T ( 773 R) N
+(785 F ) S 8 T ( 787 F ) S 16 T ( 787 F ) S 24 T ( 791 T ) S 32 T ( 769 I ) S 40 T ( 774 I) N
+(786 Q ) S 8 T ( 788 Q ) S 16 T ( 788 Q ) S 24 T ( 792 Q ) S 32 T ( 770 Q ) S 40 T ( 775 Q) N
+(787 A ) S 8 T ( 789 A ) S 16 T ( 789 A ) S 24 T ( 793 A ) S 32 T ( 771 A ) S 40 T ( 776 K) N
+(788 H ) S 8 T ( 790 H ) S 16 T ( 790 H ) S 24 T ( 794 R ) S 32 T ( 772 A ) S 40 T ( 777 T) N
+(789 I ) S 8 T ( 791 I ) S 16 T ( 791 I ) S 24 T ( 795 C ) S 32 T ( 773 T ) S 40 T ( 778 I) N
+(790 R ) S 8 T ( 792 R ) S 16 T ( 792 R ) S 24 T ( 796 R ) S 32 T ( 774 R ) S 40 T ( 779 R) N
+(791 G ) S 8 T ( 793 G ) S 16 T ( 793 G ) S 24 T ( 797 G ) S 32 T ( 775 G ) S 40 T ( 780 G) N
+(792 Y ) S 8 T ( 794 Y ) S 16 T ( 794 Y ) S 24 T ( 798 F ) S 32 T ( 776 W ) S 40 T ( 781 W) N
+(793 L ) S 8 T ( 795 L ) S 16 T ( 795 L ) S 24 T ( 799 L ) S 32 T ( 777 I ) S 40 T ( 782 L) N
+(794 I ) S 8 T ( 796 I ) S 16 T ( 796 M ) S 24 T ( 800 M ) S 32 T ( 778 A ) S 40 T ( 783 M) N
+(795 R ) S 8 T ( 797 R ) S 16 T ( 797 R ) S 24 T ( 801 R ) S 32 T ( 779 R ) S 40 T ( 784 R) N
+(796 K ) S 8 T ( 798 K ) S 16 T ( 798 K ) S 24 T ( 802 V ) S 32 T ( 780 K ) S 40 T ( 785 K) N
+(797 A ) S 8 T ( 799 A ) S 16 T ( 799 A ) S 24 T ( 803 E ) S 32 T ( 781 V ) S 40 T ( 786 K) N
+(798 Y ) S 8 T ( 800 Y ) S 16 T ( 800 Y ) S 24 T ( 804 Y ) S 32 T ( 782 Y ) S 40 T ( 787 Y) N
+(799 K ) S 8 T ( 801 K ) S 16 T ( 801 K ) S 24 T ( 805 R ) S 32 T ( 783 K ) S 40 T ( 788 M) N
+(800 K ) S 8 T ( 802 K ) S 16 T ( 802 K ) S 24 T ( 806 R ) S 32 T ( 784 Q ) S 40 T ( 789 R) N
+(801 L ) S 8 T ( 803 L ) S 16 T ( 803 L ) S 24 T ( 807 M ) S 32 T ( 785 A ) S 40 T ( 790 M) N
+(802 Q ) S 8 T ( 804 Q ) S 16 T ( 804 Q ) S 24 T ( 808 V ) S 32 T ( 786 R ) S 40 T ( 791 R) N
+(803 D ) S 8 T ( 805 D ) S 16 T ( 805 D ) S 24 T ( 809 E ) S 32 T ( 787 E ) S 40 T ( 792 R) N
+(804 Q ) S 8 T ( 806 Q ) S 16 T ( 806 Q ) S 24 T ( 810 R ) S 32 T ( 788 H ) S 40 T ( 793 A) N
+(805 R ) S 8 T ( 807 R ) S 16 T ( 807 R ) S 24 T ( 811 R ) S 32 T ( 789 T ) S 40 T ( 794 A) N
+(806 I ) S 8 T ( 808 I ) S 16 T ( 808 I ) S 24 T ( 812 E ) S 32 T ( 790 V ) S 40 T ( 795 I) N
+(seqhc1i) (Page 9/13) (Jan 30, 08 14:38) title
+border
+grestore
+(Printed by V.Ovchinnikov) rhead
+(seqhc1i) (3/5) (Wednesday January 30, 2008) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (10-12) 4
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 2.235602 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(807 G ) p 8 T ( 809 G ) S 16 T ( 809 G ) S 24 T ( 813 S ) S 32 T ( 791 A ) S 40 T ( 796 T) N
+(808 L ) S 8 T ( 810 L ) S 16 T ( 810 L ) S 24 T ( 814 I ) S 32 T ( 792 A ) S 40 T ( 797 I) N
+(809 S ) S 8 T ( 811 S ) S 16 T ( 811 T ) S 24 T ( 815 F ) S 32 T ( 793 R ) S 40 T ( 798 Q) N
+(810 V ) S 8 T ( 812 V ) S 16 T ( 812 L ) S 24 T ( 816 C ) S 32 T ( 794 I ) S 40 T ( 799 R) N
+(811 I ) S 8 T ( 813 I ) S 16 T ( 813 I ) S 24 T ( 817 I ) S 32 T ( 795 I ) S 40 T ( 800 Y) N
+(812 Q ) S 8 T ( 814 Q ) S 16 T ( 814 Q ) S 24 T ( 818 Q ) S 32 T ( 796 Q ) S 40 T ( 801 V) N
+(813 R ) S 8 T ( 815 R ) S 16 T ( 815 R ) S 24 T ( 819 Y ) S 32 T ( 797 Q ) S 40 T ( 802 R) N
+(814 N ) S 8 T ( 816 N ) S 16 T ( 816 N ) S 24 T ( 820 N ) S 32 T ( 798 N ) S 40 T ( -    ) N
+(815 I ) S 8 T ( 817 I ) S 16 T ( 817 V ) S 24 T ( 821 V ) S 32 T ( 799 L ) S 40 T ( -    ) N
+(816 R ) S 8 T ( 818 R ) S 16 T ( 818 R ) S 24 T ( 822 R ) S 32 T ( 800 R ) S 40 T ( -    ) N
+(817 K ) S 8 T ( 819 K ) S 16 T ( 819 K ) S 24 T ( 823 S ) S 32 T ( 801 A ) S 40 T ( -    ) N
+(818 W ) S 8 T ( 820 W ) S 16 T ( 820 W ) S 24 T ( 824 F ) S 32 T ( 802 Y ) S 40 T ( -    ) N
+(819 L ) S 8 T ( 821 L ) S 16 T ( 821 L ) S 24 T ( 825 M ) S 32 T ( 803 I ) S 40 T ( -    ) N
+(820 V ) S 8 T ( 822 V ) S 16 T ( 822 V ) S 24 T ( 826 N ) S 32 T ( 804 D ) S 40 T ( 803 G) N
+(821 L ) S 8 T ( 823 L ) S 16 T ( 823 L ) S 24 T ( 827 V ) S 32 T ( 805 F ) S 40 T ( 804 H) N
+(822 R ) S 8 T ( 824 R ) S 16 T ( 824 R ) S 24 T ( 828 K ) S 32 T ( 806 K ) S 40 T ( 805 Q) N
+(823 N ) S 8 T ( 825 N ) S 16 T ( 825 N ) S 24 T ( 829 H ) S 32 T ( 807 S ) S 40 T ( 806 A) N
+(824 W ) S 8 T ( 826 W ) S 16 T ( 826 W ) S 24 T ( 830 W ) S 32 T ( 808 W ) S 40 T ( 807 R) N
+(825 Q ) S 8 T ( 827 Q ) S 16 T ( 827 E ) S 24 T ( 831 P ) S 32 T ( 809 P ) S 40 T ( 808 C) N
+(826 W ) S 8 T ( 828 W ) S 16 T ( 828 W ) S 24 T ( 832 W ) S 32 T ( 810 W ) S 40 T ( 809 Y) N
+(827 W ) S 8 T ( 829 W ) S 16 T ( 829 W ) S 24 T ( 833 M ) S 32 T ( 811 W ) S 40 T ( 810 A) N
+(828 K ) S 8 T ( 830 K ) S 16 T ( 830 R ) S 24 T ( 834 K ) S 32 T ( 812 K ) S 40 T ( 811 T) N
+(829 L ) S 8 T ( 831 L ) S 16 T ( 831 L ) S 24 T ( 835 L ) S 32 T ( 813 L ) S 40 T ( 812 F) N
+(830 Y ) S 8 T ( 832 Y ) S 16 T ( 832 F ) S 24 T ( 836 F ) S 32 T ( 814 F ) S 40 T ( 813 L) N
+(831 S ) S 8 T ( 833 A ) S 16 T ( 833 N ) S 24 T ( 837 F ) S 32 T ( 815 S ) S 40 T ( 814 R) N
+(832 K ) S 8 T ( 834 K ) S 16 T ( 834 K ) S 24 T ( 838 K ) S 32 T ( 816 K ) S 40 T ( 815 R) N
+(833 V ) S 8 T ( 835 V ) S 16 T ( 835 V ) S 24 T ( 839 I ) S 32 T ( 817 A ) S 40 T ( 816 T) N
+(834 K ) S 8 T ( 836 K ) S 16 T ( 836 K ) S 24 T ( 840 K ) S 32 T ( 818 R ) S 40 T ( 817 R) N
+(835 P ) S 8 T ( 837 P ) S 16 T ( 837 P ) S 24 T ( 841 P ) S 32 T ( 819 P ) S 40 T ( 818 A) N
+(836 L ) S 8 T ( 838 L ) S 16 T ( 838 L ) S 24 T ( 842 L ) S 32 T ( 820 L ) S 40 T ( 819 A) N
+(837 L ) S 8 T ( 839 L ) S 16 T ( 839 L ) S 24 T ( 843 L ) S 32 T ( 821 L ) S 40 T ( 820 I) N
+(838 S ) S 8 T ( 840 S ) S 16 T ( 840 N ) S 24 T ( 844 K ) S 32 T ( 822 K ) S 40 T ( 821 I) N
+(839 I ) S 8 T ( 841 I ) S 16 T ( 841 I ) S 24 T ( 845 S ) S 32 T ( 823 R ) S 40 T ( 822 I) N
+(840 A ) S 8 T ( 842 A ) S 16 T ( 842 A ) S 24 T ( 846 A ) S 32 T ( 824 R ) S 40 T ( 823 Q) N
+(841 R ) S 8 T ( 843 R ) S 16 T ( 843 R ) S 24 T ( 847 E ) S 32 T ( 825 N ) S 40 T ( 824 K) N
+(842 Q ) S 8 T ( 844 L ) S 16 T ( 844 Q ) S 24 T ( 848 S ) S 32 T ( 826 F ) S 40 T ( 825 F) N
+(843 E ) S 8 T ( 845 E ) S 16 T ( 845 E ) S 24 T ( 849 E ) S 32 T ( 827 E ) S 40 T ( 826 Q) N
+(844 E ) S 8 T ( 846 E ) S 16 T ( 846 D ) S 24 T ( 850 K ) S 32 T ( 828 K ) S 40 T ( 827 R) N
+(845 E ) S 8 T ( 847 E ) S 16 T ( 847 E ) S 24 T ( 851 E ) S 32 T ( 829 E ) S 40 T ( 828 M) N
+(846 M ) S 8 T ( 848 M ) S 16 T ( 848 N ) S 24 T ( 852 M ) S 32 T ( 830 I ) S 40 T ( 829 Y) N
+(847 K ) S 8 T ( 849 K ) S 16 T ( 849 K ) S 24 T ( 853 A ) S 32 T ( 831 K ) S 40 T ( 830 V) N
+(848 E ) S 8 T ( 850 E ) S 16 T ( 850 K ) S 24 T ( 854 N ) S 32 T ( 832 E ) S 40 T ( 831 V) N
+(849 Q ) S 8 T ( 851 Q ) S 16 T ( 851 A ) S 24 T ( 855 M ) S 32 T ( 833 K ) S 40 T ( 832 R) N
+(850 L ) S 8 T ( 852 V ) S 16 T ( 852 Q ) S 24 T ( 856 K ) S 32 T ( 834 E ) S 40 T ( 833 K) N
+(851 K ) S 8 T ( 853 E ) S 16 T ( 853 E ) S 24 T ( 857 E ) S 32 T ( 835 R ) S 40 T ( 834 R) N
+(852 Q ) S 8 T ( 854 Q ) S 16 T ( 854 E ) S 24 T ( 858 E ) S 32 T ( 836 E ) S 40 T ( 835 Y) N
+(853 M ) S 8 T ( 855 M ) S 16 T ( 855 F ) S 24 T ( 859 F ) S 32 T ( 837 I ) S 40 T ( 836 Q) N
+(854 D ) S 8 T ( 856 D ) S 16 T ( 856 A ) S 24 T ( 860 E ) S 32 T ( 838 L ) S 40 T ( 837 C) N
+(855 K ) S 8 T ( 857 K ) S 16 T ( 857 K ) S 24 T ( 861 K ) S 32 T ( 839 E ) S 40 T ( 838 M) N
+(856 M ) S 8 T ( 858 M ) S 16 T ( 858 M ) S 24 T ( 862 T ) S 32 T ( 840 L ) S 40 T ( 839 R) N
+(857 K ) S 8 T ( 859 K ) S 16 T ( 859 K ) S 24 T ( 863 K ) S 32 T ( 841 K ) S 40 T ( 840 D) N
+(858 E ) S 8 T ( 860 E ) S 16 T ( 860 E ) S 24 T ( 864 E ) S 32 T ( 842 S ) S 40 T ( 841 A) N
+(859 D ) S 8 T ( 861 D ) S 16 T ( 861 E ) S 24 T ( 865 E ) S 32 T ( 843 N ) S 40 T ( 842 T) N
+(860 L ) S 8 T ( 862 L ) S 16 T ( 862 F ) S 24 T ( 866 L ) S 32 T ( 844 L ) S 40 T ( 843 I) N
+(861 A ) S 8 T ( 863 A ) S 16 T ( 863 A ) S 24 T ( 867 A ) S 32 T ( 845 T ) S 40 T ( 844 A) N
+(862 K ) S 8 T ( 864 K ) S 16 T ( 864 S ) S 24 T ( 868 K ) S 32 T ( 846 D ) S 40 T ( 845 L) N
+(863 T ) S 8 T ( 865 T ) S 16 T ( 865 C ) S 24 T ( 869 S ) S 32 T ( 847 S ) S 40 T ( 846 Q) N
+(864 E ) S 8 T ( 866 E ) S 16 T ( 866 E ) S 24 T ( 870 E ) S 32 T ( 848 T ) S 40 T ( 847 A) N
+(865 R ) S 8 T ( 867 R ) S 16 T ( 867 Q ) S 24 T ( 871 A ) S 32 T ( 849 T ) S 40 T ( 848 L) N
+(866 I ) S 8 T ( 868 I ) S 16 T ( 868 M ) S 24 T ( 872 K ) S 32 T ( 850 Q ) S 40 T ( 849 L) N
+(867 K ) S 8 T ( 869 K ) S 16 T ( 869 R ) S 24 T ( 873 R ) S 32 T ( 851 K ) S 40 T ( 850 R) N
+(868 K ) S 8 T ( 870 K ) S 16 T ( 870 K ) S 24 T ( 874 K ) S 32 T ( 852 D ) S 40 T ( 851 G) N
+(869 E ) S 8 T ( 871 E ) S 16 T ( 871 E ) S 24 T ( 875 E ) S 32 T ( 853 K ) S 40 T ( 852 Y) N
+(870 L ) S 8 T ( 872 L ) S 16 T ( 872 L ) S 24 T ( 876 L ) S 32 T ( 854 L ) S 40 T ( 853 L) N
+(871 E ) S 8 T ( 873 E ) S 16 T ( 873 E ) S 24 T ( 877 E ) S 32 T ( 855 E ) S 40 T ( 854 V) N
+(872 E ) S 8 T ( 874 E ) S 16 T ( 874 E ) S 24 T ( 878 E ) S 32 T ( 856 K ) S 40 T ( 855 R) N
+(873 Q ) S 8 T ( 875 Q ) S 16 T ( 875 Q ) S 24 T ( 879 K ) S 32 T ( 857 S ) S 40 T ( 856 N) N
+(874 N ) S 8 T ( 876 N ) S 16 T ( 876 N ) S 24 T ( 880 M ) S 32 T ( 858 L ) S 40 T ( 857 K) N
+(875 V ) S 8 T ( 877 V ) S 16 T ( 877 T ) S 24 T ( 881 V ) S 32 T ( 859 K ) S 40 T ( 858 Y) N
+(876 T ) S 8 T ( 878 T ) S 16 T ( 878 V ) S 24 T ( 882 V ) S 32 T ( 860 D ) S 40 T ( 859 Q) N
+(877 L ) S 8 T ( 879 L ) S 16 T ( 879 L ) S 24 T ( 883 L ) S 32 T ( 861 T ) S 40 T ( 860 M) N
+(878 L ) S 8 T ( 880 L ) S 16 T ( 880 M ) S 24 T ( 884 L ) S 32 T ( 862 E ) S 40 T ( 861 M) N
+(879 E ) S 8 T ( 881 E ) S 16 T ( 881 Q ) S 24 T ( 885 Q ) S 32 T ( 863 S ) S 40 T ( 862 L) N
+(880 Q ) S 8 T ( 882 Q ) S 16 T ( 882 Q ) S 24 T ( 886 E ) S 32 T ( 864 N ) S 40 T ( 863 R) N
+(881 K ) S 8 T ( 883 K ) S 16 T ( 883 K ) S 24 T ( 887 K ) S 32 T ( 865 V ) S 40 T ( 864 E) N
+(882 N ) S 8 T ( 884 N ) S 16 T ( 884 N ) S 24 T ( 888 N ) S 32 T ( 866 L ) S 40 T ( 865 H) N
+(883 D ) S 8 T ( 885 D ) S 16 T ( 885 D ) S 24 T ( 889 D ) S 32 T ( 867 D ) S 40 T ( 866 K) N
+(884 L ) S 8 T ( 886 L ) S 16 T ( 886 L ) S 24 T ( 890 L ) S 32 T ( 868 L ) S 40 T ( 867 S) N
+(885 F ) S 8 T ( 887 F ) S 16 T ( 887 V ) S 24 T ( 891 Q ) S 32 T ( 869 Q ) S 40 T ( 868 I) N
+(886 L ) S 8 T ( 888 L ) S 16 T ( 888 I ) S 24 T ( 892 L ) S 32 T ( 870 R ) S 40 T ( 869 I) N
+(887 Q ) S 8 T ( 889 Q ) S 16 T ( 889 A ) S 24 T ( 893 Q ) S 32 T ( 871 Q ) S 40 T ( 870 I) N
+(888 L ) S 8 T ( 890 L ) S 16 T ( 890 M ) S 24 T ( 894 V ) S 32 T ( 872 L ) S 40 T ( 871 Q) N
+(889 Q ) S 8 T ( 891 Q ) S 16 T ( 891 S ) S 24 T ( 895 Q ) S 32 T ( 873 K ) S 40 T ( 872 K) N
+(890 T ) S 8 T ( 892 T ) S 16 T ( 892 S ) S 24 T ( 896 A ) S 32 T ( 874 A ) S 40 T ( 873 H) N
+(891 L ) S 8 T ( 893 I ) S 16 T ( 893 G ) S 24 T ( 897 E ) S 32 T ( 875 E ) S 40 T ( 874 V) N
+(892 E ) S 8 T ( 894 E ) S 16 T ( 894 E ) S 24 T ( 898 A ) S 32 T ( 876 K ) S 40 T ( 875 R) N
+(893 D ) S 8 T ( 895 D ) S 16 T ( 895 D ) S 24 T ( 899 D ) S 32 T ( 877 E ) S 40 T ( 876 G) N
+(894 S ) S 8 T ( 896 S ) S 16 T ( 896 A ) S 24 T ( 900 S ) S 32 T ( 878 T ) S 40 T ( 877 W) N
+(895 M ) S 8 T ( 897 M ) S 16 T ( 897 I ) S 24 T ( 901 L ) S 32 T ( 879 L ) S 40 T ( 878 L) N
+(896 G ) S 8 T ( 898 G ) S 16 T ( 898 G ) S 24 T ( 902 A ) S 32 T ( 880 K ) S 40 T ( 879 A) N
+(897 D ) S 8 T ( 899 D ) S 16 T ( 899 D ) S 24 T ( 903 D ) S 32 T ( 881 A ) S 40 T ( 880 R) N
+(898 Q ) S 8 T ( 900 Q ) S 16 T ( 900 A ) S 24 T ( 904 A ) S 32 T ( 882 M ) S 40 T ( 881 V) N
+(899 E ) S 8 T ( 901 E ) S 16 T ( 901 E ) S 24 T ( 905 E ) S 32 T ( 883 Y ) S 40 T ( 882 H) N
+(900 E ) S 8 T ( 902 D ) S 16 T ( 902 E ) S 24 T ( 906 E ) S 32 T ( 884 D ) S 40 T ( 883 Y) N
+(901 R ) S 8 T ( 903 R ) S 16 T ( 903 K ) S 24 T ( 907 R ) S 32 T ( 885 S ) S 40 T ( 884 H) N
+(902 V ) S 8 T ( 904 V ) S 16 T ( 904 I ) S 24 T ( 908 C ) S 32 T ( 886 K ) S 40 T ( 885 R) N
+(903 E ) S 8 T ( 905 E ) S 16 T ( 905 E ) S 24 T ( 909 D ) S 32 T ( 887 D ) S 40 T ( 886 T) N
+(seqhc1i) (Page 10/13) (Jan 30, 08 14:38) title
+border
+/v 1 store
+/x0 x v get 2.235602 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(904 K ) p 8 T ( 906 K ) S 16 T ( 906 Q ) S 24 T ( 910 Q ) S 32 T ( 888 A ) S 40 T ( 887 L) N
+(905 L ) S 8 T ( 907 L ) S 16 T ( 907 L ) S 24 T ( 911 L ) S 32 T ( 889 L ) S 40 T ( 888 K) N
+(906 I ) S 8 T ( 908 I ) S 16 T ( 908 I ) S 24 T ( 912 I ) S 32 T ( 890 E ) S 40 T ( 889 A) N
+(907 M ) S 8 T ( 909 M ) S 16 T ( 909 K ) S 24 T ( 913 K ) S 32 T ( 891 A ) S 40 T ( 890 I) N
+(908 Q ) S 8 T ( 910 Q ) S 16 T ( 910 Q ) S 24 T ( 914 T ) S 32 T ( 892 Q ) S 40 T ( 891 V) N
+(909 K ) S 8 T ( 911 K ) S 16 T ( 911 K ) S 24 T ( 915 K ) S 32 T ( 893 K ) S 40 T ( 892 Y) N
+(910 A ) S 8 T ( 912 A ) S 16 T ( 912 S ) S 24 T ( 916 I ) S 32 T ( 894 R ) S 40 T ( 893 L) N
+(911 D ) S 8 T ( 913 D ) S 16 T ( 913 D ) S 24 T ( 917 Q ) S 32 T ( 895 E ) S 40 T ( 894 Q) N
+(912 F ) S 8 T ( 914 F ) S 16 T ( 914 F ) S 24 T ( 918 L ) S 32 T ( 896 L ) S 40 T ( 895 C) N
+(913 E ) S 8 T ( 915 E ) S 16 T ( 915 E ) S 24 T ( 919 E ) S 32 T ( 897 E ) S 40 T ( 896 C) N
+(914 S ) S 8 T ( 916 S ) S 16 T ( 916 T ) S 24 T ( 920 A ) S 32 T ( 898 I ) S 40 T ( 897 Y) N
+(915 Q ) S 8 T ( 917 Q ) S 16 T ( 917 Q ) S 24 T ( 921 K ) S 32 T ( 899 R ) S 40 T ( 898 R) N
+(916 I ) S 8 T ( 918 I ) S 16 T ( 918 I ) S 24 T ( 922 I ) S 32 T ( 900 V ) S 40 T ( 899 R) N
+(917 K ) S 8 T ( 919 K ) S 16 T ( 919 K ) S 24 T ( 923 K ) S 32 T ( 901 E ) S 40 T ( 900 M) N
+(918 E ) S 8 T ( 920 E ) S 16 T ( 920 E ) S 24 T ( 924 E ) S 32 T ( 902 D ) S 40 T ( 901 M) N
+(919 L ) S 8 T ( 921 L ) S 16 T ( 921 L ) S 24 T ( 925 V ) S 32 T ( 903 M ) S 40 T ( 902 A) N
+(920 E ) S 8 T ( 922 E ) S 16 T ( 922 E ) S 24 T ( 926 T ) S 32 T ( 904 E ) S 40 T ( 903 K) N
+(921 E ) S 8 T ( 923 E ) S 16 T ( 923 D ) S 24 T ( 927 E ) S 32 T ( 905 S ) S 40 T ( 904 R) N
+(922 R ) S 8 T ( 924 R ) S 16 T ( 924 K ) S 24 T ( 928 R ) S 32 T ( 906 E ) S 40 T ( 905 E) N
+(923 L ) S 8 T ( 925 L ) S 16 T ( 925 L ) S 24 T ( 929 A ) S 32 T ( 907 L ) S 40 T ( 906 L) N
+(924 L ) S 8 T ( 926 L ) S 16 T ( 926 M ) S 24 T ( 930 E ) S 32 T ( 908 D ) S 40 T ( 907 K) N
+(925 D ) S 8 T ( 927 D ) S 16 T ( 927 D ) S 24 T ( 931 D ) S 32 T ( 909 E ) S 40 T ( 908 K) N
+(926 E ) S 8 T ( 928 E ) S 16 T ( 928 E ) S 24 T ( 932 E ) S 32 T ( 910 K ) S 40 T ( 909 L) N
+(927 E ) S 8 T ( 929 E ) S 16 T ( 929 E ) S 24 T ( 933 E ) S 32 T ( 911 K ) S 40 T ( 910 K) N
+(928 D ) S 8 T ( 930 D ) S 16 T ( 930 D ) S 24 T ( 934 E ) S 32 T ( 912 L ) S 40 T ( 911 I) N
+(929 A ) S 8 T ( 931 A ) S 16 T ( 931 A ) S 24 T ( 935 I ) S 32 T ( 913 A ) S 40 T ( 912 E) N
+(930 A ) S 8 T ( 932 A ) S 16 T ( 932 A ) S 24 T ( 936 N ) S 32 T ( 914 L ) S 40 T ( 913 A) N
+(931 A ) S 8 T ( 933 S ) S 16 T ( 933 T ) S 24 T ( 937 A ) S 32 T ( 915 E ) S 40 T ( 914 R) N
+(932 D ) S 8 T ( 934 D ) S 16 T ( 934 E ) S 24 T ( 938 E ) S 32 T ( 916 N ) S 40 T ( 915 S) N
+(933 L ) S 8 T ( 935 L ) S 16 T ( 935 L ) S 24 T ( 939 L ) S 32 T ( 917 L ) S 40 T ( 916 V) N
+(934 E ) S 8 T ( 936 E ) S 16 T ( 936 S ) S 24 T ( 940 T ) S 32 T ( 918 Q ) S 40 T ( 917 E) N
+(935 G ) S 8 T ( 937 G ) S 16 T ( 937 A ) S 24 T ( 941 A ) S 32 T ( 919 N ) S 40 T ( 918 R) N
+(936 I ) S 8 T ( 938 I ) S 16 T ( 938 Q ) S 24 T ( 942 K ) S 32 T ( 920 Q ) S 40 T ( 919 Y) N
+(937 K ) S 8 T ( 939 K ) S 16 T ( 939 K ) S 24 T ( 943 K ) S 32 T ( 921 K ) S 40 T ( 920 K) N
+(938 K ) S 8 T ( 940 K ) S 16 T ( 940 K ) S 24 T ( 944 R ) S 32 T ( 922 R ) S 40 T ( 921 K) N
+(939 K ) S 8 T ( 941 K ) S 16 T ( 941 K ) S 24 T ( 945 K ) S 32 T ( 923 S ) S 40 T ( 922 L) N
+(940 M ) S 8 T ( 942 M ) S 16 T ( 942 S ) S 24 T ( 946 L ) S 32 T ( 924 V ) S 40 T ( 923 H) N
+(941 E ) S 8 T ( 943 E ) S 16 T ( 943 D ) S 24 T ( 947 E ) S 32 T ( 925 E ) S 40 T ( 924 I) N
+(942 A ) S 8 T ( 944 G ) S 16 T ( 944 A ) S 24 T ( 948 D ) S 32 T ( 926 E ) S 40 T ( 925 G) N
+(943 D ) S 8 T ( 945 D ) S 16 T ( 945 E ) S 24 T ( 949 E ) S 32 T ( 927 K ) S 40 T ( -    ) N
+(944 N ) S 8 T ( 946 N ) S 16 T ( 946 I ) S 24 T ( 950 C ) S 32 T ( 928 V ) S 40 T ( -    ) N
+(945 A ) S 8 T ( 947 A ) S 16 T ( 947 G ) S 24 T ( 951 S ) S 32 T ( 929 R ) S 40 T ( -    ) N
+(946 N ) S 8 T ( 948 N ) S 16 T ( 948 E ) S 24 T ( 952 E ) S 32 T ( 930 D ) S 40 T ( -    ) N
+(947 L ) S 8 T ( 949 L ) S 16 T ( 949 L ) S 24 T ( 953 L ) S 32 T ( 931 L ) S 40 T ( 926 L) N
+(948 K ) S 8 T ( 950 K ) S 16 T ( 950 K ) S 24 T ( 954 K ) S 32 T ( 932 E ) S 40 T ( 927 E) N
+(949 K ) S 8 T ( 951 K ) S 16 T ( 951 K ) S 24 T ( 955 K ) S 32 T ( 933 E ) S 40 T ( 928 N) N
+(950 D ) S 8 T ( 952 D ) S 16 T ( 952 D ) S 24 T ( 956 D ) S 32 T ( 934 E ) S 40 T ( 929 K) N
+(951 I ) S 8 T ( 953 I ) S 16 T ( 953 V ) S 24 T ( 957 I ) S 32 T ( 935 L ) S 40 T ( 930 I) N
+(952 G ) S 8 T ( 954 G ) S 16 T ( 954 E ) S 24 T ( 958 D ) S 32 T ( 936 Q ) S 40 T ( 931 M) N
+(953 D ) S 8 T ( 955 E ) S 16 T ( 955 D ) S 24 T ( 959 D ) S 32 T ( 937 E ) S 40 T ( 932 Q) N
+(954 L ) S 8 T ( 956 L ) S 16 T ( 956 L ) S 24 T ( 960 L ) S 32 T ( 938 E ) S 40 T ( 933 L) N
+(955 E ) S 8 T ( 957 E ) S 16 T ( 957 E ) S 24 T ( 961 E ) S 32 T ( 939 Q ) S 40 T ( 934 Q) N
+(956 N ) S 8 T ( 958 H ) S 16 T ( 958 A ) S 24 T ( 962 L ) S 32 T ( 940 K ) S 40 T ( 935 R) N
+(957 T ) S 8 T ( 959 S ) S 16 T ( 959 G ) S 24 T ( 963 T ) S 32 T ( 941 L ) S 40 T ( 936 K) N
+(958 L ) S 8 T ( 960 L ) S 16 T ( 960 L ) S 24 T ( 964 L ) S 32 T ( 942 R ) S 40 T ( 937 I) N
+(959 Q ) S 8 T ( 961 Q ) S 16 T ( 961 A ) S 24 T ( 965 A ) S 32 T ( 943 N ) S 40 T ( 938 D) N
+(960 K ) S 8 T ( 962 K ) S 16 T ( 962 K ) S 24 T ( 966 K ) S 32 T ( 944 T ) S 40 T ( 939 E) N
+(961 A ) S 8 T ( 963 S ) S 16 T ( 963 A ) S 24 T ( 967 V ) S 32 T ( 945 L ) S 40 T ( 940 Q) N
+(962 E ) S 8 T ( 964 E ) S 16 T ( 964 E ) S 24 T ( 968 E ) S 32 T ( 946 E ) S 40 T ( 941 N) N
+(963 Q ) S 8 T ( 965 Q ) S 16 T ( 965 Q ) S 24 T ( 969 K ) S 32 T ( 947 K ) S 40 T ( 942 K) N
+(964 D ) S 8 T ( 966 E ) S 16 T ( 966 E ) S 24 T ( 970 E ) S 32 T ( 948 L ) S 40 T ( 943 E) N
+(965 K ) S 8 T ( 967 K ) S 16 T ( 967 K ) S 24 T ( 971 K ) S 32 T ( 949 K ) S 40 T ( 944 Y) N
+(966 A ) S 8 T ( 968 A ) S 16 T ( 968 T ) S 24 T ( 972 H ) S 32 T ( 950 K ) S 40 T ( 945 K) N
+(967 H ) S 8 T ( 969 H ) S 16 T ( 969 T ) S 24 T ( 973 A ) S 32 T ( 951 K ) S 40 T ( 946 S) N
+(968 K ) S 8 T ( 970 K ) S 16 T ( 970 K ) S 24 T ( 974 T ) S 32 T ( 952 Y ) S 40 T ( 947 L) N
+(969 D ) S 8 T ( 971 D ) S 16 T ( 971 D ) S 24 T ( 975 E ) S 32 T ( 953 E ) S 40 T ( 948 L) N
+(970 N ) S 8 T ( 972 N ) S 16 T ( 972 N ) S 24 T ( 976 N ) S 32 T ( 954 E ) S 40 T ( 949 E) N
+(971 Q ) S 8 T ( 973 Q ) S 16 T ( 973 Q ) S 24 T ( 977 K ) S 32 T ( 955 E ) S 40 T ( 950 K) N
+(972 I ) S 8 T ( 974 I ) S 16 T ( 974 I ) S 24 T ( 978 V ) S 32 T ( 956 L ) S 40 T ( 951 M) N
+(973 S ) S 8 T ( 975 S ) S 16 T ( 975 K ) S 24 T ( 979 K ) S 32 T ( 957 E ) S 40 T ( 952 N) N
+(974 T ) S 8 T ( 976 T ) S 16 T ( 976 T ) S 24 T ( 980 N ) S 32 T ( 958 E ) S 40 T ( 953 N) N
+(975 L ) S 8 T ( 977 L ) S 16 T ( 977 L ) S 24 T ( 981 L ) S 32 T ( 959 M ) S 40 T ( 954 L) N
+(976 Q ) S 8 T ( 978 Q ) S 16 T ( 978 Q ) S 24 T ( 982 T ) S 32 T ( 960 K ) S 40 T ( 955 E) N
+(977 G ) S 8 T ( 979 G ) S 16 T ( 979 D ) S 24 T ( 983 E ) S 32 T ( 961 R ) S 40 T ( 956 I) N
+(978 E ) S 8 T ( 980 E ) S 16 T ( 980 E ) S 24 T ( 984 E ) S 32 T ( 962 V ) S 40 T ( 957 T) N
+(979 I ) S 8 T ( 981 M ) S 16 T ( 981 M ) S 24 T ( 985 M ) S 32 T ( 963 N ) S 40 T ( 958 Y) N
+(980 S ) S 8 T ( 982 S ) S 16 T ( 982 A ) S 24 T ( 986 A ) S 32 T ( 964 D ) S 40 T ( 959 S) N
+(981 Q ) S 8 T ( 983 Q ) S 16 T ( 983 Q ) S 24 T ( 987 V ) S 32 T ( 965 G ) S 40 T ( 960 T) N
+(982 Q ) S 8 T ( 984 Q ) S 16 T ( 984 Q ) S 24 T ( 988 L ) S 32 T ( 966 Q ) S 40 T ( 961 E) N
+(983 D ) S 8 T ( 985 D ) S 16 T ( 985 D ) S 24 T ( 989 D ) S 32 T ( 967 S ) S 40 T ( 962 T) N
+(984 E ) S 8 T ( 986 E ) S 16 T ( 986 E ) S 24 T ( 990 E ) S 32 T ( 968 D ) S 40 T ( 963 E) N
+(985 H ) S 8 T ( 987 H ) S 16 T ( 987 H ) S 24 T ( 991 T ) S 32 T ( 969 T ) S 40 T ( 964 K) N
+(986 I ) S 8 T ( 988 I ) S 16 T ( 988 L ) S 24 T ( 992 I ) S 32 T ( 970 I ) S 40 T ( 965 L) N
+(987 G ) S 8 T ( 989 G ) S 16 T ( 989 S ) S 24 T ( 993 A ) S 32 T ( 971 S ) S 40 T ( 966 R) N
+(988 K ) S 8 T ( 990 K ) S 16 T ( 990 K ) S 24 T ( 994 K ) S 32 T ( 972 R ) S 40 T ( 967 S) N
+(989 L ) S 8 T ( 991 L ) S 16 T ( 991 L ) S 24 T ( 995 L ) S 32 T ( 973 L ) S 40 T ( 968 D) N
+(990 N ) S 8 T ( 992 N ) S 16 T ( 992 N ) S 24 T ( 996 T ) S 32 T ( 974 E ) S 40 T ( 969 V) N
+(991 K ) S 8 T ( 993 K ) S 16 T ( 993 K ) S 24 T ( 997 K ) S 32 T ( 975 K ) S 40 T ( 970 E) N
+(992 E ) S 8 T ( 994 E ) S 16 T ( 994 E ) S 24 T ( 998 E ) S 32 T ( 976 I ) S 40 T ( 971 R) N
+(993 K ) S 8 T ( 995 K ) S 16 T ( 995 K ) S 24 T ( 999 K ) S 32 T ( 977 K ) S 40 T ( 972 L) N
+(994 K ) S 8 T ( 996 K ) S 16 T ( 996 K ) S 24 T ( 1000 K) S 32 T ( 978 D ) S 40 T ( 973 R) N
+(995 A ) S 8 T ( 997 A ) S 16 T ( 997 N ) S 24 T ( 1001 A) S 32 T ( 979 E ) S 40 T ( 974 M) N
+(996 L ) S 8 T ( 998 L ) S 16 T ( 998 L ) S 24 T ( 1002 L) S 32 T ( 980 L ) S 40 T ( 975 S) N
+(997 E ) S 8 T ( 999 E ) S 16 T ( 999 E ) S 24 T ( 1003 Q) S 32 T ( 981 Q ) S 40 T ( 976 E) N
+(998 E ) S 8 T ( 1000 E  1000 E) S 24 T ( 1004 E) S 32 T ( 982 K ) S 40 T ( 977 E) N
+(999 A ) S 8 T ( 1001 A  1001 V) S 24 T ( 1005 A) S 32 T ( 983 E ) S 40 T ( 978 E) N
+(1000 N ) S 8 T ( 1002 N  1002 Q) S 24 T ( 1006 H) S 32 T ( 984 V ) S 40 T ( 979 A) N
+(seqhc1i) (Page 11/13) (Jan 30, 08 14:38) title
+border
+/v 2 store
+/x0 x v get 2.235602 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(1001 K ) p 8 T ( 1003 K  1003 K) S 24 T ( 1007 Q) S 32 T ( 985 E ) S 40 T ( 980 K) N
+(1002 K ) S 8 T ( 1004 K  1004 K) S 24 T ( 1008 Q) S 32 T ( 986 E ) S 40 T ( 981 N) N
+(1003 T ) S 8 T ( 1005 T  1005 T) S 24 T ( 1009 T) S 32 T ( 987 L ) S 40 T ( 982 A) N
+(1004 S ) S 8 T ( 1006 S  1006 L) S 24 T ( 1010 L) S 32 T ( 988 T ) S 40 T ( 983 T) N
+(1005 D ) S 8 T ( 1007 D  1007 E) S 24 T ( 1011 D) S 32 T ( 989 E ) S 40 T ( 984 N) N
+(1006 S ) S 8 T ( 1008 S  1008 D) S 24 T ( 1012 D) S 32 T ( 990 S ) S 40 T ( 985 R) N
+(1007 L ) S 8 T ( 1009 L  1009 L) S 24 T ( 1013 L) S 32 T ( 991 F ) S 40 T ( 986 V) N
+(1008 Q ) S 8 T ( 1010 Q  1010 Q) S 24 T ( 1014 Q) S 32 T ( 992 S ) S 40 T ( 987 L) N
+(1009 A ) S 8 T ( 1011 A  1011 A) S 24 T ( 1015 V) S 32 T ( 993 E ) S 40 T ( 988 S) N
+(1010 E ) S 8 T ( 1012 E  1012 E) S 24 T ( 1016 E) S 32 T ( 994 E ) S 40 T ( 989 L) N
+(1011 E ) S 8 T ( 1013 E  1013 E) S 24 T ( 1017 E) S 32 T ( 995 S ) S 40 T ( 990 Q) N
+(1012 D ) S 8 T ( 1014 D  1014 D) S 24 T ( 1018 D) S 32 T ( 996 K ) S 40 T ( 991 E) N
+(1013 K ) S 8 T ( 1015 K  1015 K) S 24 T ( 1019 K) S 32 T ( 997 D ) S 40 T ( 992 E) N
+(1014 C ) S 8 T ( 1016 C  1016 V) S 24 T ( 1020 V) S 32 T ( 998 K ) S 40 T ( 993 I) N
+(1015 N ) S 8 T ( 1017 N  1017 N) S 24 T ( 1021 N) S 32 T ( 999 G ) S 40 T ( 994 A) N
+(1016 H ) S 8 T ( 1018 H  1018 H) S 24 T ( 1022 T) S 32 T ( 1000 V) S 40 T ( 995 K) N
+(1017 L ) S 8 T ( 1019 L  1019 L) S 24 T ( 1023 L) S 32 T ( 1001 L) S 40 T ( 996 L) N
+(1018 N ) S 8 T ( 1020 N  1020 S) S 24 T ( 1024 T) S 32 T ( 1002 E) S 40 T ( 997 R) N
+(1019 K ) S 8 T ( 1021 K  1021 K) S 24 T ( 1025 K) S 32 T ( 1003 K) S 40 T ( 998 K) N
+(1020 L ) S 8 T ( 1022 L  1022 L) S 24 T ( 1026 A) S 32 T ( 1004 T) S 40 T ( 999 E) N
+(1021 K ) S 8 T ( 1023 K  1023 K) S 24 T ( 1027 K) S 32 T ( 1005 R) S 40 T ( 1000 L) N
+(1022 A ) S 8 T ( 1024 A  1024 T) S 24 T ( 1028 T) S 32 T ( 1006 V) S 40 T ( 1001 H) N
+(1023 K ) S 8 T ( 1025 K  1025 K) S 24 T ( 1029 K) S 32 T ( 1007 R) S 40 T ( 1002 Q) N
+(1024 L ) S 8 T ( 1026 L  1026 L) S 24 T ( 1030 L) S 32 T ( 1008 L) S 40 T ( 1003 T) N
+(1025 E ) S 8 T ( 1027 E  1027 E) S 24 T ( 1031 E) S 32 T ( 1009 Q) S 40 T ( 1004 Q) N
+(1026 Q ) S 8 T ( 1028 Q  1028 Q) S 24 T ( 1032 Q) S 32 T ( 1010 S) S 40 T ( 1005 T) N
+(1027 A ) S 8 T ( 1029 A  1029 T) S 24 T ( 1033 Q) S 32 T ( 1011 E) S 40 T ( 1006 E) N
+(1028 L ) S 8 T ( 1030 L  1030 L) S 24 T ( 1034 V) S 32 T ( 1012 L) S 40 T ( 1007 K) N
+(1029 D ) S 8 T ( 1031 D  1031 D) S 24 T ( 1035 D) S 32 T ( 1013 D) S 40 T ( 1008 K) N
+(1030 E ) S 8 T ( 1032 E  1032 E) S 24 T ( 1036 D) S 32 T ( 1014 D) S 40 T ( 1009 T) N
+(1031 L ) S 8 T ( 1033 L  1033 L) S 24 T ( 1037 L) S 32 T ( 1015 L) S 40 T ( 1010 I) N
+(1032 E ) S 8 T ( 1034 E  1034 E) S 24 T ( 1038 E) S 32 T ( 1016 T) S 40 T ( 1011 E) N
+(1033 D ) S 8 T ( 1035 D  1035 D) S 24 T ( 1039 G) S 32 T ( 1017 V) S 40 T ( 1012 E) N
+(1034 N ) S 8 T ( 1036 N  1036 N) S 24 T ( 1040 S) S 32 T ( 1018 R) S 40 T ( 1013 W) N
+(1035 L ) S 8 T ( 1037 L  1037 L) S 24 T ( 1041 L) S 32 T ( 1019 L) S 40 T ( 1014 A) N
+(1036 E ) S 8 T ( 1038 E  1038 E) S 24 T ( 1042 E) S 32 T ( 1020 D) S 40 T ( 1015 D) N
+(1037 R ) S 8 T ( 1039 R  1039 R) S 24 T ( 1043 Q) S 32 T ( 1021 S) S 40 T ( 1016 K) N
+(1038 E ) S 8 T ( 1040 E  1040 E) S 24 T ( 1044 E) S 32 T ( 1022 E) S 40 T ( 1017 Y) N
+(1039 K ) S 8 T ( 1041 K  1041 K) S 24 T ( 1045 K) S 32 T ( 1023 T) S 40 T ( 1018 K) N
+(1040 K ) S 8 T ( 1042 K  1042 K) S 24 T ( 1046 K) S 32 T ( 1024 K) S 40 T ( 1019 H) N
+(1041 V ) S 8 T ( 1043 V  1043 I) S 24 T ( 1047 L) S 32 T ( 1025 D) S 40 T ( 1020 E) N
+(1042 R ) S 8 T ( 1044 R  1044 P) S 24 T ( 1048 R) S 32 T ( 1026 K) S 40 T ( 1021 T) N
+(1043 G ) S 8 T ( 1045 G  1045 G) S 24 T ( 1049 M) S 32 T ( 1027 S) S 40 T ( 1022 E) N
+(1044 D ) S 8 T ( 1046 D  1046 D) S 24 T ( 1050 D) S 32 T ( 1028 E) S 40 T ( 1023 Q) N
+(1045 V ) S 8 T ( 1047 V  1047 V) S 24 T ( 1051 L) S 32 T ( 1029 L) S 40 T ( 1024 L) N
+(1046 E ) S 8 T ( 1048 E  1048 D) S 24 T ( 1052 E) S 32 T ( 1030 L) S 40 T ( 1025 V) N
+(1047 K ) S 8 T ( 1049 K  1049 K) S 24 T ( 1053 R) S 32 T ( 1031 R) S 40 T ( 1026 S) N
+(1048 A ) S 8 T ( 1050 A  1050 A) S 24 T ( 1054 A) S 32 T ( 1032 Q) S 40 T ( 1027 E) N
+(1049 K ) S 8 T ( 1051 K  1051 K) S 24 T ( 1055 K) S 32 T ( 1033 K) S 40 T ( 1028 L) N
+(1050 R ) S 8 T ( 1052 S  1052 R) S 24 T ( 1056 R) S 32 T ( 1034 K) S 40 T ( 1029 K) N
+(1051 K ) S 8 T ( 1053 K  1053 K) S 24 T ( 1057 K) S 32 T ( 1035 K) S 40 T ( 1030 E) N
+(1052 V ) S 8 T ( 1054 V  1054 V) S 24 T ( 1058 L) S 32 T ( 1036 L) S 40 T ( 1031 Q) N
+(1053 E ) S 8 T ( 1055 E  1055 E) S 24 T ( 1059 E) S 32 T ( 1037 E) S 40 T ( 1032 N) N
+(1054 Q ) S 8 T ( 1056 Q  1056 Q) S 24 T ( 1060 G) S 32 T ( 1038 E) S 40 T ( 1033 T) N
+(1055 D ) S 8 T ( 1057 D  1057 D) S 24 T ( 1061 D) S 32 T ( 1039 E) S 40 T ( 1034 L) N
+(1056 L ) S 8 T ( 1058 L  1058 L) S 24 T ( 1062 L) S 32 T ( 1040 L) S 40 T ( 1035 L) N
+(1057 K ) S 8 T ( 1059 K  1059 K) S 24 T ( 1063 K) S 32 T ( 1041 K) S 40 T ( 1036 K) N
+(1058 S ) S 8 T ( 1060 S  1060 T) S 24 T ( 1064 L) S 32 T ( 1042 Q) S 40 T ( 1037 T) N
+(1059 T ) S 8 T ( 1061 T  1061 T) S 24 T ( 1065 A) S 32 T ( 1043 V) S 40 T ( 1038 E) N
+(1060 Q ) S 8 T ( 1062 Q  1062 Q) S 24 T ( 1066 H) S 32 T ( 1044 Q) S 40 T ( 1039 K) N
+(1061 E ) S 8 T ( 1063 E  1063 E) S 24 T ( 1067 D) S 32 T ( 1045 E) S 40 T ( 1040 E) N
+(1062 N ) S 8 T ( 1064 N  1064 T) S 24 T ( 1068 S) S 32 T ( 1046 A) S 40 T ( 1041 E) N
+(1063 V ) S 8 T ( 1065 V  1065 V) S 24 T ( 1069 I) S 32 T ( 1047 L) S 40 T ( 1042 L) N
+(1064 E ) S 8 T ( 1066 E  1066 E) S 24 T ( 1070 M) S 32 T ( 1048 A) S 40 T ( 1043 N) N
+(1065 D ) S 8 T ( 1067 D  1067 D) S 24 T ( 1071 D) S 32 T ( 1049 A) S 40 T ( 1044 R) N
+(-     ) S 8 T ( -     ) S 16 T ( -       -      -        1045 R) N
+(-     ) S 8 T ( -     ) S 16 T ( -     ) S 24 T ( -      -        1046 I) N
+(1066 L ) S 8 T ( 1068 L) S 16 T ( 1068 L) S 24 T ( 1072 L) S 32 T ( 1050 E) S 40 T ( 1047 H) N
+(1067 E ) S 8 T ( 1069 E) S 16 T ( 1069 E) S 24 T ( 1073 E) S 32 T ( 1051 T) S 40 T ( 1048 D) N
+(1068 R ) S 8 T ( 1070 R) S 16 T ( 1070 R) S 24 T ( 1074 N) S 32 T ( 1052 A) S 40 T ( 1049 Q) N
+(1069 V ) S 8 T ( 1071 V) S 16 T ( 1071 V) S 24 T ( 1075 D) S 32 T ( 1053 A) S 40 T ( 1050 A) N
+(1070 K ) S 8 T ( 1072 K) S 16 T ( 1072 K) S 24 T ( 1076 K) S 32 T ( 1054 K) S 40 T ( 1051 K) N
+(1071 R ) S 8 T ( 1073 R) S 16 T ( 1073 R) S 24 T ( 1077 Q) S 32 T ( 1055 L) S 40 T ( 1052 E) N
+(1072 E ) S 8 T ( 1074 E) S 16 T ( 1074 D) S 24 T ( 1078 Q) S 32 T ( 1056 A) S 40 T ( 1053 I) N
+(1073 L ) S 8 T ( 1075 L) S 16 T ( 1075 L) S 24 T ( 1079 L) S 32 T ( 1057 Q) S 40 T ( 1054 T) N
+(1074 E ) S 8 T ( 1076 E) S 16 T ( 1076 E) S 24 T ( 1080 D) S 32 T ( 1058 E) S 40 T ( 1055 E) N
+(1075 E ) S 8 T ( 1077 E) S 16 T ( 1077 D) S 24 T ( 1081 E) S 32 T ( 1059 A) S 40 T ( 1056 T) N
+(1076 N ) S 8 T ( 1078 N) S 16 T ( 1078 A) S 24 T ( 1082 K) S 32 T ( 1060 A) S 40 T ( 1057 M) N
+(1077 V ) S 8 T ( 1079 V) S 16 T ( 1079 G) S 24 T ( 1083 L) S 32 T ( 1061 N) S 40 T ( 1058 E) N
+(1078 R ) S 8 T ( 1080 R) S 16 T ( 1080 R) S 24 T ( 1084 K) S 32 T ( 1062 K) S 40 T ( 1059 K) N
+(1079 R ) S 8 T ( 1081 R) S 16 T ( 1081 K) S 24 T ( 1085 K) S 32 T ( 1063 K) S 40 T ( 1060 K) N
+(1080 K ) S 8 T ( 1082 K) S 16 T ( 1082 K) S 24 T ( 1086 K) S 32 T ( 1064 L) S 40 T ( 1061 L) N
+(1081 E ) S 8 T ( 1083 E) S 16 T ( 1083 D) S 24 T ( 1087 D) S 32 T ( 1065 Q) S 40 T ( 1062 V) N
+(1082 A ) S 8 T ( 1084 A) S 16 T ( 1084 M) S 24 T ( 1088 F) S 32 T ( 1066 G) S 40 T ( 1063 E) N
+(1083 E ) S 8 T ( 1085 E) S 16 T ( 1085 E) S 24 T ( 1089 E) S 32 T ( 1067 E) S 40 T ( 1064 E) N
+(1084 I ) S 8 T ( 1086 I) S 16 T ( 1086 I) S 24 T ( 1090 I) S 32 T ( 1068 Y) S 40 T ( 1065 T) N
+(1085 S ) S 8 T ( 1087 T) S 16 T ( 1087 N) S 24 T ( 1091 S) S 32 T ( 1069 T) S 40 T ( 1066 K) N
+(1086 S ) S 8 T ( 1088 T) S 16 T ( 1088 G) S 24 T ( 1092 Q) S 32 T ( 1070 E) S 40 T ( 1067 Q) N
+(1087 L ) S 8 T ( 1089 L) S 16 T ( 1089 L) S 24 T ( 1093 I) S 32 T ( 1071 L) S 40 T ( 1068 L) N
+(1088 N ) S 8 T ( 1090 N) S 16 T ( 1090 N) S 24 T ( 1094 Q) S 32 T ( 1072 N) S 40 T ( 1069 E) N
+(1089 S ) S 8 T ( 1091 S) S 16 T ( 1091 S) S 24 T ( 1095 S) S 32 T ( 1073 E) S 40 T ( 1070 L) N
+(1090 K ) S 8 T ( 1092 K) S 16 T ( 1092 K) S 24 T ( 1096 K) S 32 T ( 1074 K) S 40 T ( 1071 D) N
+(1091 L ) S 8 T ( 1093 L) S 16 T ( 1093 L) S 24 T ( 1097 I) S 32 T ( 1075 F) S 40 T ( 1072 L) N
+(1092 E ) S 8 T ( 1094 E) S 16 T ( 1094 E) S 24 T ( 1098 E) S 32 T ( 1076 N) S 40 T ( 1073 N) N
+(1093 D ) S 8 T ( 1095 D) S 16 T ( 1095 D) S 24 T ( 1099 D) S 32 T ( 1077 S) S 40 T ( 1074 D) N
+(1094 E ) S 8 T ( 1096 E) S 16 T ( 1096 E) S 24 T ( 1100 E) S 32 T ( 1078 E) S 40 T ( 1075 E) N
+(1095 Q ) S 8 T ( 1097 Q) S 16 T ( 1097 Q) S 24 T ( 1101 Q) S 32 T ( 1079 V) S 40 T ( 1076 R) N
+(seqhc1i) (Page 12/13) (Jan 30, 08 14:38) title
+border
+grestore
+(Printed by V.Ovchinnikov) rhead
+(seqhc1i) (4/5) (Wednesday January 30, 2008) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (13) 5
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 2.235602 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(1096 N ) p 8 T ( 1098 N) S 16 T ( 1098 N) S 24 T ( 1102 A) S 32 T ( 1080 T) S 40 T ( 1077 L) N
+(1097 L ) S 8 T ( 1099 L) S 16 T ( 1099 L) S 24 T ( 1103 L) S 32 T ( 1081 A) S 40 T ( 1078 R) N
+(1098 V ) S 8 T ( 1100 V) S 16 T ( 1100 V) S 24 T ( 1104 G) S 32 T ( 1082 R) S 40 T ( 1079 Y) N
+(1099 S ) S 8 T ( 1101 S) S 16 T ( 1101 A) S 24 T ( 1105 M) S 32 T ( 1083 S) S 40 T ( 1080 Q) N
+(1100 Q ) S 8 T ( 1102 Q) S 16 T ( 1102 Q) S 24 T ( 1106 Q) S 32 T ( 1084 N) S 40 T ( 1081 N) N
+(1101 L ) S 8 T ( 1103 L) S 16 T ( 1103 L) S 24 T ( 1107 L) S 32 T ( 1085 V) S 40 T ( 1082 L) N
+(1102 Q ) S 8 T ( 1104 Q) S 16 T ( 1104 Q) S 24 T ( 1108 Q) S 32 T ( 1086 E) S 40 T ( 1083 L) N
+(1103 R ) S 8 T ( 1105 R) S 16 T ( 1105 K) S 24 T ( 1109 K) S 32 T ( 1087 K) S 40 T ( 1084 N) N
+(1104 K ) S 8 T ( 1106 K) S 16 T ( 1106 K) S 24 T ( 1110 K) S 32 T ( 1088 S) S 40 T ( 1085 E) N
+(1105 I ) S 8 T ( 1107 I) S 16 T ( 1107 I) S 24 T ( 1111 I) S 32 T ( 1089 K) S 40 T ( 1086 F) N
+(1106 K ) S 8 T ( 1108 K) S 16 T ( 1108 K) S 24 T ( 1112 K) S 32 T ( 1090 K) S 40 T ( 1087 S) N
+(1107 E ) S 8 T ( 1109 E) S 16 T ( 1109 E) S 24 T ( 1113 E) S 32 T ( 1091 T) S 40 T ( 1088 R) N
+(1108 L ) S 8 T ( 1110 L) S 16 T ( 1110 L) S 24 T ( 1114 L) S 32 T ( 1092 L) S 40 T ( 1089 L) N
+(1109 Q ) S 8 T ( 1111 Q) S 16 T ( 1111 Q) S 24 T ( 1115 Q) S 32 T ( 1093 E) S 40 T ( 1090 E) N
+(1110 A ) S 8 T ( 1112 A) S 16 T ( 1112 A) S 24 T ( 1116 A) S 32 T ( 1094 S) S 40 T ( 1091 E) N
+(1111 R ) S 8 T ( 1113 R) S 16 T ( 1113 R) S 24 T ( 1117 R) S 32 T ( 1095 Q) S 40 T ( 1092 R) N
+(1112 I ) S 8 T ( 1114 I) S 16 T ( 1114 I) S 24 T ( 1118 I) S 32 T ( 1096 L) S 40 T ( 1093 Y) N
+(1113 E ) S 8 T ( 1115 E) S 16 T ( 1115 E) S 24 T ( 1119 E) S 32 T ( 1097 V) S 40 T ( 1094 D) N
+(1114 E ) S 8 T ( 1116 E) S 16 T ( 1116 E) S 24 T ( 1120 E) S 32 T ( 1098 A) S 40 T ( 1095 D) N
+(1115 L ) S 8 T ( 1117 L) S 16 T ( 1117 L) S 24 T ( 1121 L) S 32 T ( 1099 V) S 40 T ( 1096 L) N
+(1116 E ) S 8 T ( 1118 E) S 16 T ( 1118 E) S 24 T ( 1122 E) S 32 T ( 1100 N) S 40 T ( 1097 K) N
+(1117 E ) S 8 T ( 1119 E) S 16 T ( 1119 E) S 24 T ( 1123 E) S 32 T ( 1101 N) S 40 T ( 1098 D) N
+(1118 E ) S 8 T ( 1120 E) S 16 T ( 1120 E) S 24 T ( 1124 E) S 32 T ( 1102 E) S 40 T ( 1099 E) N
+(1119 L ) S 8 T ( 1121 L  1121 L) S 24 T ( 1125 I) S 32 T ( 1103 L) S 40 T ( 1100 M) N
+(seqhc1i) (Page 13/13) (Jan 30, 08 14:38) title
+border
+grestore
+(Printed by V.Ovchinnikov) rhead
+(seqhc1i) (5/5) (Wednesday January 30, 2008) footer
+end % of iso1dict
+pagesave restore
+showpage
+
+%%Trailer
+end
+%%EOF

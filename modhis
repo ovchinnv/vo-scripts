@@ -1,0 +1,116 @@
+#!/bin/bash
+
+# awk program for modifying PDB files
+# arg(1) file to process
+# arg(2) file with commands
+
+ while read line ; do
+ cmd=`echo $line | awk ' { print tolower(substr($1,1,3))}'`
+# echo $cmd
+ if [  "$cmd" == "hse" ]; then
+  HISE=${line##HSE}
+ continue
+ fi
+ if [  "$cmd" == "hsd" ]; then
+  HISD=${line##HSD}
+ continue
+ fi
+ if [  "$cmd" == "gln" ]; then
+  GLNE=${line##GLN}
+ continue
+ fi
+ if [  "$cmd" == "asn" ]; then
+  ASNE=${line##ASN}
+ continue
+ fi
+ if [  "$cmd" == "hsw" ]; then
+  HISFLIP=${line##HSW}
+ continue
+ fi
+ done <$2
+ 
+awk  -v HISE="$HISE" -v HISD="$HISD" -v GLNE="$GLNE" -v ASNE="$ASNE" -v HISFLIP="$HISFLIP" '
+      BEGIN { 
+
+      $0=HISE
+      for (i=1; i<=NF; i++) {
+       HSE[$i]=1
+      }
+      $0=HISD
+      for (i=1; i<=NF; i++) {
+       HSD[$i]=1
+      }
+      $0=HISFLIP
+      for (i=1; i<=NF; i++) {
+       HISflip[$i]=1
+      }
+      $0=ASNE
+      for (i=1; i<=NF; i++) {
+       ASN[$i]=1
+      }
+      $0=GLNE
+      for (i=1; i<=NF; i++) {
+       GLN[$i]=1
+      }
+
+ }
+
+ {
+    if ($1 == "ATOM" ) {
+      if ( $5 in HSD ) {
+       if ( $3 == "CA") print "Changing "$4" "$5" to HSD" >"modpdb.log"
+       sub(" "$4" ", " HIS ");
+#       print $0
+      } else if ( $5 in HSE ) {
+       if ( $3 == "CA" ) print "Changing "$4" "$5" to HSE" >"modpdb.log"
+       sub(" "$4" ", " HSD ");
+#       print $0
+      } else if ( $5 in HISflip ) {
+        print $4" flip:" $5 >"modpdb.log"
+       if ( $3 == "ND1") { 
+        sub (" ND1 ", " CD2 ");
+       } else if ($3 == "CD2") {
+       sub (" CD2 ", " ND1 ");
+       } else if ($3 == "CE1") {
+       sub (" CE1 ", " NE2 ");
+       } else if ($3 == "NE2") {
+       sub (" NE2 ", " CE1 ");
+       }
+      } else if ( $5 in GLN ) {
+       if ( $3 == "OE1") { 
+        sub (" OE1 ", " NE2 ");
+        print $4" flip:" $5 >"modpdb.log"
+       } else if ($3 == "NE2") {
+       sub (" NE2 ", " OE1 ");
+       }
+      } else if ( $5 in ASN ) {
+       if ( $3 == "OD1") { 
+        sub (" OD1 ", " ND2 ");
+        print $4" flip:" $5 >"modpdb.log"
+       } else if ($3 == "ND2") {
+       sub (" ND2 ", " OD1 ");
+       }
+    }
+    if ( $5 in HISflip ) {
+       if ( $3 == "ND1") { 
+        print $4" flip:" $5 >"modpdb.log"
+        sub (" ND1 ", " CD2 ");
+       } else if ($3 == "CD2") {
+       sub (" CD2 ", " ND1 ");
+       } else if ($3 == "CE1") {
+       sub (" CE1 ", " NE2 ");
+       } else if ($3 == "NE2") {
+       sub (" NE2 ", " CE1 ");
+       }
+     }
+   }     
+ print $0
+} ' $1 
+
+
+
+      
+      
+      
+      
+      

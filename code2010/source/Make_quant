@@ -1,0 +1,157 @@
+#####################################################################################################################
+#CFLAGS	= mpif90  -fdefault-real-8 -frecord-marker=4  -frange-check -fbounds-check -fdefault-double-8 -ffixed-line-length-0 -O2 -DDOUBLE -DCRAY -DOUT -Dimmbnd -c #-DLES#-Mvect=prefetch  
+CFLAGS	= mpif77  -ffixed-line-length-0 -O3 -DDOUBLE -fdefault-real-8 -frecord-marker=4 -fdefault-double-8 -DCRAY -DOUT -Dimmbnd -c #-DLES#-Mvect=prefetch  
+#LDFLAGS = mpif90  -ffixed-line-length-0 -O2 -static -o  
+LDFLAGS = mpif77  -o  
+
+CMD     = ../eddy
+
+#####################################################################################################################
+.SUFFIXES:  .F 
+.F.o:
+	 $(CFLAGS) $<
+
+.f.o:
+	 $(CFLAGS) $<	
+OBJ = \
+main.o \
+eddy_bl_f.o\
+IO.o\
+probe.o\
+refreshbc.o\
+swap.o\
+presdp2p.o\
+ boundary_exp.o\
+ boundary_imp.o\
+ setup.o\
+ srcterms.o\
+ timeindeg.o\
+ timestep.o\
+ turvis.o\
+ rhs.o\
+ peter.o\
+ inout.o\
+ info.o\
+ numrec.o \
+ h3dcy2_fftw.o \
+ fft99.o\
+ slice.o\
+ spacedevel.o\
+ timedevel.o\
+ filter.o\
+ center.o\
+ multigrdset.o\
+ multigrdsolver.o\
+ tridag.o\
+ exasol.o\
+ massbal.o\
+ resid.o\
+ rescale.o\
+ lagrange.o\
+ poissx.o\
+ poistg.o\
+ direct.o\
+ cfftlib_4p.o\
+ peqinit.o\
+ nag_4p.o\
+ statistiche.o\
+forcing.o\
+scrivi.o\
+setup_ose.o\
+setinterp_ose.o\
+blas_ose.o\
+grid_ose.o\
+pentdiag.o\
+ose.o\
+rsbud3.o\
+blktri.o\
+pfft_yz.o\
+tridiag.o\
+2ptcorr.o\
+noise.o\
+stats.o\
+save.o\
+spec.o\
+readini.o\
+planes.o\
+box2.o\
+spress.o
+
+$(CMD):		$(OBJ)
+		@echo Makefile: ... compiling $@
+		$(LDFLAGS) $(@) $(OBJ) $(LIBS)
+
+clean:
+	rm -f *.o
+
+dep:
+	makedepend *.F *.f headers/*.h
+# DO NOT DELETE
+main.o :headers/*.h Makefile
+eddy_bl_f.o:headers/*.h Makefile
+IO.o:headers/*.h Makefile
+probe.o:headers/*.h Makefile
+refreshbc.o:headers/*.h Makefile
+swap.o:headers/*.h swap.F Makefile
+presdp2p.o:headers/*.h Makefile
+ boundary_exp.o:headers/*.h Makefile
+ boundary_imp.o:headers/*.h Makefile
+ setup.o:headers/*.h Makefile
+ srcterms.o:headers/*.h Makefile
+ timeindeg.o:headers/*.h Makefile
+ timestep.o:headers/*.h Makefile
+ turvis.o:headers/*.h Makefile
+ rhs.o:headers/*.h Makefile
+ peter.o:peter.F headers/*.h Makefile
+ inout.o:headers/*.h Makefile
+ info.o:headers/*.h Makefile
+ tecplot.o:headers/*.h Makefile
+ plot.o:headers/*.h Makefile
+ numrec.o:headers/*.h Makefile
+ h3dcy2_fftw.o:headers/*.h Makefile
+ fft99.o:headers/*.h Makefile
+ slice.o:headers/*.h Makefile
+ spacedevel.o:headers/*.h Makefile
+ timedevel.o:headers/*.h Makefile
+ filter.o:headers/*.h Makefile
+ center.o:headers/*.h Makefile
+ multigrdset.o:headers/*.h Makefile
+ multigrdsolver.o:headers/*.h Makefile
+ tridag.o:headers/*.h Makefile
+ exasol.o:headers/*.h Makefile
+ massbal.o:headers/*.h Makefile
+ resid.o:headers/*.h Makefile
+ rescale.o:headers/*.h Makefile
+ lagrange.o:headers/*.h Makefile
+ h3dndc.o:headers/*.h Makefile
+ poissx.o:headers/*.h Makefile
+ poistg.o:headers/*.h Makefile
+ direct.o:headers/*.h direct.F Makefile
+ blktri.o:headers/*.h Makefile
+ cfftlib_4p.o:headers/*.h Makefile
+ peqinit.o:headers/*.h Makefile
+ nag_4p.o:headers/*.h Makefile
+ statistiche.o:headers/*.h Makefile
+forcing.o:headers/*.h Makefile
+scrivi.o:headers/*.h Makefile
+ose.o:headers/*.h Makefile
+setup_ose.o:headers/*.h Makefile
+setinterp_ose.o:headers/*.h Makefile
+blas_ose.o:headers/*.h Makefile
+grid_ose.o:headers/*.h Makefile
+pentdiag.o:headers/*.h Makefile
+rsbud3.o:headers/*.h rsbud3.F Makefile
+pfft_yz.o:headers/*.h pfft_yz.F Makefile
+tridiag.o: tridiag.f Makefile
+2ptcorr.o: 2ptcorr.f headers/dimension.h headers/two_pt.h Makefile
+noise.o: noise.f headers/ose.h Makefile
+stats.o: stats.F headers/common.h headers/dimension.h Makefile 
+save.o: save.f headers/save.h headers/common.h headers/dimension.h Makefile
+spec.o: spec.f headers/spec.h headers/common.h headers/dimension.h Makefile
+readini.o: readini.F headers/common.h headers/dimension.h Makefile
+planes.o: planes.F headers/common.h headers/dimension.h headers/planes.h Makefile
+box2.o: box2.F headers/common.h headers/dimension.h headers/box2.h Makefile
+spress.o: spress.F headers/dimension.h headers/spress.h Makefile
+
+
+

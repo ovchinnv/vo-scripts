@@ -1,0 +1,149 @@
+#!/bin/vmd
+#############################################################
+structure          $psffile
+coordinates        $pdbfile
+outputname         scratch/$name
+
+firsttimestep      0
+set shake  off
+temperature        $temperature
+
+# to skip minimization
+#bincoordinates     scratch/${name}_minif.coor
+#extendedSystem     scratch/${name}_minif.xsc
+
+# Parameter File
+paraTypeCharmm	    on
+parameters          /n/home/ovchinnv/charmm/c34a2/toppar/par_all27_prot_na.prm
+#parameters          /home/ovchinnikov/charmm/c33b1/toppar/par_all27_prot_na.prm
+#parameters          /u0/o/ovchinnv/cparam/par_all27_prot_na.prm
+
+# Force-Field Parameters
+exclude             scaled1-4
+1-4scaling          1.0
+cutoff              12.
+switching           on
+switchdist          10.
+pairlistdist        14.5
+
+# Integrator Parameters
+timestep            1.0  ;# 2fs/step
+rigidBonds          $shake  ;# needed for 2fs steps
+fullElectFrequency  1
+stepspercycle       10
+fixedAtomsForces   yes ;# whether ot not forces between fixed atoms are calculated
+fixedAtoms          on
+fixedAtomsCol       B
+fixedAtomsFile      $resfile ;# restraints file
+
+constraints         on
+consref             $reffile ;# reference positions file -- often same as the original PDB
+conskfile           $resfile
+conskcol            B
+
+# Constant Temperature Control
+langevin            on    ;# do langevin dynamics
+#langevinFile        $resfile
+#langevinCol         Z
+langevinDamping     2     ;# damping coefficient (gamma)
+langevinTemp        $temperature
+langevinHydrogen    off    ;# don't couple langevin bath to hydrogens
+                                                                                
+# Constant Pressure Control (variable volume)
+if { ($shake == "all") || ($shake == "water") } {
+useGroupPressure      yes ;# needed for rigidBonds
+} else {
+usegroupPressure      no
+}
+useFlexibleCell       no
+useConstantArea       no
+
+langevinPiston        on
+langevinPistonTarget  1.01325 ;#  in bar -> 1 atm
+langevinPistonPeriod  100.
+langevinPistonDecay   50.
+langevinPistonTemp    $temperature ; # same temperature as the system target temp
+#
+# Periodic Boundary Conditions -- hexagonal cell; add some `room'
+# note: rf is actually the distance from the origin to a corner
+#cellBasisVector1     [expr {1.09*sqrt(3.0)*$rf}]    0.                          0.
+#cellBasisVector2     [expr {1.09*sqrt(3.0)*$rf/2.0}]  [expr {1.09*3.0*$rf/2.0}]  0.
+#cellBasisVector3     0.                0.                          [expr {1.09*$rh}]
+#cellOrigin           0.                0.                          0. 
+# Periodic Boundary Conditions -- rhombic dodecahedron
+#set d [expr {$r*2.02}] ;# double to get diameter & add some room
+#cellBasisVector1     $d                0.                          0.
+#cellBasisVector2     0.                $d                          0.
+#cellBasisVector3     [expr {0.5*$d}]   [expr {0.5*$d}]             [expr {$d/sqrt(2.0)}]
+#cellOrigin           0.                0.                          0. 
+# Periodic Boundary Conditions -- box
+cellBasisVector1     $a   0.     0.
+cellBasisVector2     0.    $b    0.
+cellBasisVector3     0.    0.     $c
+cellOrigin           0.    0.     0. 
+
+
+wrapWater           on
+wrapAll             on
+wrapNearest         on
+
+# PME (for full-system periodic electrostatics)
+PME                 yes 
+PMEGridSizeX        160
+PMEGridSizeY        96
+PMEGridSizeZ        80
+                                                                                
+# Output
+
+#############################################################
+## OUTPUT PARAMETERS                                       ##
+#############################################################
+set freq 1000;
+
+restartfreq         $freq     ;# 500steps = every 1ps APPLIES TO MINIMIZATION TOO
+dcdfreq             $freq
+xstFreq             $freq
+outputEnergies      $freq
+outputPressure      $freq
+outputTiming        $freq
+
+margin 20
+
+## minimization
+
+output scratch/${name}_minif
+minimize 500
+fixedAtoms off
+ 
+for {set i 0} {$i < 5 } {incr i } {
+ constraintscaling [expr {100-$i*20}];
+ output scratch/${name}_mini${i}
+ minimize 100
+}
+
+set nsteps 100000; # equilibration 
+
+# if this the first run, then heat slowly
+for {set count 0} {$count<5} {incr count} {
+ output scratch/${name}_npt${count}
+ constraintscaling [expr {20-$count*4}];
+ if { $count == 0 } {
+#  timestep 1.0
+  reinitvels 0
+  set ftemp $temperature
+  set ncycle 10 ;# 10 increments
+  set nsubsteps [expr { int($nsteps/$ncycle) }]; # break up into 10 runs
+  set dtemp [expr { 1.00*$ftemp/$ncycle}];
+  for { set temp $dtemp } { $temp <=$ftemp } { set temp [expr $temp + $dtemp]} { 
+   reinitvels $temp
+   langevinTemp $temp
+   langevinPistonTemp $temp  
+   run $nsubsteps
+  }
+ } else {
+
+# regular run
+# timestep 2
+ run $nsteps
+ }
+}

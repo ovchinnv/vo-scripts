@@ -1,0 +1,79 @@
+#!/bin/vmd
+#
+# vmd psfgen plugin still cannot read charmm psf files correctly
+# therefore, in this approach, I read the psf into vmd, write out individual pdbs, 
+# and then rebuild the psf using VMD commands
+mol delete all
+
+set psffile ../bpgm_apo_sn
+set pdbfile ../bpgm_apo_msn
+
+mol load psf ${psffile}.psf pdb ${pdbfile}.pdb
+set bpgm [atomselect top "segid BPGM"] 
+set mg   [atomselect top "segid MG"] 
+set ion3 [atomselect top "segid ION3"] 
+set ion4 [atomselect top "segid ION4"] 
+set xwat [atomselect top "segid XWAT"] 
+set wat  [atomselect top "segid WAT"] 
+
+$bpgm writepdb bpgm_vmd.pdb
+$mg   writepdb mg_vmd.pdb
+$xwat writepdb xwat_vmd.pdb
+$ion3 writepdb ion3_vmd.pdb
+$ion4 writepdb ion4_vmd.pdb
+$wat  writepdb wat_vmd.pdb
+#
+#
+# split water segments, if necessary (to accommodate psfgen)
+set nwat [ expr { [llength [$wat get water]]/3 } ]
+if {$nwat > 10000} {
+ exec ./renamewat wat_vmd.pdb wat_vmd
+}
+#
+#
+#################################
+set toppar  /home/taly/charmm/c34a2/toppar
+set topfile top_all27_prot_na.rtf
+
+psfcontext reset
+topology ${toppar}/${topfile}
+topology ${toppar}/stream/toppar_all27_na_nad_ppi.str
+
+segment BPGM {
+ pdb     bpgm_vmd.pdb
+}
+coordpdb bpgm_vmd.pdb BPGM
+
+segment MG {
+ auto none
+ pdb     mg_vmd.pdb
+}
+coordpdb mg_vmd.pdb MG
+
+segment XWAT {
+ auto none
+ pdb     xwat_vmd.pdb
+}
+coordpdb xwat_vmd.pdb XWAT
+
+for {set i 3} {$i<=4} {incr i} {
+ segment ION$i {
+  auto none
+  pdb     ion${i}_vmd.pdb
+ }
+ coordpdb ion${i}_vmd.pdb ION$i
+}
+for {set i 1} {$i<=2} {incr i} {
+ segment WAT$i {
+  auto none
+  pdb     wat_vmd$i.pdb
+ }
+ coordpdb wat_vmd$i.pdb WAT$i
+}
+
+# clean up:
+exec rm -f bpgm_vmd.pdb mg_vmd.pdb xwat_vmd.pdb wat*_vmd.pdb ion*_vmd.pdb
+
+writepsf bpgm_apo_vmd.psf
+writepdb bpgm_apo_vmd.pdb
+

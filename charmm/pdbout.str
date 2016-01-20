@@ -1,0 +1,16 @@
+* write out different segments in separate pdb files
+*
+
+if @?iseg eq 0 set iseg 1
+define done sele none end
+define sel select all end
+
+label pdbloop
+ set segid@iseg ?selsegi
+ write coor pdb name @segid@@iseg.pdb sele segid @segid@@iseg end
+ define done sele done .or. segid @segid@@iseg end
+ define sel sele sel .and. .not. done end
+ incr iseg
+ if ?nsel .ne. 0 -
+goto pdbloop
+

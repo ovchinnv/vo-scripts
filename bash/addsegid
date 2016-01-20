@@ -1,0 +1,10 @@
+#!/bin/bash
+
+awk ' BEGIN { segid=ARGV[2]; ARGV[2]="" }
+   
+{
+     if ( $1 == "ATOM" ) {
+      print substr($0,1,72)""segid
+     }
+}     
+' $1 $2      

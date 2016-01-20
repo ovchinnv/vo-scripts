@@ -1,0 +1,1921 @@
+%!PS-Adobe-3.0
+%%Title: seqhc6
+%%For: 
+%%Creator: a2ps version 4.13
+%%CreationDate: Sun Sep  9 19:59:34 2007
+%%BoundingBox: 24 24 588 768
+%%DocumentData: Clean7Bit
+%%Orientation: Landscape
+%%Pages: 3
+%%PageOrder: Ascend
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: font Courier
+%%+ font Courier-Bold
+%%+ font Courier-BoldOblique
+%%+ font Courier-Oblique
+%%+ font Helvetica
+%%+ font Helvetica-Bold
+%%+ font Symbol
+%%+ font Times-Bold
+%%+ font Times-Roman
+%%DocumentProcessColors: Black 
+%%DocumentSuppliedResources: procset a2ps-a2ps-hdr
+%%+ procset a2ps-black+white-Prolog
+%%+ encoding ISO-8859-1Encoding
+%%EndComments
+/a2psdict 200 dict def
+a2psdict begin
+%%BeginProlog
+%%Copyright: (c) 1988, 89, 90, 91, 92, 93 Miguel Santana
+%%Copyright: (c) 1995, 96, 97, 98 Akim Demaille, Miguel Santana
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+
+% EPSF import as in the Red Book
+/BeginInclude {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack 
+  userdict begin
+    0 setgray 0 setlinecap
+    1 setlinewidth 0 setlinejoin
+    10 setmiterlimit [ ] 0 setdash newpath
+    gs_languagelevel 1 ne {
+      false setstrokeadjust false setoverprint 
+    } if
+} bind def
+
+/EndInclude {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+/BeginEPSF {
+  BeginInclude
+  /showpage { } def
+} bind def
+
+/EndEPSF {
+  EndInclude
+} bind def
+
+% Page prefeed
+/page_prefeed {         % bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} bind def
+
+/deffont {
+  findfont exch scalefont def
+} bind def
+
+/reencode_font {
+  findfont reencode 2 copy definefont pop def
+} bind def
+
+% Function c-show (str => -)
+% centers text only according to x axis.
+/c-show { 
+  dup stringwidth pop
+  2 div neg 0 rmoveto
+  show
+} bind def
+
+% Function l-show (str => -)
+% prints texts so that it ends at currentpoint
+/l-show {
+  dup stringwidth pop neg 
+  0 
+  rmoveto show
+} bind def
+
+% center-fit show (str w => -)
+% show centered, and scale currentfont so that the width is less than w
+/cfshow {
+  exch dup stringwidth pop
+  % If the title is too big, try to make it smaller
+  3 2 roll 2 copy
+  gt
+  { % if, i.e. too big
+    exch div
+    currentfont exch scalefont setfont
+  } { % ifelse
+    pop pop 
+  }
+  ifelse
+  c-show			% center title
+} bind def
+
+% Return the y size of the current font
+% - => fontsize
+/currentfontsize {
+  currentfont /FontType get 0 eq {
+    currentfont /FontMatrix get 3 get
+  }{
+    currentfont /FontMatrix get 3 get 1000 mul
+  } ifelse
+} bind def
+
+% reencode the font
+% <encoding-vector> <fontdict> -> <newfontdict>
+/reencode { %def
+  dup length 5 add dict begin
+    { %forall
+      1 index /FID ne 
+      { def }{ pop pop } ifelse
+    } forall
+    /Encoding exch def
+
+    % Use the font's bounding box to determine the ascent, descent,
+    % and overall height; don't forget that these values have to be
+    % transformed using the font's matrix.
+    % We use `load' because sometimes BBox is executable, sometimes not.
+    % Since we need 4 numbers an not an array avoid BBox from being executed
+    /FontBBox load aload pop
+    FontMatrix transform /Ascent exch def pop
+    FontMatrix transform /Descent exch def pop
+    /FontHeight Ascent Descent sub def
+
+    % Define these in case they're not in the FontInfo (also, here
+    % they're easier to get to.
+    /UnderlinePosition 1 def
+    /UnderlineThickness 1 def
+    
+    % Get the underline position and thickness if they're defined.
+    currentdict /FontInfo known {
+      FontInfo
+      
+      dup /UnderlinePosition known {
+	dup /UnderlinePosition get
+	0 exch FontMatrix transform exch pop
+	/UnderlinePosition exch def
+      } if
+      
+      dup /UnderlineThickness known {
+	/UnderlineThickness get
+	0 exch FontMatrix transform exch pop
+	/UnderlineThickness exch def
+      } if
+      
+    } if
+    currentdict 
+  end 
+} bind def
+
+% composite fonts for ASCII-EUC mixed string
+% Version 1.2 1/31/1990
+% Orignal Ken'ichi HANDA (handa@etl.go.jp)
+% Modified Norio Katayama (katayama@rd.nacsis.ac.jp),1998
+% Extend & Fix Koji Nakamaru (maru@on.cs.keio.ac.jp), 1999
+% Anyone can freely copy, modify, distribute this program.
+
+/copyfont {	% font-dic extra-entry-count  copyfont  font-dic
+	1 index maxlength add dict begin
+	{	1 index /FID ne 2 index /UniqueID ne and
+		{def} {pop pop} ifelse
+	} forall
+	currentdict
+	end
+} bind def
+
+/compositefont { % ASCIIFontName EUCFontName RomanScale RomanOffset Rot(T/F) compositefont font
+    /RomanRotation exch def
+    /RomanOffset exch def
+    /RomanScale exch def
+    userdict /fixeucfont_dict known not {
+	userdict begin
+	    /fixeucfont_dict 2 dict begin
+		/UpperByteEncoding [
+		    16#00 1 16#20 { pop 0 } for
+		    16#21 1 16#28 { 16#20 sub } for
+		    16#29 1 16#2F { pop 0 } for
+		    16#30 1 16#74 { 16#27 sub } for
+		    16#75 1 16#FF { pop 0 } for
+		] def
+	        /LowerByteEncoding [
+		    16#00 1 16#A0 { pop /.notdef } for
+		    16#A1 1 16#FE { 16#80 sub 16 2 string cvrs
+				    (cXX) dup 1 4 -1 roll
+				    putinterval cvn } for
+		    /.notdef
+		] def
+		currentdict
+	    end def
+	end
+    } if
+    findfont dup /FontType get 0 eq {
+	14 dict begin
+	    %
+	    % 7+8 bit EUC font
+	    %
+	    12 dict begin
+		/EUCFont exch def
+		/FontInfo (7+8 bit EUC font) readonly def
+		/PaintType 0 def
+		/FontType 0 def
+		/FontMatrix matrix def
+		% /FontName
+		/Encoding fixeucfont_dict /UpperByteEncoding get def
+		/FMapType 2 def
+		EUCFont /WMode known
+		{ EUCFont /WMode get /WMode exch def }
+		{ /WMode 0 def } ifelse
+		/FDepVector [
+		    EUCFont /FDepVector get 0 get
+		    [ 16#21 1 16#28 {} for 16#30 1 16#74 {} for ]
+		    {
+			13 dict begin
+			    /EUCFont EUCFont def
+			    /UpperByte exch 16#80 add def	
+			    % /FontName
+			    /FontInfo (EUC lower byte font) readonly def
+			    /PaintType 0 def
+			    /FontType 3 def
+			    /FontMatrix matrix def
+			    /FontBBox {0 0 0 0} def
+			    /Encoding
+				fixeucfont_dict /LowerByteEncoding get def
+			    % /UniqueID
+			    % /WMode
+			    /BuildChar {
+				gsave
+				exch dup /EUCFont get setfont
+				/UpperByte get
+				2 string
+				dup 0 4 -1 roll put
+				dup 1 4 -1 roll put
+				dup stringwidth setcharwidth
+				0 0 moveto show
+				grestore
+			    } bind def
+			    currentdict
+			end
+			/lowerbytefont exch definefont
+		    } forall
+		] def
+		currentdict
+	    end
+	    /eucfont exch definefont
+	    exch
+	    findfont 1 copyfont dup begin
+		RomanRotation {
+			/FontMatrix FontMatrix
+			[ 0 RomanScale neg RomanScale 0 RomanOffset neg 0 ]
+			matrix concatmatrix def
+		}{
+			/FontMatrix FontMatrix
+			[ RomanScale 0 0 RomanScale 0 RomanOffset ] matrix concatmatrix
+			def
+			/CDevProc
+			    {pop pop pop pop 0 exch -1000 exch 2 div 880} def
+		} ifelse
+	    end
+	    /asciifont exch definefont
+	    exch
+	    /FDepVector [ 4 2 roll ] def
+	    /FontType 0 def
+	    /WMode 0 def
+	    /FMapType 4 def
+	    /FontMatrix matrix def
+	    /Encoding [0 1] def
+	    /FontBBox {0 0 0 0} def
+%	    /FontHeight 1.0 def % XXXX
+	    /FontHeight RomanScale 1.0 ge { RomanScale }{ 1.0 } ifelse def
+	    /Descent -0.3 def   % XXXX
+	    currentdict
+	end
+	/tmpfont exch definefont
+	pop
+	/tmpfont findfont
+    }{
+	pop findfont 0 copyfont
+    } ifelse
+} def	
+
+/slantfont {	% FontName slant-degree  slantfont  font'
+    exch findfont 1 copyfont begin
+    [ 1 0 4 -1 roll 1 0 0 ] FontMatrix exch matrix concatmatrix
+    /FontMatrix exch def
+    currentdict
+    end
+} def
+
+% Function print line number (<string> # -)
+/# {
+  gsave
+    sx cw mul neg 2 div 0 rmoveto
+    f# setfont
+    c-show
+  grestore
+} bind def
+
+% -------- Some routines to enlight plain b/w printings ---------
+
+% Underline
+% width --
+/dounderline {
+  currentpoint
+  gsave
+    moveto
+    0 currentfont /Descent get currentfontsize mul rmoveto
+    0 rlineto
+    stroke
+  grestore
+} bind def
+
+% Underline a string
+% string --
+/dounderlinestring {
+  stringwidth pop
+  dounderline
+} bind def
+
+/UL {
+  /ul exch store
+} bind def
+
+% Draw a box of WIDTH wrt current font
+% width --
+/dobox {
+  currentpoint
+  gsave
+    newpath
+    moveto
+    0 currentfont /Descent get currentfontsize mul rmoveto
+    dup 0 rlineto
+    0 currentfont /FontHeight get currentfontsize mul rlineto
+    neg 0 rlineto
+    closepath
+    stroke
+  grestore
+} bind def
+
+/BX {
+  /bx exch store
+} bind def
+
+% Box a string
+% string --
+/doboxstring {
+  stringwidth pop
+  dobox
+} bind def
+
+%
+% ------------- Color routines ---------------
+%
+/FG /setrgbcolor load def
+
+% Draw the background
+% width --
+/dobackground {
+  currentpoint
+  gsave
+    newpath
+    moveto
+    0 currentfont /Descent get currentfontsize mul rmoveto
+    dup 0 rlineto
+    0 currentfont /FontHeight get currentfontsize mul rlineto
+    neg 0 rlineto
+    closepath
+    bgcolor aload pop setrgbcolor
+    fill
+  grestore
+} bind def
+
+% Draw bg for a string
+% string --
+/dobackgroundstring {
+  stringwidth pop
+  dobackground
+} bind def
+
+
+/BG {
+  dup /bg exch store
+  { mark 4 1 roll ] /bgcolor exch store } if
+} bind def
+
+
+/Show {
+  bg { dup dobackgroundstring } if
+  ul { dup dounderlinestring } if
+  bx { dup doboxstring } if
+  show
+} bind def
+
+% Function T(ab), jumps to the n-th tabulation in the current line
+/T {
+  cw mul x0 add
+  bg { dup currentpoint pop sub dobackground } if
+  ul { dup currentpoint pop sub dounderline } if
+  bx { dup currentpoint pop sub dobox } if
+  y0 moveto
+} bind def
+
+% Function n: move to the next line
+/n {
+  /y0 y0 bfs sub store
+  x0 y0 moveto
+} bind def
+
+% Function N: show and move to the next line
+/N {
+  Show
+  /y0 y0 bfs sub store
+  x0 y0 moveto
+} bind def
+
+/S {
+  Show
+} bind def
+
+%%BeginResource: procset a2ps-a2ps-hdr 2.0 2
+%%Copyright: (c) 1988, 89, 90, 91, 92, 93 Miguel Santana
+%%Copyright: (c) 1995, 96, 97, 98 Akim Demaille, Miguel Santana
+% Function title: prints page header.
+% <ct> <rt> <lt> are passed as argument
+/title { 
+  % 1. Draw the background
+  x v get y v get moveto
+  gsave
+    0 th 2 div neg rmoveto 
+    th setlinewidth
+    0.95 setgray
+    pw 0 rlineto stroke
+  grestore
+  % 2. Border it
+  gsave
+    0.7 setlinewidth
+    pw 0 rlineto
+    0 th neg rlineto
+    pw neg 0 rlineto
+    closepath stroke
+  grestore
+  % stk: ct rt lt
+  x v get y v get th sub 1 add moveto
+%%IncludeResource: font Helvetica
+  fHelvetica fnfs 0.8 mul scalefont setfont
+  % 3. The left title
+  gsave
+    dup stringwidth pop fnfs 0.8 mul add exch % leave space took on stack
+    fnfs 0.8 mul hm rmoveto
+    show			% left title
+  grestore
+  exch
+  % stk: ct ltw rt
+  % 4. the right title
+  gsave
+    dup stringwidth pop fnfs 0.8 mul add exch % leave space took on stack
+    dup
+    pw exch stringwidth pop fnfs 0.8 mul add sub
+    hm
+    rmoveto
+    show			% right title
+  grestore
+  % stk: ct ltw rtw
+  % 5. the center title
+  gsave
+    pw 3 1 roll
+    % stk: ct pw ltw rtw
+    3 copy 
+    % Move to the center of the left room
+    sub add 2 div hm rmoveto
+    % What is the available space in here?
+    add sub fnfs 0.8 mul sub fnfs 0.8 mul sub
+    % stk: ct space_left
+%%IncludeResource: font Helvetica-Bold
+  fHelvetica-Bold fnfs scalefont setfont
+    cfshow
+  grestore
+} bind def
+
+% Function border: prints virtual page border
+/border { %def
+  gsave				% print four sides
+    0 setgray
+    x v get y v get moveto
+    0.7 setlinewidth		% of the square
+    pw 0 rlineto
+    0 ph neg rlineto
+    pw neg 0 rlineto
+    closepath stroke
+  grestore
+} bind def
+
+% Function water: prints a water mark in background
+/water { %def
+  gsave
+    scx scy moveto rotate
+%%IncludeResource: font Times-Bold
+  fTimes-Bold 100 scalefont setfont
+    .97 setgray
+    dup stringwidth pop 2 div neg -50 rmoveto
+    show
+  grestore
+} bind def
+
+% Function rhead: prints the right header
+/rhead {  %def
+  lx ly moveto
+  fHelvetica fnfs 0.8 mul scalefont setfont
+  l-show
+} bind def
+
+% Function footer (cf rf lf -> -)
+/footer {
+  fHelvetica fnfs 0.8 mul scalefont setfont
+  dx dy moveto
+  show
+
+  snx sny moveto
+  l-show
+  
+  fnx fny moveto
+  c-show
+} bind def
+%%EndResource
+%%BeginResource: procset a2ps-black+white-Prolog 2.0 1
+
+% Function T(ab), jumps to the n-th tabulation in the current line
+/T { 
+  cw mul x0 add y0 moveto
+} bind def
+
+% Function n: move to the next line
+/n { %def
+  /y0 y0 bfs sub store
+  x0 y0 moveto
+} bind def
+
+% Function N: show and move to the next line
+/N {
+  Show
+  /y0 y0 bfs sub store
+  x0 y0 moveto
+}  bind def
+
+/S {
+  Show
+} bind def
+
+/p {
+  false UL
+  false BX
+  fCourier bfs scalefont setfont
+  Show
+} bind def
+
+/sy {
+  false UL
+  false BX
+  fSymbol bfs scalefont setfont
+  Show
+} bind def
+
+/k {
+  false UL
+  false BX
+  fCourier-Oblique bfs scalefont setfont
+  Show
+} bind def
+
+/K {
+  false UL
+  false BX
+  fCourier-Bold bfs scalefont setfont
+  Show
+} bind def
+
+/c {
+  false UL
+  false BX
+  fCourier-Oblique bfs scalefont setfont
+  Show
+} bind def
+
+/C {
+  false UL
+  false BX
+  fCourier-BoldOblique bfs scalefont setfont
+  Show 
+} bind def
+
+/l {
+  false UL
+  false BX
+  fHelvetica bfs scalefont setfont
+  Show
+} bind def
+
+/L {
+  false UL
+  false BX
+  fHelvetica-Bold bfs scalefont setfont
+  Show 
+} bind def
+
+/str{
+  false UL
+  false BX
+  fTimes-Roman bfs scalefont setfont
+  Show
+} bind def
+
+/e{
+  false UL
+  true BX
+  fHelvetica-Bold bfs scalefont setfont
+  Show
+} bind def
+
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier
+%%IncludeResource: font Courier-Oblique
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Times-Roman
+%%IncludeResource: font Symbol
+%%IncludeResource: font Courier-BoldOblique
+%%BeginResource: encoding ISO-8859-1Encoding
+/ISO-8859-1Encoding [
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/space /exclam /quotedbl /numbersign /dollar /percent /ampersand /quoteright 
+/parenleft /parenright /asterisk /plus /comma /minus /period /slash 
+/zero /one /two /three /four /five /six /seven 
+/eight /nine /colon /semicolon /less /equal /greater /question 
+/at /A /B /C /D /E /F /G 
+/H /I /J /K /L /M /N /O 
+/P /Q /R /S /T /U /V /W 
+/X /Y /Z /bracketleft /backslash /bracketright /asciicircum /underscore 
+/quoteleft /a /b /c /d /e /f /g 
+/h /i /j /k /l /m /n /o 
+/p /q /r /s /t /u /v /w 
+/x /y /z /braceleft /bar /braceright /asciitilde /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/space /exclamdown /cent /sterling /currency /yen /brokenbar /section 
+/dieresis /copyright /ordfeminine /guillemotleft /logicalnot /hyphen /registered /macron 
+/degree /plusminus /twosuperior /threesuperior /acute /mu /paragraph /bullet 
+/cedilla /onesuperior /ordmasculine /guillemotright /onequarter /onehalf /threequarters /questiondown 
+/Agrave /Aacute /Acircumflex /Atilde /Adieresis /Aring /AE /Ccedilla 
+/Egrave /Eacute /Ecircumflex /Edieresis /Igrave /Iacute /Icircumflex /Idieresis 
+/Eth /Ntilde /Ograve /Oacute /Ocircumflex /Otilde /Odieresis /multiply 
+/Oslash /Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn /germandbls 
+/agrave /aacute /acircumflex /atilde /adieresis /aring /ae /ccedilla 
+/egrave /eacute /ecircumflex /edieresis /igrave /iacute /icircumflex /idieresis 
+/eth /ntilde /ograve /oacute /ocircumflex /otilde /odieresis /divide 
+/oslash /ugrave /uacute /ucircumflex /udieresis /yacute /thorn /ydieresis 
+] def
+%%EndResource
+% Initialize page description variables.
+/sh 612 def
+/sw 792 def
+/llx 24 def
+/urx 768 def
+/ury 588 def
+/lly 24 def
+/#copies 1 def
+/th 15.000000 def
+/fnfs 11 def
+/bfs 6.703297 def
+/cw 4.021978 def
+
+% Dictionary for ISO-8859-1 support
+/iso1dict 8 dict begin
+  /fCourier ISO-8859-1Encoding /Courier reencode_font
+  /fCourier-Bold ISO-8859-1Encoding /Courier-Bold reencode_font
+  /fCourier-BoldOblique ISO-8859-1Encoding /Courier-BoldOblique reencode_font
+  /fCourier-Oblique ISO-8859-1Encoding /Courier-Oblique reencode_font
+  /fHelvetica ISO-8859-1Encoding /Helvetica reencode_font
+  /fHelvetica-Bold ISO-8859-1Encoding /Helvetica-Bold reencode_font
+  /fTimes-Bold ISO-8859-1Encoding /Times-Bold reencode_font
+  /fTimes-Roman ISO-8859-1Encoding /Times-Roman reencode_font
+currentdict end def
+/bgcolor [ 0 0 0 ] def
+/bg false def
+/ul false def
+/bx false def
+% The font for line numbering
+/f# /Helvetica findfont bfs .6 mul scalefont def
+/fSymbol /Symbol findfont def
+/hm fnfs 0.25 mul def
+/pw
+   cw 36.400000 mul
+def
+/ph
+   520.846151 th add
+def
+/pmw urx llx sub pw 5 mul sub 4 div def
+/pmh 0 def
+/v 0 def
+/x [
+  0
+  dup pmw add pw add
+  dup pmw add pw add
+  dup pmw add pw add
+  dup pmw add pw add
+] def
+/y [
+  pmh ph add 0 mul ph add
+  dup
+  dup
+  dup
+  dup
+] def
+/scx sw 2 div def
+/scy sh 2 div def
+/snx urx def
+/sny lly 2 add def
+/dx llx def
+/dy sny def
+/fnx scx def
+/fny dy def
+/lx snx def
+/ly ury fnfs 0.8 mul sub def
+/sx 0 def
+/tab 8 def
+/x0 0 def
+/y0 0 def
+%%EndSetup
+
+%%Page: (1-5) 1
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 2.815385 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(1FMW ) p 8 T ( 2BKH ) S 16 T ( 1OE9) N
+(1 N ) S 8 T ( -     ) S 16 T ( -     ) N
+(2 P ) S 8 T ( -     ) S 16 T ( -     ) N
+(3 I ) S 8 T ( -     ) S 16 T ( -     ) N
+(4 H ) S 8 T ( -     ) S 16 T ( -     ) N
+(5 D ) S 8 T ( -     ) S 16 T ( -     ) N
+(6 R ) S 8 T ( -     ) S 16 T ( -     ) N
+(7 T ) S 8 T ( -     ) S 16 T ( -     ) N
+(8 S ) S 8 T ( -     ) S 16 T ( -     ) N
+(9 D ) S 8 T ( -     ) S 16 T ( -     ) N
+(10 Y ) S 8 T ( -     ) S 16 T ( -     ) N
+(11 H ) S 8 T ( -     ) S 16 T ( -     ) N
+(12 K ) S 8 T ( -     ) S 16 T ( -     ) N
+(13 Y ) S 8 T ( -     ) S 16 T ( -     ) N
+(14 L ) S 8 T ( -     ) S 16 T ( -     ) N
+(15 K ) S 8 T ( -     ) S 16 T ( -     ) N
+(16 V ) S 8 T ( -     ) S 16 T ( -     ) N
+(17 K ) S 8 T ( -     ) S 16 T ( -     ) N
+(18 Q ) S 8 T ( -     ) S 16 T ( -     ) N
+(19 G ) S 8 T ( -     ) S 16 T ( -     ) N
+(20 D ) S 8 T ( -     ) S 16 T ( -     ) N
+(21 S ) S 8 T ( -     ) S 16 T ( -     ) N
+(22 D ) S 8 T ( -     ) S 16 T ( 1 M ) N
+(23 L ) S 8 T ( -     ) S 16 T ( 2 A ) N
+(24 F ) S 8 T ( -     ) S 16 T ( 3 A ) N
+(25 K ) S 8 T ( -     ) S 16 T ( 4 S ) N
+(26 L ) S 8 T ( -     ) S 16 T ( 5 E ) N
+(27 T ) S 8 T ( -     ) S 16 T ( 6 L ) N
+(28 V ) S 8 T ( 1 M ) S 16 T ( 7 Y ) N
+(29 S ) S 8 T ( 2 E ) S 16 T ( 8 T ) N
+(30 D ) S 8 T ( 3 D ) S 16 T ( 9 K ) N
+(31 K ) S 8 T ( 4 G ) S 16 T ( 10 Y ) N
+(32 R ) S 8 T ( 5 K ) S 16 T ( 11 A ) N
+(33 Y ) S 8 T ( 6 P ) S 16 T ( 12 R ) N
+(34 I ) S 8 T ( 7 V ) S 16 T ( 13 V ) N
+(35 W ) S 8 T ( 8 W ) S 16 T ( 14 W ) N
+(36 Y ) S 8 T ( 9 A ) S 16 T ( 15 I ) N
+(37 N ) S 8 T ( -     ) S 16 T ( 16 P ) N
+(38 P ) S 8 T ( -     ) S 16 T ( 17 D ) N
+(39 D ) S 8 T ( -     ) S 16 T ( 18 P ) N
+(40 P ) S 8 T ( 10 P ) S 16 T ( 19 E ) N
+(41 K ) S 8 T ( 11 H ) S 16 T ( 20 E ) N
+(42 E ) S 8 T ( 12 P ) S 16 T ( 21 V ) N
+(43 R ) S 8 T ( 13 T ) S 16 T ( 22 W ) N
+(44 D ) S 8 T ( 14 D ) S 16 T ( 23 K ) N
+(45 S ) S 8 T ( 15 G ) S 16 T ( 24 S ) N
+(46 Y ) S 8 T ( 16 F ) S 16 T ( 25 A ) N
+(47 E ) S 8 T ( 17 Q ) S 16 T ( 26 E ) N
+(48 C ) S 8 T ( 18 V ) S 16 T ( 27 L ) N
+(49 G ) S 8 T ( 19 G ) S 16 T ( 28 L ) N
+(50 E ) S 8 T ( 20 N ) S 16 T ( 29 K ) N
+(51 I ) S 8 T ( 21 I ) S 16 T ( 30 D ) N
+(52 V ) S 8 T ( 22 V ) S 16 T ( 31 Y ) N
+(53 S ) S 8 T ( 23 D ) S 16 T ( 32 K ) N
+(54 E ) S 8 T ( 24 I ) S 16 T ( 33 P ) N
+(55 T ) S 8 T ( 25 G ) S 16 T ( 34 G ) N
+(56 S ) S 8 T ( 26 P ) S 16 T ( 35 D ) N
+(57 D ) S 8 T ( 27 D ) S 16 T ( 36 K ) N
+(58 S ) S 8 T ( 28 S ) S 16 T ( 37 V ) N
+(59 F ) S 8 T ( 29 L ) S 16 T ( 38 L ) N
+(60 F ) S 8 T ( 30 I ) S 16 T ( 39 L ) N
+(61 K ) S 8 T ( 31 E ) S 16 T ( 40 R ) N
+(62 T ) S 8 T ( 32 P ) S 16 T ( 41 L ) N
+(63 V ) S 8 T ( 33 L ) S 16 T ( 42 E ) N
+(64 D ) S 8 T ( 34 N ) S 16 T ( 43 E ) N
+(-     ) S 8 T ( 35 Q ) S 16 T ( 44 G ) N
+(-     ) S 8 T ( 36 K ) S 16 T ( 45 K ) N
+(65 G ) S 8 T ( 37 G ) S 16 T ( 46 D ) N
+(66 Q ) S 8 T ( 38 K ) S 16 T ( 47 L ) N
+(67 D ) S 8 T ( 39 T ) S 16 T ( 48 E ) N
+(68 R ) S 8 T ( 40 F ) S 16 T ( 49 Y ) N
+(69 Q ) S 8 T ( 41 L ) S 16 T ( 50 C ) N
+(70 V ) S 8 T ( 42 A ) S 16 T ( 51 L ) N
+(71 K ) S 8 T ( 43 L ) S 16 T ( 52 D ) N
+(-     ) S 8 T ( -     ) S 16 T ( 53 P ) N
+(-     ) S 8 T ( -     ) S 16 T ( 54 K ) N
+(-     ) S 8 T ( -     ) S 16 T ( 55 T ) N
+(seqhc6) (Page 1/14) (Sep 09, 07 19:46) title
+border
+/v 1 store
+/x0 x v get 2.815385 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(72 K ) p 8 T ( 44 I ) S 16 T ( 56 K ) N
+(73 D ) S 8 T ( 45 N ) S 16 T ( 57 E ) N
+(74 D ) S 8 T ( 46 Q ) S 16 T ( 58 L ) N
+(75 A ) S 8 T ( 47 V ) S 16 T ( 59 P ) N
+(76 N ) S 8 T ( 48 F ) S 16 T ( 60 P ) N
+(77 Q ) S 8 T ( 49 P ) S 16 T ( 61 L ) N
+(78 R ) S 8 T ( 50 A ) S 16 T ( 62 R ) N
+(79 N ) S 8 T ( 51 E ) S 16 T ( 63 N ) N
+(80 P ) S 8 T ( 52 E ) S 16 T ( 64 P ) N
+(81 I ) S 8 T ( 53 D ) S 16 T ( 65 D ) N
+(82 K ) S 8 T ( 54 S ) S 16 T ( 66 I ) N
+(83 F ) S 8 T ( 55 K ) S 16 T ( 67 L ) N
+(84 D ) S 8 T ( 56 K ) S 16 T ( 68 V ) N
+(85 G ) S 8 T ( 57 D ) S 16 T ( 69 G ) N
+(86 V ) S 8 T ( 58 V ) S 16 T ( 70 E ) N
+(87 E ) S 8 T ( 59 E ) S 16 T ( 71 N ) N
+(88 D ) S 8 T ( 60 D ) S 16 T ( 72 D ) N
+(89 M ) S 8 T ( 61 N ) S 16 T ( 73 L ) N
+(90 S ) S 8 T ( 62 C ) S 16 T ( 74 T ) N
+(91 E ) S 8 T ( 63 S ) S 16 T ( 75 A ) N
+(92 L ) S 8 T ( 64 L ) S 16 T ( 76 L ) N
+(93 S ) S 8 T ( 65 M ) S 16 T ( 77 S ) N
+(94 Y ) S 8 T ( 66 Y ) S 16 T ( 78 Y ) N
+(95 L ) S 8 T ( 67 L ) S 16 T ( 79 L ) N
+(96 N ) S 8 T ( 68 N ) S 16 T ( 80 H ) N
+(97 E ) S 8 T ( 69 E ) S 16 T ( 81 E ) N
+(98 P ) S 8 T ( 70 A ) S 16 T ( 82 P ) N
+(99 A ) S 8 T ( 71 T ) S 16 T ( 83 A ) N
+(100 V ) S 8 T ( 72 L ) S 16 T ( 84 V ) N
+(101 F ) S 8 T ( 73 L ) S 16 T ( 85 L ) N
+(102 H ) S 8 T ( 74 H ) S 16 T ( 86 H ) N
+(103 N ) S 8 T ( 75 N ) S 16 T ( 87 N ) N
+(104 L ) S 8 T ( 76 I ) S 16 T ( 88 L ) N
+(105 R ) S 8 T ( 77 K ) S 16 T ( 89 K ) N
+(106 V ) S 8 T ( 78 V ) S 16 T ( 90 V ) N
+(107 R ) S 8 T ( 79 R ) S 16 T ( 91 R ) N
+(108 Y ) S 8 T ( 80 Y ) S 16 T ( 92 F ) N
+(109 N ) S 8 T ( 81 S ) S 16 T ( 93 I ) N
+(110 Q ) S 8 T ( 82 K ) S 16 T ( 94 D ) N
+(-     ) S 8 T ( -     ) S 16 T ( 95 S ) N
+(111 D ) S 8 T ( 83 D ) S 16 T ( 96 K ) N
+(112 L ) S 8 T ( 84 R ) S 16 T ( 97 L ) N
+(113 Y ) S 8 T ( 85 Y ) S 16 T ( 98 Y ) N
+(114 T ) S 8 T ( 86 T ) S 16 T ( 99 T ) N
+(115 Y ) S 8 T ( 87 Y ) S 16 T ( 100 Y ) N
+(116 S ) S 8 T ( 88 V ) S 16 T ( 101 C ) N
+(117 G ) S 8 T ( 89 A ) S 16 T ( 102 G ) N
+(118 L ) S 8 T ( 90 N ) S 16 T ( 103 I ) N
+(119 F ) S 8 T ( 91 I ) S 16 T ( 104 V ) N
+(120 L ) S 8 T ( 92 L ) S 16 T ( 105 L ) N
+(121 V ) S 8 T ( 93 I ) S 16 T ( 106 V ) N
+(122 A ) S 8 T ( 94 A ) S 16 T ( 107 A ) N
+(123 V ) S 8 T ( 95 V ) S 16 T ( 108 I ) N
+(124 N ) S 8 T ( 96 N ) S 16 T ( 109 N ) N
+(125 P ) S 8 T ( 97 P ) S 16 T ( 110 P ) N
+(126 F ) S 8 T ( 98 Y ) S 16 T ( 111 Y ) N
+(127 K ) S 8 T ( 99 F ) S 16 T ( 112 E ) N
+(128 R ) S 8 T ( 100 D ) S 16 T ( 113 Q ) N
+(129 I ) S 8 T ( 101 I ) S 16 T ( 114 L ) N
+(130 P ) S 8 T ( 102 P ) S 16 T ( 115 P ) N
+(-     ) S 8 T ( 103 K ) S 16 T ( -     ) N
+(131 I ) S 8 T ( 104 I ) S 16 T ( 116 I ) N
+(132 Y ) S 8 T ( 105 Y ) S 16 T ( 117 Y ) N
+(133 T ) S 8 T ( 106 S ) S 16 T ( 118 G ) N
+(134 Q ) S 8 T ( 107 S ) S 16 T ( 119 E ) N
+(135 E ) S 8 T ( 108 E ) S 16 T ( 120 D ) N
+(136 M ) S 8 T ( 109 T ) S 16 T ( 121 I ) N
+(137 V ) S 8 T ( 110 I ) S 16 T ( 122 I ) N
+(138 D ) S 8 T ( 111 K ) S 16 T ( 123 N ) N
+(139 I ) S 8 T ( 112 S ) S 16 T ( 124 A ) N
+(140 F ) S 8 T ( 113 Y ) S 16 T ( 125 Y ) N
+(141 K ) S 8 T ( 114 Q ) S 16 T ( 126 S ) N
+(142 G ) S 8 T ( 115 G ) S 16 T ( 127 G ) N
+(143 R ) S 8 T ( 116 K ) S 16 T ( 128 Q ) N
+(144 R ) S 8 T ( 117 S ) S 16 T ( 129 N ) N
+(145 R ) S 8 T ( 118 L ) S 16 T ( 130 M ) N
+(146 N ) S 8 T ( 119 G ) S 16 T ( 131 G ) N
+(seqhc6) (Page 2/14) (Sep 09, 07 19:46) title
+border
+/v 2 store
+/x0 x v get 2.815385 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(147 E ) p 8 T ( 120 T ) S 16 T ( 132 D ) N
+(148 V ) S 8 T ( 121 M ) S 16 T ( 133 M ) N
+(149 A ) S 8 T ( 122 P ) S 16 T ( 134 D ) N
+(150 P ) S 8 T ( 123 P ) S 16 T ( 135 P ) N
+(151 H ) S 8 T ( 124 H ) S 16 T ( 136 H ) N
+(152 I ) S 8 T ( 125 V ) S 16 T ( 137 I ) N
+(153 F ) S 8 T ( 126 F ) S 16 T ( 138 F ) N
+(154 A ) S 8 T ( 127 A ) S 16 T ( 139 A ) N
+(155 I ) S 8 T ( 128 I ) S 16 T ( 140 V ) N
+(156 S ) S 8 T ( 129 A ) S 16 T ( 141 A ) N
+(157 D ) S 8 T ( 130 D ) S 16 T ( 142 E ) N
+(158 V ) S 8 T ( 131 K ) S 16 T ( 143 E ) N
+(159 A ) S 8 T ( 132 A ) S 16 T ( 144 A ) N
+(160 Y ) S 8 T ( 133 F ) S 16 T ( 145 Y ) N
+(161 R ) S 8 T ( 134 R ) S 16 T ( 146 K ) N
+(162 S ) S 8 T ( 135 D ) S 16 T ( 147 Q ) N
+(163 M ) S 8 T ( 136 M ) S 16 T ( 148 M ) N
+(164 L ) S 8 T ( 137 K ) S 16 T ( 149 A ) N
+(165 D ) S 8 T ( 138 V ) S 16 T ( 150 R ) N
+(166 D ) S 8 T ( 139 L ) S 16 T ( 151 D ) N
+(167 R ) S 8 T ( 140 K ) S 16 T ( 152 E ) N
+(168 Q ) S 8 T ( 141 L ) S 16 T ( 153 R ) N
+(169 N ) S 8 T ( 142 S ) S 16 T ( 154 N ) N
+(170 Q ) S 8 T ( 143 Q ) S 16 T ( 155 Q ) N
+(171 L ) S 8 T ( 144 I ) S 16 T ( 156 I ) N
+(172 L ) S 8 T ( 145 I ) S 16 T ( 157 I ) N
+(173 I ) S 8 T ( 146 V ) S 16 T ( 158 V ) N
+(174 T ) S 8 T ( 147 S ) S 16 T ( 159 S ) N
+(175 G ) S 8 T ( 148 G ) S 16 T ( 160 G ) N
+(176 E ) S 8 T ( 149 E ) S 16 T ( 161 E ) N
+(177 S ) S 8 T ( 150 S ) S 16 T ( 162 S ) N
+(178 G ) S 8 T ( 151 G ) S 16 T ( 163 G ) N
+(179 A ) S 8 T ( 152 A ) S 16 T ( 164 A ) N
+(180 G ) S 8 T ( 153 G ) S 16 T ( 165 G ) N
+(181 K ) S 8 T ( 154 K ) S 16 T ( 166 K ) N
+(182 T ) S 8 T ( 155 T ) S 16 T ( 167 T ) N
+(183 E ) S 8 T ( 156 E ) S 16 T ( 168 V ) N
+(184 N ) S 8 T ( 157 N ) S 16 T ( 169 S ) N
+(185 T ) S 8 T ( 158 T ) S 16 T ( 170 A ) N
+(186 K ) S 8 T ( 159 K ) S 16 T ( 171 K ) N
+(187 K ) S 8 T ( 160 F ) S 16 T ( 172 Y ) N
+(188 V ) S 8 T ( 161 V ) S 16 T ( 173 A ) N
+(189 I ) S 8 T ( 162 L ) S 16 T ( 174 M ) N
+(190 Q ) S 8 T ( 163 R ) S 16 T ( 175 R ) N
+(191 Y ) S 8 T ( 164 Y ) S 16 T ( 176 Y ) N
+(192 L ) S 8 T ( 165 L ) S 16 T ( 177 F ) N
+(193 A ) S 8 T ( 166 T ) S 16 T ( 178 A ) N
+(194 S ) S 8 T ( 167 E ) S 16 T ( 179 T ) N
+(195 V ) S 8 T ( 168 S ) S 16 T ( 180 V ) N
+(196 A ) S 8 T ( 169 Y ) S 16 T ( 181 S ) N
+(197 G ) S 8 T ( 170 G ) S 16 T ( 182 G ) N
+(198 R ) S 8 T ( 171 T ) S 16 T ( 183 S ) N
+(199 N ) S 8 T ( 172 G ) S 16 T ( 184 A ) N
+(200 Q ) S 8 T ( 173 Q ) S 16 T ( 185 S ) N
+(201 A ) S 8 T ( 174 D ) S 16 T ( 186 E ) N
+(202 N ) S 8 T ( -     ) S 16 T ( 187 A ) N
+(203 G ) S 8 T ( -     ) S 16 T ( 188 N ) N
+(204 S ) S 8 T ( -     ) S 16 T ( -     ) N
+(205 G ) S 8 T ( -     ) S 16 T ( -     ) N
+(206 V ) S 8 T ( -     ) S 16 T ( -     ) N
+(207 L ) S 8 T ( 175 I ) S 16 T ( 189 V ) N
+(208 E ) S 8 T ( 176 D ) S 16 T ( 190 E ) N
+(209 Q ) S 8 T ( 177 D ) S 16 T ( 191 E ) N
+(210 Q ) S 8 T ( 178 R ) S 16 T ( 192 K ) N
+(211 I ) S 8 T ( 179 I ) S 16 T ( 193 V ) N
+(212 L ) S 8 T ( 180 V ) S 16 T ( 194 L ) N
+(213 Q ) S 8 T ( 181 E ) S 16 T ( 195 A ) N
+(214 A ) S 8 T ( 182 A ) S 16 T ( 196 S ) N
+(215 N ) S 8 T ( 183 N ) S 16 T ( 197 N ) N
+(216 P ) S 8 T ( 184 P ) S 16 T ( 198 P ) N
+(217 I ) S 8 T ( 185 L ) S 16 T ( 199 I ) N
+(218 L ) S 8 T ( 186 L ) S 16 T ( 200 M ) N
+(219 E ) S 8 T ( 187 E ) S 16 T ( 201 E ) N
+(220 A ) S 8 T ( 188 A ) S 16 T ( 202 S ) N
+(221 F ) S 8 T ( 189 F ) S 16 T ( 203 I ) N
+(222 G ) S 8 T ( 190 G ) S 16 T ( 204 G ) N
+(223 N ) S 8 T ( 191 N ) S 16 T ( 205 N ) N
+(seqhc6) (Page 3/14) (Sep 09, 07 19:46) title
+border
+/v 3 store
+/x0 x v get 2.815385 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(224 A ) p 8 T ( 192 A ) S 16 T ( 206 A ) N
+(225 K ) S 8 T ( 193 K ) S 16 T ( 207 K ) N
+(226 T ) S 8 T ( 194 T ) S 16 T ( 208 T ) N
+(227 T ) S 8 T ( 195 V ) S 16 T ( 209 T ) N
+(228 R ) S 8 T ( 196 R ) S 16 T ( 210 R ) N
+(229 N ) S 8 T ( 197 N ) S 16 T ( 211 N ) N
+(230 N ) S 8 T ( 198 N ) S 16 T ( 212 N ) N
+(231 S ) S 8 T ( 199 S ) S 16 T ( 213 S ) N
+(232 S ) S 8 T ( 200 S ) S 16 T ( 214 S ) N
+(233 R ) S 8 T ( 201 R ) S 16 T ( 215 R ) N
+(234 F ) S 8 T ( 202 F ) S 16 T ( 216 F ) N
+(235 G ) S 8 T ( 203 G ) S 16 T ( 217 G ) N
+(236 K ) S 8 T ( 204 K ) S 16 T ( 218 K ) N
+(237 F ) S 8 T ( 205 F ) S 16 T ( 219 Y ) N
+(238 I ) S 8 T ( 206 V ) S 16 T ( 220 I ) N
+(239 E ) S 8 T ( 207 E ) S 16 T ( 221 E ) N
+(240 I ) S 8 T ( 208 I ) S 16 T ( 222 I ) N
+(241 Q ) S 8 T ( 209 H ) S 16 T ( 223 G ) N
+(242 F ) S 8 T ( 210 F ) S 16 T ( 224 F ) N
+(243 N ) S 8 T ( 211 N ) S 16 T ( 225 D ) N
+(244 S ) S 8 T ( 212 E ) S 16 T ( 226 K ) N
+(245 A ) S 8 T ( 213 K ) S 16 T ( 227 R ) N
+(246 G ) S 8 T ( 214 S ) S 16 T ( 228 Y ) N
+(247 F ) S 8 T ( 215 S ) S 16 T ( 229 R ) N
+(248 I ) S 8 T ( 216 V ) S 16 T ( 230 I ) N
+(249 S ) S 8 T ( 217 V ) S 16 T ( 231 I ) N
+(250 G ) S 8 T ( 218 G ) S 16 T ( 232 G ) N
+(251 A ) S 8 T ( 219 G ) S 16 T ( 233 A ) N
+(252 S ) S 8 T ( 220 F ) S 16 T ( 234 N ) N
+(253 I ) S 8 T ( 221 V ) S 16 T ( 235 M ) N
+(254 Q ) S 8 T ( 222 S ) S 16 T ( 236 R ) N
+(255 S ) S 8 T ( 223 H ) S 16 T ( 237 T ) N
+(256 Y ) S 8 T ( 224 Y ) S 16 T ( 238 Y ) N
+(257 L ) S 8 T ( 225 L ) S 16 T ( 239 L ) N
+(258 L ) S 8 T ( 226 L ) S 16 T ( 240 L ) N
+(259 E ) S 8 T ( 227 E ) S 16 T ( 241 E ) N
+(260 K ) S 8 T ( 228 K ) S 16 T ( 242 K ) N
+(261 S ) S 8 T ( 229 S ) S 16 T ( 243 S ) N
+(262 R ) S 8 T ( 230 R ) S 16 T ( 244 R ) N
+(263 V ) S 8 T ( 231 I ) S 16 T ( 245 V ) N
+(264 V ) S 8 T ( 232 C ) S 16 T ( 246 V ) N
+(265 F ) S 8 T ( 233 V ) S 16 T ( 247 F ) N
+(266 Q ) S 8 T ( 234 Q ) S 16 T ( 248 Q ) N
+(267 S ) S 8 T ( 235 G ) S 16 T ( 249 A ) N
+(268 E ) S 8 T ( 236 K ) S 16 T ( 250 E ) N
+(269 T ) S 8 T ( 237 E ) S 16 T ( 251 E ) N
+(270 E ) S 8 T ( 238 E ) S 16 T ( 252 E ) N
+(271 R ) S 8 T ( 239 R ) S 16 T ( 253 R ) N
+(272 N ) S 8 T ( 240 N ) S 16 T ( 254 N ) N
+(273 Y ) S 8 T ( 241 Y ) S 16 T ( 255 Y ) N
+(274 H ) S 8 T ( 242 H ) S 16 T ( 256 H ) N
+(275 I ) S 8 T ( 243 I ) S 16 T ( 257 I ) N
+(276 F ) S 8 T ( 244 F ) S 16 T ( 258 F ) N
+(277 Y ) S 8 T ( 245 Y ) S 16 T ( 259 Y ) N
+(278 Q ) S 8 T ( 246 R ) S 16 T ( 260 Q ) N
+(279 L ) S 8 T ( 247 L ) S 16 T ( 261 L ) N
+(280 L ) S 8 T ( 248 C ) S 16 T ( 262 C ) N
+(281 A ) S 8 T ( 249 A ) S 16 T ( 263 A ) N
+(282 G ) S 8 T ( 250 G ) S 16 T ( 264 S ) N
+(283 A ) S 8 T ( 251 A ) S 16 T ( 265 A ) N
+(284 T ) S 8 T ( 252 S ) S 16 T ( 266 A ) N
+(285 A ) S 8 T ( 253 E ) S 16 T ( 267 L ) N
+(286 E ) S 8 T ( 254 D ) S 16 T ( 268 P ) N
+(287 E ) S 8 T ( 255 I ) S 16 T ( 269 E ) N
+(288 K ) S 8 T ( 256 R ) S 16 T ( 270 F ) N
+(289 A ) S 8 T ( 257 R ) S 16 T ( 271 T ) N
+(290 L ) S 8 T ( 258 L ) S 16 T ( 272 L ) N
+(291 H ) S 8 T ( 259 H ) S 16 T ( 273 R ) N
+(292 L ) S 8 T ( 260 L ) S 16 T ( 274 L ) N
+(293 A ) S 8 T ( 261 S ) S 16 T ( 275 G ) N
+(294 G ) S 8 T ( 262 S ) S 16 T ( 276 N ) N
+(295 P ) S 8 T ( 263 P ) S 16 T ( 277 A ) N
+(296 E ) S 8 T ( 264 D ) S 16 T ( 278 N ) N
+(297 S ) S 8 T ( 265 N ) S 16 T ( 279 Y ) N
+(298 F ) S 8 T ( 266 F ) S 16 T ( 280 F ) N
+(299 N ) S 8 T ( 267 R ) S 16 T ( 281 H ) N
+(300 Y ) S 8 T ( 268 Y ) S 16 T ( 282 Y ) N
+(seqhc6) (Page 4/14) (Sep 09, 07 19:46) title
+border
+/v 4 store
+/x0 x v get 2.815385 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(301 L ) p 8 T ( 269 L ) S 16 T ( 283 T ) N
+(302 N ) S 8 T ( 270 N ) S 16 T ( 284 K ) N
+(303 Q ) S 8 T ( 271 R ) S 16 T ( 285 Q ) N
+(-     ) S 8 T ( 272 G ) S 16 T ( -     ) N
+(-     ) S 8 T ( 273 C ) S 16 T ( -     ) N
+(-     ) S 8 T ( 274 T ) S 16 T ( -     ) N
+(-     ) S 8 T ( 275 R ) S 16 T ( -     ) N
+(-     ) S 8 T ( 276 Y ) S 16 T ( -     ) N
+(-     ) S 8 T ( 277 F ) S 16 T ( -     ) N
+(-     ) S 8 T ( 278 A ) S 16 T ( -     ) N
+(-     ) S 8 T ( 279 N ) S 16 T ( -     ) N
+(-     ) S 8 T ( 280 K ) S 16 T ( -     ) N
+(-     ) S 8 T ( 281 E ) S 16 T ( -     ) N
+(-     ) S 8 T ( 282 T ) S 16 T ( -     ) N
+(-     ) S 8 T ( 283 D ) S 16 T ( -     ) N
+(-     ) S 8 T ( 284 K ) S 16 T ( -     ) N
+(-     ) S 8 T ( 285 Q ) S 16 T ( -     ) N
+(-     ) S 8 T ( 286 I ) S 16 T ( -     ) N
+(-     ) S 8 T ( 287 L ) S 16 T ( -     ) N
+(-     ) S 8 T ( 288 Q ) S 16 T ( -     ) N
+(-     ) S 8 T ( 289 N ) S 16 T ( -     ) N
+(-     ) S 8 T ( 290 R ) S 16 T ( -     ) N
+(-     ) S 8 T ( 291 K ) S 16 T ( -     ) N
+(-     ) S 8 T ( 292 S ) S 16 T ( -     ) N
+(-     ) S 8 T ( 293 P ) S 16 T ( -     ) N
+(-     ) S 8 T ( 294 E ) S 16 T ( -     ) N
+(-     ) S 8 T ( 295 Y ) S 16 T ( -     ) N
+(-     ) S 8 T ( 296 L ) S 16 T ( -     ) N
+(-     ) S 8 T ( 297 K ) S 16 T ( -     ) N
+(304 S ) S 8 T ( 298 A ) S 16 T ( 286 G ) N
+(305 G ) S 8 T ( 299 G ) S 16 T ( 287 G ) N
+(306 C ) S 8 T ( 300 S ) S 16 T ( 288 S ) N
+(307 V ) S 8 T ( 301 L ) S 16 T ( 289 P ) N
+(308 D ) S 8 T ( 302 K ) S 16 T ( 290 V ) N
+(309 I ) S 8 T ( 303 D ) S 16 T ( 291 I ) N
+(310 K ) S 8 T ( 304 P ) S 16 T ( 292 D ) N
+(311 G ) S 8 T ( 305 L ) S 16 T ( 293 G ) N
+(312 V ) S 8 T ( 306 L ) S 16 T ( 294 I ) N
+(313 S ) S 8 T ( 307 D ) S 16 T ( 295 D ) N
+(314 D ) S 8 T ( 308 D ) S 16 T ( 296 D ) N
+(315 S ) S 8 T ( 309 H ) S 16 T ( 297 A ) N
+(316 E ) S 8 T ( 310 G ) S 16 T ( 298 K ) N
+(317 E ) S 8 T ( 311 D ) S 16 T ( 299 E ) N
+(318 F ) S 8 T ( 312 F ) S 16 T ( 300 M ) N
+(319 K ) S 8 T ( 313 I ) S 16 T ( 301 V ) N
+(320 I ) S 8 T ( 314 R ) S 16 T ( 302 N ) N
+(321 T ) S 8 T ( 315 M ) S 16 T ( 303 T ) N
+(322 Q ) S 8 T ( 316 T ) S 16 T ( 304 Q ) N
+(323 A ) S 8 T ( 317 A ) S 16 T ( 305 A ) N
+(324 M ) S 8 T ( 318 M ) S 16 T ( 306 C ) N
+(325 D ) S 8 T ( 319 K ) S 16 T ( 307 T ) N
+(326 I ) S 8 T ( 320 K ) S 16 T ( 308 L ) N
+(327 V ) S 8 T ( 321 I ) S 16 T ( 309 L ) N
+(328 G ) S 8 T ( 322 G ) S 16 T ( 310 G ) N
+(329 F ) S 8 T ( 323 L ) S 16 T ( 311 I ) N
+(330 S ) S 8 T ( 324 D ) S 16 T ( 312 S ) N
+(331 Q ) S 8 T ( 325 D ) S 16 T ( 313 D ) N
+(332 E ) S 8 T ( 326 E ) S 16 T ( 314 S ) N
+(333 E ) S 8 T ( 327 E ) S 16 T ( 315 Y ) N
+(334 Q ) S 8 T ( 328 K ) S 16 T ( 316 Q ) N
+(335 M ) S 8 T ( 329 L ) S 16 T ( 317 M ) N
+(336 S ) S 8 T ( 330 D ) S 16 T ( 318 G ) N
+(337 I ) S 8 T ( 331 L ) S 16 T ( 319 I ) N
+(338 F ) S 8 T ( 332 F ) S 16 T ( 320 F ) N
+(339 K ) S 8 T ( 333 R ) S 16 T ( 321 R ) N
+(340 I ) S 8 T ( 334 V ) S 16 T ( 322 I ) N
+(341 I ) S 8 T ( 335 V ) S 16 T ( 323 L ) N
+(342 A ) S 8 T ( 336 A ) S 16 T ( 324 A ) N
+(343 G ) S 8 T ( 337 G ) S 16 T ( 325 G ) N
+(344 I ) S 8 T ( 338 V ) S 16 T ( 326 I ) N
+(345 L ) S 8 T ( 339 L ) S 16 T ( 327 L ) N
+(346 H ) S 8 T ( 340 H ) S 16 T ( 328 H ) N
+(347 L ) S 8 T ( 341 L ) S 16 T ( 329 L ) N
+(348 G ) S 8 T ( 342 G ) S 16 T ( 330 G ) N
+(349 N ) S 8 T ( 343 N ) S 16 T ( 331 N ) N
+(350 I ) S 8 T ( 344 I ) S 16 T ( 332 V ) N
+(351 K ) S 8 T ( 345 D ) S 16 T ( 333 E ) N
+(seqhc6) (Page 5/14) (Sep 09, 07 19:46) title
+border
+grestore
+(Printed by ) rhead
+(seqhc6) (1/3) (Sunday September 09, 2007) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (6-10) 2
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 2.815385 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(352 F ) p 8 T ( 346 F ) S 16 T ( 334 F ) N
+(353 E ) S 8 T ( 347 E ) S 16 T ( 335 A ) N
+(354 K ) S 8 T ( 348 E ) S 16 T ( 336 S ) N
+(355 G ) S 8 T ( 349 A ) S 16 T ( 337 R ) N
+(-     ) S 8 T ( 350 G ) S 16 T ( -     ) N
+(-     ) S 8 T ( 351 S ) S 16 T ( -     ) N
+(356 A ) S 8 T ( 352 T ) S 16 T ( 338 D ) N
+(357 G ) S 8 T ( 353 S ) S 16 T ( 339 S ) N
+(358 E ) S 8 T ( 354 G ) S 16 T ( 340 D ) N
+(359 G ) S 8 T ( 355 G ) S 16 T ( 341 S ) N
+(360 A ) S 8 T ( 356 C ) S 16 T ( 342 C ) N
+(361 V ) S 8 T ( 357 N ) S 16 T ( 343 A ) N
+(362 L ) S 8 T ( 358 L ) S 16 T ( 344 I ) N
+(363 K ) S 8 T ( 359 K ) S 16 T ( 345 P ) N
+(364 D ) S 8 T ( 360 N ) S 16 T ( 346 P ) N
+(365 K ) S 8 T ( 361 K ) S 16 T ( 347 K ) N
+(366 T ) S 8 T ( 362 S ) S 16 T ( 348 H ) N
+(367 A ) S 8 T ( 363 T ) S 16 T ( 349 D ) N
+(368 L ) S 8 T ( 364 Q ) S 16 T ( 350 P ) N
+(369 N ) S 8 T ( 365 A ) S 16 T ( 351 L ) N
+(-     ) S 8 T ( 366 L ) S 16 T ( 352 T ) N
+(-     ) S 8 T ( 367 E ) S 16 T ( -     ) N
+(-     ) S 8 T ( 368 Y ) S 16 T ( -     ) N
+(370 A ) S 8 T ( 369 C ) S 16 T ( 353 I ) N
+(371 A ) S 8 T ( 370 A ) S 16 T ( 354 F ) N
+(372 S ) S 8 T ( 371 E ) S 16 T ( 355 C ) N
+(373 T ) S 8 T ( 372 K ) S 16 T ( 356 D ) N
+(374 V ) S 8 T ( 373 L ) S 16 T ( 357 L ) N
+(375 F ) S 8 T ( 374 L ) S 16 T ( 358 M ) N
+(376 V ) S 8 T ( 375 L ) S 16 T ( 359 V ) N
+(377 N ) S 8 T ( 376 D ) S 16 T ( 360 D ) N
+(378 P ) S 8 T ( 377 Q ) S 16 T ( 361 Y ) N
+(379 S ) S 8 T ( 378 D ) S 16 T ( 362 E ) N
+(380 V ) S 8 T ( 379 D ) S 16 T ( 363 E ) N
+(381 L ) S 8 T ( 380 L ) S 16 T ( 364 M ) N
+(382 E ) S 8 T ( 381 R ) S 16 T ( 365 A ) N
+(383 K ) S 8 T ( 382 V ) S 16 T ( 366 H ) N
+(384 A ) S 8 T ( 383 S ) S 16 T ( 367 W ) N
+(385 L ) S 8 T ( 384 L ) S 16 T ( 368 L ) N
+(386 M ) S 8 T ( 385 T ) S 16 T ( 369 C ) N
+(387 E ) S 8 T ( 386 T ) S 16 T ( 370 H ) N
+(388 P ) S 8 T ( 387 R ) S 16 T ( 371 R ) N
+(389 R ) S 8 T ( 388 V ) S 16 T ( 372 K ) N
+(390 I ) S 8 T ( 389 M ) S 16 T ( 373 L ) N
+(391 L ) S 8 T ( 390 L ) S 16 T ( 374 A ) N
+(392 A ) S 8 T ( 391 T ) S 16 T ( 375 T ) N
+(393 G ) S 8 T ( 392 T ) S 16 T ( 376 A ) N
+(394 R ) S 8 T ( 393 A ) S 16 T ( 377 T ) N
+(-     ) S 8 T ( 394 G ) S 16 T ( -     ) N
+(-     ) S 8 T ( 395 G ) S 16 T ( -     ) N
+(-     ) S 8 T ( 396 A ) S 16 T ( -     ) N
+(-     ) S 8 T ( 397 K ) S 16 T ( -     ) N
+(-     ) S 8 T ( 398 G ) S 16 T ( -     ) N
+(395 D ) S 8 T ( 399 T ) S 16 T ( 378 E ) N
+(396 L ) S 8 T ( 400 V ) S 16 T ( 379 T ) N
+(397 V ) S 8 T ( 401 I ) S 16 T ( 380 Y ) N
+(398 A ) S 8 T ( 402 K ) S 16 T ( 381 I ) N
+(399 Q ) S 8 T ( 403 V ) S 16 T ( 382 K ) N
+(400 H ) S 8 T ( 404 P ) S 16 T ( 383 P ) N
+(401 L ) S 8 T ( 405 L ) S 16 T ( 384 I ) N
+(402 N ) S 8 T ( 406 K ) S 16 T ( 385 S ) N
+(403 V ) S 8 T ( 407 V ) S 16 T ( 386 K ) N
+(404 E ) S 8 T ( 408 E ) S 16 T ( 387 L ) N
+(405 K ) S 8 T ( 409 Q ) S 16 T ( 388 H ) N
+(406 S ) S 8 T ( 410 A ) S 16 T ( 389 A ) N
+(407 S ) S 8 T ( 411 N ) S 16 T ( 390 I ) N
+(408 S ) S 8 T ( 412 N ) S 16 T ( 391 N ) N
+(409 S ) S 8 T ( 413 A ) S 16 T ( 392 A ) N
+(410 R ) S 8 T ( 414 R ) S 16 T ( 393 R ) N
+(411 D ) S 8 T ( 415 D ) S 16 T ( 394 D ) N
+(412 A ) S 8 T ( 416 A ) S 16 T ( 395 A ) N
+(413 L ) S 8 T ( 417 L ) S 16 T ( 396 L ) N
+(414 V ) S 8 T ( 418 A ) S 16 T ( 397 A ) N
+(415 K ) S 8 T ( 419 K ) S 16 T ( 398 K ) N
+(416 A ) S 8 T ( 420 T ) S 16 T ( 399 H ) N
+(417 L ) S 8 T ( 421 V ) S 16 T ( 400 I ) N
+(418 Y ) S 8 T ( 422 Y ) S 16 T ( 401 Y ) N
+(seqhc6) (Page 6/14) (Sep 09, 07 19:46) title
+border
+/v 1 store
+/x0 x v get 2.815385 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(419 G ) p 8 T ( 423 S ) S 16 T ( 402 A ) N
+(420 R ) S 8 T ( 424 H ) S 16 T ( 403 N ) N
+(421 L ) S 8 T ( 425 L ) S 16 T ( 404 L ) N
+(422 F ) S 8 T ( 426 F ) S 16 T ( 405 F ) N
+(423 L ) S 8 T ( 427 D ) S 16 T ( 406 N ) N
+(424 W ) S 8 T ( 428 H ) S 16 T ( 407 W ) N
+(425 L ) S 8 T ( 429 V ) S 16 T ( 408 I ) N
+(426 V ) S 8 T ( 430 V ) S 16 T ( 409 V ) N
+(427 K ) S 8 T ( 431 N ) S 16 T ( 410 D ) N
+(428 K ) S 8 T ( 432 R ) S 16 T ( 411 H ) N
+(429 I ) S 8 T ( 433 V ) S 16 T ( 412 V ) N
+(430 N ) S 8 T ( 434 Q ) S 16 T ( 413 K ) N
+(431 V ) S 8 T ( 435 C ) S 16 T ( 414 A ) N
+(432 L ) S 8 T ( 436 F ) S 16 T ( 415 L ) N
+(433 C ) S 8 T ( 437 P ) S 16 T ( 416 H ) N
+(434 Q ) S 8 T ( 438 F ) S 16 T ( 417 S ) N
+(435 E ) S 8 T ( 439 E ) S 16 T ( 418 T ) N
+(436 R ) S 8 T ( 440 T ) S 16 T ( 419 V ) N
+(437 K ) S 8 T ( 441 S ) S 16 T ( 420 K ) N
+(438 A ) S 8 T ( 442 S ) S 16 T ( 421 Q ) N
+(439 Y ) S 8 T ( 443 Y ) S 16 T ( 422 H ) N
+(-     ) S 8 T ( -     ) S 16 T ( 423 S ) N
+(440 F ) S 8 T ( 444 F ) S 16 T ( 424 F ) N
+(441 I ) S 8 T ( 445 I ) S 16 T ( 425 I ) N
+(442 G ) S 8 T ( 446 G ) S 16 T ( 426 G ) N
+(443 V ) S 8 T ( 447 V ) S 16 T ( 427 V ) N
+(444 L ) S 8 T ( 448 L ) S 16 T ( 428 L ) N
+(445 D ) S 8 T ( 449 D ) S 16 T ( 429 D ) N
+(446 I ) S 8 T ( 450 I ) S 16 T ( 430 I ) N
+(447 S ) S 8 T ( 451 A ) S 16 T ( 431 Y ) N
+(448 G ) S 8 T ( 452 G ) S 16 T ( 432 G ) N
+(449 F ) S 8 T ( 453 F ) S 16 T ( 433 F ) N
+(450 E ) S 8 T ( 454 E ) S 16 T ( 434 E ) N
+(451 I ) S 8 T ( 455 Y ) S 16 T ( 435 T ) N
+(452 F ) S 8 T ( 456 F ) S 16 T ( 436 F ) N
+(453 K ) S 8 T ( 457 E ) S 16 T ( 437 E ) N
+(454 V ) S 8 T ( 458 H ) S 16 T ( 438 I ) N
+(455 N ) S 8 T ( 459 N ) S 16 T ( 439 N ) N
+(456 S ) S 8 T ( 460 S ) S 16 T ( 440 S ) N
+(457 F ) S 8 T ( 461 F ) S 16 T ( 441 F ) N
+(458 E ) S 8 T ( 462 E ) S 16 T ( 442 E ) N
+(459 Q ) S 8 T ( 463 Q ) S 16 T ( 443 Q ) N
+(460 L ) S 8 T ( 464 F ) S 16 T ( 444 F ) N
+(461 C ) S 8 T ( 465 C ) S 16 T ( 445 C ) N
+(462 I ) S 8 T ( 466 I ) S 16 T ( 446 I ) N
+(463 N ) S 8 T ( 467 N ) S 16 T ( 447 N ) N
+(464 Y ) S 8 T ( 468 Y ) S 16 T ( 448 Y ) N
+(465 T ) S 8 T ( 469 C ) S 16 T ( 449 A ) N
+(466 N ) S 8 T ( 470 N ) S 16 T ( 450 N ) N
+(467 E ) S 8 T ( 471 E ) S 16 T ( 451 E ) N
+(468 K ) S 8 T ( 472 K ) S 16 T ( 452 K ) N
+(469 L ) S 8 T ( 473 L ) S 16 T ( 453 L ) N
+(470 Q ) S 8 T ( 474 Q ) S 16 T ( 454 Q ) N
+(471 Q ) S 8 T ( 475 Q ) S 16 T ( 455 Q ) N
+(472 F ) S 8 T ( 476 F ) S 16 T ( 456 Q ) N
+(473 F ) S 8 T ( 477 F ) S 16 T ( 457 F ) N
+(474 N ) S 8 T ( 478 N ) S 16 T ( 458 N ) N
+(475 H ) S 8 T ( 479 E ) S 16 T ( 459 M ) N
+(476 H ) S 8 T ( 480 R ) S 16 T ( 460 H ) N
+(477 M ) S 8 T ( 481 I ) S 16 T ( 461 V ) N
+(478 F ) S 8 T ( 482 L ) S 16 T ( 462 F ) N
+(479 K ) S 8 T ( 483 K ) S 16 T ( 463 K ) N
+(480 L ) S 8 T ( 484 E ) S 16 T ( 464 L ) N
+(481 E ) S 8 T ( 485 E ) S 16 T ( 465 E ) N
+(482 Q ) S 8 T ( 486 Q ) S 16 T ( 466 Q ) N
+(483 E ) S 8 T ( 487 E ) S 16 T ( 467 E ) N
+(484 E ) S 8 T ( 488 L ) S 16 T ( 468 E ) N
+(485 Y ) S 8 T ( 489 Y ) S 16 T ( 469 Y ) N
+(486 L ) S 8 T ( 490 Q ) S 16 T ( 470 M ) N
+(487 K ) S 8 T ( 491 K ) S 16 T ( 471 K ) N
+(488 K ) S 8 T ( 492 G ) S 16 T ( 472 Q ) N
+(489 I ) S 8 T ( 493 L ) S 16 T ( 473 I ) N
+(490 N ) S 8 T ( 494 G ) S 16 T ( 474 P ) N
+(491 W ) S 8 T ( 495 V ) S 16 T ( 475 W ) N
+(492 T ) S 8 T ( 496 N ) S 16 T ( 476 T ) N
+(493 F ) S 8 T ( 497 E ) S 16 T ( 477 L ) N
+(494 I ) S 8 T ( 498 V ) S 16 T ( 478 I ) N
+(seqhc6) (Page 7/14) (Sep 09, 07 19:46) title
+border
+/v 2 store
+/x0 x v get 2.815385 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(495 D ) p 8 T ( 499 H ) S 16 T ( 479 D ) N
+(496 F ) S 8 T ( 500 Y ) S 16 T ( 480 F ) N
+(497 G ) S 8 T ( -     ) S 16 T ( -     ) N
+(498 L ) S 8 T ( 501 V ) S 16 T ( 481 Y ) N
+(499 D ) S 8 T ( 502 D ) S 16 T ( 482 D ) N
+(500 S ) S 8 T ( 503 N ) S 16 T ( 483 N ) N
+(501 Q ) S 8 T ( 504 Q ) S 16 T ( 484 Q ) N
+(502 A ) S 8 T ( 505 D ) S 16 T ( 485 P ) N
+(503 T ) S 8 T ( 506 C ) S 16 T ( 486 C ) N
+(504 I ) S 8 T ( 507 I ) S 16 T ( 487 I ) N
+(505 D ) S 8 T ( 508 D ) S 16 T ( 488 N ) N
+(506 L ) S 8 T ( 509 L ) S 16 T ( 489 L ) N
+(507 I ) S 8 T ( 510 I ) S 16 T ( 490 I ) N
+(508 D ) S 8 T ( 511 E ) S 16 T ( 491 E ) N
+(509 G ) S 8 T ( 512 A ) S 16 T ( 492 A ) N
+(510 R ) S 8 T ( 513 R ) S 16 T ( 493 K ) N
+(511 Q ) S 8 T ( -     ) S 16 T ( -     ) N
+(512 P ) S 8 T ( 514 L ) S 16 T ( -     ) N
+(513 P ) S 8 T ( 515 V ) S 16 T ( 494 M ) N
+(514 G ) S 8 T ( 516 G ) S 16 T ( 495 G ) N
+(515 I ) S 8 T ( 517 I ) S 16 T ( 496 V ) N
+(516 L ) S 8 T ( 518 L ) S 16 T ( 497 L ) N
+(517 A ) S 8 T ( 519 D ) S 16 T ( 498 D ) N
+(518 L ) S 8 T ( 520 I ) S 16 T ( 499 L ) N
+(519 L ) S 8 T ( 521 L ) S 16 T ( 500 L ) N
+(520 D ) S 8 T ( 522 D ) S 16 T ( 501 D ) N
+(521 E ) S 8 T ( 523 E ) S 16 T ( 502 E ) N
+(522 Q ) S 8 T ( 524 E ) S 16 T ( 503 E ) N
+(523 S ) S 8 T ( 525 N ) S 16 T ( 504 C ) N
+(524 V ) S 8 T ( 526 R ) S 16 T ( 505 K ) N
+(525 F ) S 8 T ( 527 L ) S 16 T ( 506 M ) N
+(526 P ) S 8 T ( 528 P ) S 16 T ( 507 P ) N
+(527 N ) S 8 T ( 529 Q ) S 16 T ( 508 K ) N
+(528 A ) S 8 T ( 530 P ) S 16 T ( 509 G ) N
+(529 T ) S 8 T ( 531 S ) S 16 T ( 510 S ) N
+(530 D ) S 8 T ( 532 D ) S 16 T ( 511 D ) N
+(531 N ) S 8 T ( 533 Q ) S 16 T ( 512 D ) N
+(532 T ) S 8 T ( 534 H ) S 16 T ( 513 T ) N
+(533 L ) S 8 T ( 535 F ) S 16 T ( 514 W ) N
+(534 I ) S 8 T ( 536 T ) S 16 T ( 515 A ) N
+(535 T ) S 8 T ( 537 S ) S 16 T ( 516 Q ) N
+(536 K ) S 8 T ( 538 A ) S 16 T ( 517 K ) N
+(537 L ) S 8 T ( 539 G ) S 16 T ( 518 L ) N
+(538 H ) S 8 T ( 540 H ) S 16 T ( 519 Y ) N
+(539 S ) S 8 T ( 541 Q ) S 16 T ( 520 N ) N
+(540 H ) S 8 T ( 542 K ) S 16 T ( 521 T ) N
+(541 F ) S 8 T ( 543 H ) S 16 T ( 522 H ) N
+(542 S ) S 8 T ( -     ) S 16 T ( 523 L ) N
+(543 K ) S 8 T ( 544 K ) S 16 T ( 524 N ) N
+(544 K ) S 8 T ( 545 D ) S 16 T ( 525 K ) N
+(545 N ) S 8 T ( 546 H ) S 16 T ( 526 C ) N
+(546 A ) S 8 T ( 547 F ) S 16 T ( 527 A ) N
+(547 Y ) S 8 T ( 548 L ) S 16 T ( 528 F ) N
+(548 E ) S 8 T ( 549 S ) S 16 T ( 529 E ) N
+(549 E ) S 8 T ( 550 I ) S 16 T ( 530 K ) N
+(550 P ) S 8 T ( 551 P ) S 16 T ( 531 P ) N
+(551 R ) S 8 T ( 552 R ) S 16 T ( 532 R ) N
+(552 F ) S 8 T ( 553 K ) S 16 T ( 533 L ) N
+(553 S ) S 8 T ( 554 S ) S 16 T ( 534 S ) N
+(554 K ) S 8 T ( 555 K ) S 16 T ( 535 N ) N
+(555 T ) S 8 T ( 556 L ) S 16 T ( 536 K ) N
+(556 E ) S 8 T ( 557 A ) S 16 T ( 537 A ) N
+(557 F ) S 8 T ( 558 I ) S 16 T ( 538 F ) N
+(558 G ) S 8 T ( 559 H ) S 16 T ( 539 I ) N
+(-     ) S 8 T ( 560 R ) S 16 T ( -     ) N
+(-     ) S 8 T ( 561 N ) S 16 T ( -     ) N
+(-     ) S 8 T ( 562 I ) S 16 T ( -     ) N
+(-     ) S 8 T ( 563 A ) S 16 T ( -     ) N
+(-     ) S 8 T ( 564 Y ) S 16 T ( -     ) N
+(-     ) S 8 T ( 565 D ) S 16 T ( -     ) N
+(-     ) S 8 T ( 566 E ) S 16 T ( -     ) N
+(-     ) S 8 T ( 567 G ) S 16 T ( -     ) N
+(-     ) S 8 T ( 568 F ) S 16 T ( -     ) N
+(-     ) S 8 T ( 569 I ) S 16 T ( -     ) N
+(559 V ) S 8 T ( 570 I ) S 16 T ( 540 I ) N
+(560 T ) S 8 T ( 571 R ) S 16 T ( 541 K ) N
+(561 H ) S 8 T ( 572 H ) S 16 T ( 542 H ) N
+(seqhc6) (Page 8/14) (Sep 09, 07 19:46) title
+border
+/v 3 store
+/x0 x v get 2.815385 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(562 Y ) p 8 T ( 573 F ) S 16 T ( 543 F ) N
+(563 A ) S 8 T ( 574 A ) S 16 T ( 544 A ) N
+(564 G ) S 8 T ( 575 G ) S 16 T ( 545 D ) N
+(565 Q ) S 8 T ( 576 A ) S 16 T ( 546 K ) N
+(566 V ) S 8 T ( 577 V ) S 16 T ( 547 V ) N
+(567 M ) S 8 T ( 578 C ) S 16 T ( 548 E ) N
+(568 Y ) S 8 T ( 579 Y ) S 16 T ( 549 Y ) N
+(569 E ) S 8 T ( 580 E ) S 16 T ( 550 Q ) N
+(570 I ) S 8 T ( 581 T ) S 16 T ( 551 C ) N
+(571 Q ) S 8 T ( 582 T ) S 16 T ( 552 E ) N
+(572 D ) S 8 T ( 583 Q ) S 16 T ( 553 G ) N
+(573 W ) S 8 T ( 584 F ) S 16 T ( 554 F ) N
+(574 L ) S 8 T ( 585 V ) S 16 T ( 555 L ) N
+(575 E ) S 8 T ( 586 E ) S 16 T ( 556 E ) N
+(576 K ) S 8 T ( 587 K ) S 16 T ( 557 K ) N
+(577 N ) S 8 T ( 588 N ) S 16 T ( 558 N ) N
+(578 K ) S 8 T ( 589 N ) S 16 T ( 559 K ) N
+(579 D ) S 8 T ( 590 D ) S 16 T ( 560 D ) N
+(580 P ) S 8 T ( 591 A ) S 16 T ( 561 T ) N
+(581 L ) S 8 T ( 592 L ) S 16 T ( 562 V ) N
+(582 Q ) S 8 T ( 593 H ) S 16 T ( 563 Y ) N
+(583 Q ) S 8 T ( 594 M ) S 16 T ( 564 E ) N
+(584 D ) S 8 T ( 595 S ) S 16 T ( 565 E ) N
+(585 L ) S 8 T ( 596 L ) S 16 T ( 566 Q ) N
+(586 E ) S 8 T ( 597 E ) S 16 T ( 567 I ) N
+(587 L ) S 8 T ( 598 S ) S 16 T ( 568 K ) N
+(588 C ) S 8 T ( 599 L ) S 16 T ( 569 V ) N
+(589 F ) S 8 T ( 600 I ) S 16 T ( 570 L ) N
+(590 K ) S 8 T ( 601 C ) S 16 T ( 571 K ) N
+(591 D ) S 8 T ( 602 E ) S 16 T ( 572 S ) N
+(592 S ) S 8 T ( 603 S ) S 16 T ( 573 S ) N
+(593 S ) S 8 T ( 604 R ) S 16 T ( 574 K ) N
+(-     ) S 8 T ( -     ) S 16 T ( 575 K ) N
+(594 D ) S 8 T ( 605 D ) S 16 T ( 576 F ) N
+(595 V ) S 8 T ( 606 F ) S 16 T ( 577 L ) N
+(596 V ) S 8 T ( 607 I ) S 16 T ( 578 L ) N
+(597 T ) S 8 T ( 608 R ) S 16 T ( 579 P ) N
+(598 K ) S 8 T ( 609 E ) S 16 T ( 580 E ) N
+(599 L ) S 8 T ( 610 L ) S 16 T ( 581 L ) N
+(600 F ) S 8 T ( 611 F ) S 16 T ( 582 F ) N
+(601 N ) S 8 T ( 612 E ) S 16 T ( 583 Q ) N
+(602 D ) S 8 T ( 613 S ) S 16 T ( 584 D ) N
+(-     ) S 8 T ( -     ) S 16 T ( 585 E ) N
+(-     ) S 8 T ( -     ) S 16 T ( 586 E ) N
+(-     ) S 8 T ( -     ) S 16 T ( 587 K ) N
+(-     ) S 8 T ( -     ) S 16 T ( 588 A ) N
+(-     ) S 8 T ( -     ) S 16 T ( 589 I ) N
+(-     ) S 8 T ( -     ) S 16 T ( 590 S ) N
+(-     ) S 8 T ( -     ) S 16 T ( 591 P ) N
+(-     ) S 8 T ( -     ) S 16 T ( 592 T ) N
+(-     ) S 8 T ( -     ) S 16 T ( 593 S ) N
+(-     ) S 8 T ( -     ) S 16 T ( 594 A ) N
+(-     ) S 8 T ( -     ) S 16 T ( 595 T ) N
+(-     ) S 8 T ( -     ) S 16 T ( 596 P ) N
+(-     ) S 8 T ( -     ) S 16 T ( 597 S ) N
+(-     ) S 8 T ( -     ) S 16 T ( 598 G ) N
+(-     ) S 8 T ( -     ) S 16 T ( 599 R ) N
+(-     ) S 8 T ( -     ) S 16 T ( 600 V ) N
+(-     ) S 8 T ( -     ) S 16 T ( 601 P ) N
+(-     ) S 8 T ( -     ) S 16 T ( 602 L ) N
+(-     ) S 8 T ( -     ) S 16 T ( 603 S ) N
+(-     ) S 8 T ( -     ) S 16 T ( 604 R ) N
+(-     ) S 8 T ( -     ) S 16 T ( 605 T ) N
+(603 P ) S 8 T ( 614 S ) S 16 T ( 606 P ) N
+(604 N ) S 8 T ( 615 T ) S 16 T ( 607 V ) N
+(605 I ) S 8 T ( 616 N ) S 16 T ( 608 K ) N
+(606 A ) S 8 T ( 617 N ) S 16 T ( 609 P ) N
+(607 S ) S 8 T ( 618 N ) S 16 T ( 610 A ) N
+(608 R ) S 8 T ( 619 K ) S 16 T ( 611 K ) N
+(609 A ) S 8 T ( 620 D ) S 16 T ( 612 A ) N
+(610 K ) S 8 T ( 621 T ) S 16 T ( 613 R ) N
+(611 K ) S 8 T ( 622 K ) S 16 T ( 614 P ) N
+(612 G ) S 8 T ( 623 Q ) S 16 T ( 615 G ) N
+(613 A ) S 8 T ( 624 K ) S 16 T ( 616 Q ) N
+(614 N ) S 8 T ( 625 A ) S 16 T ( 617 T ) N
+(-     ) S 8 T ( 626 G ) S 16 T ( 618 S ) N
+(-     ) S 8 T ( 627 K ) S 16 T ( 619 K ) N
+(seqhc6) (Page 9/14) (Sep 09, 07 19:46) title
+border
+/v 4 store
+/x0 x v get 2.815385 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(-     ) p 8 T ( 628 L ) S 16 T ( 620 E ) N
+(-     ) S 8 T ( 629 S ) S 16 T ( 621 H ) N
+(615 F ) S 8 T ( 630 F ) S 16 T ( 622 K ) N
+(616 I ) S 8 T ( 631 I ) S 16 T ( 623 K ) N
+(617 T ) S 8 T ( 632 S ) S 16 T ( 624 T ) N
+(618 V ) S 8 T ( 633 V ) S 16 T ( 625 V ) N
+(619 A ) S 8 T ( 634 G ) S 16 T ( 626 G ) N
+(620 A ) S 8 T ( 635 N ) S 16 T ( 627 H ) N
+(621 Q ) S 8 T ( 636 K ) S 16 T ( 628 Q ) N
+(622 Y ) S 8 T ( 637 F ) S 16 T ( 629 F ) N
+(623 K ) S 8 T ( 638 K ) S 16 T ( 630 R ) N
+(624 E ) S 8 T ( 639 T ) S 16 T ( 631 N ) N
+(625 Q ) S 8 T ( 640 Q ) S 16 T ( 632 S ) N
+(626 L ) S 8 T ( 641 L ) S 16 T ( 633 L ) N
+(627 A ) S 8 T ( 642 N ) S 16 T ( 634 H ) N
+(628 S ) S 8 T ( 643 L ) S 16 T ( 635 L ) N
+(629 M ) S 8 T ( 644 L ) S 16 T ( 636 M ) N
+(630 A ) S 8 T ( 645 D ) S 16 T ( 637 E ) N
+(631 T ) S 8 T ( 646 K ) S 16 T ( 638 T ) N
+(632 L ) S 8 T ( 647 L ) S 16 T ( 639 L ) N
+(633 E ) S 8 T ( 648 R ) S 16 T ( 640 N ) N
+(634 T ) S 8 T ( 649 S ) S 16 T ( 641 A ) N
+(635 T ) S 8 T ( 650 T ) S 16 T ( 642 T ) N
+(636 N ) S 8 T ( 651 G ) S 16 T ( 643 T ) N
+(637 P ) S 8 T ( 652 A ) S 16 T ( 644 P ) N
+(638 H ) S 8 T ( 653 S ) S 16 T ( 645 H ) N
+(639 F ) S 8 T ( 654 F ) S 16 T ( 646 Y ) N
+(640 V ) S 8 T ( 655 I ) S 16 T ( 647 V ) N
+(641 R ) S 8 T ( 656 R ) S 16 T ( 648 R ) N
+(642 C ) S 8 T ( 657 C ) S 16 T ( 649 C ) N
+(643 I ) S 8 T ( 658 I ) S 16 T ( 650 I ) N
+(644 I ) S 8 T ( 659 K ) S 16 T ( 651 K ) N
+(645 P ) S 8 T ( 660 P ) S 16 T ( 652 P ) N
+(646 N ) S 8 T ( 661 N ) S 16 T ( 653 N ) N
+(647 N ) S 8 T ( 662 L ) S 16 T ( 654 D ) N
+(648 K ) S 8 T ( 663 K ) S 16 T ( 655 F ) N
+(649 Q ) S 8 T ( 664 M ) S 16 T ( 656 K ) N
+(650 L ) S 8 T ( 665 T ) S 16 T ( 657 F ) N
+(651 P ) S 8 T ( 666 S ) S 16 T ( 658 P ) N
+(652 A ) S 8 T ( 667 H ) S 16 T ( 659 F ) N
+(653 K ) S 8 T ( 668 H ) S 16 T ( 660 T ) N
+(654 L ) S 8 T ( 669 F ) S 16 T ( 661 F ) N
+(655 E ) S 8 T ( 670 E ) S 16 T ( 662 D ) N
+(656 D ) S 8 T ( 671 G ) S 16 T ( 663 E ) N
+(657 K ) S 8 T ( 672 A ) S 16 T ( 664 K ) N
+(658 V ) S 8 T ( 673 Q ) S 16 T ( 665 R ) N
+(659 V ) S 8 T ( 674 I ) S 16 T ( 666 A ) N
+(660 L ) S 8 T ( 675 L ) S 16 T ( 667 V ) N
+(661 D ) S 8 T ( 676 S ) S 16 T ( 668 Q ) N
+(662 Q ) S 8 T ( 677 Q ) S 16 T ( 669 Q ) N
+(663 L ) S 8 T ( 678 L ) S 16 T ( 670 L ) N
+(664 R ) S 8 T ( 679 Q ) S 16 T ( 671 R ) N
+(665 C ) S 8 T ( 680 C ) S 16 T ( 672 A ) N
+(666 N ) S 8 T ( 681 S ) S 16 T ( 673 C ) N
+(667 G ) S 8 T ( 682 G ) S 16 T ( 674 G ) N
+(668 V ) S 8 T ( 683 M ) S 16 T ( 675 V ) N
+(669 L ) S 8 T ( 684 V ) S 16 T ( 676 L ) N
+(670 E ) S 8 T ( 685 S ) S 16 T ( 677 E ) N
+(671 G ) S 8 T ( 686 V ) S 16 T ( 678 T ) N
+(672 I ) S 8 T ( 687 L ) S 16 T ( 679 I ) N
+(673 R ) S 8 T ( 688 D ) S 16 T ( 680 R ) N
+(674 I ) S 8 T ( 689 L ) S 16 T ( 681 I ) N
+(675 T ) S 8 T ( 690 M ) S 16 T ( 682 S ) N
+(676 R ) S 8 T ( 691 Q ) S 16 T ( 683 A ) N
+(677 K ) S 8 T ( 692 G ) S 16 T ( 684 A ) N
+(678 G ) S 8 T ( 693 G ) S 16 T ( 685 G ) N
+(679 F ) S 8 T ( 694 F ) S 16 T ( 686 F ) N
+(680 P ) S 8 T ( 695 P ) S 16 T ( 687 P ) N
+(681 N ) S 8 T ( 696 S ) S 16 T ( 688 S ) N
+(682 R ) S 8 T ( 697 R ) S 16 T ( 689 R ) N
+(683 I ) S 8 T ( 698 A ) S 16 T ( 690 W ) N
+(684 I ) S 8 T ( 699 S ) S 16 T ( 691 T ) N
+(685 Y ) S 8 T ( 700 F ) S 16 T ( 692 Y ) N
+(686 A ) S 8 T ( 701 H ) S 16 T ( 693 Q ) N
+(687 D ) S 8 T ( 702 E ) S 16 T ( 694 E ) N
+(688 V ) S 8 T ( 703 Y ) S 16 T ( 695 F ) N
+(689 K ) S 8 T ( 704 N ) S 16 T ( 696 S ) N
+(seqhc6) (Page 10/14) (Sep 09, 07 19:46) title
+border
+grestore
+(Printed by ) rhead
+(seqhc6) (2/3) (Sunday September 09, 2007) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (11-14) 3
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 2.815385 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(690 R ) p 8 T ( 705 M ) S 16 T ( 697 R ) N
+(691 Y ) S 8 T ( 706 Y ) S 16 T ( 698 Y ) N
+(692 Y ) S 8 T ( 707 K ) S 16 T ( 699 R ) N
+(693 L ) S 8 T ( 708 K ) S 16 T ( 700 V ) N
+(694 L ) S 8 T ( 709 S ) S 16 T ( 701 L ) N
+(695 A ) S 8 T ( 710 L ) S 16 T ( 702 M ) N
+(696 P ) S 8 T ( 711 P ) S 16 T ( 703 K ) N
+(697 N ) S 8 T ( 712 D ) S 16 T ( 704 Q ) N
+(698 V ) S 8 T ( 713 K ) S 16 T ( 705 K ) N
+(699 P ) S 8 T ( 714 L ) S 16 T ( 706 D ) N
+(700 R ) S 8 T ( 715 A ) S 16 T ( 707 V ) N
+(701 D ) S 8 T ( 716 R ) S 16 T ( 708 L ) N
+(702 A ) S 8 T ( 717 L ) S 16 T ( 709 S ) N
+(703 E ) S 8 T ( 718 D ) S 16 T ( 710 D ) N
+(704 D ) S 8 T ( 719 P ) S 16 T ( 711 R ) N
+(705 S ) S 8 T ( -     ) S 16 T ( -     ) N
+(706 Q ) S 8 T ( 720 R ) S 16 T ( 712 K ) N
+(707 K ) S 8 T ( 721 L ) S 16 T ( 713 Q ) N
+(708 A ) S 8 T ( 722 F ) S 16 T ( 714 T ) N
+(709 T ) S 8 T ( 723 C ) S 16 T ( 715 C ) N
+(710 D ) S 8 T ( 724 K ) S 16 T ( 716 K ) N
+(711 A ) S 8 T ( 725 A ) S 16 T ( 717 N ) N
+(712 V ) S 8 T ( 726 L ) S 16 T ( 718 V ) N
+(713 L ) S 8 T ( 727 F ) S 16 T ( 719 L ) N
+(714 K ) S 8 T ( 728 K ) S 16 T ( 720 E ) N
+(715 H ) S 8 T ( 729 A ) S 16 T ( 721 K ) N
+(716 L ) S 8 T ( 730 L ) S 16 T ( 722 L ) N
+(717 N ) S 8 T ( 731 G ) S 16 T ( 723 I ) N
+(718 I ) S 8 T ( 732 L ) S 16 T ( 724 L ) N
+(719 D ) S 8 T ( 733 N ) S 16 T ( 725 D ) N
+(720 P ) S 8 T ( 734 E ) S 16 T ( 726 K ) N
+(721 E ) S 8 T ( 735 I ) S 16 T ( 727 D ) N
+(722 Q ) S 8 T ( 736 D ) S 16 T ( 728 K ) N
+(723 Y ) S 8 T ( 737 Y ) S 16 T ( 729 Y ) N
+(724 R ) S 8 T ( 738 K ) S 16 T ( 730 Q ) N
+(725 F ) S 8 T ( 739 F ) S 16 T ( 731 F ) N
+(726 G ) S 8 T ( 740 G ) S 16 T ( 732 G ) N
+(727 I ) S 8 T ( 741 L ) S 16 T ( 733 K ) N
+(728 T ) S 8 T ( 742 T ) S 16 T ( 734 T ) N
+(729 K ) S 8 T ( 743 K ) S 16 T ( 735 K ) N
+(730 I ) S 8 T ( 744 V ) S 16 T ( 736 I ) N
+(731 F ) S 8 T ( 745 F ) S 16 T ( 737 F ) N
+(732 F ) S 8 T ( 746 F ) S 16 T ( 738 F ) N
+(733 R ) S 8 T ( 747 R ) S 16 T ( 739 R ) N
+(734 A ) S 8 T ( 748 P ) S 16 T ( 740 A ) N
+(735 G ) S 8 T ( 749 G ) S 16 T ( 741 G ) N
+(736 Q ) S 8 T ( 750 K ) S 16 T ( 742 Q ) N
+(737 L ) S 8 T ( 751 F ) S 16 T ( 743 V ) N
+(738 A ) S 8 T ( 752 A ) S 16 T ( 744 A ) N
+(739 R ) S 8 T ( 753 E ) S 16 T ( 745 Y ) N
+(740 I ) S 8 T ( 754 F ) S 16 T ( 746 L ) N
+(741 E ) S 8 T ( 755 D ) S 16 T ( 747 E ) N
+(742 E ) S 8 T ( 756 Q ) S 16 T ( 748 K ) N
+(743 A ) S 8 T ( 757 I ) S 16 T ( 749 I ) N
+(744 R ) S 8 T ( 758 M ) S 16 T ( 750 R ) N
+(745 E ) S 8 T ( 759 K ) S 16 T ( 751 A ) N
+(746 Q ) S 8 T ( 760 S ) S 16 T ( 752 D ) N
+(747 I ) S 8 T ( 761 P ) S 16 T ( 753 L ) N
+(748 S ) S 8 T ( 762 D ) S 16 T ( 754 R ) N
+(749 E ) S 8 T ( 763 H ) S 16 T ( 755 A ) N
+(750 I ) S 8 T ( 764 L ) S 16 T ( 756 A ) N
+(751 I ) S 8 T ( 765 A ) S 16 T ( 757 C ) N
+(752 K ) S 8 T ( 766 E ) S 16 T ( 758 I ) N
+(753 A ) S 8 T ( 767 L ) S 16 T ( 759 R ) N
+(754 I ) S 8 T ( 768 V ) S 16 T ( 760 I ) N
+(755 Q ) S 8 T ( 769 K ) S 16 T ( 761 Q ) N
+(756 A ) S 8 T ( 770 R ) S 16 T ( 762 K ) N
+(757 A ) S 8 T ( 771 V ) S 16 T ( 763 T ) N
+(758 T ) S 8 T ( 772 N ) S 16 T ( 764 I ) N
+(759 R ) S 8 T ( -     ) S 16 T ( 765 R ) N
+(760 G ) S 8 T ( 773 H ) S 16 T ( 766 G ) N
+(761 W ) S 8 T ( 774 W ) S 16 T ( 767 W ) N
+(762 I ) S 8 T ( 775 L ) S 16 T ( 768 L ) N
+(763 A ) S 8 T ( 776 I ) S 16 T ( 769 M ) N
+(764 R ) S 8 T ( 777 C ) S 16 T ( 770 R ) N
+(765 K ) S 8 T ( 778 S ) S 16 T ( 771 K ) N
+(766 V ) S 8 T ( 779 R ) S 16 T ( 772 K ) N
+(seqhc6) (Page 11/14) (Sep 09, 07 19:46) title
+border
+/v 1 store
+/x0 x v get 2.815385 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(767 Y ) p 8 T ( 780 W ) S 16 T ( 773 Y ) N
+(768 K ) S 8 T ( 781 K ) S 16 T ( 774 M ) N
+(769 Q ) S 8 T ( 782 K ) S 16 T ( 775 R ) N
+(770 A ) S 8 T ( 783 V ) S 16 T ( 776 M ) N
+(771 R ) S 8 T ( 784 Q ) S 16 T ( 777 R ) N
+(772 E ) S 8 T ( 785 W ) S 16 T ( 778 R ) N
+(773 H ) S 8 T ( 786 C ) S 16 T ( 779 A ) N
+(774 T ) S 8 T ( 787 S ) S 16 T ( 780 A ) N
+(775 V ) S 8 T ( 788 L ) S 16 T ( 781 I ) N
+(776 A ) S 8 T ( 789 S ) S 16 T ( 782 T ) N
+(777 A ) S 8 T ( 790 V ) S 16 T ( 783 I ) N
+(778 R ) S 8 T ( 791 I ) S 16 T ( 784 Q ) N
+(779 I ) S 8 T ( 792 K ) S 16 T ( 785 R ) N
+(780 I ) S 8 T ( 793 L ) S 16 T ( 786 Y ) N
+(781 Q ) S 8 T ( 794 K ) S 16 T ( 787 V ) N
+(782 Q ) S 8 T ( 795 N ) S 16 T ( 788 R ) N
+(783 N ) S 8 T ( -     ) S 16 T ( 789 G ) N
+(784 L ) S 8 T ( -     ) S 16 T ( 790 H ) N
+(785 R ) S 8 T ( -     ) S 16 T ( 791 Q ) N
+(786 A ) S 8 T ( -     ) S 16 T ( 792 A ) N
+(-     ) S 8 T ( -     ) S 16 T ( 793 R ) N
+(-     ) S 8 T ( -     ) S 16 T ( 794 C ) N
+(-     ) S 8 T ( -     ) S 16 T ( 795 Y ) N
+(-     ) S 8 T ( -     ) S 16 T ( 796 A ) N
+(787 Y ) S 8 T ( 796 K ) S 16 T ( 797 T ) N
+(788 I ) S 8 T ( 797 I ) S 16 T ( 798 F ) N
+(789 D ) S 8 T ( 798 K ) S 16 T ( 799 L ) N
+(790 F ) S 8 T ( 799 Y ) S 16 T ( 800 R ) N
+(791 K ) S 8 T ( 800 R ) S 16 T ( 801 R ) N
+(792 S ) S 8 T ( 801 A ) S 16 T ( 802 T ) N
+(793 W ) S 8 T ( 802 E ) S 16 T ( 803 R ) N
+(794 P ) S 8 T ( 803 A ) S 16 T ( 804 A ) N
+(795 W ) S 8 T ( 804 C ) S 16 T ( 805 A ) N
+(796 W ) S 8 T ( 805 I ) S 16 T ( 806 I ) N
+(797 K ) S 8 T ( 806 K ) S 16 T ( 807 I ) N
+(798 L ) S 8 T ( 807 M ) S 16 T ( 808 I ) N
+(799 F ) S 8 T ( 808 Q ) S 16 T ( 809 Q ) N
+(800 S ) S 8 T ( 809 K ) S 16 T ( 810 K ) N
+(801 K ) S 8 T ( 810 T ) S 16 T ( 811 F ) N
+(802 R ) S 8 T ( 811 R ) S 16 T ( 812 R ) N
+(803 P ) S 8 T ( 812 M ) S 16 T ( 813 M ) N
+(804 L ) S 8 T ( 813 W ) S 16 T ( 814 Y ) N
+(805 L ) S 8 T ( 814 L ) S 16 T ( 815 V ) N
+(806 K ) S 8 T ( 815 C ) S 16 T ( 816 V ) N
+(807 R ) S 8 T ( 816 K ) S 16 T ( 817 R ) N
+(808 R ) S 8 T ( 817 R ) S 16 T ( 818 K ) N
+(809 N ) S 8 T ( 818 R ) S 16 T ( 819 R ) N
+(810 F ) S 8 T ( 819 H ) S 16 T ( 820 Y ) N
+(811 E ) S 8 T ( 820 K ) S 16 T ( 821 Q ) N
+(812 K ) S 8 T ( 821 P ) S 16 T ( 822 C ) N
+(813 E ) S 8 T ( 822 R ) S 16 T ( 823 M ) N
+(814 I ) S 8 T ( 823 I ) S 16 T ( 824 R ) N
+(815 K ) S 8 T ( 824 D ) S 16 T ( 825 D ) N
+(816 E ) S 8 T ( 825 G ) S 16 T ( 826 A ) N
+(817 K ) S 8 T ( -     ) S 16 T ( 827 T ) N
+(818 E ) S 8 T ( -     ) S 16 T ( 828 I ) N
+(819 R ) S 8 T ( -     ) S 16 T ( 829 A ) N
+(820 E ) S 8 T ( -     ) S 16 T ( 830 L ) N
+(821 I ) S 8 T ( -     ) S 16 T ( 831 Q ) N
+(822 L ) S 8 T ( -     ) S 16 T ( 832 A ) N
+(823 E ) S 8 T ( -     ) S 16 T ( 833 L ) N
+(824 L ) S 8 T ( -     ) S 16 T ( 834 L ) N
+(825 K ) S 8 T ( -     ) S 16 T ( 835 R ) N
+(826 S ) S 8 T ( -     ) S 16 T ( 836 G ) N
+(827 N ) S 8 T ( -     ) S 16 T ( 837 Y ) N
+(828 L ) S 8 T ( -     ) S 16 T ( 838 L ) N
+(829 T ) S 8 T ( -     ) S 16 T ( 839 V ) N
+(830 D ) S 8 T ( -     ) S 16 T ( 840 R ) N
+(831 S ) S 8 T ( -     ) S 16 T ( 841 N ) N
+(832 T ) S 8 T ( -     ) S 16 T ( -     ) N
+(833 T ) S 8 T ( -     ) S 16 T ( -     ) N
+(834 Q ) S 8 T ( -     ) S 16 T ( -     ) N
+(835 K ) S 8 T ( -     ) S 16 T ( -     ) N
+(836 D ) S 8 T ( -     ) S 16 T ( -     ) N
+(837 K ) S 8 T ( -     ) S 16 T ( -     ) N
+(838 L ) S 8 T ( -     ) S 16 T ( -     ) N
+(839 E ) S 8 T ( -     ) S 16 T ( 842 K ) N
+(seqhc6) (Page 12/14) (Sep 09, 07 19:46) title
+border
+/v 2 store
+/x0 x v get 2.815385 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(840 K ) p 8 T ( -     ) S 16 T ( 843 Y ) N
+(841 S ) S 8 T ( -     ) S 16 T ( 844 Q ) N
+(842 L ) S 8 T ( -     ) S 16 T ( 845 M ) N
+(843 K ) S 8 T ( -     ) S 16 T ( 846 M ) N
+(844 D ) S 8 T ( -     ) S 16 T ( 847 L ) N
+(845 T ) S 8 T ( -     ) S 16 T ( 848 R ) N
+(846 E ) S 8 T ( 826 L ) S 16 T ( 849 E ) N
+(847 S ) S 8 T ( 827 V ) S 16 T ( 850 H ) N
+(848 N ) S 8 T ( 828 K ) S 16 T ( 851 K ) N
+(849 V ) S 8 T ( 829 V ) S 16 T ( 852 S ) N
+(850 L ) S 8 T ( 830 G ) S 16 T ( 853 I ) N
+(851 D ) S 8 T ( 831 T ) S 16 T ( 854 I ) N
+(852 L ) S 8 T ( 832 L ) S 16 T ( 855 I ) N
+(853 Q ) S 8 T ( 833 K ) S 16 T ( 856 Q ) N
+(854 R ) S 8 T ( 834 K ) S 16 T ( 857 K ) N
+(855 Q ) S 8 T ( 835 R ) S 16 T ( 858 H ) N
+(856 L ) S 8 T ( 836 L ) S 16 T ( 859 V ) N
+(857 K ) S 8 T ( 837 D ) S 16 T ( 860 R ) N
+(858 A ) S 8 T ( 838 K ) S 16 T ( 861 G ) N
+(859 E ) S 8 T ( 839 F ) S 16 T ( 862 W ) N
+(860 K ) S 8 T ( 840 N ) S 16 T ( 863 L ) N
+(861 T ) S 8 T ( 841 V ) S 16 T ( 864 R ) N
+(862 L ) S 8 T ( 842 V ) S 16 T ( 865 V ) N
+(863 K ) S 8 T ( 843 S ) S 16 T ( 866 H ) N
+(864 A ) S 8 T ( 844 A ) S 16 T ( 867 Y ) N
+(865 M ) S 8 T ( 845 L ) S 16 T ( 868 H ) N
+(866 Y ) S 8 T ( 846 K ) S 16 T ( 869 R ) N
+(867 D ) S 8 T ( 847 D ) S 16 T ( 870 T ) N
+(868 S ) S 8 T ( 848 G ) S 16 T ( 871 L ) N
+(869 K ) S 8 T ( 849 K ) S 16 T ( 872 K ) N
+(870 D ) S 8 T ( 850 Q ) S 16 T ( 873 A ) N
+(871 A ) S 8 T ( 851 E ) S 16 T ( 874 I ) N
+(872 L ) S 8 T ( 852 M ) S 16 T ( 875 V ) N
+(873 E ) S 8 T ( 853 S ) S 16 T ( 876 Y ) N
+(874 A ) S 8 T ( 854 K ) S 16 T ( 877 L ) N
+(875 Q ) S 8 T ( 855 Q ) S 16 T ( 878 Q ) N
+(876 K ) S 8 T ( 856 V ) S 16 T ( 879 C ) N
+(877 R ) S 8 T ( 857 K ) S 16 T ( 880 C ) N
+(878 E ) S 8 T ( 858 D ) S 16 T ( 881 Y ) N
+(879 L ) S 8 T ( 859 L ) S 16 T ( 882 R ) N
+(880 E ) S 8 T ( 860 E ) S 16 T ( 883 R ) N
+(881 I ) S 8 T ( 861 I ) S 16 T ( 884 M ) N
+(882 R ) S 8 T ( 862 S ) S 16 T ( 885 M ) N
+(883 V ) S 8 T ( 863 I ) S 16 T ( 886 A ) N
+(884 E ) S 8 T ( 864 D ) S 16 T ( 887 K ) N
+(885 D ) S 8 T ( 865 A ) S 16 T ( 888 R ) N
+(886 M ) S 8 T ( 866 L ) S 16 T ( 889 E ) N
+(887 E ) S 8 T ( 867 M ) S 16 T ( 890 L ) N
+(888 S ) S 8 T ( 868 A ) S 16 T ( 891 K ) N
+(889 E ) S 8 T ( 869 K ) S 16 T ( 892 K ) N
+(890 L ) S 8 T ( 870 I ) S 16 T ( 893 L ) N
+(891 D ) S 8 T ( 871 K ) S 16 T ( 894 K ) N
+(892 E ) S 8 T ( 872 S ) S 16 T ( 895 I ) N
+(893 K ) S 8 T ( 873 T ) S 16 T ( 896 E ) N
+(894 K ) S 8 T ( 874 M ) S 16 T ( 897 A ) N
+(895 L ) S 8 T ( 875 M ) S 16 T ( 898 R ) N
+(896 A ) S 8 T ( 876 T ) S 16 T ( 899 S ) N
+(897 L ) S 8 T ( 877 R ) S 16 T ( 900 V ) N
+(898 E ) S 8 T ( 878 E ) S 16 T ( 901 E ) N
+(899 N ) S 8 T ( 879 Q ) S 16 T ( 902 R ) N
+(900 L ) S 8 T ( 880 I ) S 16 T ( 903 Y ) N
+(901 Q ) S 8 T ( 881 Q ) S 16 T ( 904 K ) N
+(902 N ) S 8 T ( 882 K ) S 16 T ( 905 K ) N
+(903 Q ) S 8 T ( 883 E ) S 16 T ( 906 L ) N
+(904 K ) S 8 T ( 884 Y ) S 16 T ( 907 H ) N
+(905 R ) S 8 T ( 885 D ) S 16 T ( 908 I ) N
+(906 S ) S 8 T ( 886 A ) S 16 T ( 909 G ) N
+(907 V ) S 8 T ( 887 L ) S 16 T ( 910 L ) N
+(908 E ) S 8 T ( 888 V ) S 16 T ( 911 E ) N
+(909 E ) S 8 T ( 889 K ) S 16 T ( 912 N ) N
+(910 K ) S 8 T ( 890 S ) S 16 T ( 913 K ) N
+(911 V ) S 8 T ( 891 S ) S 16 T ( 914 I ) N
+(912 R ) S 8 T ( 892 A ) S 16 T ( 915 M ) N
+(913 D ) S 8 T ( 893 V ) S 16 T ( 916 Q ) N
+(914 L ) S 8 T ( 894 L ) S 16 T ( 917 L ) N
+(915 E ) S 8 T ( 895 L ) S 16 T ( 918 Q ) N
+(916 E ) S 8 T ( 896 S ) S 16 T ( 919 R ) N
+(seqhc6) (Page 13/14) (Sep 09, 07 19:46) title
+border
+/v 3 store
+/x0 x v get 2.815385 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(917 E ) p 8 T ( 897 A ) S 16 T ( 920 K ) N
+(918 L ) S 8 T ( 898 L ) S 16 T ( 921 I ) N
+(919 Q ) S 8 T ( 899 Q ) S 16 T ( 922 D ) N
+(920 E ) S 8 T ( 900 K ) S 16 T ( 923 Q ) N
+(-     ) S 8 T ( -     ) S 16 T ( 924 N ) N
+(921 Q ) S 8 T ( 901 K ) S 16 T ( 925 K ) N
+(922 K ) S 8 T ( 902 Q ) S 16 T ( 926 E ) N
+(923 L ) S 8 T ( 903 Q ) S 16 T ( 927 Y ) N
+(924 R ) S 8 T ( 904 E ) S 16 T ( 928 K ) N
+(925 N ) S 8 T ( 905 E ) S 16 T ( 929 S ) N
+(926 T ) S 8 T ( 906 E ) S 16 T ( 930 L ) N
+(927 L ) S 8 T ( 907 A ) S 16 T ( 931 L ) N
+(928 E ) S 8 T ( 908 E ) S 16 T ( 932 E ) N
+(929 K ) S 8 T ( 909 R ) S 16 T ( 933 K ) N
+(930 L ) S 8 T ( 910 L ) S 16 T ( 934 M ) N
+(931 K ) S 8 T ( 911 R ) S 16 T ( 935 N ) N
+(932 K ) S 8 T ( 912 R ) S 16 T ( 936 N ) N
+(933 K ) S 8 T ( 913 I ) S 16 T ( 937 L ) N
+(934 Y ) S 8 T ( 914 Q ) S 16 T ( 938 E ) N
+(935 E ) S 8 T ( 915 E ) S 16 T ( 939 I ) N
+(936 E ) S 8 T ( 916 E ) S 16 T ( 940 T ) N
+(937 E ) S 8 T ( 917 M ) S 16 T ( 941 Y ) N
+(938 L ) S 8 T ( 918 E ) S 16 T ( 942 S ) N
+(939 E ) S 8 T ( 919 K ) S 16 T ( 943 T ) N
+(940 E ) S 8 T ( 920 E ) S 16 T ( 944 E ) N
+(941 M ) S 8 T ( 921 R ) S 16 T ( 945 T ) N
+(942 K ) S 8 T ( 922 K ) S 16 T ( 946 E ) N
+(943 R ) S 8 T ( 923 R ) S 16 T ( 947 K ) N
+(944 V ) S 8 T ( 924 R ) S 16 T ( 948 L ) N
+(945 N ) S 8 T ( 925 E ) S 16 T ( 949 R ) N
+(946 D ) S 8 T ( 926 E ) S 16 T ( 950 S ) N
+(947 G ) S 8 T ( 927 D ) S 16 T ( 951 D ) N
+(948 Q ) S 8 T ( 928 E ) S 16 T ( 952 V ) N
+(949 S ) S 8 T ( 929 Q ) S 16 T ( 953 E ) N
+(950 D ) S 8 T ( -     ) S 16 T ( 954 R ) N
+(seqhc6) (Page 14/14) (Sep 09, 07 19:46) title
+border
+grestore
+(Printed by ) rhead
+(seqhc6) (3/3) (Sunday September 09, 2007) footer
+end % of iso1dict
+pagesave restore
+showpage
+
+%%Trailer
+end
+%%EOF

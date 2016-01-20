@@ -1,0 +1,11 @@
+#!/bin/bash
+
+aname=`date +%m.%d.%y`c37a1.tgz
+# remove leading zero as per my convention
+aname=`echo $aname | awk '{ if (substr($0,1,1) == 0 ) { print substr($0,2) } else { print $0 } }'`
+echo -n 'Creating archive '$aname
+tar -czvhf $aname ./source ./build/UNX ./gnu ./ifort ./install.com ./path ./pgi
+echo 'done!'
+echo 'backing up:'
+scp -P 99 $aname surgeon@128.103.92.246:/bkp7/string_code/
+echo 'done!'

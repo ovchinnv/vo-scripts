@@ -1,0 +1,167 @@
+#####################################################################################################################
+MPIHOME=/home/ovchinnikov/usr/openmpi
+
+FLAGS	= $(MPIHOME)/bin/mpif77 -132 -r8 -O3 -align all
+# options
+CFLAGS  = $(FLAGS) -c -Dimmbnd -DPARALLEL -Dint=integer Dfloat=real*8 -Dmpi_float=MPI_DOUBLE_PRECISION           -c #-DLES  
+
+LDFLAGS = $(FLAGS) -o  
+LIBS = -L $(MPIHOME)/lib
+
+CMD     = eddy
+#####################################################################################################################
+
+.SUFFIXES:  .F .F90
+.F90.o:
+	 $(CFLAGS) $<
+
+.F.o:
+	 $(CFLAGS) $<
+
+.f.o:
+	 $(CFLAGS) $<	
+OBJ = \
+main.o \
+eddy.o\
+size.o\
+IO.o\
+probe.o\
+refreshbc.o\
+swap.o\
+presdp2p.o\
+ boundary_exp.o\
+ boundary_imp.o\
+ setup.o\
+ srcterms.o\
+ timeindeg.o\
+ timestep.o\
+ turvis.o\
+ rhs.o\
+ peter.o\
+ inout.o\
+ info.o\
+ numrec.o \
+ h3dcy2_fftw.o \
+ fft99.o\
+ slice.o\
+ spacedevel.o\
+ timedevel.o\
+ filter.o\
+ center.o\
+ multigrdset.o\
+ multigrdsolver.o\
+ tridag.o\
+ exasol.o\
+ massbal.o\
+ resid.o\
+ rescale.o\
+ lagrange.o\
+ poissx.o\
+ poistg.o\
+ direct.o\
+ cfftlib_4p.o\
+ peqinit.o\
+ nag_4p.o\
+forcing.o\
+scrivi.o\
+setup_ose.o\
+setinterp_ose.o\
+blas_ose.o\
+grid_ose.o\
+pentdiag.o\
+ose.o\
+rsbud3.o\
+blktri.o\
+pfft_yz.o\
+tridiag.o\
+2ptcorr.o\
+noise.o\
+stats.o\
+save.o\
+spec.o\
+readini.o\
+planes.o\
+box2.o\
+spress.o\
+quartic.o
+
+
+$(CMD):		$(OBJ)
+		@echo Makefile: ... compiling $@
+		$(LDFLAGS) $(@) $(OBJ) $(LIBS)
+
+clean:
+	rm -f $(CMD) $(OBJ)
+
+dep:
+	makedepend *.F *.f *.F90 headers/*.h
+# DO NOT DELETE
+main.o :headers/*.h 
+eddy.o: 	IO.o size.o headers/*.h 
+IO.o:headers/*.h
+size.0:size.F90
+probe.o:headers/*.h 
+refreshbc.o:headers/*.h 
+swap.o:headers/*.h swap.F 
+presdp2p.o:headers/*.h 
+ boundary_exp.o:headers/*.h 
+ boundary_imp.o:headers/*.h 
+ setup.o:headers/*.h 
+ srcterms.o:headers/*.h 
+ timeindeg.o:headers/*.h 
+ timestep.o:headers/*.h 
+ turvis.o:headers/*.h 
+ rhs.o:headers/*.h 
+ peter.o:peter.F headers/*.h 
+ inout.o:headers/*.h 
+ info.o:headers/*.h 
+ tecplot.o:headers/*.h 
+ plot.o:headers/*.h 
+ numrec.o:headers/*.h 
+ h3dcy2_fftw.o:headers/*.h 
+ fft99.o:headers/*.h 
+ slice.o:headers/*.h 
+ spacedevel.o:headers/*.h 
+ timedevel.o:headers/*.h 
+ filter.o:headers/*.h 
+ center.o:headers/*.h 
+ multigrdset.o:headers/*.h 
+ multigrdsolver.o:headers/*.h 
+ tridag.o:headers/*.h 
+ exasol.o:headers/*.h 
+ massbal.o:headers/*.h 
+ resid.o:headers/*.h 
+ rescale.o:headers/*.h 
+ lagrange.o:headers/*.h 
+ h3dndc.o:headers/*.h 
+ poissx.o:headers/*.h 
+ poistg.o:headers/*.h 
+ direct.o:headers/*.h direct.F 
+ blktri.o:headers/*.h 
+ cfftlib_4p.o:headers/*.h 
+ peqinit.o:headers/*.h 
+ nag_4p.o:headers/*.h 
+ statistiche.o:headers/*.h 
+forcing.o:headers/*.h 
+scrivi.o:headers/*.h 
+ose.o:headers/*.h 
+setup_ose.o:headers/*.h 
+setinterp_ose.o:headers/*.h 
+blas_ose.o:headers/*.h 
+grid_ose.o:headers/*.h 
+pentdiag.o:headers/*.h 
+rsbud3.o:headers/*.h rsbud3.F 
+pfft_yz.o:headers/*.h pfft_yz.F 
+tridiag.o: tridiag.f 
+2ptcorr.o: 2ptcorr.f headers/dimension.h headers/two_pt.h 
+noise.o: noise.f headers/ose.h 
+stats.o: stats.F headers/common.h headers/dimension.h  
+save.o: save.f headers/save.h headers/common.h headers/dimension.h 
+spec.o: spec.f headers/spec.h headers/common.h headers/dimension.h 
+readini.o: readini.F headers/common.h headers/dimension.h 
+planes.o: planes.F headers/common.h headers/dimension.h headers/planes.h 
+box2.o: box2.F headers/common.h headers/dimension.h headers/box2.h 
+spress.o: spress.F headers/dimension.h headers/spress.h 
+
+
+

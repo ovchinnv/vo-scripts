@@ -1,0 +1,16 @@
+#!/bin/bash
+# COMPARES SEQUENCES FROM PDB FILES
+
+awk '
+
+BEGIN {
+        file1=ARGV[1];
+}
+
+{ 
+  if ($1 == "SEQRES") 
+  {
+    print file1,$0
+  }
+} ' $1   
+

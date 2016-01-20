@@ -1,0 +1,91 @@
+* evaluate distance between centers of mass, not HB interactions
+
+set version 27
+
+set psffile m6ppstr_nowat
+stream readpsf.str
+
+set corfile nvt330_m6ppstr_now1
+read coor card name @{corfile}.avg.cor ! initial file
+
+system "echo '% D767/R136, D767/S119, D767/T122, F736/T122, G761/S64O, L4/HE' > @{CORFILE}.hb2"
+!
+!
+define backbone select type O .or. type N .or. type C .or. type CA end
+define HC select resid 126:142 .and. backbone end
+define loop4 select resid 770:774 .and. segid HC .and. backbone end
+!
+bomblev -2
+prnlev 0
+
+set fname1 nvt330_m6ppstr_now1.dcd
+set fname2 nvt330_m6ppstr_now21.dcd
+set nfr1 2624
+set nfr2 1000
+
+set i 1
+label file
+calc i = @i + 1
+ open file read unit @i name @fname@@i
+! traj query unit 1
+! set nfr ?nfile
+ traj iread @i ! skip 100 begin 0 stop 1000000
+ set j 0
+ label traj
+!  traj read
+!******************* add distance variables for interaction between converter & motor
+quick select resid 767 .and. ( type CB .or. type CG .or. type OD1 .or. type OD2 ) end select resid 136 .and. ( type CZ .or. type NH1 .or. type NH2 ) end
+set d1 ?dist
+quick select resid 767 .and. ( type CB .or. type CG .or. type OD1 .or. type OD2 ) end select resid 119 .and. ( type CB .or. type OG ) end ! 
+set d2 ?dist
+quick select resid 767 .and. ( type CB .or. type CG .or. type OD1 .or. type OD2 ) end select resid 122 .and. ( type CB .or. type OG1 ) end ! 
+set d3 ?dist
+quick select resid 763 .and. ( type O ) end select resid 122 .and. ( type CB .or. type OG1 ) end
+set d4 ?dist
+quick select resid 761 .and. ( type N ) end select resid  64 .and. ( type CB .or. type OG ) end
+set d5 ?dist
+quick select loop4 end select HC end
+set d6 ?dist
+goto skip
+!******************* add distance variables for interaction between converter & motor
+quick select resid 767 .and. ( type OD1 ) end select resid 136 .and. ( type NH1 ) end
+set d1a ?dist
+quick select resid 767 .and. ( type OD1 ) end select resid 136 .and. ( type NH2 ) end
+set d1b ?dist
+quick select resid 767 .and. ( type OD2 ) end select resid 136 .and. ( type NH1 ) end
+set d1c ?dist
+quick select resid 767 .and. ( type OD2 ) end select resid 136 .and. ( type NH2 ) end
+set d1d ?dist
+!
+quick select resid 767 .and. ( type OD1 ) end select resid 119 .and. ( type OG ) end  
+set d2a ?dist
+quick select resid 767 .and. ( type OD2 ) end select resid 119 .and. ( type OG ) end  
+set d2b ?dist
+!
+quick select resid 767 .and. ( type OD1 ) end select resid 122 .and. ( type OG1 ) end ! 
+set d3a ?dist
+quick select resid 767 .and. ( type OD2 ) end select resid 122 .and. ( type OG1 ) end ! 
+set d3b ?dist
+!
+quick select resid 763 .and. ( type O ) end select resid 122 .and. ( type OG1 ) end
+set d4 ?dist
+quick select resid 761 .and. ( type N ) end select resid  64 .and. ( type OG ) end
+set d5 ?dist
+quick select loop4 end select HC end
+set d6 ?dist
+label skip
+!*************************************************************************
+
+!  system "echo '@D1A @D1B @D1C @D1D @D2A @D2B @D3A @D3B @D4 @D5 @D6' >> @{CORFILE}.hb "
+  system "echo '@D1 @D2 @D3 @D4 @D5 @D6' >> @{FNAME@@I}.hb2 "
+!
+  incr j
+  traj read
+  if @j .le. @nfr@@i -
+ goto traj
+! prnlev 5
+ close unit @i
+
+if @i .le. 2 - 
+goto file
+

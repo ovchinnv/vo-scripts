@@ -1,0 +1,120 @@
+* principal component analysis
+* in this case the modes have been previously computed and are read from file
+*
+
+prnlev 3
+      
+set readave = 0 ! read existing averaged structure?
+set nmodes = 10 ! compute only these (most significant modes) 
+
+set psffile 
+set corfile 
+
+stream readpsf.str
+
+!!!!!!!!! file for alignment
+set corfile2 
+
+open read card unit 1 name @corfile2.crd
+read coor card unit 1 comp resid
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! set up dcd file
+set dcdfile conv_@me.dcd
+open file read unit 1 name @dcdfile.dcd
+traj query unit 1
+show ?skip
+set skip ?skip
+set begin ?start
+      
+! can use coor dyna for averaged coordinates
+  
+! select atoms for PCA
+set backbone type C .or. type CA .or. type N .or. type O
+
+!define vatoms select ( @solute ) .and. ( @backbone ) end
+define vatoms select ( @solute ) .and. ( @{pca_atoms} ) end
+
+coor orie rms select vatoms end comp ! will orient the comparison set -- i.e.  rigor, based on the postrigor
+
+!!!!!!!!!!!!! orient & trim dcd !!!!!!!!!!!!!!!!!!!!!!!
+coor copy comp ! put reference coordinates into comp
+open write unit 2 file name prigor1_pca_all.dcd
+merge firstu 1 nunit 1 outputu 2 skip @skip begin @begin sele vatoms end -
+orient mass sele vatoms end 
+close unit 1
+close unit 2
+open file read unit 1 name prigor1_pca_all.dcd
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+delete atom select .not. (vatoms) end
+open unit 2 card write name prigor1_pca_all.psf
+write psf card unit 2
+
+!delete atom select all end
+!open unit 2 card read name trash.psf
+!read psf card unit 2
+
+define vatoms select all end
+set natom ?nsel
+calc offset = (3*@natom - @nmodes) 
+!calc offset = 0
+!calc nmodes = 3*@natom
+
+      
+! find average structure & save
+
+!goto skipave
+if @readave .eq. 0 then
+  coor dyna firstu 1 nunit 1
+  open write card unit 25 name prigor1_avg_all.crd
+  write coor card unit 25
+else
+  open read card unit 25 name prigor1_avg_all.crd
+  read coor card unit 25 
+endif
+!label skipave
+bomblev -2 ! to avoid bombing on large number of atoms in vibran
+
+vibran nmod @nmodes ihbfrq 0 inbfrq 0
+!quasi nunits 1 firstu 1 nskip @skip begin @begin select vatoms end nfreq @nmodes temp 298.0 ! thermo resi
+quasi nunits 1 firstu 1 nskip @skip begin @begin nfreq @nmodes nadd @offset temp 298.0
+!quasi nunits 1 firstu 1 nskip @skip begin @begin select vatoms end nfreq @nmodes temp 298.0 ! thermo resi
+!quasi nunits 1 firstu 1 nskip @skip begin @begin select vatoms end nfreq @nmodes nadd @offset temp 298.0 ! thermo resi
+
+! i understand that 'quasi' is analogous to 'diag'
+! note reference coordinates must be present in the main coordinate array
+! thermo computes entropy, enthalpy & Cv; resi uses the selected atoms in each residue
+! temp (real) is necessary to estimate frequencies from fluctuations
+  
+! ?? coor cova ??
+! ?? coor LSQP [mass] ??
+
+
+! write visualization trajectory:
+
+!open write unit 52 file name rigor.pca.dcd
+!open write unit 21 file name rigor.pca_.dcd
+!open write unit 21 file name rigor.pca_.dcd
+
+!print norm mode 1 thru 20 ! MRMS 1
+!open write unit 52 card name rigor.pca
+!write norm card unit 52
+
+print norm select vatoms end! mrms 1! mode 1 thru @nmodes ! MRMS 1
+open write unit 52 file name prigor1_all.pca
+write norm unit 52  ! write does NOT perform any normalization
+
+!write trajectory unit 50 sequ modes 1 thru 10 sequ   ! temp 300; supe to superimpose
+!write trajectory unit 70 modes 1 thru 10 sequ select vatom end   ! temp 300; supe to superimpose
+! could also do 7-16, if the first 6 are rigid (don't know that they would be...)
+
+end ! vibran
+
+stop
+
+
+
+
+

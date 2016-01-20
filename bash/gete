@@ -1,0 +1,21 @@
+#!/bin/bash
+
+what=prot1
+which=a
+fout=${what}_${which}.ave
+echo -n > $fout
+grep "AVER>" ../logs/${what}${which}_out0 | awk ' { print $3" " $6 } ' >> $fout
+grep "AVER>" ../logs/${what}${which}_out1 | awk ' { print $3" " $6 } ' >> $fout
+#
+which=b
+fout=${what}_${which}.ave
+echo -n > $fout
+grep "AVER>" ../logs/${what}${which}_out0 | awk ' { print $3" " $6 } ' >> $fout
+grep "AVER>" ../logs/${what}${which}_out1 | awk ' { print $3" " $6 } ' >> $fout
+#
+which=c
+fout=${what}_${which}.ave
+echo -n > $fout
+grep "AVER>" ../logs/${what}${which}_out0 | awk ' { print $3" " $6 } ' >> $fout
+grep "AVER>" ../logs/${what}${which}_out1 | awk ' { print $3" " $6 } ' >> $fout
+

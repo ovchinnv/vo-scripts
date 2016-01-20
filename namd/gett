@@ -1,0 +1,4 @@
+#!/bin/bash
+
+grep -i "^ENERGY" $1 | awk \
+ ' BEGIN {n=0 ; tave=0;} {print " "$2 " : " $13 ; tave = ( n * tave + $13 ) / (n+1) ; n=n+1 } END { print " AVERAGE: " tave}'

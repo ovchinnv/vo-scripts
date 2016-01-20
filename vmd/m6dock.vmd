@@ -1,0 +1,98 @@
+#!/bin/vmd
+# dock pre-powerstroke myosin into the actomyosin structure of holmes et al (2003).  I am using the myosin 5 rigor as template, and a sequence alignment
+# file; only cleft residues are used in the docking;
+
+
+mol delete all
+#load myosin 5
+mol load psf myo5r_ec_dock_eef1.psf pdb myo5r_ec_dock_eef1.pdb
+set m5 [molinfo top];
+#load myosin 6
+mol load psf m6tr_pps_rigc.psf pdb m6rigtr_hybrid.pdb
+set m6 [molinfo top];
+
+####################
+# define atoms for orientation -- the residue numbers below are from myosin 6
+set template {};
+for {set i 414} {$i<440} {incr i} { lappend template $i };
+for {set i 469} {$i<490} {incr i} { lappend template $i };
+for {set i 525} {$i<534} {incr i} { lappend template $i };
+for {set i 643} {$i<660} {incr i} { lappend template $i };
+set template [lsort $template];
+
+set template1 {};
+set template2 {};
+
+#use sequence alignment to find matching residues in myosin 5
+set fid [open "seqal6" r];
+
+foreach res6 $template {
+
+ while {[gets $fid line] > -1} {
+   # remove white space
+   set line [split $line];
+   set trimmed_line {};
+   foreach entry $line {
+    set trimmed [string trim $entry];
+    if { [string length $trimmed]>0 } {
+     lappend trimmed_line $trimmed
+    }
+   }     
+
+   foreach {r1 n1 r2 n2 r3 n3 } [split $trimmed_line] {break;}
+   if {[string equal $r1 "-"]} { foreach {r1 r2 n2 r3 n3 } [split $trimmed_line " "] {break;} } ;# 1st residue missing so skip it (see file seqal6)
+   if {[string equal $r2 "-"]} { continue ; } ;# cannot align this residue
+
+   if {[string equal $r2 $res6]} {
+    if {[string equal $r3 "-"]} { break ; } ;# cannot align this residue
+   
+    lappend template1 $r2
+    lappend template2 $r3
+    break; # bust out of while loop
+   }
+ }     
+}
+
+puts $template1
+puts $template2
+
+
+######## now preform orientation #############
+set template [atomselect $m5 "( resid $template2 ) and name CA"];
+set orient [atomselect $m6 "( resid $template1 ) and name CA"];
+set all [atomselect $m6 "all"];
+$all move [measure fit $orient $template];
+######## write out myosin 6 file #############
+#$all writepdb m6rigtr_hybrid_docked.pdb
+
+######### add representations
+axes location off
+color Display {Background} gray
+
+mol delrep 0 $m5
+mol representation tube
+mol selection not water and noh
+mol color colorid 0
+mol addrep $m5
+
+mol delrep 0 $m6
+mol representation tube
+mol selection not water and noh
+mol color colorid 1
+mol addrep $m6
+
+## add actin polymer
+
+mol load psf actin_adp13_eef1.psf pdb actin_adp13_m_eef1.pdb
+set a [molinfo top];
+
+mol delrep 0 $a
+
+mol representation tube
+mol selection not water and noh
+mol color colorid 5
+mol addrep $a
+
+set m6 [molinfo top];
+
+

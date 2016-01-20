@@ -1,0 +1,93 @@
+* script to rotate solute so that it fits into a box of smallest rectangular volume
+* inspired by the rotate option in VMD solvate
+*
+
+coor orie select solute end
+
+set vec xdir 0 ydir 0 zdir 1
+set dphi 10
+set phi 0
+
+set vmin 99999999999
+!*******************************************
+set return zloop
+label zrot
+ goto getvol
+ label zloop
+ if @vol .lt. @vmin then
+  set vmin @vol
+  coor copy comp
+ endif
+!
+ calc phi = @phi + @dphi
+ coor rota @vec PHI @dphi sele solute end
+ if @phi .lt. 180 goto zrot
+coor copy
+!*******************************************
+set phi 0
+set vec xdir 0 ydir 1 zdir 0
+set return yloop
+label yrot
+ goto getvol
+ label yloop
+ if @vol .lt. @vmin then
+  set vmin @vol
+  coor copy comp
+ endif
+!
+ calc phi = @phi + @dphi
+ coor rota @vec PHI @dphi sele solute end
+ if @phi .lt. 180 goto yrot
+coor copy
+!*******************************************
+set phi 0
+set vec xdir 1 ydir 0 zdir 0
+set return xloop
+label xrot
+ goto getvol
+ label xloop
+ if @vol .lt. @vmin then
+  set vmin @vol
+  coor copy comp
+ endif
+!
+ calc phi = @phi + @dphi
+ coor rota @vec PHI @dphi sele solute end
+ if @phi .lt. 180 goto xrot
+coor copy
+!*******************************************
+
+echo "VOLUME (Angstroms ^ 3) : @VMIN"
+
+return
+stop
+
+label getvol
+
+coor stat select solute end
+
+calc xmin = ?xmin
+calc ymin = ?ymin
+calc zmin = ?zmin
+calc xmax = ?xmax
+calc ymax = ?ymax 
+calc zmax = ?zmax 
+
+calc xmi = @xmin
+calc xma = @xmax
+calc ymi = @ymin
+calc yma = @ymax
+calc zmi = @zmin
+calc zma = @zmax
+!
+calc xl = ( @xma - @xmi )
+calc yl = ( @yma - @ymi )
+calc zl = ( @zma - @zmi )
+!
+!************ make into a cube
+set l @xl
+if  @yl .gt. @l  set l @yl 
+if  @zl .gt. @l  set l @zl 
+calc vol = @l*@l*@l
+
+goto @return

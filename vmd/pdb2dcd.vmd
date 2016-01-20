@@ -1,0 +1,3 @@
+#!/bin/bash
+mol load pdb frame-59-200.pdb
+animate write dcd frame-59-200.dcd

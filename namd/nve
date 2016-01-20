@@ -1,0 +1,127 @@
+#!/bin/vmd
+#############################################################
+structure          $psffile
+coordinates        $pdbfile
+
+if {$restart == 1 }      { 
+ bincoordinates     $restartName.coor
+if {$resetTemp == 0} {
+ binvelocities      $restartName.vel
+} else {
+ temperature $temperature
+}
+ extendedSystem     $restartName.xsc
+} elseif {$restart == 0} {
+ temperature $temperature
+}
+ 
+set outputname     $outputName 
+firsttimestep      $firstTstep
+
+# Parameter File
+paraTypeCharmm	    on
+#parameters          /home/ovchinnikov/charmm/c34a2/toppar/par_all27_prot_na.prm
+#parameters          /home/ovchinnikov/charmm/c33b1/toppar/par_all27_prot_na.prm
+#parameters          /u0/o/ovchinnv/cparam/par_all27_prot_na.prm
+parameters          /home/ovchinnikov/charmm/c34a1/toppar/par_all27_prot_na.prm
+
+# Force-Field Parameters
+exclude             scaled1-4
+1-4scaling          1.0
+cutoff              12.
+switching           on
+switchdist          10.
+pairlistdist        14.5
+
+# Integrator Parameters
+timestep            $dt  ;# 2fs/step
+rigidBonds          $shake  ;# needed for 2fs steps
+nonbondedFreq       1
+if { ($shake == "all") || ($shake == "water") } {
+ fullElectFrequency  1
+} else {
+ fullElectFrequency  2
+}   
+stepspercycle       $stepspercycle
+fixedAtoms          $fixedAtoms
+fixedAtomsCol       X
+fixedAtomsFile      $resfile ;# restraints file
+
+constraints         $cswitch
+consref             $reffile ;# reference positions file -- often same as the original PDB
+conskfile           $resfile
+conskcol            Y
+constraintScaling   $cscale ;# multiplies the factor in the PDB file
+
+# Constant Temperature Control
+langevin            $lang    ;# do langevin dynamics
+#langevinFile        $resfile
+#langevinCol         Z
+langevinDamping     2     ;# damping coefficient (gamma)
+langevinTemp        $temperature
+#langevinHydrogen    off    ;# don't couple langevin bath to hydrogens
+                                                                                
+# Constant Pressure Control (variable volume)
+if { ($shake == "all") || ($shake == "water") } {
+useGroupPressure      yes ;# needed for rigidBonds
+} else {
+usegroupPressure      no
+}
+useFlexibleCell       no
+useConstantArea       no
+
+#
+# Periodic Boundary Conditions
+
+set sx $a
+set sy $b
+set sz $c
+
+cellBasisVector1     $sx   0.     0.
+cellBasisVector2     0.    $sy    0.
+cellBasisVector3     0.    0.     $sz
+cellOrigin           0.    0.     0. 
+
+wrapWater           on
+wrapAll             on
+wrapNearest         on
+
+# PME (for full-system periodic electrostatics)
+PME                 yes 
+PMEGridSizeX        144
+PMEGridSizeY        96
+PMEGridSizeZ        96
+                                                                                
+# Output
+outputName            $outputName
+
+############## Cylindrical Boundary Forces ##################
+#cylindricalBC         off
+#cylindricalBCCenter   0 0 0
+#cylindricalBCAxis     z
+#cylindricalBCr1       $r
+#cylindricalBCl1       [expr  $ndir/2]
+#cylindricalBCk1       1
+
+# Note: the cylindrical potential applies forces at cylinder boundaries as well !!!
+#############################################################
+## OUTPUT PARAMETERS                                       ##
+#############################################################
+
+restartfreq         $freq     ;# 500steps = every 1ps APPLIES TO MINIMIZATION TOO
+dcdfreq             $freq
+xstFreq             $freq
+outputEnergies      $freq
+outputPressure      $freq
+outputTiming        $freq
+
+## minimization
+#minimize 300
+
+
+#reinitvels          $temperature
+
+# this should be > t equilibration and t diffusion over cavities 
+# ions equilibration takes longer
+
+run $nsteps

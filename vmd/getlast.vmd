@@ -1,0 +1,17 @@
+#!/usr/bin/vmd
+# save the last frame from dcd files as a pdb
+#
+
+foreach { psffile dcdname pdbname } $argv {break} ;# get from command line
+
+#set psffile
+#set dcdname
+#set pdbname
+
+mol load psf ${psffile}.psf
+
+mol addfile ${dcdname}.dcd type dcd waitfor all
+set nf [expr {[molinfo top get numframes]-1}];
+animate write pdb ${pdbname}.pdb beg $nf end $nf
+animate write dcd ${pdbname}.dcd beg $nf end $nf
+animate write namdbin ${pdbname}.coor beg $nf end $nf

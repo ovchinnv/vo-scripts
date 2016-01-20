@@ -1,0 +1,42 @@
+#!/bin/bash
+
+if [ -z $1 ] ; then 
+ echo "USAGE: grender <scene_file> (pyg format)"
+ exit 1
+fi
+
+# set magnification -- default is 2, which quadruples the resolution
+if [ -z $2 ] ; then
+ scale=1.5
+else
+ scale=$2
+fi  
+
+xres=`head -n 10 $1 |  grep resolution | awk '{print substr($3,2,length($3)-2)}'`
+yres=`head -n 10 $1 |  grep resolution | awk '{print substr($4,1,length($3)-2)}'`
+#
+xresnew=`  echo "scale=0; $xres*$scale/1" | bc`
+yresnew=`  echo "scale=0; $yres*$scale/1" | bc`
+#echo $xres $xresnew $scale
+# header:
+head -n 10 $1 > gheader
+sed s/\($xres/\($xresnew/ gheader |  sed s/$yres\)/$yresnew\)/ > gheader2
+
+# size of header:
+hsize=`wc gheader | awk '{print $3}'`
+echo $hsize
+# duplicate rest of file using dd
+dd ibs=$hsize skip=1 if=$1 of=_${1}
+# put new header in
+cat gheader2 _${1} > __${1}
+
+#clean up
+rm -f gheader gheader2 _${1}
+#render
+#
+echo "Rendering scene file "$1" at resolution "$xresnew" x "$yresnew"."
+gelato __${1}
+
+#remove custom scene file
+#rm -f gheader gheader2 __${1}
+

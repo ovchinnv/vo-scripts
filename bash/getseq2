@@ -1,0 +1,39 @@
+#!/bin/bash
+# COMPARES SEQUENCES FROM PDB FILES
+
+awk '
+
+BEGIN {
+        FIELDWIDTHS=" 6 5 1 4 1 3 1 1 4 1 3 8 8 8 6 6 6 4"
+        file1=ARGV[1];
+        curAAID=-999
+        seq=""
+        pos=""
+        blank="     ";
+        AA["ALA"]="A";AA["ARG"]="R";AA["ASP"]="D";AA["GLN"]="Q";AA["LEU"]="L";AA["THR"]="T";AA["GLU"]="E";AA["ILE"]="I";
+	AA["PHE"]="F";AA["LYS"]="K";AA["SER"]="S";AA["VAL"]="V";AA["MET"]="M";AA["ASN"]="N";AA["PRO"]="P";AA["TYR"]="Y";
+	AA["HIS"]="H";AA["HSD"]="H";AA["HSE"]="H";AA["GLY"]="G";AA["TRP"]="W";AA["CYS"]="C";
+
+}
+
+{
+  if ($1 == "ATOM  ") {
+    if ( curAAID != $9 ) {
+     if (curAAID != ($9-1)) {
+       seq=seq"\n New sequence or gap : positions ("curAAID" / "$9")\n"
+       seq1=seq1"\n\n"
+     }
+     print $9": "$6" "AA[$6]
+     seq=seq" "$6
+     pos=pos" "substr(blank,0,3-length($9))""$9
+     seq1=seq1""AA[$6]
+     curAAID = $9
+     }
+  }
+}
+END {
+print seq1
+print seq
+#  print seq" "pos
+} ' $1   
+

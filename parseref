@@ -1,0 +1,83 @@
+#!/bin/bash
+
+awk ' { 
+
+plen=length($NF)
+pages=substr($NF,1,plen-1)
+sub("–","-",pages)
+
+year=substr( $(NF-1),2,4)
+volume=$(NF-2)
+
+author1f=$2
+if (substr($3,length($3),1) == ",") {
+ author1l=substr($3,1,length($3)-1)
+}
+else {
+ author1l=$3
+}
+ 
+ 
+atag=author1l""year
+
+# find journal name starting with NF-3 and moving back
+i=NF-3;
+journal=$i; 
+do { 
+    i=i-1
+    if ( index($i,",") == 0 ) { 
+     journal=$i" "journal
+    }
+    else {
+     break;
+    } 
+  } while (1)
+
+#find article title starting with field $i and moving back
+title=$i;
+buffer=""
+do { 
+    i=i-1
+    if ( substr($i,2,1) != "." ) { ; # "." means we got an initial, so time to stop 
+     title=buffer""title
+     buffer=$i" " ; # store word in buffer
+    }
+    else {
+     i=i+1 ; # we overshot by one so roll back
+     break;
+    } 
+  } while (1)
+title=substr(title,1,length(title)-1)"."
+sub("–","-",title)
+
+# find article authors starting with field $i and moving back
+authors=substr($i,1,length($i)-1); 
+do { 
+    i=i-1
+    if ( substr($i,length($i),1) != "]" ) { 
+     authors=$i" "authors
+    }
+    else {
+     break;
+    } 
+  } while (1)
+gsub(","," and ", authors)
+
+# save the entry number, in "key" field
+i=index($i,"[");
+j=index($i,"]");
+key=substr($i,i+1,j-i-1)
+
+print "@article{"atag",\n"\
+      "\t key={"key"},\n" \
+      "\t authors={"authors"},\n" \
+      "\t title={{"title"}},\n" \
+      "\t journal={"journal"},\n" \
+      "\t volume={"volume"},\n" \
+      "\t pages={"pages"},\n" \
+      "\t year={"year"},\n" \
+      "}"
+
+}' $1 > ${1%%\.*}.bib
+
+

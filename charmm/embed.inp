@@ -1,0 +1,122 @@
+* embed emr protein inside membrane
+*
+!
+!
+ioformat extended
+!
+!goto readpar
+!
+! write out membrane pdb files
+read psf card name dmpc/step5_assembly.psf
+read coor pdb name dmpc/step5_assembly.pdb resid 
+set iseg 3
+stream pdbout.str
+delete atom sele all end
+! write out emr pdb files
+read psf card name emr-tpp-immc.psf
+read coor card name emr-tpp-dmpcn-swapm.cor
+
+print coor sele .not. init end ! nterminal patches were missing in psf; 
+
+!
+!========= rotate protein so that the center is at 0,0,0, and the pore is oriented in the z-diection
+set sel1 (segid TPP)
+!set sel2 (( (segid EMR1 .and. resid 21 ) .or. (segid EMR2 .and. resid 48 ) ) .and. type CA )
+set sel2 (( (segid EMR2 .and. resid 48 ) ) .and. type CA ) ! for this conformation only
+stream rota.str
+!================================================
+!
+set iseg 0
+stream pdbout.str
+delete atom sele all end
+!
+label readpar
+! now create a combined structure with everything
+! options to param/topology reader script
+!================================================
+set version 36
+set cgenff
+set adpar tpp/tpp
+set lipid
+
+stream readpsf36.str
+
+! read pdb's
+set iseg 0
+label combine
+set seg segid@iseg
+if @?{segid@@iseg} eq 0 goto done
+set seg @segid@@iseg
+read sequ pdb name @{seg}.pdb
+
+set other ! nothing
+
+if @seg eq TIP3 set other noangl nodihe
+if @seg eq POT  set other noangl nodihe
+if @seg eq CLA  set other noangl nodihe
+if @seg eq EMR1 set other first nter last cter
+if @seg eq EMR2 set other first nter last cter
+
+generate @seg setup warn @other
+
+read coor pdb name @{seg}.pdb resid
+
+incr iseg 
+
+goto combine
+
+label done
+!
+! orig. files have no Nterminal tyr coords (were not patched) ; generate missing hydrogens
+coor init sele segid EMR* .and. resid 4 .and. hydrogen end
+hbuild
+!
+! now remove lipid and water overlapping with the protein 
+! first, systematically rotate protein so that the fewest number of lipids need to be deleted
+!
+set overlap 2. ! fairly small
+!
+set sel .byres. (segid MEMB .and. .not. hydrogen .and. ( (solute .and. .not. (hydrogen .or. lone) ) .around. @overlap ) )
+define solute sele segid EMR1 .or. segid EMR2 .or. segid TPP end
+define delete sele @sel end
+!
+set dphi 10 ! rotation increment
+set phi 0
+set phimin 0 ! phi at minimum
+set numdel ?nsel
+label rotate
+ incr phi by @dphi
+ coor rota xdir 0 ydir 0 zdir 1 phi @dphi sele solute end
+ define delete sele @sel end
+ if ?nsel lt @numdel then 
+  set numdel ?nsel
+  set phimin @phi
+ endif
+ if @phi lt 360 -
+goto rotate
+! rotate to optimum angle
+calc dphi = @phimin - @phi ! (first need to rotate back to original orientation, then forward by phimin)
+coor rota xdir 0 ydir 0 zdir 1 phi @dphi sele solute end
+
+! now delete atoms
+define solute sele segid EMR1 .or. segid EMR2 .or. segid TPP end
+delete atom select .byres. (resname TIP3 .and. type OH2 .and. -
+                           ( (solute .and. .not. (hydrogen .or. lone) ) .around. @overlap ) ) end
+join renumber TIP3
+define solute sele segid EMR1 .or. segid EMR2 .or. segid TPP end
+delete atom select .byres. (type POT .and. -
+                           ( (solute .and. .not. (hydrogen .or. lone) ) .around. @overlap ) ) end
+!join renumber POT
+define solute sele segid EMR1 .or. segid EMR2 .or. segid TPP end
+delete atom select .byres. (type CLA .and. -
+                           ( (solute .and. .not. (hydrogen .or. lone) ) .around. @overlap ) ) end
+!join renumber CLA
+define solute sele segid EMR1 .or. segid EMR2 .or. segid TPP end
+delete atom select .byres. (segid MEMB .and. .not. hydrogen .and. -
+                           ( (solute .and. .not. (hydrogen .or. lone) ) .around. @overlap ) ) end
+join renumber MEMB
+!
+
+write psf card name emr-tpp-dmpc.psf
+write coor card name emr-tpp-dmpc.cor
+

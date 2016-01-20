@@ -1,0 +1,3 @@
+#!/bin/bash
+# acemd only acceprs REMARK fields in the psf as initial comments
+sed 's/^\*/REMARK:/' $1

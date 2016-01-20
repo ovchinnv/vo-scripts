@@ -1,0 +1,37 @@
+* check H/N/Q flips
+*
+!************* PROCEDURE *************
+! 1) read structure and coordinates
+! 2) define selection to check
+! 3) make sure ener.str works (e.g. define energy parameters)
+! 4) run aux scripts
+! 5) write coordinates
+!*************************************
+
+set psffile ../clpx-3hws
+set corfile @{psffile}-m
+
+if @?toppar eq 0 set toppar   ~/charmm/c37a1/toppar
+open unit 1 read form name "@TOPPAR/top_all27_prot_na.rtf"
+read rtf card unit 1
+! ATP parameters
+stream @toppar/stream/toppar_all27_na_nad_ppi.str
+!
+open unit 1 read form name "@TOPPAR/par_all27_prot_na.prm"
+read param card unit 1
+
+read psf card name @{psffile}.psf
+read coor card name @{corfile}.cor
+coor copy comp
+
+! FACTS setup
+set epsilon 1
+nbond nbxmod 5 atom cdie eps @epsilon shift vatom vdistance vswitch cutnb 14.0 ctofnb 12. ctonnb 10. e14fac 1.0 wmin 1.5
+scalar wcomp = wmain ! we need to overwrite wmain below
+scalar wmain = radius
+facts tcps 22 teps @epsilon gamm 0.015 tavw
+
+define solute sele segid CX* end
+
+stream asn.inp
+

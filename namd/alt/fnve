@@ -1,0 +1,135 @@
+#!/bin/bash
+
+# local install
+charmrun=~/usr/bin/charmrun
+namd2=~/usr/bin/namd2
+# binaries
+charmrun=~/src/NAMD_2.6_Linux-amd64/charmrun
+namd2=~/src/NAMD_2.6_Linux-amd64/namd2
+# TCP
+#charmrun=~/src/NAMD_2.6_Linux-amd64-TCP/charmrun
+#namd2=~/src/NAMD_2.6_Linux-amd64-TCP/namd2
+
+#daedalus/quantum
+nodes=( 017 018 019 )
+local=1
+ppn=8
+
+echo "group main">nodelist
+count=0
+
+if [ $local -eq 1 ]; then 
+ echo host `hostname`>nodelist; 
+ count=$(($count+1)); 
+fi ;# only if running locally too
+
+for i in ${nodes[@]}
+do
+ echo n$i>>NODES
+ echo "host n$i">>nodelist
+ count=$(($count+1))
+done
+
+nproc=$(($count*$ppn)) ; # 2 cpus per node
+################################################################
+
+psffile=m6ppstr-x.psf
+pdbfile=m6ppstr.pdb
+resfile=m6ppstr.res
+reffile=$pdbfile
+
+restartName=scratch/cpt_5
+outputName=scratch/nve
+
+dt=2.0 ; #timestep
+freq=1000;
+
+numrun=15;
+nsteps=600000
+firstTstep=0
+
+count=0;
+flag="";
+T=298; # temperature
+
+for nrun in `seq 1 $numrun`
+ do
+#  count=$(($nrun-1))
+  script=__nve$count$flag
+
+  echo '#!/bin/vmd' > $script
+  echo '#variable parameters (automatic)'  >> $script
+  grep -i SET boxsize.str | awk '{print tolower($0)}' >>$script 
+  echo set restart 1                       >>$script  # this is a default parameter, don't change
+  echo set resetTemp 0      >>$script
+  echo set psffile $psffile >>$script
+  echo set pdbfile $pdbfile >>$script
+  echo set resfile $resfile >>$script
+  echo set reffile $reffile >>$script
+
+  echo set count $count                    >> $script 
+
+  echo set shake all                       >> $script
+  echo set dt $dt                          >> $script
+  echo set firstTstep $firstTstep          >> $script
+  echo set stepspercycle 10                >> $script
+
+  echo set fixedAtoms off                  >> $script
+  echo set cswitch off                     >> $script
+  echo set cscale `echo 10-$count*5 |bc`   >> $script # this is the way to do arithmetic in bash
+
+  
+  echo set nsteps $nsteps                  >> $script
+  echo set freq $freq                      >> $script  ;# frequency for restrt files
+
+  echo set outputName $outputName$count$flag         >> $script
+  echo set restartName $restartName       >> $script
+# for subsequent runs
+  restartName=$outputName$count$flag
+
+  echo set temperature $T                >> $script
+  echo set lang off                      >> $script
+
+############################### TMD-TCL ####################
+  echo "############################### TMD-TCL ####################" >>$script
+  echo TclForces off                 >> $script;
+  echo TclForcesScript {             >> $script;
+  echo set TMDforcesOn 0             >> $script; # turn off if you just want to monitor the RMSD             
+  echo set TMDfile rigornl_atpout_tmd_all.pdb       >> $script;# PDB file with target positions
+  echo set TMDorient 1               >> $script;# should the structures be oriented periodically?
+  echo set TMDorientFreq 100         >> $script;# frequency of orientation
+  echo set TMDBMD 0                  >> $script;# is BMD on?
+  echo set TMDdRMS -0.00             >> $script;# how fast is the TMD target value changing (A/ps for TMD; A for BMD)
+  echo set TMDtargetRMS 0.1           >> $script;# -1: computed at the beginning
+  echo set TMDfinalRMS 0.1           >> $script;# desired final RMSD from the target structure 
+  echo set TMDk  0.0                 >> $script;# force constant
+  echo set TMDfinalK 0.0             >> $script;# for increasing/decreasing force constant during a simulation 
+  echo set TMDdK -0.1                >> $script;# increase/decrease in force constant (kcal/mol/A/A/ps)
+  echo set TMDprintFreq 100          >> $script;# output frequency
+  echo set TMDlogFile "TMD_$count$flag.log" >> $script;# TMD output file
+  echo set TMDdistanceLimit 0.0      >> $script;# the maximum force on any atom will be no larger than if the distance
+                                                # between the current & target coordinates were at most THIS; i.e. cap the
+                                                # force for large deviations between endpoint structures; value 0 turns off;
+######### DO NOT MODIFY BELOW #############################
+  echo "######### DO NOT MODIFY BELOW #############################" >>$script
+  echo set TMDfirstTstep $firstTstep >> $script
+  echo set TMDdt         '$dt'       >> $script
+  echo source tmd3.tcl               >> $script
+  echo }                             >> $script
+
+  cat $input                         >> $script
+###############################################################
+
+  $charmrun $namd2 +p$nproc $script  &>$output$count$flag
+
+######################
+ if [ $? -ne 0 ];  then
+   echo Execution interrupted due to errors during run $nrun.
+   exit
+ fi 
+ 
+# increment firstTstep
+ firstTstep=$(($firstTstep+$nsteps)) 
+ count=$(($count+1 ))
+
+done

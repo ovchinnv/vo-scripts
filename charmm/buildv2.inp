@@ -1,0 +1,55 @@
+* 7.21.07 prepare myosinV postrigor pdb files from crystal structures
+* now that I have determined the histidine states & GLN ASN flips, rebuild the model
+* I have manually generated the prigor files using makepdb.inp & modhis scripts
+* based on buildv.inp
+*
+
+set version 19
+
+stream ../readpsf.str
+
+! HC
+open card read unit 1 name hc_mod.pdb
+read sequ pdb unit 1
+generate HC setup warn first nter last cter 
+read coor pdb unit 1 resid
+!!!!!!!!!!!!!!!!!!!!!!!!!11
+! LC
+open card read unit 1 name lc_mod.pdb
+read sequ pdb unit 1
+generate LC setup warn first nter last cter
+read coor pdb unit 1 resid
+! ATP
+open card read unit 1 name atp.pdb
+read sequ pdb unit 1
+generate ATP setup warn 
+read coor pdb unit 1 resid 
+! MG
+open card read unit 1 name mg.pdb
+read sequ pdb unit 1
+generate MG setup warn 
+read coor pdb unit 1 resid 
+! crystal waters
+
+set offset ?nres
+read sequ TIP3 525
+generate XWAT nodihe noangle
+open card read unit 1 name xwat.pdb
+read coor pdb unit 1 offset @offset
+!
+! flag  xray atoms -- these will be fixed later;
+
+coor init select hydrogen end
+hbuild
+
+define unknown select .not. init end
+if ?nsel .ne. 0 stop
+
+write psf card name prigor_prot@version.psf
+write coor card name prigor_prot@version.cor
+
+
+
+
+
+
