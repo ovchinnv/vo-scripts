@@ -1,0 +1,113 @@
+* NEB test case; CAM protein;  trajectory genration based on internal coordinate interpolation.
+* 
+
+set nrep 24
+
+
+set version 19
+
+set psffile 1exr
+set ID cam
+set crddir ./
+set nmini1 10  ! number of minimizations in replica generation
+set nmini2 10  ! number of minimizations in replica generation
+
+open unit 1 read form name "toph19.inp"
+read rtf card unit 1
+close unit 1
+
+open unit 1 read form name "param19.inp"
+read param card unit 1
+close unit 1
+!!!!!!!!!!!!!!!!!
+
+!!!!!!!!!!!!!!! PSF
+open read form unit 1 name @psffile.psf
+read psf card unit 1
+close unit 1
+!
+rename segid @ID select segid 1EXR end
+
+!!!!!!!!!!!!!!!!! ENDPOINT COORDINATES!!!!!!!!!!!
+open read form unit 1 name ./@{ID}1_min.CRD
+open read form unit 2 name ./@{ID}2_min.CRD
+read coor card unit 1  
+read coor comp card unit 2
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+coor orie rms
+update cutnb 14.0 rdie vswitch shift
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! sequentially create & minimize replicas
+! create first replica
+REPLicate S nrep 1 select segid @ID END   ! coordinates are copied automatically
+delete atom select segid @ID end          ! delete main part
+
+!!!!!!!!!!! WRITE FIRST REPLICA !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  write coor card      select segid S1 end name @crddir/@ID_1.crd
+!!!!!!!!!!! WRITE LAST REPLICA !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+calc last = @nrep + 2
+  write coor comp card select segid S1 end name @crddir/@ID_@last.crd
+
+
+set linear ( type N .or. type C .or. type CA )  ! linearly interpolate the backbone
+
+nobomb ! don't bomd on empty selections
+
+ic gene ! generate ic table entries
+ic fill ! fill ic table from main coordinates
+
+! shrink the side chain bonds (fischer's approach) & rebuild structures
+
+ic fill ! fill ic table from main coordinates
+set bsc 0.5
+ic scale bond @bsc
+
+coor init select .not. @linear end
+if ?nsel eq ?natom ic seed 1 CA 1 C 2 N  ! if all atoms were initialized, need to seed before build
+ic build
+!
+ic fill comp ! re-fill ic table from comparison coordinates
+set bsc 0.5
+ic scale bond @bsc
+coor init select .not. @linear end comp
+if ?nsel eq ?natom ic seed 1 CA 1 C 2 N comp ! if all atoms were initialized, need to seed before build
+ic build comp
+
+label skip_scale
+
+set i 1
+label loop_rep
+
+ic diff comp ! put IC_comp - IC_main
+
+calc scale = 1 / (@nrep - @i + 2)
+
+set bsc @scale
+set asc @scale
+set dsc @scale
+set isc @scale
+set  a  @scale
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ic scale bond @bsc angle @asc dihe @dsc impr @isc
+ic fill append ! append to existing values : main = main +  scale * ( comp - main )
+
+coor average fact @a select @linear .and. segid S1 end ! main = a * comp + (1-a) * main
+coor init select .not. @linear end
+if ?nsel eq ?natom ic seed 1 CA 1 C 2 N  ! if all atoms were initialized, need to seed before build
+ic build
+!
+coor orie rms mass
+
+ calc k = @i+1
+ write coor card select segid S1 end name @crddir/@ID_@k.crd
+
+ incr i by 1
+ if @i le @nrep -
+goto loop_rep
+
+
+
+
+

@@ -19,8 +19,8 @@ lognames={...
 % for multiple log names
 basename='window';
 basext='.log';
-ibeg=72;
-iend=82;
+ibeg=5;
+iend=11;
 % modifications below this line should not normally be needed
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if (~isempty(basename))
@@ -177,7 +177,7 @@ for j=1:nrep
 %%%%%%%%%%%%%% check if there are no samples
  if (length(dt)<2)
   mfp(j,:)=NaN; % will deal with this later
-  warning(['Window ',num2str(i),' has no valid samples. Set both corresponding MFPTs to NaN.']);
+  warning(['Window ',num2str(j),' has no valid samples. Set both corresponding MFPTs to NaN.']);
   continue
  end
 %%%%%%%%%%%%%
@@ -235,13 +235,17 @@ for i=indnan
  Diffe(i)=interp1(indok,Diffe(indok),i);
 end
 
-figure('position',[300 300 600 200]) ;  hold on ; box on;
+figure('position',[300 300 600 250]) ;  hold on ; box on;
 errorbar(alpha, Diff, sqrt(Diffe),'k.-') ;
-xlabel('\it \alpha');
-ylabel('\it D(alpha)');
+%errorbar(alpha, Diff, sqrt(Diffe),'k.-') ;
+xlabel('$\alpha$', 'fontsize',14, 'interpreter','latex');
+ylabel('$D(\Delta s)^{-2}$', 'interpreter','latex','fontsize',14);
 set(gca, 'fontsize',14);
 set(gcf,'paperpositionmode','auto');
 print(gcf,'-depsc2','wdiff.eps');
 % save fe profile and diffusion coeff. profile
 %
 save(diffile, 'fe','Diff','Diffe');
+
+
+

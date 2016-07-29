@@ -1,0 +1,75 @@
+#!/bin/vmd
+mol delete all
+source ~/scripts/vmd/colors.vmd
+
+mol load psf rab11a_mgwat.psf
+
+set path unb-m5b/64
+#set path unb-m5a/64
+set path m5b-m5a/64
+#set basename rab11a0_
+set nrep 64
+
+for {set i 0} {$i < $nrep} {incr i} {
+ mol addfile $path/${basename}${i}.cor type cor
+}
+
+set rab [molinfo top]
+
+color Display {Background} gray
+axes location off
+mol delrep 0 $rab
+display stereo SideBySide
+
+set cons noh;
+set style "ribbons 10 0 4.5";
+
+############# macros
+source ~/vmd/rab/rabamacros.vmd
+#set selection "( ( segid RAB and resid 12 to 1000 ) or segid GTP MG ) and beta 1" ;# exclude Nterm RAB residues 7--12 which fluctuate
+set selection "( ( segid RAB and resid 12 to 1000 ) or segid GTP MG ) "
+source ~/scripts/vmd/align.vmd
+
+####################
+mol representation $style
+mol selection rab and $cons
+mol color colorid $red
+mol addrep $rab
+
+mol representation licorice
+mol selection tp and $cons
+mol color name
+mol addrep $rab
+
+mol representation lines
+mol selection $cons and not water
+mol color name
+mol addrep $rab
+
+mol representation lines
+mol selection water
+mol color name
+mol addrep $rab
+
+
+mol representation $style
+mol selection sw1 and $cons
+mol color colorid $yellow
+mol addrep $rab
+
+mol representation $style
+mol selection ploop and $cons
+mol color colorid $pink
+mol addrep $rab
+
+mol representation $style
+mol selection sw2 and $cons
+mol color colorid $iceblue
+mol addrep $rab
+
+
+mol representation licorice
+mol selection sb1 and $cons
+mol color name
+mol addrep $rab
+

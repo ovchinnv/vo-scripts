@@ -1,0 +1,22 @@
+#!/bin/vmd
+mol delete all
+
+set fpath ./
+set psffile ../struc/fre-fad-x
+mol load psf ${psffile}.psf
+
+set conf fre
+set ext nvt
+set solute  [atomselect top "protein or resname FAD"];
+set solvent [atomselect top "not (protein or resname FAD)"];
+
+set ifile 30
+set efile 35
+
+for { set i $ifile } { $i <= $efile } { incr i 1 } {
+# read dcd
+ set dcdfile $fpath/${conf}${i}${ext}
+ animate read  dcd $dcdfile.dcd beg 0 skip 1 waitfor all
+ animate write dcd ${dcdfile}_noxw.dcd beg 0 skip 1 waitfor all sel $solute
+ animate delete all
+}

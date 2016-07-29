@@ -61,6 +61,6 @@ update
 $all set x $xavg
 $all set y $yavg
 $all set z $zavg
-#animate write pdb trash.dat beg $nf
+animate write pdb average.pdb beg $nf
 unset xave yave zave xavg yavg zavg
 #############################################################################

@@ -1,5 +1,5 @@
 #!/bin/vmd
-# align frames for top molecule w.r.t. first frame
+# align each frame for top molecule w.r.t. the preceding frame
 #
 ############################################################################
 set id [ molinfo top ];
@@ -15,6 +15,9 @@ if { ![info exists "cons"] } {
 }
 if { ![info exists "qupdate"] } {
  set qupdate 0
+}
+if { ![info exists "qpreceding"] } {
+ set qpreceding 0
 }
 
 #
@@ -32,7 +35,10 @@ set rmsd {};
 for { set i_ 0 } { ${i_}<$nf } { incr i_ } {
  $orient frame ${i_}
  $all frame ${i_}
- if { $qupdate } { $orient update ; $all update ; }
+ if { $qpreceding } {
+  if { ${i_}>0 } { $template frame [expr ${i_} - 1] }
+ }
+ if { $qupdate } { $orient update ; $all update ; if { $qpreceding } { $template update; } }
  $all move [measure fit $orient $template]
  lappend rmsd [ measure rmsd $orient $template ];
 }

@@ -1,0 +1,48 @@
+#!/bin/vmd
+#
+############################################################################
+set id [ molinfo top ];
+set nf [molinfo $id get numframes];
+
+if { ![info exists "selection"] } {
+ set selection "all"
+}
+
+if { ![info exists "qmass"] } {
+ set qmass 0
+}
+
+#set all      [atomselect $id "all"];
+set sel      [atomselect $id $selection];
+
+if { $qmass } {
+ set wgt [$sel get mass] ;
+ puts "Computing COM for $selection ... "
+} else {
+ puts "Computing COG for $selection ... "
+}
+#
+set com {}
+#
+for { set i 0 } { $i<$nf } { incr i } {
+# $all frame $i
+# $all update
+ $sel frame $i
+ $sel update
+ if { $qmass } {
+  lappend com [measure center $sel weight $wgt]
+ } else {
+  lappend com [measure center $sel]
+ }
+}
+#############################################################################
+#
+# save to file
+if { ![info exists "comname"] } {
+ set d [exec date +%d-%m-%y];
+ set comname "com$d.dat"
+}
+set fid [open "$comname" w+];
+foreach c $com { puts $fid "$c" }
+close $fid
+
