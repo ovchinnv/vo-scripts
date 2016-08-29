@@ -2,6 +2,9 @@
 *
 
 nobomb
+set wrnlev ?wrnlev
+wrnlev 2
+
 if @?version eq 0 set version 36
 if @version ne 36 error WRONG PARAMETER VERSION : REQUESTED @version, PROVIDING 36
 if @?resid eq 0 then
@@ -178,3 +181,8 @@ if @crd ne 0 read coords @format unit 1
 if @pdb ne 0 @string open unit 1 card read name @pdbfile.pdb
 if @pdb ne 0 read coords pdb unit 1 @resid
 @string close unit 1
+
+wrnlev @wrnlev
+return
+
+

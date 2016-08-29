@@ -1,0 +1,37 @@
+#!/bin/bash
+# retrieve a model from pdb file with multiple models
+# files when no MODEL <n> is present
+
+if [ -z $1 ]; then
+ echo " ERROR : No PDB file provided (Usage : ./getmodel <pdb file> <#model>)"
+ exit 1
+elif [ -z $2 ]; then
+ echo " ERROR : No model number provided. (Usage : ./getmodel <pdb file> <#model>) "
+ exit 2
+fi
+
+pdbfile=$1
+model=$2
+
+# first line :
+li=`grep -Ein "MODEL\s+$model\s+" $pdbfile`
+# extract line number
+li=${li%%:*}
+
+# last line :
+le=`grep -Ein "ENDMDL" $pdbfile`
+# extract line number
+#li=${li%%:*}
+
+for l in $le ; do
+# echo $l
+ le=${l%%:*}
+ if [ $le -gt $li ] ; then
+  break;
+ fi
+done
+
+echo "REMARK : MODEL $model FROM $pdbfile LINES $li : $le"
+head $pdbfile -n$((le-1)) | tail -n+$((li+1))
+echo END
+echo

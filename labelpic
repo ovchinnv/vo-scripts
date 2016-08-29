@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# add text labels to ppm files before making movie
+
+d=( `cat trajdata.txt` );
+files=( `ls -1 untitled*` );
+
+n=${#d[@]}; # number of elements
+for i in `seq 1 $((n/3))` ; do
+ echo "processing frame $i"
+ t=${d[$((i*3-3))]};
+ T=${d[$((i*3-2))]};
+ de=${d[$((i*3-1))]};
+ text0=" Frame: $i"
+ text1=" Time(ns): $t (ns)"
+ text2=" T(K): $T"
+ text3=" E(kcal/mol): $de"
+# echo $text
+# ppmlabel -x 50 -y 50 -text "$text" untitled.00000.ppm > new.ppm
+# ppmlabel -x 50 -y 50 -text "MAMA" untitled.00000.ppm > new.ppm
+# note two identical text occurences for stereo effect
+ convert -font helvetica -fill black -pointsize 20 \
+ -draw "text 0,130 '$text1'" -draw "text 0,160 '$text2'" -draw "text 0,190 '$text3'" -draw "text 0,100 '$text0'"\
+ -draw "text 335,130 '$text1'" -draw "text 335,160 '$text2'" -draw "text 335,190 '$text3'" -draw "text 335,100 '$text0'"\
+ ${files[$((i-1))]} l_${files[$((i-1))]}
+#exit
+done;
+

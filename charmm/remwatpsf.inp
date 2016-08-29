@@ -1,0 +1,21 @@
+* delete water from psf
+*
+!dimension chsize 1000000
+
+
+set psffile rab11a_sn
+set psfout  rab11a_now
+
+set pdbfile rab11a_msn
+set pdbout  rab11a_now
+
+read psf card name @{psffile}.psf
+read coor pdb name @{pdbfile}.pdb resid
+
+define solute select segid RAB* .or. segid *DP* .or. segid MG* .or. segid *TP* end
+
+delete atom sele .not. solute end
+
+write psf card name @{psfout}.psf
+write coor pdb name @{pdbout}.pdb
+
