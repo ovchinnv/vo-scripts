@@ -23,7 +23,7 @@ endif
 !!!!!!!! TOPOLOGY/PARAMS
 if version eq 36 @string open unit 1 read form name "@TOPPAR/top_all36_prot.rtf"
 if version eq 27 @string open unit 1 read form name "@TOPPAR/top_all27_prot_na.rtf"
-if version eq 22 @string open unit 1 read form name "@TOPPAR/top_all22_prot@{CMAP}.inp"
+if version eq 22 @string open unit 1 read form name "@TOPPAR/top_all22_prot@{CMAP}.rtf"
 if version eq 19 @string open unit 1 read form name "@TOPPAR/toph19.inp"
 if version eq eef1 open unit 1 read form name "~/scripts/charmm/toph19_eef1_na.inp"
 read rtf card unit 1
@@ -39,7 +39,7 @@ endif
 !
 if version eq 36 @string open unit 1 read form name "@TOPPAR/par_all36_prot.prm"
 if version eq 27 @string open unit 1 read form name "@TOPPAR/par_all27_prot_na.prm"
-if version eq 22 @string open unit 1 read form name "@TOPPAR/par_all22_prot@{CMAP}.inp"
+if version eq 22 @string open unit 1 read form name "@TOPPAR/par_all22_prot@{CMAP}.prm"
 if version eq 19 @string open unit 1 read form name "@TOPPAR/param19.inp"
 if version eq eef1 open unit 1 read form name "~/scripts/charmm/param19_eef1_na.inp"
 read param card unit 1
