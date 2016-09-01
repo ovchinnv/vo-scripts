@@ -1,6 +1,6 @@
 #!/bin/tcl
 
-pbc readxst xsc/${psffile}10nvt.xsc -all
+pbc readxst ${xscfile} -all
 pbc unwrap -sel "protein" -first first
-
+pbc wrap -compound res -center com -centersel "protein and noh" -all
 
