@@ -1,0 +1,43 @@
+#!/bin/vmd
+#
+############################################################################
+set id [ molinfo top ];
+set nf [molinfo $id get numframes];
+
+if { ![info exists "selection1"] } {
+ set selection1 "all"
+}
+if { ![info exists "selection2"] } {
+ set selection2 "all"
+}
+set dist {};
+
+puts "Computing distance between ${selection1} and ${selection2} ..."
+
+set all [atomselect $id "all"];
+set s1  [atomselect $id $selection1];
+set s2  [atomselect $id $selection2];
+#
+for {set i 0} {$i<$nf} {incr i} {
+# puts "Processing frame: $i"
+  $s1 frame $i
+  $s1 update
+  $s2 frame $i
+  $s2 update
+#
+  set pos1 [measure center $s1 weight mass];
+  set pos2 [measure center $s2 weight mass];
+  set dpos [vecsub $pos1 $pos2];
+  foreach {x y z} $dpos {
+   lappend dist [expr { sqrt($x*$x+$y*$y+$z*$z) } ];
+  }
+} ; # i
+#
+# save to file
+if { ![info exists "distname"] } {
+ set d [exec date +%d-%m-%y];
+ set distname "dist$d.dat"
+}
+set fid [open "$distname" w+];
+foreach d $dist { puts $fid "$d" }
+close $fid

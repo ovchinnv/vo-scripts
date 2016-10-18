@@ -1,0 +1,65 @@
+#!/bin/bash
+
+# this is a crude quick solution to run many fep jobs via acefep/acenvt file
+# NOTE : the simulation script is assumed to have averything except lamdas set
+# i.e. number of steps, number of runs; this is just a macro to define all the windows at once
+fepexe=acefep ; # simulation script
+
+######### prescribe lambda below #####
+
+ilam=0;         # initial lambda
+elam=1;         # final lambda
+dlam=0.025;
+
+lambdaf=( `seq $ilam $dlam $elam` ) ;
+##### create array stretched near 1;
+bexp=1.4 ; 
+dec=3 ; #decimal scale
+lambdaf=();
+l=$ilam;
+for l in `seq $ilam $dlam $elam` ; do
+ ll=`awk "BEGIN { printf \"%.*f\", $dec, (1-(1-$l)^$bexp) }"`
+#echo $ll
+ lambdaf+=("$ll")
+done
+
+# backward :
+lambdab=();
+for l in ${lambdaf[@]} ; do
+ lambdab=( $l ${lambdab[@]} ) ;
+done
+######################################
+if [ ! -z $lambdaf ] ; then
+ lambdab=("${lambdab[@]:1}"); # remove first element because it is the last element of forward aray
+fi
+
+lambdas=( ${lambdaf[@]} ${lambdab[@]} ); # final lambdas array
+######################################
+#echo ${lambdaf[@]}
+#echo ${lambdab[@]}
+echo "RUNNING LAMBDA RANGE \"${lambdas[@]}\" ";
+#exit
+
+n=${#lambdas[@]} ;# length
+
+tempexe="_dofep_";
+cp $fepexe $tempexe  ; # make a copy
+chmod u+wrx $tempexe ;# just in case, 
+
+
+nm2=$((n-2));
+for ind in `seq 0 $nm2` ; do
+ lambda=${lambdas[$ind]}
+ lambda2=${lambdas[$((ind+1))]}
+#
+ echo "Processing window : [$lambda, $lambda2]";
+#
+ sed -i s/alambda=.*/alambda=$lambda\;/ $tempexe
+ sed -i s/alambda2=.*/alambda2=$lambda2\;/ $tempexe
+#
+ ./$tempexe modyn fep
+#
+done
+
+rm -f $tempexe
+

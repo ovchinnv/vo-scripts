@@ -21,3 +21,11 @@ for { set i 0 } { $i<$nf } { incr i } {
  lappend rg [measure rgyr $sel]
 }
 #############################################################################
+# save to file
+if { ![info exists "rgyrname"] } {
+ set d [exec date +%d-%m-%y];
+ set rgyrname "rgyr$d.dat"
+}
+set fid [open "$rgyrname" w+];
+foreach r $rg { puts $fid "$r" }
+close $fid

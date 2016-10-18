@@ -27,7 +27,7 @@ if @?zmax eq 0 set zmax  10
 ! read initial water box (216 molecules)
 read sequ tip3 216
 generate wat0 noangle nodihe
-stream read-watbox.str ! this script written by nilssen
+stream ~/scripts/charmm/read-watbox.str ! this script written by nilssen
 rename segid w0 select segid wat0 end
 set box 18.856  ! size of cubic water box
 

@@ -1,6 +1,12 @@
 #!/bin/tcl
 
 pbc readxst ${xscfile} -all
+set cell [pbc get -first first -last 0];
+# now set the same cell on all frames
+foreach c $cell { break; }
+foreach {dx dy dz} $c break;
+puts "$dx $dy $dz"
+pbc set "$dx $dy $dz" -all
 pbc unwrap -sel "protein" -first first
 pbc wrap -compound res -center com -centersel "protein and noh" -all
 

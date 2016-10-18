@@ -30,7 +30,7 @@ set boxsize 18.856  ! size of cubic solvent box
 
 read sequ tip3 @nwatres
 generate wat0 noangle nodihe
-stream read-watbox.str ! this script written by nilssen
+stream ~/scripts/charmm/read-watbox.str
 rename segid w0 sele segid wat0 end ! this will be the template box
 
 calc xmi = @xmin - @buf 
@@ -55,7 +55,7 @@ delete atom sele segid wat0 end
 calc nwat = @nbox * @nwatres
 read sequ tip3 @nwat
 generate wat0 noangle nodihe
-stream read-watbox.str ! this script written by nilssen
+stream ~/scripts/charmm/read-watbox.str
 
 ! move boxes around
 define w0 sele segid w0 end

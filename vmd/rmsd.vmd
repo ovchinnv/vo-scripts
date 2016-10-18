@@ -1,20 +1,21 @@
 #!/bin/vmd
 # assume that the trajectory has been loaded
 # assume that domains have been defined
-set cons backbone
+set cons noh
+set dir rmsd
 #
-set nf  [molinfo $cam get numframes];
-set all [atomselect $cam all];
+set nf  [molinfo $ab get numframes];
+set all [atomselect $ab all];
 #
 # prepare atom selections
 #
-#set domains { A B C D E F G H L1 L2 L3 L4 L5 L6 L7 bsheet1 bsheet2 AD BC ABCD EH FG EFGH DE Nterm Cterm };
-set domains { L1 L2 L3 L4 L5 L6 L7 bsheet1 bsheet2 ABCD EFGH DE Nterm Cterm protein};
+set domains { heavy light all }
 #
 set k 0
 foreach R $domains {
  set a($k) [ atomselect top "$R and $cons"];
- set b($k) [ atomselect top "$R and $cons" frame [expr {$nf - 1}]]
+ set b($k) [ atomselect top "$R and $cons" frame 0 ] ;# first frams
+# set b($k) [ atomselect top "$R and $cons" frame [expr {$nf - 1}]] ;# last frams
  set rmsd($k) {}; # initialize
  incr k
 } ;# foreach
@@ -34,17 +35,20 @@ for {set i 0} {$i<$nf} {incr i} {
   $all frame $i
   $all update
 #
-  $all move [measure fit $orient $template]
+  $all move [measure fit $orient $template weight mass]
 #
-  lappend rmsd($j) [measure rmsd $orient $template]
+  lappend rmsd($j) [measure rmsd $orient $template weight mass]
  } ; # j
 #
 } ; # i
 
 # prepare output file
-set fid [ open $dir/rmsd_${conf}_${tag}.dat w];
+set fid [ open $dir/rmsd_${name}.dat w];
 for {set j 0} {$j<$k} {incr j} {
   puts $fid " [lindex $domains $j] $rmsd($j)"
 }
 #
 close $fid
+unset rmsd
+unset a
+unset b

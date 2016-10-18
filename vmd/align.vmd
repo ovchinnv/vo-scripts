@@ -54,3 +54,5 @@ close $fid
 
 unset orient
 unset template
+unset rmsd
+unset all

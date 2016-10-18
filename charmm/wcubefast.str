@@ -31,7 +31,7 @@ set boxsize 18.856  ! size of cubic solvent box
 read sequ tip3 @nwatres
 read sequ tip3 216
 generate wat0 noangle nodihe
-stream read-watbox.str ! this script written by nilssen
+stream ~/scripts/charmm/read-watbox.str ! this script written by nilssen
 rename segid w0 sele segid wat0 end ! this will be the template box
 
 calc xmi = @xmin - @buf 

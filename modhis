@@ -15,6 +15,10 @@
   HISD=${line##HSD}
  continue
  fi
+ if [  "$cmd" == "hsp" ]; then
+  HISP=${line##HSP}
+ continue
+ fi
  if [  "$cmd" == "gln" ]; then
   GLNE=${line##GLN}
  continue
@@ -28,8 +32,8 @@
  continue
  fi
  done <$2
- 
-awk  -v HISE="$HISE" -v HISD="$HISD" -v GLNE="$GLNE" -v ASNE="$ASNE" -v HISFLIP="$HISFLIP" '
+
+awk  -v HISE="$HISE" -v HISD="$HISD" -v HISP="$HISP" -v GLNE="$GLNE" -v ASNE="$ASNE" -v HISFLIP="$HISFLIP" '
       BEGIN { 
 
       $0=HISE
@@ -39,6 +43,10 @@ awk  -v HISE="$HISE" -v HISD="$HISD" -v GLNE="$GLNE" -v ASNE="$ASNE" -v HISFLIP=
       $0=HISD
       for (i=1; i<=NF; i++) {
        HSD[$i]=1
+      }
+      $0=HISP
+      for (i=1; i<=NF; i++) {
+       HSP[$i]=1
       }
       $0=HISFLIP
       for (i=1; i<=NF; i++) {
@@ -52,60 +60,52 @@ awk  -v HISE="$HISE" -v HISD="$HISD" -v GLNE="$GLNE" -v ASNE="$ASNE" -v HISFLIP=
       for (i=1; i<=NF; i++) {
        GLN[$i]=1
       }
-
- }
+      FIELDWIDTHS="6 5 1 4 1 3 1 1 4 1 3 8 8 8 6 6 6 4"
+    }
 
  {
-    if ($1 == "ATOM" ) {
-      if ( $5 in HSD ) {
-       if ( $3 == "CA") print "Changing "$4" "$5" to HSD" >"modpdb.log"
-       sub(" "$4" ", " HIS ");
+    if ($1 == "ATOM  " ) {
+      resid=$9 + 0 ;#convert string to number
+      if ( resid in HSD ) {
+       if ( $4 ~ "\\s*CA\\s*" ) print "Changing "$6" "resid" to HSD" >"modpdb.log"
+       sub($6, "HSD");
 #       print $0
-      } else if ( $5 in HSE ) {
-       if ( $3 == "CA" ) print "Changing "$4" "$5" to HSE" >"modpdb.log"
-       sub(" "$4" ", " HSD ");
+      } else if ( resid in HSE ) {
+       if ( $4 ~ "\\s*CA\\s*" ) print "Changing "$6" "resid" to HSE" >"modpdb.log"
+       sub($6, "HSE");
 #       print $0
-      } else if ( $5 in HISflip ) {
-        print $4" flip:" $5 >"modpdb.log"
-       if ( $3 == "ND1") { 
-        sub (" ND1 ", " CD2 ");
-       } else if ($3 == "CD2") {
-       sub (" CD2 ", " ND1 ");
-       } else if ($3 == "CE1") {
-       sub (" CE1 ", " NE2 ");
-       } else if ($3 == "NE2") {
-       sub (" NE2 ", " CE1 ");
+      } else if ( resid in HSP ) {
+       aname=$4
+       if ( $4 ~ "\\s*CA\\s*" ) print "Changing "$6" "resid" to HSP" >"modpdb.log"
+       sub($6, "HSP");
+#       print $0
+      } else if ( resid in HISflip ) {
+        print $6" flip:" resid >"modpdb.log"
+       if ( $4 ~ "\\s*ND1\\s*") {
+        sub ($4, " CD2");
+       } else if ($4 ~ "\\s*CD2\\s*") {
+       sub ($4, " ND1");
+       } else if ($4 ~ "\\s*CE1\\s*") {
+       sub ($4, " NE2");
+       } else if ($4 ~ "\\s*NE2\\s*") {
+       sub ($4, " CE1");
        }
-      } else if ( $5 in GLN ) {
-       if ( $3 == "OE1") { 
-        sub (" OE1 ", " NE2 ");
-        print $4" flip:" $5 >"modpdb.log"
-       } else if ($3 == "NE2") {
-       sub (" NE2 ", " OE1 ");
+      } else if ( resid in GLN ) {
+       if ( $4 ~ "\\s*OE1\\s*") {
+        sub ($4, " NE2");
+        print $6" flip:" resid >"modpdb.log"
+       } else if ($4 ~ "\\s*NE2\\s*") {
+       sub ($4, " OE1");
        }
-      } else if ( $5 in ASN ) {
-       if ( $3 == "OD1") { 
-        sub (" OD1 ", " ND2 ");
-        print $4" flip:" $5 >"modpdb.log"
-       } else if ($3 == "ND2") {
-       sub (" ND2 ", " OD1 ");
+      } else if ( resid in ASN ) {
+       if ( $4 ~ "\\s*OD1\\s*") {
+        sub ($4, " ND2");
+        print $6" flip:" resid >"modpdb.log"
+       } else if ($4 ~ "\\s*ND2\\s*") {
+       sub ($4, " OD1");
        }
     }
-    if ( $5 in HISflip ) {
-       if ( $3 == "ND1") { 
-        print $4" flip:" $5 >"modpdb.log"
-        sub (" ND1 ", " CD2 ");
-       } else if ($3 == "CD2") {
-       sub (" CD2 ", " ND1 ");
-       } else if ($3 == "CE1") {
-       sub (" CE1 ", " NE2 ");
-       } else if ($3 == "NE2") {
-       sub (" NE2 ", " CE1 ");
-       }
-     }
-   }     
+   }
  print $0
 } ' $1 
-
-
 

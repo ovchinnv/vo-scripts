@@ -3,8 +3,6 @@
 
 set version 27
 
-set eps 1.0 ! dielectric constant
-
 if @?psffile eq 0 set psffile unknown
 if @?corfile eq 0 set corfile unknown_m
 if @?format eq 0 set format card 

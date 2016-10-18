@@ -1,0 +1,44 @@
+#!/bin/bash
+#
+# link all fep output files into a separate directory for postprocessing
+# NOTE :assuming that output files all have unique names so that they can coexist in the same directory
+#
+
+if test -z "$1"
+then
+ echo "USAGE: esubdir <dir1> <dir2> ... <dirN>"
+ exit 1
+fi
+
+
+fepdir=fepdata;
+
+mkdir -p $fepdir
+
+for d in "$@" ; do
+ if [ ! -d $d ] ; then
+  echo "File $d is not a directory. Skipping.";
+ else
+  echo "Linking FEP data files from directory $d"
+  pushd $d >/dev/null
+  for f in *.fep ; do
+  echo "===> Linking file $f ..."
+  flink=$f ;
+# ad hoc v : juju to add lambda2 to guarantee uniqueness (missing in filenames from early runs)
+   lambda2=${d%.fep}
+   lambda2=${lambda2##*-}
+   fname=${f%.fep}
+   fext=${f##*.}
+   flink=$fname-${lambda2}.$fext
+#
+# ad hoc : remove if filename already contains lambda2 ^
+# link :
+   ln -fs ../$d/$f ../$fepdir/$flink
+#
+  done
+#  exit
+#
+  popd >/dev/null
+#
+ fi
+done

@@ -1,0 +1,121 @@
+#!/bin/vmd
+#############################################################
+# optional prefix for running out of directory
+if {[ info exists "prefix" ]==0} {
+ set prefix "." ; # nothing
+}
+#############################################################
+structure          $prefix/$psffile
+coordinates        $prefix/$pdbfile
+#
+#
+if [file exists $xscfile] {
+  set fd [open $xscfile r]
+  while { [gets $fd line] > -1 } { 
+   set a [lindex $line 1];
+   set b [lindex $line 5];
+   set c [lindex $line 8];
+  }
+  close $fd
+}
+#
+#
+if {$mde == "namd2"} {
+ paratypecharmm on
+}
+parameters          $prefix/${parameters}
+
+# Force-Field Parameters
+exclude             scaled1-4
+1-4scaling          1.0
+cutoff              $cutoff
+switching           on
+switchdist          $switchdist
+fullelectfrequency  $pmefreq
+nonbondedfreq       $nbondfreq
+
+# Integrator Parameters
+timestep            $dt  ;# fs
+
+if {$mde == "acemd"} { ;# only for acemd
+ hydrogenscale       $hydrogenmass ;# scaling of H mass for faster integration
+}
+rigidbonds          $shake  ;# needed for 2fs steps
+rigidtolerance      1e-5 ;# faster
+rigiditerations     400 ; # up from 100
+#stepspercycle       $stepspercycle
+
+constraints         $cswitch
+consref             $resfile ;# reference positions file
+if { $mde == "namd2" } {
+ conskfile          $prefix/$resfile
+ conskcol           B ; # specify restraint fc column for NAMD
+}
+
+# Constant Temperature Control
+langevin            $lang    ;# do langevin dynamics
+#langevinFile        $resfile
+#langevinCol         Z
+langevindamping     $lfriction     ;# damping coefficient (gamma)
+langevintemp        $temperature
+#langevinHydrogen    off    ;# don't couple langevin bath to hydrogens
+berendsenpressure   $baro
+berendsenpressuretarget 1.01325
+berendsenpressurerelaxationtime $bptime ;# note that this is in femtoseconds
+berendsenpressurecompressibility 0.0000457
+if {$mde == "namd2" } {
+ berendsenpressurefreq $pmefreq
+}
+vdwforceswitching   on ;# CHARMM vdw force switching function
+#
+#############################################################
+## OUTPUT PARAMETERS                                       ##
+#
+outputname          $outputName
+restartfreq         [expr {$freq*5} ]; # make less frequent to decrease likelihood of repeat craches
+dcdfreq             $freq
+if { $mde == "acemd" } {
+ energyfreq          $freq
+# energyfreq          1
+} elseif { $mde == "namd2" } {
+ xstFreq             $freq
+ outputEnergies      $freq
+ outputPressure      $freq
+ outputTiming        $freq
+};
+#########################################################################
+# Periodic Boundary Conditions
+# PME (for full-system periodic electrostatics)
+pme                 yes
+pmegridspacing      1.0
+pmetolerance        10e-6 ;#faster than default 1e-6
+#
+useconstantratio   yes ;# on for membranes
+if { $mde == "acemd" } {
+ useflexiblecell    no
+} elseif { $mde == "namd2" } {
+ useflexiblecell    yes
+};
+
+set sx $a
+set sy $b
+set sz $c
+
+if { $mde == "acemd" } {
+ celldimension        $sx               $sy                         $sz ;
+} elseif { $mde == "namd2" } {
+ cellBasisVector1     $sx               0.                          0.
+ cellBasisVector2     0.                $sy                         0.
+ cellBasisVector3     0.                0.                          $sz
+ cellOrigin           0.                0.                          0.
+};
+
+
+
+############################################################################
+# Run
+# minimization
+minimize $ministeps
+
+# dynamics
+run $nsteps

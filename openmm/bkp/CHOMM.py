@@ -64,10 +64,10 @@ if 1:
   membrane_on=0
 #
  try :
-  platformName
+  platform
  except NameError:
-# use CUDA unless variable 'platformName' defined
-  platformName="CUDA"
+# use CUDA unless variable 'platform' defined
+  platform="CUDA"
 #
 #========================== Subroutines
 #==========================
@@ -207,13 +207,13 @@ if 1:
  system=psf.createSystem(params,
                          nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
                          constraints=cons, removeCMMotion=False, hydrogenMass=hmass*u.amu,
-                         verbose=False);
+                         verbose=True);
 
 #================= harmonic restraints from file, a la NAMD/ACEMD
  if (constraints) :
   dprint("Adding absolute positional harmonic restraints to atoms marked in beta column of PDB file '"+consfile+"'");
-  force=mm.CustomExternalForce("s*0.5*k*periodicdistance(x,y,z,x0,y0,z0)^2");
-#  force=mm.CustomExternalForce("s*0.5*k*( (x-x0)^2 + (y-y0)^2 + (z-z0)^2 )");
+  force=mm.CustomExternalForce("s*0.5*k*periodicdistance(x,y,z,x0,y0,z0)");
+#  force=CustomExternalForce("s*0.5*k*( (x-x0)^2 + (y-y0)^2 + (z-z0)^2 )");
   force.addPerParticleParameter("k");
   force.addPerParticleParameter("x0");
   force.addPerParticleParameter("y0");
@@ -226,12 +226,9 @@ if 1:
    bnodim=b/u.angstrom/u.angstrom; # have to deal with units, which are A^2 for B-factors
    if ( bnodim > 0 ) :
     icons+=1;
-    k=bnodim*u.kilocalorie/u.mole/u.angstrom/u.angstrom
+    k=bnodim*constraintscaling*u.kilocalorie/u.mole/u.angstrom/u.angstrom
 #   dprint(" Adding restraint on atom ",iatom," with force constant ", k );
-    x0=r[0].value_in_unit(u.nanometer)
-    y0=r[1].value_in_unit(u.nanometer)
-    z0=r[2].value_in_unit(u.nanometer)
-    force.addParticle(iatom, [k,x0,y0,z0]);
+    force.addParticle(iatom, [k,r[0],r[1],r[2]]);
    iatom+=1;
   dprint("Added restraints on ", icons, " atoms");
   dprint("Harmonic force constants will be scaled uniformly by x"+str(constraintscaling));
@@ -287,11 +284,11 @@ if 1:
    integrator=mm.VerletIntegrator(dt*u.femtosecond);
 #====================================================
 #
- dprint("Initializing compute platform ",platformName);
- platform=mm.Platform.getPlatformByName(platformName);
+ dprint("Initializing compute platform ",platform);
+ platform=mm.Platform.getPlatformByName(platform);
  properties={'CudaPrecision': 'mixed'};
  dprint("Preparing simulation topology");
- if (platformName=="CUDA") :
+ if (platform=="CUDA") :
   simulation=app.Simulation(psf.topology, system, integrator, platform, properties);
  else :
   simulation=app.Simulation(psf.topology, system, integrator);
@@ -306,13 +303,8 @@ if 1:
    dprint("Setting simulation coordinates from file '",pdbfile,"'");
    simulation.context.setPositions(pdb.positions);
  else :
-  dprint("Setting simulation restart data from file '",restartfile,"'");
-  with open(restartfile, 'r') as f:
-   xml=f.read();
-   oldstate=mm.XmlSerializer.deserialize(xml)
-   simulation.context.setPositions(oldstate.getPositions());
-   simulation.context.setVelocities(oldstate.getVelocities());
-   simulation.context.setTime(oldstate.getTime());
+  dprint("Setting simulation coordinates from file '",restartfile,"'");
+  simulation.loadState(restartfile);
 #
 #================ Print initial energy compoments :
  dprint("Initial Potential energy" );

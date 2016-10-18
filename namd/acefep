@@ -1,0 +1,284 @@
+#!/bin/bash
+prefix="."; # do not change
+###################################################################
+if test -z "$1"
+then 
+ echo "USAGE: Nnve input_file output_file"
+ exit 1
+else
+ input=$1
+fi  
+############# job output file ####################################
+if test -z "$2"
+then 
+ echo "USAGE: Nnve input_file output_file"
+ exit 1
+else
+ output=$2
+fi 
+###################################################################
+mde=acemd ;# MD engine; can be acemd or namd
+mde=namd2 ;
+submitmode=nersc ;# how the job will be executed
+
+mkdir -p scratch
+
+psffile=struc/emr-tpp-dmpcn-x.psf
+pdbfile=struc/emr-tpp-dmpcn-fep.pdb
+
+resfile=$pdbfile ;
+
+name=emr;
+
+outputName=scratch/${name}
+
+hmass=1; # hydrogen mass
+freq=50000;
+#freq=100000;
+
+count=67;
+
+cres=$((count-1)); # restart number
+numrun=10;
+cfin=$((count+$numrun-1));
+
+cscale=0.5 ;
+cutoff=12 ;
+parameters="param/emr-tpp-dmpc.prm";
+barostat="on";
+constraints="off" ;
+
+keep_water_out="off" ;
+#tclscript=tcl/keep_water_out_memb.acemd
+
+############### alchemical FE v ###############
+alch="on" ;
+alchscript="fep.conf" ;
+alchpdb=$pdbfile ;
+alchfreq=100 ; # usually set to 10 
+alcheqstep=0 ; # only for first run in a series (then set to zero) ; I think this is useless : can just discard part of data
+alambda=0.000 ;
+alambda2=0.035 ;
+if [  $alch == "on" ] ; then
+ aldir=fep-${alambda}-${alambda2}
+ mkdir -p $aldir
+ pushd $aldir
+ mkdir -p scratch
+ prefix=".." ;# to find correct files after pushd
+fi
+############### alchemical FE ^ ###############
+############### FER configuration v ###################
+FER="on"
+ferpdb=struc/emr-tpp-dmpcn-mini.pdb
+# set restraint constant -- in analogy with confinement setup
+fercount=5 ; # this gives a low restraint constant that keeps the TPP "roughly" in the same place
+nu=`echo "0.001 * e ( l (1.9) * ( ${fercount} - 1) )" | bc -l`
+echo "--> NU (AKMA) = $nu"
+conv=20.45483;
+echo -n "--> NU (1/ps/100) = "; echo `echo "$nu * $conv / 100" | bc -l `;
+tmass=`cat ${prefix}/struc/tpp_totmass.dat`
+fc=`echo "scale=10; $tmass * ( 2 * $nu * 3.1415 )^2" | bc` ;# this is twice the force constant in CHARMM _plus_ scaling by total mass
+echo "--> Force prefactor in CHARMM (AKMA) = [2 x NU x pi]^2 = $fc";
+############### FER configuration ^ ###################
+
+#nsteps=1000000;
+#nsteps=125000;
+nsteps=100000;
+#nsteps=0; # minimization
+
+flag="fep";
+T=298; # temperature
+
+restartName=./scratch/${name}${cres}${flag}; # note for nested runs may need to add "../"
+#restartName=../scratch/${name}${cres}npt; # to override
+
+if [ "$count" -eq "0" ]; then
+ restart=0;
+else
+ restart=1;
+fi
+
+while [ $count -le $cfin ]
+ do
+  script=__md$count$flag
+
+  echo '#!/bin/vmd' > $script
+  echo set mde $mde          >>$script ;
+  if [ ! -z ${alch+x} ];then
+   echo set alch $alch          >>$script ;
+  fi
+  echo set psffile  $psffile >>$script
+  echo set pdbfile  $pdbfile >>$script
+#
+  if [ "$count" -ge "100" ]; then
+   resfile=$resfile_tpp ; # keep tpp in place
+  fi
+#
+  echo set resfile  $resfile >>$script
+
+  echo set temperature $T    >>$script
+  echo set cutoff $cutoff    >>$script
+  echo set switchdist `echo $cutoff-2 | bc -l`    >>$script
+
+  if [ "$restart" -eq "0" ]; then
+   grep -i SET ${prefix}/struc/tpp.str |\
+     sed 's/=//' |\
+     awk '{print tolower($1)" "tolower($2)" "$3}' >>$script 
+   echo 'temperature       $temperature' >>$script
+   dt=1.0 ; #timestep
+   shake=none ;
+   restart=1 ; #future calculations
+   if [ $mde == "namd2" ]; then
+    echo  margin 5                                >> $script
+   fi
+   echo set xscfile _none_                        >>$script
+   echo set ministeps 500                         >> $script
+  else
+   echo set xscfile $restartName.xsc              >>$script
+# prefer not to rely on AceMD extendedsystem
+   if [ $mde == "namd2" ]; then
+    echo extendedsystem '$xscfile'                >>$script
+   fi
+#   dt=2 ; #timestep
+#   dt=1.75 ; #timestep
+   dt=1 ; #timestep
+   shake=none ;
+   echo bincoordinates     $restartName.coor  >>$script
+   echo binvelocities      $restartName.vel   >>$script
+   echo set ministeps    0                   >> $script
+  fi
+#
+  if [ "$count" -ge "100" ]; then
+   keep_water_out="off" ;
+  fi
+#
+  if [ "$count" -ge "100" ]; then
+   constraints="off" ;
+  fi
+#
+  if [ "$count" -ge "200" ]; then
+   barostat="off" ;
+  fi
+#
+  echo set shake $shake                    >> $script
+  echo set dt $dt                          >> $script
+  echo set hydrogenmass $hmass             >> $script
+  if [ $mde == "namd2" ]; then
+   echo set stepspercycle 15               >> $script
+  fi
+  echo set pmefreq 4                       >> $script
+  echo set nbondfreq 2                     >> $script
+  echo set parameters        $parameters   >> $script
+
+  echo set cswitch $constraints            >> $script
+  if [ "$constraints" == "on" ]; then
+   echo constraintscaling $cscale          >> $script ;
+  fi
+  echo set nsteps $nsteps                  >> $script
+  echo set freq $freq                      >> $script  ;# frequency for restrt files
+
+  echo set outputName $outputName$count$flag >> $script
+# for subsequent runs
+
+  echo set lang on                       >> $script
+  echo set lfriction  1                 >> $script
+#
+  echo set baro $barostat            >> $script
+#  echo set bptime 10000              >> $script
+  echo set bptime 500              >> $script
+  if [ $mde == "acemd" ]; then
+   echo wrap all                      >> $script
+  elif [ $mde == "namd2" ]; then
+   echo wrapWater on                 >> $script
+   echo wrapAll   on                 >> $script
+  fi
+# keep water out of membrane interior, if requested
+#===================================================
+  if [ $keep_water_out == "on" ]; then
+   echo tclforces on                 >> $script
+   if [ $mde == "namd2" ]; then
+    echo "TclForcesScript {"         >> $script
+   fi
+   echo set allatompdb $pdbfile      >> $script
+   echo set waterCheckFreq     1000  >> $script
+   echo set lipidCheckFreq   $nsteps >> $script ;# membrane position recomputation
+# define water and lipid names
+   echo set watResName  "TIP3"       >> $script
+   echo set watAtomName "OH2"        >> $script
+   echo set lipResName  "DMPC"       >> $script
+   echo set lipAtomName "C1"         >> $script
+#   echo set lipAtomName "P"         >> $script
+# define force constant per group (units -- Kcal/(mol*A) -- to be set in $tclscript)
+   echo set fconst 1                 >> $script
+   echo set potential 0              >> $script
+   echo set "watexcl {}"             >> $script
+   echo source $tclscript            >> $script
+#   cat $tclscript                    >> $script
+   if [ $mde == "namd2" ]; then
+    echo "} ;# TclForcesScript"      >> $script
+   fi
+  fi
+#========= keep water out ^ ==========================
+# FEP : 
+  if [  $alch == "on" ]; then
+   echo set prefix ${prefix}                 >> $script
+   echo set alchpdb ${prefix}/${alchpdb}     >> $script
+   echo set alcheqstep $alcheqstep           >> $script
+   alcheqstep=0 ; #disable equilibration for subsequent runs
+   echo set alchfreq $alchfreq               >> $script
+   echo set alambda $alambda                 >> $script
+   echo set alambda2 $alambda2               >> $script
+   echo set fepcount $count                  >> $script
+   cat ${prefix}/${alchscript}               >> $script
+  fi
+# FER :
+  if [  $FER == "on" ]; then
+   echo "#################### FER Section ##">> $script
+   echo freeEnergy $FER                      >> $script
+   echo "freeEnergyConfig {
+   urestraint {
+    rmsd
+    group { file=${prefix}/${ferpdb} occu } ; # orientation
+    group { file=${prefix}/${ferpdb} beta } ; # forcing
+    kf=$fc
+    ref=0
+    reffile=${prefix}/${ferpdb}
+   }
+}"                                           >> $script
+
+  fi
+# main config
+  cat ${prefix}/${input}                     >> $script
+###############################################################
+# submit job
+  if [ $submitmode == "now" ] ; then
+   time $mde $script >& $output$count$flag
+   sleep 5; # give that poor GPU a break !
+######################
+   if [ $? -ne 0 ];  then
+    echo Execution interrupted due to errors during run $count.
+    exit
+   else
+    qunstable=`tail $output$count$flag | grep -i unstable | wc -m`
+    if [ "$qunstable" -gt "0" ]; then
+     echo Will repeat previous run.
+     mv $output$count$flag ${output}${count}${flag}.crash
+    else
+# all ok : increment run count
+     restartName=$outputName$count$flag
+     mv output.dcd ${restartName}.dcd
+     count=$(($count+1 ))
+    fi
+   fi
+  else
+   restartName=$outputName$count$flag
+   count=$(($count+1 ))
+  fi
+# else : scripts will be generated but not submitted
+#################################################################
+done
+
+if [ $alch == "on" ]; then
+ popd ;
+fi
+

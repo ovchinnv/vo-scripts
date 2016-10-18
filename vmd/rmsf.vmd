@@ -1,0 +1,74 @@
+#!/bin/vmd
+#
+# compute rmsf fluctuations & out it into beta
+#
+
+set iframe 5001 ; # skip initial frames
+
+set id [molinfo top];
+set nf [molinfo top get numframes];
+set last [expr {$nf - 1}]; # index of last frame
+
+set selection "heavy"
+set selection "light"
+
+set cons "noh" ;
+#
+puts "Will compute residue rmsf of selection ( $selection and $cons )";
+puts "Ignoring the first $iframe frames"
+puts "Orienting frames"
+#
+set all      [atomselect top all];
+set template [atomselect top "($selection) and ($cons)" frame $iframe] 
+set orient   [atomselect top "($selection) and ($cons)" frame $iframe] 
+for { set i $iframe } { $i<$nf } { incr i } {
+ $orient frame $i
+ $orient update
+ $all frame $i
+ $all update
+ $all move [measure fit $orient $template weight mass]
+}
+puts "Computing average structure"
+set rav [measure avpos $orient first $iframe]
+set xav {};
+set yav {};
+set zav {};
+foreach r $rav {
+ foreach {xx yy zz} $r { lappend xav $xx ;  lappend yav $yy ; lappend zav $zz } 
+}
+animate dup frame 0 $id ;# duplicate first frame and put at the end
+# set average coordinates
+$template frame $nf
+$template set x $xav
+$template set y $yav
+$template set z $zav
+# align again, this time wrt average frame
+puts "Reorienting with respect to average structure"
+
+for {set j $iframe} {$j<$nf} {incr j} {
+  $orient frame $j
+  $all frame $j
+  $all move [measure fit $orient $template weight mass]
+}
+
+puts "Computing rmsf"
+# compute rmsf
+$template set beta [measure rmsf $template first $iframe last $last]; 
+# also write a pdb with fluctuations in the beta column
+$template writepdb rmsf/rmsf_$name.pdb
+#
+mol representation newcartoon
+mol color beta
+mol selection protein
+mol addrep $id
+
+color scale method BWR
+
+puts "Writing files"
+# output to a file
+set beta [$template get beta]
+set atomid [$template get serial] ;
+set resid [$template get resid];
+set fid [open rmsf/rmsf_${name}_$selection.dat w+];
+foreach b_ $beta a_ $atomid r_ $resid { puts $fid "$a_ $r_ $b_" }
+close $fid

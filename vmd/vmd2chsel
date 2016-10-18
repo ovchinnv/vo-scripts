@@ -1,0 +1,4 @@
+#!/bin/bash
+#translate vmd selection command to charmm (best guess)
+
+sed -e 's/atomselect macro/define/' -e 's/{/sele ( /' -e 's/}/ ) end/' -e 's/and/\.and\./' -e 's/to/\:/' $1

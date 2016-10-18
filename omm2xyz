@@ -1,0 +1,19 @@
+#!/bin/bash
+# extract coordinates from an OpenMM .xml file and write as xyz triplets
+if [ -z $1 ] ; then 
+ echo "USAGE : omm2xyz xmlfile.xml"
+ exit 1;
+else
+ xmlfile=$1
+fi
+
+if [ -z $2 ]; then
+ xyzfile=${xmlfile%%.xml}.xyz
+else
+ xyzfile=$2
+fi
+
+echo "No element info available" > $xyzfile
+grep "<Position " $xmlfile  | sed -e s/.=/\ /g -e s/\"//g -e s.\/\>.. | awk '{printf "%3s %10.5f %10.5f %10.5f\n", "Unk", $2, $3, $4}' >> $xyzfile
+nlines=`wc -l $xyzfile | cut -d' ' -f1`
+sed -i "1i $((nlines-1))" $xyzfile
