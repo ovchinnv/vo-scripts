@@ -1,6 +1,6 @@
 #!/bin/bash
 # change 1-letter sequence to a 3-letter sequence and generate a pdb file 
-# which is needed if you want to number the residues starting from a nomber other than one
+# which is needed if you want to number the residues starting from a number other than one
 #
 if [ -z $2 ] ; then
  ires=1 ;

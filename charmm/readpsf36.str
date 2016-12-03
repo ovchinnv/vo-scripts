@@ -13,6 +13,12 @@ else
  set resid resid
 endif
 
+if @?xplor eq 0 then
+ set xplor
+else
+ set xplor xplor
+endif
+
 if @?toppar eq 0 set toppar   ~/charmm/parameters/c36
 if @?topparcgenff eq 0 set topparcgenff   ~/charmm/parameters/cgenff2b8
 !
@@ -158,11 +164,26 @@ if @?adstr ne 0 then
  stream unit 11 parser local
 endif
 !===============================================================
+if @?adstr1 ne 0 then
+ @string open unit 11 read form name "@{ADSTR1}"
+ stream unit 11 parser local
+endif
+!===============================================================
+if @?adstr2 ne 0 then
+ @string open unit 11 read form name "@{ADSTR2}"
+ stream unit 11 parser local
+endif
+!===============================================================
+if @?adstr3 ne 0 then
+ @string open unit 11 read form name "@{ADSTR3}"
+ stream unit 11 parser local
+endif
+!===============================================================
 !
 label read_psf
 if @?psffile eq 0 return
 @string open unit 1 read @format name @psffile.psf
-read psf @format unit 1
+read psf @format unit 1 @xplor
 @string close unit 1
 if @?cor eq 0 set cor 1 
 if @?crd eq 0 set crd 1 

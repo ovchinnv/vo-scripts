@@ -1,0 +1,5 @@
+#!/bin/bash
+gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=eps2write \
+  -sOutputFile=${1%.eps}rot.eps \
+  -c "<</Orientation 3>> setpagedevice" \
+  -f $1

@@ -1,7 +1,7 @@
 * try to autodetect disulfide bridges and patch structure
 *
 
-set dcut 2.3 ! SG atoms separated by less than this distance are assumed to be connected via a disulfide bridge
+set dcut 4.1 ! SG atoms separated by less than this distance are assumed to be connected via a disulfide bridge
 set cmdfile "add_disulfide.str"
 system "echo '*' disulfide bridge patches > @CMDFILE"
 system "echo '*' >> @CMDFILE"
@@ -21,7 +21,7 @@ label disuloop1
  quick sele bynum @{s1} end sele bynum @{s2} end
  echo ?dist
  if ?dist lt @dcut then ! update patch script
-  system "echo 'patch disu @{SEG1} @{RES1} @{SEG2} @{RES2}' >> @CMDFILE "
+  system "echo 'patch disu @{SEG1} @{RES1} @{SEG2} @{RES2} setup warn' >> @CMDFILE "
   goto break
  endif
  define rest sele rest .and. .not. bynum @{s2} end
