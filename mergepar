@@ -2,7 +2,7 @@
 # combine multiple parameters file into one for acemd
 #
 
-outpar=emr-tpp-dmpc-staple.prm
+outpar=mergepar.par
 echo -n > $outpar
 
 echo "* combined parameter file for ACEMD simulations; generated automatically for ${outpar}" > _header
@@ -72,4 +72,4 @@ echo NBFIX     >>$outpar
 cat _nbfx      >>$outpar
 echo END       >>$outpar
 
-#rm -f _header _bond _angl _dihe _impr _cmap _nbfx _nbnd
+rm -f _header _bond _angl _dihe _impr _cmap _nbfx _nbnd

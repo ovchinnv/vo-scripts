@@ -14,7 +14,7 @@ pdbfile=$1
 model=$2
 
 # first line :
-li=`grep -Ein "MODEL\s+$model\s+" $pdbfile`
+li=`grep -Ein "MODEL\s+$model\s*" $pdbfile`
 # extract line number
 li=${li%%:*}
 

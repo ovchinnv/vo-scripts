@@ -1,0 +1,32 @@
+#!/bin/bash
+# quick pka check using propka
+# output warnings if some aa's have pka's close to 7
+propka=propka31 ; # name of propka executable
+pdb=$1
+name=${pdb%.*};
+$propka $pdb >&/dev/null
+
+sumline=`grep -n SUMMARY ${name}.pka | awk {'print $1'} ` ;# line at which summary begins
+sumline=${sumline%%:*}
+sumline=$((sumline+2)) ;
+
+freeline=`grep -n Free ${name}.pka | awk {'print $1'}` ;# line at which FE summary begins
+freeline=${freeline%%:*}
+freeline=$(($freeline-2-$sumline))
+
+tail ${name}.pka -n +$sumline | head -n $freeline > pka.dat
+#
+# read pka.dat with an awk script to check pka's
+#
+awk " {
+ if ( (\$1 == \"GLU\") || (\$1 == \"ASP\") || (\$1 == \"HIS\") ) {
+  diff=\$4 - 7.4;
+  abs=( diff>0 ? diff : -diff );
+  if ( ( abs < 0.5 ) && (\$4 != 99.99) ) {
+   print \" ===================================================================================\";
+   print \" ===> PropKa WARNING for structure '$name' : predicted  pKa of residue \"\$1\" \"\$2\" is \"\$4
+   print \" ===================================================================================\";
+  }
+ }
+}" pka.dat
+

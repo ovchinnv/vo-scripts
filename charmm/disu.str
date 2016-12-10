@@ -13,6 +13,7 @@ label disuloop1
  set seg1 ?selsegi
  set res1 ?selresi
  define rest sele sgs .and. .not. bynum @{s1} end
+ if ?nsel eq 0 goto break
  label disuloop2
  set s2   ?selatom
  set seg2 ?selsegi

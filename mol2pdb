@@ -8,7 +8,7 @@ else
 fi
 #
 if [ -x $2 ] ; then
- pdbfile=${mol2file%%.*}.pdb
+ pdbfile=${mol2file%.*}.pdb
 else
  pdbfile=$2
 fi

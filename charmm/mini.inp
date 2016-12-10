@@ -1,52 +1,50 @@
-* CaM pre-dynamics minimization test: based on ../ cam.inp
+* build structure files
 *
 
-set version 27
+set version 36
 
-if @?psffile eq 0 set psffile unknown
-if @?corfile eq 0 set corfile unknown
-if @?format eq 0 set format card 
+set psffile @name
+set corfile @psffile
 
-stream readpsf.str
-
-!!!!!!!!!!!!!!!!!!! MINIMIZATION (BROOKS) !!!!!!!!!!!!!!!!!!!
-
-UPDAte atom cdie cutnb 14.0 ctofnb 12.0 vswitch shift  ! options for GETE; same thing that we run dynamics with
+if @?clib eq 0 set clib ~/scripts/charmm
+stream @{clib}/readpsf36.str
 
 coor copy comp
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!goto skipmini
-set k 30
-label minimize
-cons harm force @k select segid @ID .and. .not. hydrogen end
 
-mini sd nstep 20 tolenr 0.0001
-mini conj nstep 20 tolenr 0.0001
-mini abnr nstep 20 tolenr 0.0001
+cons harm sele prop wmain .eq. 1 end force 200
 
-coor orie rms
+set imini 1
+set nmini 5
 
-decr k by 10.0
-if k ge 0.0 -
-goto minimize
+label mini
 
+mini sd nstep 20
+mini conj nstep 20
+mini abnr nstep 10
 
-label final_mini
-cons harm clear  ! turn off constraints
+coor chir check fix
 
-mini abnr nstep 100 - ! conjugate gradient minimization
-         tolenr 0.0001  ! if the energy change is less that tolenr, minimization routine will exit
+incr imini
+if @imini lt @nmini goto mini
 
-label skipmini
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-write coor @format name @{corfile}_m.cor
-write coor pdb name @{corfile}_m.pdb
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+cons harm sele prop wmain .eq. 1 end force 10
 
-coor orie rms mass sele .not. hydrogen end! RMSD to initial structure
+set imini 1
+set nmini 5
 
-goto kill
+label mini2
 
-!!!! STOP HERE !!!!!!!!!!!
-label kill
-stop
+mini sd nstep 20
+mini conj nstep 20
+mini abnr nstep 10
+
+coor chir check fix
+
+incr imini
+if @imini lt @nmini goto mini2
+
+mini abnr nstep 20
+
+write coor card name @corfile_m.cor
+
+coor orie rms mass

@@ -1,0 +1,10 @@
+* set up FACTS solvation for energy claculation
+*
+
+set eps 1.
+nbond nbxmod 5 atom cdie eps @eps shift vatom vdistance vswitch cutnb 14.0 ctofnb 12.0 ctonnb 10.0 e14fac wmin 1.5
+scalar wmain = radius 
+facts tcps 22 teps @eps gamm 0.015 tavw
+
+energy
+

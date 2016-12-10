@@ -1,0 +1,44 @@
+* try to autodetect cyclization and patch structure
+*
+
+set dcut 4.0 ! CA atoms separated by less than this distance are assumed to be connected
+set cmdfile "cyclize.str"
+system "echo '* cyclization patch' > @CMDFILE"
+system "echo '*' >> @CMDFILE"
+system "echo >> @CMDFILE"
+
+define cas sele type CA end
+
+label loop1
+ set s1   ?selatom
+ set seg1 ?selsegi
+ set res1 ?selresi
+ define rest sele segid @{seg1} .and. .not. resid @{res1} end
+ calc lastatom = @{s1} + ?nsel
+ define lastatom sele bynum @{lastatom} end
+ set res2 ?selresi
+ set seg2 ?selsegi
+ if @{seg1} ne @{seg2} then
+  echo Error : Could not find last residue of segment @{seg1}
+  return
+ endif
+ ! compute distance
+ quick sele bynum @{s1} end sele segid @{seg2} .and. resid @{res2} .and. cas end
+ echo ?dist
+ if ?dist lt @dcut then ! update patch script
+  if ?selresn .eq. PRO then ! select patch name
+   set link lip2 ! make sure this patch is defined
+  else
+   set link link
+  endif
+  system "echo 'patch @{LINK} @{SEG2} @{RES2} @{SEG1} @{RES1}' >> @CMDFILE "
+  system "echo 'set qcyclic 1' >> @CMDFILE "
+  system "echo 'autogen angl dihe' >> @CMDFILE "
+ endif
+ ! go to next segment
+ define cas sele cas .and. .not. segid @{seg1} end
+ if ?nsel gt 0 -
+goto loop1
+! execute the script
+stream @CMDFILE
+return
