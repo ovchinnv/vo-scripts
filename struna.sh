@@ -1,5 +1,23 @@
 #!/bin/bash
-# shell utility functions for ftsm
+# shell utility functions for string method
+#======================================================================================================================
+ function exists() { # returns 1 if command $1 exists, 0 otherwise
+  cmd=$1
+  if command -v $cmd >/dev/null 2>&1; then
+   echo 1
+  else
+   echo 0
+  fi
+ }
+#======================================================================================================================
+ assert_exists() { # exists if a required command in $1 is undefined
+#  a=`exists $1`
+#  echo $a
+  if [ `exists $1` -eq 0 ]; then
+   echo " cannot find program \"$1\", aborting."
+   exit
+  fi
+ }
 #======================================================================================================================
  function dpar() { # returns dpar for ftsm ; takes arguments irep(1) brep(2) erep(3) : this, first, and last replica
   irep=$1

@@ -1,0 +1,43 @@
+#!/bin/bash
+# renumber atoms in a mol2 file
+# the need arose because avogadro removes atom numbers if you edit the molecule
+
+awk '\
+  BEGIN {
+   FIELDWIDTHS="8 5 70";
+   blank="            ";
+   nH=0;
+   nO=0;
+   nC=0;
+   nN=0;
+# other atoms to be added here as needed;
+  }
+
+ { aname=$2;
+   qatom=1;
+   gsub(/[0-9]/," ",aname);
+   if ( aname ~ "\\s*H\\s*" ) {
+    nH++;
+    aname="H"nH;
+   } else if ( aname ~ "^\\s*C\\s*$" ) {
+    nC++;
+    aname="C"nC;
+   } else if ( aname ~ "^\\s*N\\s*$" ) {
+    nN++;
+    aname="N"nN;
+   } else if ( aname ~ "^\\s*O\\s*$" ) {
+    nO++;
+    aname="O"nO;
+   } else {
+    qatom=0;
+   }
+   if (qatom) {
+    newname=aname""substr(blank,1, length($2)-length(aname));
+    sub($2,newname);
+   }
+   print $0;
+ }
+ ' $1 > _temp_
+mv _temp_ $1
+rm -f _temp_
+
