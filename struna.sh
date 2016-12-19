@@ -57,6 +57,12 @@
   echo $iright
  }
 #======================================================================================================================
+ function compute() { # calculates the value of expression
+  exp=$1
+  ans=`echo "$1 ; exit" | calc`
+  echo $ans
+ }
+#======================================================================================================================
  function update() { # replaces a template parameter in an input file
   f=$1
   p=$2

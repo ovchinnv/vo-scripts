@@ -1,0 +1,19 @@
+#!/bin/vmd
+
+#set files { "3bnc60" "3bnc60a" "3bnc60gl" "ch103" "ch103uca" "ch103-i3.2" };
+#set files { "3bnc60gl" "ch103" "ch103uca" "ch103-i3.2" };
+set files { "3bnc60t" "3bnc60at" "3bnc60gtl" }
+
+foreach name $files {
+ puts $name
+ mol delete all
+
+ mol load psf ${name}_now.psf
+
+ set step 1 ;
+
+ mol addfile ../dcd/${name}_now.dcd waitfor all step $step
+ set xscfile ${name}.xsc
+ source unwrap.vmd
+ animate write dcd ../dcd/${name}_unwrap.dcd waitfor all
+}
