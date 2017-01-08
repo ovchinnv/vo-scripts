@@ -1,12 +1,13 @@
 %
 names={'3bnc60t', '3bnc60at', '3bnc60glt'};
+names=[ names {'ch103t', 'ch103-i3.2t', 'ch103ucat'} ];
+names=[ names {'pgt121t', '3h109lt', 'gl121t'} ];
 
-temp=298; %K
-% entropy arrays
+% rmsd arrays
 allrmsd=[];
 labels={};
 
-for ii=1:3
+for ii=1:length(names)
  name=char(names(ii));
 
  qpdb=0 ; qpsf=0 ; qdcd=0; clear xall;% to reread

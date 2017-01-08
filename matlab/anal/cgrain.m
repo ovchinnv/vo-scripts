@@ -4,6 +4,14 @@
 name='3bnc60glt';
 name='3bnc60t';
 %name='3bnc60at';
+name='ch103t' ;
+name='ch103-i3.2t' ;
+%name='ch103ucat' ;
+
+name='gl121t';
+name='3h109lt';
+name='pgt121t';
+
 
 pdbfile=['../../struc/',name,'_now.pdb']; % in lieu of a "structure" file
 
@@ -42,9 +50,9 @@ cainds=find(typeCA);
 ncg=length(cainds);
 
 for caind = cainds'
- resinds = find( resid==resid(caind) & insertion==insertion(caind) & ismember(segid,segid(caind))) % make sure to match the segid also
+ resinds = find( resid==resid(caind) & insertion==insertion(caind) & ismember(segid,segid(caind))); % make sure to match the segid also
  wgt=mass(resinds); wgt=wgt/sum(wgt);
- length(resinds)
+% length(resinds)
  xpdbcg(caind) = wgt'*xpdb(resinds);
  ypdbcg(caind) = wgt'*ypdb(resinds);
  zpdbcg(caind) = wgt'*zpdb(resinds);

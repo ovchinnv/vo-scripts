@@ -1,7 +1,13 @@
 % covariance matrices
 names={'3bnc60glt', '3bnc60at', '3bnc60t'};
+
+names={'ch103t', 'ch103-i3.2t', 'ch103ucat'};
+
+names={'pgt121t', '3h109lt', 'gl121t'};
+
 flags={'-ca-hc', '-ca-lc' };
-flags={'-cg-hc', '-cg-lc' };
+%flags={'-cg-hc', '-cg-lc' };
+
 clrs={'b','g','r'};
 aligns={'malign.mat' 'malign-lc.mat'};
 

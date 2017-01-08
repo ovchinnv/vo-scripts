@@ -2,6 +2,14 @@
 %
 name='3bnc60at';
 
+name='ch103t';
+name='ch103ucat';
+name='ch103-i3.2t';
+
+name='gl121t';
+name='3h109lt';
+name='pgt121t';
+
 pdbfile=['../../struc/',name,'_now.pdb']; % in lieu of a "structure" file
 
 struc ;

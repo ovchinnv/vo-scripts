@@ -11,21 +11,28 @@ handles=[ hc lc bb ];
 styles={'r' 'g' 'b', 'm', 'c', 'k', };
 d=50;
 
-for ibeg=1:3
+ibeg=1 ; %3bnc
+%ibeg=10 ; %ch103
+%ibeg=19 ;%pgt121
+
+iend=ibeg+3*3-1 ; % look at one class at a time
+
+for offset=0:2
 
  j=0;
- for i=ibeg:3:length(labels)
+ for i=ibeg+offset:3:iend+offset
   j=j+1;
-  figure(handles(ibeg));
+%  i
+  figure(handles(offset+1));
   rmsd=allrmsd(i,:);
   time=[1:length(rmsd)]*40/1000;
   rmsds=smooth2(time,rmsd,d);
   plot(time,rmsds,char(styles(j)))
  end
- legend(labels(ibeg:3:end),2,'interpreter','none')
+ legend(labels(ibeg+offset:3:iend+offset),2,'interpreter','none')
  xlabel('\it t(ns)');
  ylabel('\it RMSD(\AA)','interpreter','latex')
- ylim([0 2.5]);
+ ylim([0 3]);
  set(gcf,'paperpositionmode','auto');
- print(gcf,'-depsc2',[char(labels(ibeg+6)),'.eps']);
+ print(gcf,'-depsc2',[char(labels(ibeg+offset)),'rmsd.eps']);
 end

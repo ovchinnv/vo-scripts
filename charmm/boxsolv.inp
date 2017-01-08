@@ -10,7 +10,8 @@ stream @{clib}/readpsf36.str
 
 if @?buf eq 0 set buf 11.  ! solvation radius
 
-define solute select all end
+if @?solute eq 0 set solute all
+define solute select ( @solute ) end
 coor orie select solute end ! align 
 coor stat select solute end ! select the active site region
 

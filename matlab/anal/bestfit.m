@@ -31,7 +31,8 @@ function [xall,yall,zall,rmsd]=bestfit(xall,yall,zall,xref,yref,zref,wgt,inds)
 % conpute _all_ rotated coordinates (without translation component)
   Xnew=X*trans.T ; % pure rotation (only in this case recover correct magnitudes below)
 % compute RMSD :
-  rmsd(i)=norm(Xref(inds,:)-Xnew(inds,:));
+%  rmsd(i)=norm(Xref(inds,:)-Xnew(inds,:)) ; this is the p=2 matrix norm
+  rmsd(i)=norm(Xref(inds,:)-Xnew(inds,:), 'fro') ; % Frobenius norm is consistent with VMD and other codes
 % compute rotated coordinates
 % put aligned structure into the same array to save memory
   xall(:,i)=Xnew(:,1).*oswgt + comref(1);

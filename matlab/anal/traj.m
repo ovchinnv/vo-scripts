@@ -1,5 +1,6 @@
 % read dcd trajectories
 if (exist('qdcd')) ; if (qdcd==1) ; return ; end ; end
+if (exist('dcdstep')) ; dcdstep=max(1,dcdstep) ; else ; dcdstep=1 ; end
 %
 iframe=0 ;
 for fname = dcdnames
@@ -7,13 +8,15 @@ for fname = dcdnames
  disp(['==> Processing file ',dcdfile]);
  h=read_dcdheader(dcdfile) ;
 % loop over frames
- nframes=h.NSET;
+ nframes=fix(h.NSET/dcdstep);
  xdcd=zeros(natom,nframes);
  ydcd=zeros(natom,nframes);
  zdcd=zeros(natom,nframes);
 %
  for k=1:nframes
-  [xdcd(:,k),ydcd(:,k),zdcd(:,k)]=read_dcdstep(h) ;
+  for kk=1:dcdstep
+   [xdcd(:,k),ydcd(:,k),zdcd(:,k)] = read_dcdstep(h) ;
+  end
   iframe=iframe+1;
   if (~mod(iframe,100))
    disp(['==> Read frame #', num2str(iframe)]);

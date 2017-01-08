@@ -21,6 +21,19 @@ colors=[pink ; pink; pink ; pink ; steelblue ; steelblue ; steelblue ; steelblue
 str=ind(:,1); %starting indices
 stp=ind(:,2); %stopping indices
 
+% note that the above domain definitions are with respect to 3bnc sequence
+% need to convert to unwrapped/aligned sequence :
+seqind=3 ;% 3bnc60 gl
+inda=zeros(size(ind)) ;
+for i=1:length(ind)
+ for j=1:2
+  inda(i,j)=find(maind(:,seqind)==ind(i,j));
+ end
+end
+%
+str=inda(:,1); %starting indices
+stp=inda(:,2); %stopping indices
+
 %plot the lines
 
 l=length(str);

@@ -3,15 +3,23 @@
 close all;
 
 names={ '3bnc60t' '3bnc60at', '3bnc60glt',};
+
+%names={'ch103t', 'ch103-i3.2t', 'ch103ucat'};
+
+%names={'pgt121t', '3h109lt', 'gl121t'};
+
 flags={'-ca-hc', '-ca-lc' };
+%flags={'-ca-hc'};
 flags={'-cg-hc', '-cg-lc' };
+%flags={'-cg-hc'};
 clrs={'r','g','b'};
 aligns={'malign.mat' 'malign-lc.mat'};
-xlims=[125,110];
+xlims=[145,120];
+ylims=[6,6];
 
 lw=1;
 %
-for jj=1:2
+for jj=1:length(flags)
   leg={};
   hleg=[];
   flag=char(flags(jj));
@@ -37,8 +45,10 @@ for jj=1:2
     fsm=smooth2(resnum,flucall-flucstd,d);
 %
 % populate armsf
+% find the correct antibody sequence index in maind
+    ind=find(ismember(files,name(1:end-1))); % end-1 to drop 't' et the end
     for k=1:length(armsf)
-     i3=maind(k,ii);
+     i3=maind(k,ind);
      if (i3>0 & i3<=n)
       armsf(k,1)=fs(i3);
       armsf(k,2)=fsp(i3);
@@ -58,11 +68,16 @@ for jj=1:2
 % mark residues that are mutated in comparison with the germline/common ancestor
 %===
  ms=6;
- seq0=ma(2,:); % for ch103
- seq0=ma(3,:); % for 3bnc
+ if ( strcmp( name(1:6),'3bnc60') )
+  seq0=ma(3,:); % 3bnc gl
+ elseif ( strcmp( name(1:5),'ch103') )
+  seq0=ma(5,:); % for ch103 uca
+ else
+  seq0=ma(9,:) ; % assume pgt
+ end
 
- if (ii==1)
-  seqm=ma(ii,:);
+ if (ii==1 | ii==2)
+  seqm=ma(ind,:);
 % mind=find(seq0~=seqm);
   mind = find ( (seq0~=seqm).*(seq0~='-').*(seqm~='-') ) ;
   for k=mind
@@ -79,9 +94,10 @@ for jj=1:2
 
 % print
  xlim([0 xlims(jj)]);
+ ylim([0 ylims(jj)]);
  legend(hleg,leg);
  set(gcf,'paperpositionmode','auto');
- print(gcf, '-depsc2', ['rmsf',flag,'.eps']);
+ print(gcf, '-depsc2', [char(names(1)),'rmsf',flag,'.eps']);
 end
 
 % save data

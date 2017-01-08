@@ -1,5 +1,10 @@
 %
 names={'3bnc60glt', '3bnc60at', '3bnc60t'};
+
+names={'ch103t', 'ch103-i3.2t', 'ch103ucat'};
+
+names={'gl121t', '3h109lt', 'pgt121t'};
+
 flags={'-ca-hc', '-ca-lc' };
 flags={'-cg-hc', '-cg-lc' };
 clrs={'b','g','r'};
