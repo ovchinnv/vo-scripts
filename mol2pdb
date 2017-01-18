@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -z $1 ] ; then 
- echo "USAGE : mol2pdb <mol2 file> <pdb file(optional)>"
+ echo "USAGE : mol2pdb <mol2 file> <pdb file>"
  exit 1;
 else
  mol2file=$1
