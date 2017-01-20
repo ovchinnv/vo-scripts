@@ -1,0 +1,136 @@
+#!/bin/bash
+
+###################################################################
+if test -z "$1"
+then 
+ echo "USAGE: Nnve input_file output_file"
+ exit 1
+else
+ input=$1
+fi  
+############# job output file ####################################
+if test -z "$2"
+then 
+ echo "USAGE: Nnve input_file output_file"
+ exit 1
+else
+ output=$2
+fi
+###################################################################
+mde=acemd
+name=eqalleq.outeqall
+
+psffile=${name}_sn.psf
+pdbfile=${name}_msn.pdb
+
+resfile=${pdbfile}
+
+hmass=1; # hydrogen mass
+freq=10000;
+
+count=0;
+numrun=10;
+cres=$((count-1)); # restart number
+cfin=$((count+$numrun-1));
+nsteps=100000
+
+mkdir -p scratch
+restartName=scratch/${name}${cres}eq
+outputName=scratch/${name}
+
+flag="eq";
+T=298; # temperature
+
+if [ "$count" -eq "0" ]; then
+ restart=0;
+else
+ restart=1;
+fi
+
+while [ $count -le $cfin ]
+ do
+# check if the job already completed successfully
+  if [ -f $output$count$flag ] ; then
+   ok=`grep "dx.doi.org/doi:10.1021/ct9000685" $output$count$flag` ;# paper doi shown after successful runs
+   if [ ! -z "$ok" ]; then
+    restart=1
+    restartName=$outputName$count$flag
+    count=$((count+1 ))
+    continue ;# skip this run
+   fi
+  fi
+# end of check
+  script=__md$count$flag
+
+  echo '#!/bin/vmd' > $script
+  echo set psffile  $psffile >>$script
+  echo set pdbfile  $pdbfile >>$script
+  echo set resfile  $resfile >>$script
+
+  echo set temperature $T    >>$script
+
+  if [ "$restart" -eq "0" ]; then
+   grep -i SET ${name}.str |\
+     awk '{print tolower($1)" "tolower($2)" "$3+2}' >>$script 
+   echo 'temperature       $temperature' >>$script
+   dt=1.0 ; #timestep
+   shake=none
+   echo set ministeps 100               >> $script
+  else
+# bug in using extendedsystem, so I am doing this:
+   tail -n1 $restartName.xsc | awk '{print "set a "$2}' >>$script 
+   tail -n1 $restartName.xsc | awk '{print "set b "$6}' >>$script 
+   tail -n1 $restartName.xsc | awk '{print "set c "$10}' >>$script 
+   dt=2.0 ; #timestep
+   shake=all
+   echo bincoordinates     $restartName.coor  >>$script
+   echo binvelocities      $restartName.vel   >>$script
+   echo set ministeps 0                       >>$script
+  fi
+
+  echo set shake $shake                    >> $script
+  echo set dt $dt                          >> $script
+  echo set hydrogenmass $hmass             >> $script
+  echo set stepspercycle 10                >> $script
+  echo set parameters ../param/baker14.prm      >> $script ;# note that these are c36 params
+
+  echo set cswitch on                     >> $script
+  cscale=`echo " ( 90-$count*10 ) * 1 "  |bc`;
+#  echo constraintscaling $cscale          >> $script ;
+#
+  echo set nsteps $nsteps                  >> $script
+  echo set freq $freq                      >> $script  ;# frequency for restrt files
+
+  echo set outputName $outputName$count$flag >> $script
+#
+  echo set lang on                       >> $script
+  echo set lfriction 0.1                 >> $script
+#
+  echo set baro on                   >> $script
+  echo set bptime 10000              >> $script
+  echo wrap all                      >> $script
+#
+  cat $input                         >> $script
+###############################################################
+ time $mde $script >& $output$count$flag
+ sleep 1;
+###############################################################
+ if [ $? -ne 0 ];  then
+   echo Execution interrupted due to errors during run $count.
+   exit
+ else
+   qunstable=`tail $output$count$flag | grep -i unstable | wc -m`
+   if [ "$qunstable" -gt "0" ]; then
+    echo Will repeat previous run.
+    mv $output$count$flag ${output}${count}${flag}.crash
+    mv output.dcd $outputName$count$flag.crash.dcd
+   else
+# all ok
+    restart=1
+    restartName=$outputName$count$flag
+    count=$((count+1 ))
+    mv output.dcd ${restartName}.dcd
+   fi
+ fi
+
+done
