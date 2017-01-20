@@ -32,12 +32,12 @@ calc totion = int ( @nwat * @istrength / ( 55 + @istrength ) ) - ?nsel
 ! see if we can put enough ions to cancel the charge & maintain proper ion conc.
 calc flag = @totion - abs ( ?CGTOT )
 if @flag lt 0 set totion abs ( ?CGTOT )
- 
-calc positive = int ( 0.5 * ( @totion - ?CGTOT ) )
-calc negative = @positive + ?CGTOT  
 
+if @?positive eq 0 calc positive = int ( 0.5 * ( @totion - ?CGTOT ) )
+if @?negative eq 0 calc negative = @positive + ?CGTOT  
 !
-! add potassium
+!
+! add potassium or sodium
 set ionsneeded  @positive
 set ion SOD
 set ionseg 1

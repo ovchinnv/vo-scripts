@@ -1,0 +1,7 @@
+#!/bin/bash
+
+fname=$1
+name=${fname%%.*}
+ext=${fname##*.}
+
+obabel -i${ext} $fname -opng -xC -xu -xd -d -O ${name}.png

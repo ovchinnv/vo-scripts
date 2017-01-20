@@ -5,7 +5,7 @@
 outpar=mergepar.par
 echo -n > $outpar
 
-echo "* combined parameter file for ACEMD simulations; generated automatically for ${outpar}" > _header
+echo "* combined CHARMM parameter file; generated automatically for ${outpar}" > _header
 echo "!" >> _header
 echo -n > _bond
 echo -n > _angl
