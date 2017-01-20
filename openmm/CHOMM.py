@@ -5,7 +5,6 @@ import simtk.openmm as mm
 import simtk.unit as u
 from sys import stdout, stderr, exit
 from shutil import copyfile
-
 #=====================================================================#
 # define parameters that may not have been defined by user
 #
@@ -206,7 +205,7 @@ if 1:
   dprint("Hydrogen mass is ",hmass*u.amu)
  system=psf.createSystem(params,
                          nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
-                         constraints=cons, removeCMMotion=False, hydrogenMass=hmass*u.amu,
+                         constraints=cons, removeCMMotion=False, hydrogenMass=hmass*u.amu, rigidWater=True,
                          verbose=False);
 
 #================= harmonic restraints from file, a la NAMD/ACEMD
@@ -265,7 +264,7 @@ if 1:
 # note that createSystem puts different psf sections into different force groups for ease of energy decomposition;
   for f in system.getForces() :
 # put all forces into the same group (note that this will make energy decomposition impossible)
-# we should be able to use many groups withe same substep in the RESPA init, but that might slow it down
+# we should be able to use many groups with the same substep in the RESPA init, but that might slow it down
    f.setForceGroup(0);
 # reciprocal forces get a separate group for RESPA
    if isinstance(f,mm.NonbondedForce) :
@@ -294,7 +293,7 @@ if 1:
  if (platformName=="CUDA") :
   simulation=app.Simulation(psf.topology, system, integrator, platform, properties);
  else :
-  simulation=app.Simulation(psf.topology, system, integrator);
+  simulation=app.Simulation(psf.topology, system, integrator, platform);
 #
  if (restart == 0) :
   if (corfile!=None):
@@ -343,3 +342,5 @@ if 1:
   fxsc.write(str(nsteps)+" "+str(a[0].value_in_unit(u.angstrom))+" 0 0 0 "+str(b[1].value_in_unit(u.angstrom))+" 0 0 0 "+str(c[2].value_in_unit(u.angstrom))+" 0 0 0 0 0 0 0 0 0\n");
   fxsc.close();
 
+#=====reset switching distance
+  del switchdist;

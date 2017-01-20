@@ -1,0 +1,21 @@
+#!/bin/vmd
+
+set psffile rab11a_sn-x.psf
+set pdbin   rab11a_msn.pdb
+set pdbout  rab11a_msn_chn.pdb
+
+set segids { RAB GTP MG ION3 ION4 WAT XWAT } ;
+set chainids { R G M I J W X } ;
+
+mol load psf $psffile 
+mol addfile $pdbin
+
+foreach segid $segids chainid $chainids {
+ puts " Assigning chain ID : $segid ==> $chainid "
+ set seg [ atomselect top "segid $segid" ];
+ $seg set chain $chainid
+}
+
+puts " Writing file $pdbout"
+animate write pdb $pdbout beg 0 end 0
+
