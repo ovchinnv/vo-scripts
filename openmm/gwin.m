@@ -10,19 +10,19 @@ sn=cumsum(s.^amp); sn=sn/sn(end);
 nsamp=1000;
 nsamp=10;
 r=rand(1,nsamp);
-iwins=[];
+wins=[];
 for i=1:nsamp
- iwin=find(sn>r(i),1);
- iwins=[iwins iwin];
+ win=find(sn>r(i),1)+iwin-1; % offset to zero
+ wins=[wins win];
 end
 
 %write windows to file :
-save -ascii 'nextwin.dat' iwins
+save -ascii 'nextwin.dat' wins
 
 return;
 
 close ;
-[h,x]=hist(iwins,[1:length(s)]);
+[h,x]=hist(wins,[1:length(s)]);
 
 plot(s/sum(s),'k-x'); hold on
 plot(x,h/sum(h)/(x(2)-x(1)),'r:');

@@ -3,7 +3,7 @@
 name='traf-lig27'
 
 psffile='./struc/'+name+'_sn.psf' ;
-pdbfile='./struc/'+name+'-msn.pdb' ;
+pdbfile=name+'-mini.pdb' ;
 topfile='./struc/'+name+'.top';
 paramfile='./struc/'+name+'.par' ;
 
@@ -26,11 +26,15 @@ pressure=1;    # units of atm
 pme=1; # whether to use PME
 pbc=1; # whether periodic boundary conditions are on
 
+dx=72.88126833885093
+dy=dx
+dz=dx
+
 nsteps=100000;    # number of production steps
 outputfreq=10000;  # frequency of generating output
 dcdfreq=10000;     # frequency of dcd output
 
-restart=1
+restart=@{restart}
 restartfile='@{restartfile}'
 outputName='@{outputname}'
 

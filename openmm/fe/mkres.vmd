@@ -13,7 +13,10 @@ $all set mass $m ;
 package require pbctools
 set xscfile "scratch/${name}10mini.xsc"
 pbc readxst "$xscfile" -now
-pbc wrap -compound res -center com -centersel "segid LIG1"
+pbc wrap -compound res -center com -centersel "protein"
+pbc wrap -compound res -center com -centersel "protein"
+pbc wrap -compound res -center com -centersel "protein"
+#pbc wrap -compound res -center com -centersel "segid LIG1"
 
 set confine [ atomselect top "segid LIG1"];
 #set orient [ atomselect top "within 5 of segid TPP and ( not segid TPP and protein and ( element C O N ) ) "] ;
