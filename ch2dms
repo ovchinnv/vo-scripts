@@ -1,0 +1,41 @@
+#!/bin/bash
+# write structure file for Desmond
+
+if [ -z $1 ] ; then 
+ echo "USAGE : ch2dms <psf file> <pdb file(optional)> <xscfile(optional)>"
+ exit 1;
+else
+ psffile=$1
+fi
+#
+if [ -z $2 ] ; then
+ pdbfile=${psffile%.*}.pdb
+else
+ pdbfile=$2
+fi
+
+echo "
+ mol load psf $psffile 
+ mol addfile $pdbfile type pdb
+ " > _temp_
+
+# note: the xsc file MUST be named <something>.xsc, otherwise VMD will not read the cell properly
+if [ ! -z $3 ] ; then
+ xscfile=$3
+ echo "
+ package require pbctools
+ pbc readxst \"$xscfile\" -now
+ set cell [pbc get -now];
+ foreach {dx dy dz} \$cell break;
+# puts \"\$dx \$dy \$dz\"
+ " >> _temp_
+fi
+
+dmsfile=${psffile%.*}.dms
+
+echo "
+ animate write dms $dmsfile
+ " >> _temp_
+
+vmd < _temp_
+rm -f _temp_

@@ -1,0 +1,26 @@
+#!/bin/bash
+#
+# driver program to launch equilibration and production of multiple structures
+#
+# directory spec :
+#dirs=eehe*[3-5]
+#dirs=hhh*
+dirs=`ls -d e{eh_,he}*`
+
+for d in $dirs ; do
+ echo "Processing directory $d ..."
+ pushd $d >&/dev/null
+ # check if this directory is done
+ lastrun=temp19nvt;
+ if [ -f $lastrun ] ; then
+  ok=`grep "dx.doi.org/doi:10.1021/ct9000685" $lastrun` ;# paper doi shown after successful runs
+  if [ ! -z "$ok" ]; then
+   popd >&/dev/null
+   continue ;# skip this directory
+  fi
+ fi
+ cp ../acetemp .
+ sed -i "s/name=.*/name=$d/" acetemp
+ nohup ./acetemp ../modyn-fast temp >& nvt.out
+ popd >&/dev/null
+done

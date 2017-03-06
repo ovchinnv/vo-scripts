@@ -19,7 +19,7 @@ outfile="/dev/null"
  if ($1 == "read") { 
   if ($2 == "rtf") { 
    readtop=1 ; readpar=0 ; outfile=topname;
-  } else if ($2 == "param") {
+  } else if ($2 == "para") {
    readtop=0 ; readpar=1 ; outfile=parname;
   }
  } else if (($1 == "RETURN") || ($1 == "return")) {
