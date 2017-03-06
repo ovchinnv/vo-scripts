@@ -1,0 +1,32 @@
+* Increase hydrogen mass
+* assume that topology has been read
+*
+
+! Get all hydrogens for the whole system
+define all_h sele hydrogen end
+if @?hmass eq 0 set hmass 4
+! Loop over all hydrogens
+set n ?NSEL
+set i 1
+label loop_h
+    ! Get the atom bonded to ith hydrogen
+    define this_h sele all_h .subset. @i end
+    scalar mass stat sele this_h end
+    ! compute mass increase
+    calc dmass = @hmass - ?save
+    ! decrease bonded atom mass
+    define bonded sele .bonded. this_h end
+    scalar mass stat sele bonded end
+    calc newmass = ?save - @dmass
+    scalar mass set @newmass sele bonded end
+    incr i
+    if @i .le. @n -
+goto loop_h
+! set all hydrogen masses to 4:
+scalar mass set @hmass sele all_h end
+!
+! Ready to write modified psf
+!
+return
+
+

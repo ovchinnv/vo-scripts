@@ -1,0 +1,39 @@
+#!/bin/bash
+# combine "mass" entries from multiple topology files
+#
+
+outtop=sosip36.top
+
+echo "* combined (atom mass) topology file ; generated automatically for ${outtop}" > _header
+echo "*" >>_header
+echo "36  1" >>_header
+echo "!" >> _header
+echo >> _header
+echo -n > _mass
+
+for arg in "$@" ; do
+ echo "processing file "$arg"..."
+
+awk 'BEGIN \
+{
+     readmass=0
+     topfile=ARGV[1];
+}
+{
+  if        ( substr($1,0,4) ~ /[Mm][Aa][Ss][Ss]/) { 
+     readmass=1 ; outfile="_mass"
+     print $0 >> outfile
+  }
+ }
+ ' $arg
+
+done
+#
+# now concatenate
+echo -n > $outtop
+cat _header     >$outtop
+cat _mass      >>$outtop
+echo           >>$outtop
+echo END       >>$outtop
+
+rm -f _header _mass
