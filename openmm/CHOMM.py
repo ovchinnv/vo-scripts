@@ -28,6 +28,10 @@ if 1:
   constraints
  except NameError:
   constraints=0
+ try :
+  conscol
+ except NameError:
+  conscol=1
 #
  try :
   switchdist
@@ -61,6 +65,11 @@ if 1:
   membrane_on
  except NameError:
   membrane_on=0
+#
+ try :
+  implicitSolvent
+ except NameError:
+  implicitSolvent=0
 #
  try :
   platformName
@@ -143,8 +152,8 @@ if 1:
 #========================== Initialize simulation system
  dprint("Reading PSF from file '", psffile, "'");
  psf=app.CharmmPsfFile(psffile);
- dprint("Reading parameter file '", paramfile,"'");
- params=app.CharmmParameterSet(paramfile, permissive=True); # need permissive to avoid providing atom types ( a la xplor psf )
+ dprint("Reading topology from file '",topfile,"' and parameters from file '", paramfile,"'");
+ params=app.CharmmParameterSet(topfile, paramfile, permissive=False); # running without atom typing (via mass entries in the topology) often leads to ERRORS !
 #========================================================
  if (pbc):
   dprint("Periodic boundary conditions will be used")
@@ -188,29 +197,45 @@ if 1:
   else:
    nbondMethod=app.CutoffPeriodic
    dprint("PME is off");
- else :
+ else:
+  psf.setBox(1000000*u.angstrom, 1000000*u.angstrom, 1000000*u.angstrom) # set to a very large box to eliminate wrapping
   nbondMethod=app.CutoffNonPeriodic
 #===================================================== SHAKE
  if (shake==1):
   cons=app.HBonds
+  rigidWater=True
   dprint("Will constrain all bonds involving hydrogens");
  elif (shake>1):
   cons=app.AllBonds
+  rigidWater=True
   dprint("Will constrain all bond lengths");
  else:
   cons=None
+  rigidWater=False
  dprint("Initializing simulation system");
  dprint("Nonbonded cutoff is ",cutoff*u.angstrom,". Switching is active at ",switchdist*u.angstrom)
  if (hmass>1):
   dprint("Hydrogen mass is ",hmass*u.amu)
- system=psf.createSystem(params,
+
+ if (implicitSolvent==1):
+  system=psf.createSystem(params,
+                         nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
+                         constraints=cons, rigidWater=rigidWater, removeCMMotion=False, hydrogenMass=hmass*u.amu,
+                         implicitSolvent=app.OBC2,
+                         verbose=False);
+ else:
+  system=psf.createSystem(params,
                          nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
                          constraints=cons, removeCMMotion=False, hydrogenMass=hmass*u.amu, rigidWater=True,
                          verbose=False);
 
 #================= harmonic restraints from file, a la NAMD/ACEMD
  if (constraints) :
-  dprint("Adding absolute positional harmonic restraints to atoms marked in beta column of PDB file '"+consfile+"'");
+  if (conscol==1): # beta
+   dprint("Adding absolute positional harmonic restraints to atoms marked in the beta column of PDB file '"+consfile+"'");
+  elif (conscol==2): #occupancy
+   dprint("Adding absolute positional harmonic restraints to atoms marked in the occupancy column of PDB file '"+consfile+"'");
+
   force=mm.CustomExternalForce("s*0.5*k*periodicdistance(x,y,z,x0,y0,z0)^2");
 #  force=mm.CustomExternalForce("s*0.5*k*( (x-x0)^2 + (y-y0)^2 + (z-z0)^2 )");
   force.addPerParticleParameter("k");
@@ -222,7 +247,11 @@ if 1:
   res=app.PDBFile(consfile);
   iatom=0; icons=0;
   for r, o, b  in zip(res.positions, res.occupancy, res.temperature_factor) :
-   bnodim=b/u.angstrom/u.angstrom; # have to deal with units, which are A^2 for B-factors
+   if (conscol==1): # beta
+    bnodim=b/u.angstrom/u.angstrom; # have to deal with units, which are A^2 for B-factors
+   elif (conscol==2): #occupancy
+    bnodim=o
+
    if ( bnodim > 0 ) :
     icons+=1;
     k=bnodim*u.kilocalorie/u.mole/u.angstrom/u.angstrom
@@ -327,7 +356,7 @@ if 1:
  if (nsteps>0):
   simulation.reporters.append(app.DCDReporter('output.dcd',dcdfreq));
   simulation.reporters.append(app.StateDataReporter(stdout, outputfreq, step=True, potentialEnergy=True, kineticEnergy=True, speed=True, temperature=True, 
-                                                    volume=True, separator=' '));
+                                                    volume=pbc, separator=' \t '));
   dprint("Running MD simulation for ",nsteps," steps");
   simulation.step(nsteps);
   dprint("Writing simulation restart files");
@@ -342,5 +371,5 @@ if 1:
   fxsc.write(str(nsteps)+" "+str(a[0].value_in_unit(u.angstrom))+" 0 0 0 "+str(b[1].value_in_unit(u.angstrom))+" 0 0 0 "+str(c[2].value_in_unit(u.angstrom))+" 0 0 0 0 0 0 0 0 0\n");
   fxsc.close();
 
-#=====reset switching distance
-  del switchdist;
+#==== reset switching distance
+ del switchdist;

@@ -4,7 +4,7 @@
 define replacement select @candidates .and. type OH2 end ! select num of water molecules
 set repl ?nsel ! number of replacement candidates
 if @repl .lt. @ionsneeded system "echo ADD_ION ERROR: SELECTION NOT BIG ENOUGH TO ACCOMODATE @IONSNEEDED IONS, SKIPPING..."
-if @repl .lt. @ionsneeded system goto skip_ion
+if @repl .lt. @ionsneeded goto skip_ion
 
 calc nion_int = INT ( @ionsneeded )
 
