@@ -329,9 +329,9 @@ if 1:
 #========================================== ALCHEMICAL TRANSFORMATIONS
  if (alch):
   if (alchcol==1): # beta
-   dprint("Atoms to be annihilated are marked in the beta column of PDB file '"+alchfile+"'");
+   dprint("Atoms to be annihilated/decoupled are marked in the beta column of PDB file '"+alchfile+"'");
   elif (alchcol==2): #occupancy
-   dprint("Atoms to be annihilated are marked in the occupancy column of PDB file '"+alchfile+"'");
+   dprint("Atoms to be annihilated/decoupled are marked in the occupancy column of PDB file '"+alchfile+"'");
 
   alchpdb=app.PDBFile(consfile);
   iatom=0; ialch=0;
@@ -345,7 +345,7 @@ if 1:
   dprint("Found ",len(alchatoms)," atoms for alchemical annihilation");
   ligand_atoms=alchatoms;
   dprint("Creating alchemical system");
-  factory=alchsys(system, ligand_atoms=ligand_atoms)#, platform=platformName, annihilate_sterics=False, softcore_alpha=0.5);
+  factory=alchsys(system, ligand_atoms=ligand_atoms, annihilate_sterics=(not alchdecouple), annihilate_electrostatics=(not alchdecouple));
 # reference lambda
   lambda0e=max(0.,2.*lambda0-1.)
   lambda0v=min(1.,2.*lambda0)
