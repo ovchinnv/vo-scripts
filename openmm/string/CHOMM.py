@@ -4,14 +4,7 @@ import simtk.openmm.app as app
 import simtk.openmm as mm
 import simtk.unit as u
 from sys import stdout, stderr, exit
-from shutil import copyfile
-
-if (alch):
-# from openmmtools.alchemy import AlchemicalState as alch
-# from openmmtools.alchemy import AbsoluteAlchemicalFactory as alchsys
- from alchemy import AlchemicalState as alch
- from alchemy import AbsoluteAlchemicalFactory as alchsys
- from math import ceil
+from shutil import move
 #=====================================================================#
 # define parameters that may not have been defined by user
 #
@@ -79,6 +72,11 @@ if 1:
   implicitSolvent=0
 #
  try :
+  struna
+ except NameError:
+  struna=0
+#
+ try :
   platformName
  except NameError:
 # use CUDA unless variable 'platformName' defined
@@ -114,11 +112,6 @@ if 1:
   for key in ['Bond', 'Angle', 'Dihed', 'UB', 'IMPR', 'CMAP', 'NBOND', 'PE']:
    print(ener[key], end="\t");
   print();
-#==========================
- def pote(simulation):
-  "Return potential energy"
-  pener=simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(u.kilocalories_per_mole);
-  return pener;
 #========================== box dimensions from .str file produced during system preparation
  def get_box_size_str(boxfile):
   with open(boxfile) as f:
@@ -210,7 +203,7 @@ if 1:
    nbondMethod=app.CutoffPeriodic
    dprint("PME is off");
  else:
-  psf.setBox(1000000*u.angstrom, 1000000*u.angstrom, 1000000*u.angstrom) # set to a very large box to eliminate wrapping
+  psf.setBox(1000*u.angstrom, 1000*u.angstrom, 1000*u.angstrom) # set to a very large box to eliminate wrapping
   nbondMethod=app.CutoffNonPeriodic
 #===================================================== SHAKE
  if (shake==1):
@@ -238,9 +231,9 @@ if 1:
  else:
   system=psf.createSystem(params,
                          nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
-                         constraints=cons, removeCMMotion=False, hydrogenMass=hmass*u.amu, rigidWater=True,
+                         constraints=cons, removeCMMotion=False, hydrogenMass=hmass*u.amu, rigidWater=rigidWater,
                          verbose=False);
-#
+
 #================= harmonic restraints from file, a la NAMD/ACEMD
  if (constraints) :
   if (conscol==1): # beta
@@ -264,7 +257,7 @@ if 1:
    elif (conscol==2): #occupancy
     bnodim=o
 
-   if ( bnodim > 0 ) :
+   if (bnodim > 0) :
     icons+=1;
     k=bnodim*u.kilocalorie/u.mole/u.angstrom/u.angstrom
 #   dprint(" Adding restraint on atom ",iatom," with force constant ", k );
@@ -277,6 +270,10 @@ if 1:
   dprint("Harmonic force constants will be scaled uniformly by x"+str(constraintscaling));
   system.addForce(force)
 #
+#================= string plugin
+ if (struna==1) :
+  from openmmstruna import *
+  system.addForce(StrunaForce(strunaConfig, strunaLog))
 #================= add integrator :
  dprint("Configuring integrator");
 # first, add barostat if requested :
@@ -325,61 +322,16 @@ if 1:
   else:
    dprint("Initializing Verlet integrator with timestep ",dt*u.femtosecond);
    integrator=mm.VerletIntegrator(dt*u.femtosecond);
+#====================================================
 #
-#========================================== ALCHEMICAL TRANSFORMATIONS
- if (alch):
-  if (alchcol==1): # beta
-   dprint("Atoms to be annihilated/decoupled are marked in the beta column of PDB file '"+alchfile+"'");
-  elif (alchcol==2): #occupancy
-   dprint("Atoms to be annihilated/decoupled are marked in the occupancy column of PDB file '"+alchfile+"'");
-
-  alchpdb=app.PDBFile(consfile);
-  iatom=0; ialch=0;
-  alchatoms=list();
-  for o, b  in zip(alchpdb.occupancy, alchpdb.temperature_factor) :
-   bnodim=b/u.angstrom/u.angstrom ;
-   onodim=o;
-   if (( alchcol==1 and bnodim!=0 ) or ( alchcol==2 and onodim!=0 )):
-    alchatoms.append(ialch);
-   ialch+=1;
-  dprint("Found ",len(alchatoms)," atoms for alchemical annihilation");
-  ligand_atoms=alchatoms;
-  dprint("Creating alchemical system");
-  factory=alchsys(system, ligand_atoms=ligand_atoms, annihilate_sterics=(not alchdecouple), annihilate_electrostatics=(not alchdecouple));
-# reference lambda
-  lambda0e=max(0.,2.*lambda0-1.)
-  lambda0v=min(1.,2.*lambda0)
-  dprint("Defining reference alchemical state with lambda_0=", lambda0,", lambda_0e=", lambda0e,", lambda_0v=", lambda0v);
-  astate0=alch();
-  astate0['lambda_restraints']=1.0
-  astate0['lambda_electrostatics']=lambda0e
-  astate0['lambda_sterics']=lambda0v
-# perturbed lambda
-  lambda1e=max(0.,2.*lambda1-1.)
-  lambda1v=min(1.,2.*lambda1)
-  dprint("Defining perturbed alchemical state with lambda_1=", lambda1,", lambda_1e=", lambda1e,", lambda_1v=", lambda1v);
-  astate1=alch();
-  astate1['lambda_restraints']=1.0
-  astate1['lambda_electrostatics']=lambda1e
-  astate1['lambda_sterics']=lambda1v
-  dprint("Creating perturbed system");
-  alchsystem=factory.createPerturbedSystem(astate0)
-
-#======================================================
  dprint("Initializing compute platform ",platformName);
  platform=mm.Platform.getPlatformByName(platformName);
  properties={'CudaPrecision': 'mixed'};
  dprint("Preparing simulation topology");
  if (platformName=="CUDA") :
-  if (alch):
-   simulation=app.Simulation(psf.topology, alchsystem, integrator, platform, properties);
-  else:
-   simulation=app.Simulation(psf.topology, system, integrator, platform, properties);
+  simulation=app.Simulation(psf.topology, system, integrator, platform, properties);
  else :
-  if (alch):
-   simulation=app.Simulation(psf.topology, alchsystem, integrator, platform);
-  else:
-   simulation=app.Simulation(psf.topology, system, integrator, platform);
+  simulation=app.Simulation(psf.topology, system, integrator, platform);
 #
  if (restart == 0) :
   if (corfile!=None):
@@ -414,44 +366,11 @@ if 1:
   simulation.reporters.append(app.DCDReporter('output.dcd',dcdfreq));
   simulation.reporters.append(app.StateDataReporter(stdout, outputfreq, step=True, potentialEnergy=True, kineticEnergy=True, speed=True, temperature=True, 
                                                     volume=pbc, separator=' \t '));
-  if (alch):
-# open alchemical file
-   alchfilename="%s-%5.3f-%5.3f.fep" % (alchout, lambda0, lambda1)
-   dprint("Will write alchemical energies to file '",alchfilename,"'");
-   falch=open(alchfilename,'w');
-   falch.write("%%lambda_0=%12.5f\n" % (lambda0));
-   falch.write("%%lambda_1=%12.5f\n" % (lambda1));
-   falch.write("%Step E(lambda_0) E(Lambda_1)\n");
-#
-   num_inner_steps=alchfreq ; #steps before computing alchemical energies
-   num_outer_steps=ceil(nsteps/alchfreq) ; #number of alchemical computations
-   numsteps=num_inner_steps*num_outer_steps ;
-   dprint("Running MD simulation for ",numsteps," steps");
-   for n_outer in range(0,num_outer_steps):
-    simulation.step(num_inner_steps); # run system
-# compute unperturbed energy
-    e0=pote(simulation);
-# switch to perturbed context
-#    factory.perturbSystem(alchsystem, astate1);
-    factory.perturbContext(simulation.context, astate1);
-# compute perturbed energy
-    e1=pote(simulation);
-# return to original context
-#    factory.perturbSystem(alchsystem, astate0);
-    factory.perturbContext(simulation.context, astate0);
-# write energies to file
-    falch.write("%9d %12.5f %12.5f\n" % ( (n_outer+1)*num_inner_steps, e0, e1) )
-#    falch.flush();
-   falch.close();
-  else:
-   dprint("Running MD simulation for ",nsteps," steps");
-   simulation.step(nsteps);
-
-
+  dprint("Running MD simulation for ",nsteps," steps");
+  simulation.step(nsteps);
   dprint("Writing simulation restart files");
   simulation.saveState(outputName+'.xml');
   simulation.saveCheckpoint(outputName+'.chk');
-  copyfile('output.dcd', outputName+'.dcd');
 #==== write periodic box vectors
   state=simulation.context.getState();
   a,b,c=state.getPeriodicBoxVectors();
@@ -462,3 +381,5 @@ if 1:
 
 #==== reset switching distance
  del switchdist;
+#==== move dcd file to destination file
+ move('output.dcd', outputName+'.dcd');

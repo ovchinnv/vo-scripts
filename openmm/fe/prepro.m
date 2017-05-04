@@ -4,12 +4,12 @@
 % also, for now assuming that all runs within a window have the same number of steps, which simplifies averaging
 %
 %temperature :
-temp=300 ;
+temp=298 ;
 %
-dskip=5 ; % how many entries to skip when computing final average
+dskip=100 ; % how many entries to skip when computing final average
 fepdir='.' ;
-finbase='eth-k' ;
-foutbase='eth-k' ;
+finbase='3h109l' ;
+foutbase='3h109l' ;
 %
 %forward files
 lambda0=0;
@@ -21,13 +21,17 @@ bex=1 ; % exponent to stretch near 1
 
 % ll=`awk "function sgn(n){ return (n<0)? -1:1 } ; function abs(n){ return (n>0)? n:-n }  BEGIN {  printf \"%.*f\", $dec,  (sgn(2*$l-1)*(abs(2*$l-1))^$bexp + 1)/2 }"`
 
+% note : IN THIS PARTICULAR CASE
+%can only consider electrostatic switching off because vdw iteractions are identical in vac and in model
+lambda0=0.5; nwin=16;
+
 lambdaf=[lambda0 : dlambda : lambda1]; %  forward sims
 lambdaf=(sign(2*lambdaf-1).*abs(2*lambdaf-1).^bex + 1)/2;
 %return
 lambdab=lambdaf(end:-1:1);
 
 lambdas=lambdaf ; % choose direction : lambdaf/lambdab
-%lambdas=lambdab ;
+lambdas=lambdab ;
 
 nrun=zeros(nwin); % define number of output files per window :
 irun=zeros(nwin); % define initial run index
@@ -70,11 +74,15 @@ for i=1:nwin
   data=load(fname);
   dlen=length(data);
   d=zeros(dlen, 9);
-  d(:,istep)=[1:dlen]';
-  d(:,deinst)=data(:,2)-data(:,1) ; % inst energy change
+  d(:,istep)=data(:,1);
+  d(:,deinst)=data(:,3)-data(:,2) ; % inst energy change
   d(:,deav)=cumsum(d(:,deinst))./(1:dlen)' ;
   d(:,dtemp)=temp;
-  d(:,dgav) = ( cumsum( exp ( -bet*d(:,deinst) ) )./(1:dlen)') ; % expoential average but NOT dG -- no log or beta
+% save minimum energy from first run only :
+  if (j==irun(i))
+   demin=min(d(:,deinst));
+  end
+  d(:,dgav) = ( cumsum( exp ( -bet* ( d(:,deinst) - demin ) ) )./(1:dlen)') ; % expoential average but NOT dG -- no log or beta
 %
   [m,n]=size(d);
   d2=zeros(m,4) ; % for extra calculations
@@ -121,7 +129,7 @@ for i=1:nwin
 % insert eav into main table
  dall(:,deav)=d2all(:,3);
 % take log and insert dgav also
- dall(:,dgav)=-log(d2all(:,4))/bet;
+ dall(:,dgav) = demin - log(d2all(:,4))/bet;
 %
 %
 %%%%%%%%%%%%%% write this window to file %%
@@ -149,3 +157,8 @@ end % over all windows
 fclose(fid);
 
 return ;
+
+
+
+
+
