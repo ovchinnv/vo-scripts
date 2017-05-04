@@ -1,0 +1,11 @@
+#!/bin/bash
+# grab sequence from psf
+# this is a low-sophistication method that looks at residue types of CA atoms
+if [ -z $1 ] ; then
+ echo " USAGE : seqpsf <psf file>"
+ exit
+fi
+
+psffile=$1
+cut -c-28 $psffile | grep " CA " | awk '{print $4}' | ~/scripts/seq31
+
