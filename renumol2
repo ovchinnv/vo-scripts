@@ -10,6 +10,8 @@ awk '\
    nO=0;
    nC=0;
    nN=0;
+   nS=0;
+   nF=0;
 # other atoms to be added here as needed;
   }
 
@@ -28,6 +30,12 @@ awk '\
    } else if ( aname ~ "^\\s*O\\s*$" ) {
     nO++;
     aname="O"nO;
+   } else if ( aname ~ "^\\s*S\\s*$" ) {
+    nS++;
+    aname="S"nS;
+   } else if ( aname ~ "^\\s*F\\s*$" ) {
+    nF++;
+    aname="F"nF;
    } else {
     qatom=0;
    }

@@ -1,0 +1,10 @@
+#!/bin/bash
+# get secondary structure from pdb
+if [ -z $1 ] ; then
+ echo " USAGE : getss <pdb file>"
+ exit
+fi
+
+pdbfile=$1
+stride $pdbfile | grep STR | awk '{print $2}'
+

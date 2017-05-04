@@ -2,7 +2,7 @@
 # combine "mass" entries from multiple topology files
 #
 
-outtop=sosip36.top
+outtop=mergetop.top
 
 echo "* combined (atom mass) topology file ; generated automatically for ${outtop}" > _header
 echo "*" >>_header

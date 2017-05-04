@@ -13,7 +13,13 @@ else
  xyzfile=$2
 fi
 
+if [ -z $3 ]; then
+ scale=10 ; # nm to Ang
+else
+ scale=$3
+fi
+
 echo "No element info available" > $xyzfile
-grep "<Position " $xmlfile  | sed -e s/.=/\ /g -e s/\"//g -e s.\/\>.. | awk '{printf "%3s %10.5f %10.5f %10.5f\n", "Unk", $2, $3, $4}' >> $xyzfile
+grep "<Position " $xmlfile  | sed -e s/.=/\ /g -e s/\"//g -e s.\/\>.. | awk "{printf \"%3s %10.5f %10.5f %10.5f\n\", \"Unk\", \$2*$scale, \$3*$scale, \$4*$scale}" >> $xyzfile
 nlines=`wc -l $xyzfile | cut -d' ' -f1`
 sed -i "1i $((nlines-1))" $xyzfile

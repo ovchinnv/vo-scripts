@@ -22,7 +22,7 @@ function rmsd=calc_rmsd(xall,yall,zall,xref,yref,zref,wgt,inds)
 %
   X=[ swgt(inds).*(xall(inds,i)') swgt(inds).*(yall(inds,i)') swgt(inds).*(zall(inds,i)') ];
 % compute RMSD :
-  rmsd(i)=norm(Xref(:)-X(:));
+  rmsd(i)=norm(Xref(:)-X(:),'fro'); % Frobenius norm is consistent with VMD and other codes
  end
 %
 end

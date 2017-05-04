@@ -28,8 +28,9 @@ update atom cutnb 15 ctonnb 10 ctofnb 12 vdw vshift fshift cdie
 
 nobomb
 if @?overlap eq 0 set overlap 2.5
-!stream wbox.str
-stream @{clib}/wcube.str
+if @?cube eq 1 stream @{clib}/wcube.str
+if @?cube eq 0 stream @{clib}/wbox.str
+
 rename segid wat select segid w* end ! rename all waters
 
 !goto write ! skip minimization

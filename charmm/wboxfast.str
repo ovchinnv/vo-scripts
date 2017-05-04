@@ -51,7 +51,6 @@ calc nz = int (@zl/@boxsize + 1 )
 calc nbox = @nx*@ny*@nz
 !
 ! generate a single huge water segment (faster than replicate)
-delete atom sele segid wat0 end
 calc nwat = @nbox * @nwatres
 read sequ tip3 @nwat
 generate wat0 noangle nodihe
