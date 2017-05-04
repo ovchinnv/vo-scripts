@@ -57,12 +57,6 @@
   echo $iright
  }
 #======================================================================================================================
- function compute() { # calculates the value of expression
-  exp=$1
-  ans=`echo "$1 ; exit" | calc`
-  echo $ans
- }
-#======================================================================================================================
  function update() { # replaces a template parameter in an input file
   f=$1
   p=$2
@@ -104,6 +98,30 @@
   output=$2
   while [ 1 ] ; do
    acemd $config >& $output
+   qunstable=`tail $output | grep -i unstable | wc -m`
+   if [ "$qunstable" -gt "0" ]; then
+    echo Simulation became unstable. Repeating this run.
+    mv $output ${output}.crash
+   else
+    return
+   fi
+  done
+ }
+#======================================================================================================================
+ function run_namd() { #implement as a function to detect crashes
+  config=$1
+  output=$2
+# check namd command:
+  if [ -z $3 ]; then
+   namd=namd2 ; # try default versioin
+  else
+# remove first two arguments
+   shift
+   shift
+   namd=("$*") ;# namd command string can be complicated
+  fi
+  while [ 1 ] ; do
+   ${namd[@]} $config >& $output
    qunstable=`tail $output | grep -i unstable | wc -m`
    if [ "$qunstable" -gt "0" ]; then
     echo Simulation became unstable. Repeating this run.
