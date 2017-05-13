@@ -3,10 +3,14 @@
 close all;
 kboltz=1.98e-3 ;
 
+irun=1;
+erun=35;
+irep=1;
+basename=['../pmfsep1_',num2str(irep),'.temp_'];
 
 files={};
-for i=10:19
- files=[files {['eeh_1.0_01.temp',num2str(i),'.series.txt']}];
+for i=irun:erun
+ files=[files {[basename,num2str(i),'.series.txt']}];
 end
 
 for i=1:length(files)
@@ -25,8 +29,10 @@ ener=d(:,3);
 dt = 10 * 4 / 1000000 ; % plugin_freq x timestep (fs) x (ns / fs) => to convert to time (ns)
 
 % plot for prtions of trajectory
-i1 = floor(300 / dt)+1 ; i1=find(step>i1,1)-1 
-i2 = round(600 / dt)+1 ; i2=find(step>i2,1)-1 ; % from step # find the index #
+t1=0;
+t2=1000;
+i1 = floor(t1 / dt) ; i1=find(step>i1,1,'first') ;
+i2 = floor(t2 / dt) ; i2=find(step<=i2,1,'last') ; % from step # find the index #
 
 plot(temp(i1:i2), ener(i1:i2), 'k.','linewidth',0.5) ; box on; hold on;
 
