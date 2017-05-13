@@ -3,9 +3,11 @@
 close all;
 kboltz=1.98e-3 ;
 
+%files={ 'wzip.temp10.series.txt', 'wzip.temp11.series.txt'};
+
 files={};
 for i=10:19
- files=[files {['eeh_1.0_01.temp',num2str(i),'.series.txt']}];
+ files=[files {['hhh_4.0_01.temp',num2str(i),'.series.txt']}];
 end
 
 for i=1:length(files)

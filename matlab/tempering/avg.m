@@ -1,12 +1,14 @@
 % plot some averages
-restart_file = 'eeh_1.0_01.temp19.txt';
+restart_file = 'hhh_4.0_05.temp19.txt';
+% optional file to remove earlier statistics ; comment to disable
+%restart_subtract = 'hhh_4.0_05.temp15.txt';
 gdata;
 
 close all;
 
 % interpolate average using the method of Zhang&Ma10:
 n=length(bet) ;
-db=50; % number of interpolation bins on either side of central bin
+db=20; % number of interpolation bins on either side of central bin
 for i=1:n
  ib=max(1, i-db);
  ie=min(i+db,n);
