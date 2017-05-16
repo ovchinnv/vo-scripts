@@ -1,0 +1,41 @@
+#!/bin/bash
+# write structure file for Desmond
+
+if [ -z $1 ] ; then 
+ echo "USAGE : namd2pdb <psf file(optional)> <namd/coor file (optional)> <xscfile(optional)>"
+ exit 1;
+else
+ psffile=$1
+fi
+#
+if [ -z $2 ] ; then
+ coorfile=${psffile%.*}.coor
+else
+ coorfile=$2
+fi
+
+echo "
+ mol load psf $psffile 
+ mol addfile $coorfile type namdbin
+ " > _temp_
+
+# note: the xsc file MUST be named <something>.xsc, otherwise VMD will not read the cell properly
+if [ ! -z $3 ] ; then
+ xscfile=$3
+ echo "
+ package require pbctools
+ pbc readxst \"$xscfile\" -now
+ set cell [pbc get -now];
+ foreach {dx dy dz} \$cell break;
+# puts \"\$dx \$dy \$dz\"
+ pbc wrap -compound res -sel \"water or ion\"
+ " >> _temp_
+fi
+pdbfile=${coorfile%.*}.pdb
+
+echo "
+ animate write pdb $pdbfile
+ " >> _temp_
+
+vmd -dispdev text < _temp_
+rm -f _temp_
