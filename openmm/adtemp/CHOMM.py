@@ -337,7 +337,7 @@ if 1:
  if (adTemp):
   import tempering
   from math import ceil,  sqrt
-  from numpy import array as narray
+#  from numpy import array as narray
   dprint("Initializing Adaptive Tempering Plugin with input file '",adTempConfig,"' and output file '",adTempLog,"'");
   tempering.init(adTempConfig, adTempLog)
   adTemperature=temperature; # initial temperature, must match config file
