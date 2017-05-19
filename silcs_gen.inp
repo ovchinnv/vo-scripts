@@ -1,0 +1,40 @@
+* add silcs ligands to a solvated protein
+*
+
+set version 36
+
+set clib ~/scripts/charmm
+
+set resid
+set cgenff
+set topparcgenff ~/charmm/parameters/cgenff31
+stream @{clib}/readpsf36.str
+
+set seg1 BENZ
+set seg2 PRPA
+set seg3 MEOH
+set seg4 FORM
+set seg5 MAMM
+set seg6 ACET
+set seg7 AALD
+set nseg 7
+
+set iseg 1
+label segs
+ read sequ @seg@@iseg 1
+ gene @seg@@iseg
+ read coor pdb name ligands/@seg@@iseg.pdb
+ HBUILD
+ mini abnr nsteps 20
+ energy
+ write psf card name ligands/@seg@@iseg.psf
+ write coor pdb name ligands/@seg@@iseg.pdb ! overwrite
+ delete atom select all end
+ incr iseg
+ if @iseg .le. @nseg -
+goto segs
+
+!write psf card name @seg@@iseg.psf
+!write coor pdb name @seg@@iseg.pdb
+!read coor pdb
+

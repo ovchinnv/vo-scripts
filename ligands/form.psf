@@ -1,0 +1,49 @@
+PSF EXT CMAP CHEQ
+
+         2 !NTITLE
+* ADD SILCS LIGANDS TO A SOLVATED PROTEIN                                       
+*  DATE: UNAVAILABLE IN THIS VERSION                                            
+
+         6 !NATOM
+         1 FORM     1        FORM     HA        275   0.800000E-01   1.00800           0   0.00000     -0.301140E-02
+         2 FORM     1        FORM     C         293   0.420000       12.0110           0   0.00000     -0.301140E-02
+         3 FORM     1        FORM     N         344  -0.690000       14.0070           0   0.00000     -0.301140E-02
+         4 FORM     1        FORM     HC        266   0.350000       1.00800           0   0.00000     -0.301140E-02
+         5 FORM     1        FORM     HT        266   0.350000       1.00800           0   0.00000     -0.301140E-02
+         6 FORM     1        FORM     O         370  -0.510000       15.9994           0   0.00000     -0.301140E-02
+
+         5 !NBOND: bonds
+         2         1         2         3         3         4         3         5
+         2         6
+
+         6 !NTHETA: angles
+         1         2         3         1         2         6         3         2         6
+         2         3         4         2         3         5         4         3         5
+
+         4 !NPHI: dihedrals
+         1         2         3         4         1         2         3         5
+         4         3         2         6         5         3         2         6
+
+         1 !NIMPHI: impropers
+         2         3         6         1
+
+         0 !NDON: donors
+
+
+         0 !NACC: acceptors
+
+
+         0 !NNB
+
+         0         0         0         0         0         0
+
+         1         0 !NGRP NST2
+         0         1         0
+
+         1 !MOLNT
+         1         1         1         1         1         1
+
+         0         0 !NUMLP NUMLPH
+
+         0 !NCRTERM: cross-terms
+
