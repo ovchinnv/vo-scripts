@@ -23,7 +23,7 @@ set candidates  .byres. (.not. ( @protein .around. 5 ) ) .and. segid wat
 define waters select segid wat .and. type OH2 end
 set nwat ?nsel
 
-set istrength 0.15 ! 0.150 mM
+if @?istrength eq 0 set istrength 0.15 ! 0.150 mM
 !calc totion = int ( ?nsel * @istrength / ( 55 + @istrength ) )
 ! account for ions already present:
 define ipresent select segid ion* end
@@ -40,12 +40,12 @@ if @?negative eq 0 calc negative = @positive + ?CGTOT
 ! add potassium or sodium
 set ionsneeded  @positive
 set ion SOD
-set ionseg 1
+set ionseg ion1
 stream @{clib}/addions.str
 ! add chlorine
 set ionsneeded  @negative
 set ion CLA
-set ionseg 2
+set ionseg ion2
 stream @{clib}/addions.str
 !
 write psf @format name @{psffile}n.psf xplor
@@ -65,4 +65,3 @@ goto kill
 
 label kill
 stop
-

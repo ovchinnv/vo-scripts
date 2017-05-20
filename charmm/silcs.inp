@@ -1,0 +1,53 @@
+* add silcs ligands to a solvated protein
+*
+
+set version 36
+
+set clib ~/scripts/charmm
+
+set resid
+set cgenff
+set xplor
+set topparcgenff ~/charmm/parameters/cgenff31
+stream @{clib}/readpsf36.str
+
+set seg1 BENZ
+set seg2 PRPA
+set seg3 MEOH
+set seg4 FORM
+set seg5 MAMM
+set seg6 ACET
+set seg7 AALD
+set nseg 7
+
+
+define waters select segid wat .and. type OH2 end
+set nwat ?nsel
+if @?istrength eq 0 set istrength 0.25
+calc numlig = int ( @nwat * @istrength / ( 55.5556 ) )
+
+set iseg 1
+label segs
+ set protein ( .not. segid wat )
+ scalar wcomp set 0 select all end
+ scalar wcomp set 1 select @protein end ! this avoids long strings, which might bomb CHARMM
+ set protein ( prop wcomp .eq. 1 )
+ set candidates  .byres. (.not. ( @protein .around. 5 ) ) .and. segid wat
+!
+! add ligans using ionization scripts
+ set ionsneeded @numlig
+ set ion @seg@@iseg
+ set ionseg @seg@@iseg
+ set ionpdb ligands/@seg@@iseg.pdb
+ stream @{clib}/addions.str
+ incr iseg
+ if @iseg .le. @nseg -
+goto segs
+
+!
+write psf @format name @{psffile}-silcs.psf xplor
+! standard psf
+write psf oldpsf @format name @{psffile}-silcso.psf
+write coor @format name @{corfile}-silcs.cor  
+write coor pdb name @{corfile}-silcs.pdb
+

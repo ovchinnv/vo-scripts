@@ -1,0 +1,11 @@
+REMARK  ADD SILCS LIGANDS TO A SOLVATED PROTEIN                                       
+REMARK   DATE: UNAVAILABLE IN THIS VERSION                                            
+ATOM      1  HA  AALD    1      -3.102   1.131  -0.000  1.00  0.00      AALD
+ATOM      2  C   AALD    1      -4.132   1.555  -0.000  1.00  0.00      AALD
+ATOM      3  O   AALD    1      -4.255   2.760   0.000  1.00  0.00      AALD
+ATOM      4  CB  AALD    1      -5.263   0.570   0.001  1.00  0.00      AALD
+ATOM      5  HB1 AALD    1      -4.879  -0.463  -0.000  1.00  0.00      AALD
+ATOM      6  HB2 AALD    1      -5.894   0.729   0.901  1.00  0.00      AALD
+ATOM      7  HB3 AALD    1      -5.894   0.729  -0.903  1.00  0.00      AALD
+TER       8      AALD     1
+END

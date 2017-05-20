@@ -21,13 +21,13 @@ delete atom sele @candidates end
 
 ! generate ions
 read sequence @ion @ionsneeded ! generate @nion of @ion
-gene ion@ionseg
-coor set xdir 1.0 dist 0 select segid ion@ionseg end ! assign arbitrary positions to avoid bombing on atom selections
+gene @ionseg
+coor set xdir 1.0 dist 0 select segid @ionseg end ! assign arbitrary positions to avoid bombing on atom selections
 
 set inum 1
 label add_ion
  calc i = int ( ?rand * @repl ) + 1
- coor dupl select atom wrpl @i OH2 end sele atom ion@ionseg @inum @ion end ! set ion coordinate
+ coor dupl select atom wrpl @i OH2 end sele atom @ionseg @inum @ion end ! set ion coordinate
  delete atom select atom wrpl @i * end ! delete that water residue 
  
  incr repl by -1

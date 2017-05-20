@@ -14,9 +14,24 @@ if @{nion_int} .ne. @ionsneeded goto skip_ion
 
 ! proceed with replication
 read sequence @ion @ionsneeded ! generate @nion of @ion
-gene ion@ionseg
-coor set xdir 1.0 dist 0 select segid ion@ionseg end ! assign arbitrary positions to avoid bombing on atom selections
-
+gene @{ionseg}
+! if coordinates are provided, in a pdb file, then read them here
+! (this allows making solutions other than ionic)
+if @?ionpdb .ne. 0 then
+ read coor pdb sele segid @{ionseg} end name @{ionpdb} resid
+! copy to all residues
+ if @ionsneeded .gt. 1 then
+  set i 2
+  label resloop
+   coor dupl sele segid @{ionseg} .and. resid 1 end sele segid @{ionseg} .and. resid @i end
+   incr i
+   if @i .le. @ionsneeded -
+  goto resloop
+ endif
+else
+ coor set xdir 1.0 dist 0 select segid @{ionseg} end ! assign arbitrary positions to avoid bombing on atom selections
+endif
+!
 ! next three commands put the water segment at the end of PSF
 replicate nrep 1 X select segid WAT end ! replicate water segment 
 delete atom select segid WAT end        ! this deletes the solvent segment
@@ -32,7 +47,8 @@ join wrpl renu ! renumber residues
 set inum 1
 label add_ion
  calc i = int ( ?rand * @repl ) + 1
- coor dupl select atom wrpl @i OH2 end sele atom ion@ionseg @inum @ion end ! set ion coordinate
+ coor axis sele segid @{ionseg} .and. resid @inum end sele atom wrpl @i OH2 end
+ coor trans axis sele segid @{ionseg} .and. resid @inum end
  delete atom select atom wrpl @i * end ! delete that water residue 
  
  incr repl by -1
