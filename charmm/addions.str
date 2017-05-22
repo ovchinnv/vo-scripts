@@ -18,7 +18,8 @@ gene @{ionseg}
 ! if coordinates are provided, in a pdb file, then read them here
 ! (this allows making solutions other than ionic)
 if @?ionpdb .ne. 0 then
- read coor pdb sele segid @{ionseg} end name @{ionpdb} resid
+! read coor pdb sele segid @{ionseg} end name @{ionpdb} resid
+ read coor pdb name @{ionpdb} resid
 ! copy to all residues
  if @ionsneeded .gt. 1 then
   set i 2
