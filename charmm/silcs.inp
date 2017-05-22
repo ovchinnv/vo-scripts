@@ -40,10 +40,13 @@ label segs
  set ionseg @seg@@iseg
  set ionpdb ligands/@seg@@iseg.pdb
  stream @{clib}/addions.str
+ print coor sele .not. init end
  incr iseg
  if @iseg .le. @nseg -
 goto segs
-
+!
+!mini conj nstep 100
+mini sd nstep 100
 !
 write psf @format name @{psffile}-silcs.psf xplor
 ! standard psf

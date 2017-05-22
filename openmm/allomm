@@ -1,0 +1,35 @@
+#!/bin/bash
+#
+# driver program to launch equilibration and production of multiple structures
+#
+# all directories
+dirs="traf-lig27"
+# parameters
+numrun=10
+numeq=1
+template=md.py
+
+for d in $dirs ; do
+ echo "Processing directory $d ..."
+#continue
+ mkdir -p $d
+ pushd $d >&/dev/null
+ # check if this directory is done
+ logfile=nvt.out
+ if [ -f $logfile ] ; then
+  ok=`grep "Run $((numrun-1))" $logfile` ;# paper doi shown after successful runs
+  if [ ! -z "$ok" ]; then
+   popd >&/dev/null
+   continue ;# skip this directory
+  fi
+ fi
+ cp ../$template .
+ cp ../rmsd* .
+ sed -i "s/name=.*/name=\'$d\'/" $template
+ sed -i "s/numrun=.*/numrun=$numrun/" $template
+ sed -i "s/numeq=.*/numeq=$numeq/" $template
+ mkdir -p scratch
+ nohup python $template >& nvt.out
+ popd >&/dev/null
+# exit
+done
