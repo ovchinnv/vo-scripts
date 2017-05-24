@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# make pdb file with marked restraints
+vmd -dispdev text < mkres.vmd
+# create string input file
+
+config="silcs.sm"
+echo -n > $config
+echo "
+output {
+ minwarnlev=-1 ! more permissive warnings
+}
+
+smcv_init {
+ structure=traf-apo-q2sn-silcs-res.pdb
+ defer_init_dyna=yes
+ : init maxcv=1176
+" >> $config
+
+for i in `seq 1 98` ; do 
+ for j in `seq $((i+1)) 98` ; do
+  echo " : add dist_com sele occupancy = $i end sele occupancy = $j end force 1 fbwidth 92 " >> $config
+ done
+done
+
+echo "
+ : set cvz 54 all ! the idea is to have a repulsive restraint starting at 8A separation ; the attractive part is of no concern
+! stats
+ : stat rene renm rene.dat ! restraint energy
+! dynamics
+ : dyna rstr stat staf 10000
+}" >> $config
+

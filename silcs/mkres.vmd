@@ -1,0 +1,26 @@
+#!/bin/vmd
+# write pdb file for string with silcs restraint groups marked
+#
+# load psf/pdb
+mol load psf struc/traf-apo_sn-silcs.psf pdb struc/traf-apo-q2sn-silcs.pdb
+#
+# define selections and assign occupancy values to each residue
+
+set silcres { "BENZ" "PRPA" } ;
+set silcatoms { "CG CE1 CE2" "C1 C2 C3" } ;
+set iflag 1
+
+foreach sres $silcres satoms $silcatoms {
+ puts "Processing residues $sres ..."
+
+ set sel [ atomselect top "resname $sres" ];
+ set rsel [ $sel get resid ];
+ set rsel [ lsort -integer -uniq $rsel ];
+ foreach r $rsel {
+  set residue [ atomselect top "resname $sres and resid $r and name $satoms" ]; 
+  $residue set occupancy $iflag
+  incr iflag;
+ }
+}
+
+animate write pdb traf-apo-q2sn-silcs-res.pdb
