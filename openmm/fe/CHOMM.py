@@ -4,7 +4,7 @@ import simtk.openmm.app as app
 import simtk.openmm as mm
 import simtk.unit as u
 from sys import stdout, stderr, exit
-from shutil import copyfile
+from shutil import move
 
 if (alch):
 # from openmmtools.alchemy import AlchemicalState as alch
@@ -467,7 +467,6 @@ if 1:
  dprint("Writing simulation restart files");
  simulation.saveState(outputName+'.xml');
  simulation.saveCheckpoint(outputName+'.chk');
- copyfile('output.dcd', outputName+'.dcd');
 #==== write periodic box vectors
  state=simulation.context.getState();
  a,b,c=state.getPeriodicBoxVectors();
