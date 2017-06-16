@@ -184,11 +184,16 @@ if 1:
        derror("Could not set periodic cell size.")
   else:
    try:
-    xmlfile;
-    dprint("Setting orthorhombic cell lengths from file '",xmlfile,"'")
-    dx, dy, dz=get_box_size_xml(xmlfile);
-   except Die:
-    derror("Could not set periodic cell size.")
+    restartfile;
+    dprint("Setting orthorhombic cell lengths from file '",restartfile,"'")
+    dx, dy, dz=get_box_size_xml(restartfile);
+   except NameError:
+    try:
+     xmlfile;
+     dprint("Setting orthorhombic cell lengths from file '",xmlfile,"'")
+     dx, dy, dz=get_box_size_xml(xmlfile);
+    except Die:
+     derror("Could not set periodic cell size.")
 #
   try:
    dprint("Periodic cell dimensions are (", dx*u.angstrom, ")x(", dy*u.angstrom, ")x(", dz*u.angstrom,")")
