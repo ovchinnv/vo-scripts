@@ -1,0 +1,38 @@
+* wrap coordinates into unit cell
+*
+
+stream ucell.str
+
+define move sele @move end
+coor stat sele move end mass
+
+! center of mass
+set xm ?xave
+set ym ?yave
+set zm ?zave
+!
+! convert to fractional coordinates:
+calc xmf = @s11 * @xm + @s12 * @ym + @s13 * @zm + @u1
+calc ymf = @s21 * @xm + @s22 * @ym + @s23 * @zm + @u2
+calc zmf = @s31 * @xm + @s32 * @ym + @s33 * @zm + @u3
+! change fractional coordinates so that their magnitude is less than 1
+!
+calc xnf = @xmf - int( @xmf ) - @u1
+calc ynf = @ymf - int( @ymf ) - @u2
+calc znf = @zmf - int( @zmf ) - @u3
+! ensure positivity :
+if @xnf lt 0 calc xnf = @xnf + 1.0
+if @ynf lt 0 calc ynf = @ynf + 1.0
+if @znf lt 0 calc znf = @znf + 1.0
+!
+! convert to cartesian coordinates :
+calc xn = @si11 * @xnf + @si12 * @ynf + @si13 * @znf
+calc yn = @si21 * @xnf + @si22 * @ynf + @si23 * @znf
+calc zn = @si31 * @xnf + @si32 * @ynf + @si33 * @znf
+!
+! move to this center of mass :
+calc dx = @xn - @xm
+calc dy = @yn - @ym
+calc dz = @zn - @zm
+!
+coor trans sele move end xdir @dx ydir @dy zdir @dz

@@ -1,0 +1,20 @@
+!charmm
+output {
+ minwarnlev=-1
+}
+
+smcv_init {
+ structure=@{smpdb}
+ defer_init_dyna=yes ! initialization commands (:) will be executed during the first dynamics timestep
+ : add rmsd orient sele occupancy > 0 end rms sele beta > 0 end force @{krmsd} mass
+ : list
+ : set weight 1 all
+ : set cvz 0 all   ! rmsd target is 0
+ : list
+ : fill
+ : write name cv.ini
+}
+
+smcv_dyna {
+ : dyna rstr ! simple restrained dynamics
+}

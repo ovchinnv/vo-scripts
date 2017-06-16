@@ -1,0 +1,103 @@
+* alanine dipeptide
+* RMSDs computed using uniform rotational sampling
+*
+
+set nbox 10 ! periodic box length (Ang)
+
+set version 22
+set toppar ~/charmm/parameters/c36
+stream ~/scripts/charmm/readpsf.str
+
+read sequence card
+1
+ALAD
+
+generate dial setup warn
+write psf card name diala22.psf
+! generate coordinates
+IC PARA
+IC SEED 1 CLP 1 NL 1 CA
+IC BUILD
+!
+!minimize 
+mini sd nstep 10
+mini conj nstep 10
+mini abnr nstep 10
+coor orient mass
+coor copy comp ! save coordinates
+!
+!
+! use string method restraints
+
+mcom string 1 by 1
+set s string smcv
+@s init
+
+!define com restraint
+!define restrained sele type CB end
+define restrained sele all end
+!
+@s add rmsd orient sele restrained end rmsd sele restrained end noro mass ! need mass weighting to get HOs with same frequency (see confinement paper)
+@s fill ! reference coords are the same as instant, so should be zero
+@s print
+!@s test grad
+
+! set force constant(s)
+@s set force 0 all
+! set statistics options
+set fout rms_urs.dat
+open form write name "@FOUT" unit 1
+write title unit 1
+*%rmsd
+@s stat hist hnam @fout hcol inst happ ! output cv history appending to file
+! now generate rotations
+set nrot = 100000 ! number of rotations
+set irot 1
+set jrot 1 ! output indicator
+prnlev 1
+label lrot
+ calc alpha = ( ?rand * 180 * 2 ) ! argument to rota is given in degrees
+ calc theta = ( ?rand * ?PI * 2 ) ! in radians
+ calc phi = ( acos ( - ( ?rand * 2 - 1 ) ) ) ! in radians
+! generate vector in spherical coordinates
+ calc x = sin ( @phi ) * cos ( @theta )
+ calc y = sin ( @phi ) * sin ( @theta )
+ calc z = cos ( @phi )
+!
+! given an arbitrary vector, here taken as v0=( 1 0 0 ) for simplicity its rotation into the vector above
+! (1) cross product v0 x v
+ set xrot = 0
+ set yrot = -@z
+ set zrot =  @y
+! NOTE according to CHARMM, the vector above need not be normalized; I do it anyway
+ calc norm = sqrt ( @xrot * @xrot + @yrot * @yrot + @zrot * @zrot )
+ calc xrot = @xrot / @norm
+ calc yrot = @yrot / @norm
+ calc zrot = @zrot / @norm
+ calc dot = @x
+ calc arot = 180 * acos ( @dot ) / ?PI ! rotation angle (degrees)
+! note that the rotation angle will be in 0,180 ; otherwise, the rotation vector would be inverted
+! if @dot le 0 calc arot = 180 - @arot
+!
+! first rotate the molecule about v0 using a random angle
+ coor rota xdir 1 ydir 0 zdir 0 phi @alpha
+! now rotate about the computed vector through the computed angle
+ coor rota xdir @xrot ydir @yrot zdir @zrot phi @arot
+! compute rmsd
+! @s fill ! unnecessary
+ @s hist add
+! @s stat
+! stop
+ if @jrot .eq. 1000 then
+  set jrot 0
+  @s stat ! write history
+ endif
+!
+ coor copy ! restore original coordinates
+ incr irot
+ incr jrot
+ if @irot le @nrot -
+goto lrot
+
+@s stat ! write remainder of history if any
+prnlev 5

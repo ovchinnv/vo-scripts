@@ -4,11 +4,12 @@
 set version 36
 
 if @?clib eq 0 set clib ~/scripts/charmm
+if @?plast eq 0 set plast cter
 
 stream @{clib}/readpsf36.str
 
 read sequ pdb name @name.pdb
-generate PROT setup warn first @pfirst last cter
+generate @{name} setup warn first @pfirst last @plast
 !
 set last ?nres
 !
@@ -16,7 +17,7 @@ set last ?nres
 rename atom O sele type OT1  .and. resid @last end
 rename atom OXT sele type OT2  .and. resid @last end
 
-read coor pdb name @name.pdb
+read coor pdb name @name.pdb resid
 
 rename atom CD  sele type CD1 .and. resname ILE end
 rename atom OT1 sele type O  .and. resid @last end

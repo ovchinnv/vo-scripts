@@ -1,0 +1,45 @@
+#!/bin/vmd
+
+set name traf-lig27 ;
+
+mol load psf struc/${name}_sn.psf
+exec ~/scripts/omm2xyz scratch/${name}10mini.xml
+
+set all [ atomselect top "all"];
+set m [ $all get mass ];
+mol addfile ./scratch/${name}10mini.xyz ;# reading xyz destroys masses !
+$all set mass $m ;
+
+package require pbctools
+set xscfile "scratch/${name}10mini.xsc"
+pbc readxst "$xscfile" -now
+pbc wrap -compound res -center com -centersel "segid LIG1"
+
+set confine [ atomselect top "segid LIG1"];
+#set orient [ atomselect top "within 5 of segid TPP and ( not segid TPP and protein and ( element C O N ) ) "] ;
+set orient [ atomselect top " (within 4 of segid LIG1 ) and (not segid LIG1 ) and protein and noh"] ;
+
+$all set beta 0;
+$all set occupancy 0;
+#
+set mass [$orient get mass] 
+$orient set occupancy $mass;
+$orient num
+#
+set mass [$confine get mass] 
+$confine set beta $mass;
+$confine num
+#
+# write out fer pdb
+$all writepdb ${name}-mini.pdb; # all-atom file
+#
+# compute total mass of confined structure
+#
+set totmass 0
+set mass [$confine get mass];
+foreach m $mass {
+ set totmass [ expr {$totmass + $m} ];
+}
+set fid [open ${name}_ligmass.dat w];
+puts $fid $totmass;
+close $fid;

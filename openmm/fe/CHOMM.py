@@ -4,7 +4,7 @@ import simtk.openmm.app as app
 import simtk.openmm as mm
 import simtk.unit as u
 from sys import stdout, stderr, exit
-from shutil import copyfile
+from shutil import move
 
 if (alch):
 # from openmmtools.alchemy import AlchemicalState as alch
@@ -77,6 +77,11 @@ if 1:
   implicitSolvent
  except NameError:
   implicitSolvent=0
+#
+ try :
+  struna
+ except NameError:
+  struna=0
 #
  try :
   platformName
@@ -191,11 +196,16 @@ if 1:
        derror("Could not set periodic cell size.")
   else:
    try:
-    xmlfile;
-    dprint("Setting orthorhombic cell lengths from file '",xmlfile,"'")
-    dx, dy, dz=get_box_size_xml(xmlfile);
-   except Die:
-    derror("Could not set periodic cell size.")
+    restartfile;
+    dprint("Setting orthorhombic cell lengths from file '",restartfile,"'")
+    dx, dy, dz=get_box_size_xml(restartfile);
+   except NameError:
+    try:
+     xmlfile;
+     dprint("Setting orthorhombic cell lengths from file '",xmlfile,"'")
+     dx, dy, dz=get_box_size_xml(xmlfile);
+    except NameError:
+     derror("Could not set periodic cell size.")
 #
   try:
    dprint("Periodic cell dimensions are (", dx*u.angstrom, ")x(", dy*u.angstrom, ")x(", dz*u.angstrom,")")
@@ -238,7 +248,7 @@ if 1:
  else:
   system=psf.createSystem(params,
                          nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
-                         constraints=cons, removeCMMotion=False, hydrogenMass=hmass*u.amu, rigidWater=True,
+                         constraints=cons, removeCMMotion=False, hydrogenMass=hmass*u.amu, rigidWater=rigidWater,
                          verbose=False);
 #
 #================= harmonic restraints from file, a la NAMD/ACEMD
@@ -277,6 +287,10 @@ if 1:
   dprint("Harmonic force constants will be scaled uniformly by x"+str(constraintscaling));
   system.addForce(force)
 #
+#================= string plugin
+ if (struna==1) :
+  from openmmstruna import *
+  system.addForce(StrunaForce(strunaConfig, strunaLog))
 #================= add integrator :
  dprint("Configuring integrator");
 # first, add barostat if requested :
@@ -333,7 +347,7 @@ if 1:
   elif (alchcol==2): #occupancy
    dprint("Atoms to be annihilated/decoupled are marked in the occupancy column of PDB file '"+alchfile+"'");
 
-  alchpdb=app.PDBFile(consfile);
+  alchpdb=app.PDBFile(alchfile);
   iatom=0; ialch=0;
   alchatoms=list();
   for o, b  in zip(alchpdb.occupancy, alchpdb.temperature_factor) :
@@ -342,7 +356,7 @@ if 1:
    if (( alchcol==1 and bnodim!=0 ) or ( alchcol==2 and onodim!=0 )):
     alchatoms.append(ialch);
    ialch+=1;
-  dprint("Found ",len(alchatoms)," atoms for alchemical annihilation");
+  dprint("Found ",len(alchatoms)," atoms for alchemical annihilation/decoupling");
   ligand_atoms=alchatoms;
   dprint("Creating alchemical system");
   factory=alchsys(system, ligand_atoms=ligand_atoms, annihilate_sterics=(not alchdecouple), annihilate_electrostatics=(not alchdecouple));
@@ -447,18 +461,18 @@ if 1:
    dprint("Running MD simulation for ",nsteps," steps");
    simulation.step(nsteps);
 
+#==== move dcd file to destination file
+  move('output.dcd', outputName+'.dcd');
 
-  dprint("Writing simulation restart files");
-  simulation.saveState(outputName+'.xml');
-  simulation.saveCheckpoint(outputName+'.chk');
-  copyfile('output.dcd', outputName+'.dcd');
+ dprint("Writing simulation restart files");
+ simulation.saveState(outputName+'.xml');
+ simulation.saveCheckpoint(outputName+'.chk');
 #==== write periodic box vectors
-  state=simulation.context.getState();
-  a,b,c=state.getPeriodicBoxVectors();
-  fxsc=open(outputName+'.xsc','w');
-  fxsc.write("#CHOMMPy.xsc stub\n");
-  fxsc.write(str(nsteps)+" "+str(a[0].value_in_unit(u.angstrom))+" 0 0 0 "+str(b[1].value_in_unit(u.angstrom))+" 0 0 0 "+str(c[2].value_in_unit(u.angstrom))+" 0 0 0 0 0 0 0 0 0\n");
-  fxsc.close();
-
+ state=simulation.context.getState();
+ a,b,c=state.getPeriodicBoxVectors();
+ fxsc=open(outputName+'.xsc','w');
+ fxsc.write("#CHOMMPy.xsc stub\n");
+ fxsc.write(str(nsteps)+" "+str(a[0].value_in_unit(u.angstrom))+" 0 0 0 "+str(b[1].value_in_unit(u.angstrom))+" 0 0 0 "+str(c[2].value_in_unit(u.angstrom))+" 0 0 0 0 0 0 0 0 0\n");
+ fxsc.close();
 #==== reset switching distance
  del switchdist;

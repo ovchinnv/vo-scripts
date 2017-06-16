@@ -1,0 +1,102 @@
+#!/bin/bash
+
+source ~/scripts/struna.sh
+name="traf-lig27"
+template="ftemplate.py"
+stringtemplate="template.sm"
+smpdb="traf-lig27-mini.pdb"
+
+# specify number and indices of runs to perform
+brun=1
+erun=2
+flag="fep"
+######### prescribe lambda below #####
+
+ilam=0;         # initial lambda
+elam=1;         # final lambda
+dlam=0.025;
+
+lambdaf=( `seq $ilam $dlam $elam` ) ;
+##### to create array stretched near 1;
+bexp=1 ; # stretching factor
+dec=3 ; #decimal scale
+lambdaf=();
+l=$ilam;
+for l in `seq $ilam $dlam $elam` ; do
+ ll=`awk "function max(x,y) { return (x>y)? x : y } ; function min(x,y) { return (x<y)? x : y } ; BEGIN { printf \"%.*f\", $dec, min(1-(1-$l)^$bexp,0.9999) }"`
+#echo $ll
+ lambdaf+=("$ll")
+done
+
+# backward :
+lambdab=();
+for l in ${lambdaf[@]} ; do
+ lambdab=( $l ${lambdab[@]} ) ;
+done
+######################################
+if [ ! -z $lambdaf ] ; then
+ lambdab=("${lambdab[@]:1}"); # remove first element because it is the last element of forward aray
+fi
+
+lambdas=( ${lambdaf[@]} ${lambdab[@]} ); # final lambdas array
+#lambdas=( 1 ${lambdab[@]} )
+#lambdas=( 0.5 0.25 )
+######################################
+#echo ${lambdaf[@]}
+#echo ${lambdab[@]}
+echo "RUNNING LAMBDA RANGE \"${lambdas[@]}\" ";
+#
+# set restraint constant -- in analogy with confinement setup and with calculations on NERSC
+fercount=5 ; # this gives a low restraint constant that keeps the ligand "roughly" in the same place
+nu=`echo "0.001 * e ( l (1.9) * ( ${fercount} - 1) )" | bc -l`
+echo "--> NU (AKMA) = $nu"
+conv=20.45483;
+echo -n "--> NU (1/ps/100) = "; echo `echo "$nu * $conv / 100" | bc -l `;
+tmass=`cat ${name}_ligmass.dat`
+krmsd=`echo "scale=10; $tmass * ( 2 * $nu * 3.1415 )^2" | bc` ;# this is twice the force constant in CHARMM _plus_ scaling by total mass
+echo "--> Force prefactor in CHARMM (AKMA) = [2 x NU x pi]^2 = $krmsd";
+
+n=${#lambdas[@]} ;# length
+nm2=$((n-2));
+
+for irun in `seq $brun $erun` ; do
+#
+  echo " ===> Run $irun (will quit after $erun) "
+  echo " ========================="
+#
+ for ind in `seq 0 $nm2` ; do
+#
+  lambda0=${lambdas[$ind]}
+  lambda1=${lambdas[$((ind+1))]}
+#
+  if [ $irun -eq 1 ]; then
+   restartfile=scratch/${name}10mini.xml
+  else
+   iprev=$((irun-1))
+   restartfile=scratch/${name}${flag}${iprev}-${lambda0}-${lambda1}.xml
+  fi
+#
+  outputname=scratch/${name}${flag}${irun}-${lambda0}-${lambda1}
+  alchout=${irun}
+#
+  echo "Processing window : [$lambda0, $lambda1]";
+#
+  config=fep-${lambda0}-${lambda1}
+  output=${config}.out
+  config=${config}.py
+#
+  smconfig=conf.sm
+  cp $template $config
+  cp $stringtemplate $smconfig
+#
+  for key in lambda0 lambda1 restartfile outputname alchout ; do
+    update $config $key
+  done
+  update $config strunaConfig ${smconfig}
+  update $config strunaLog ${smconfig}.out
+  update $smconfig smpdb
+  update $smconfig krmsd
+  python $config >& $output
+# exit
+ done
+done

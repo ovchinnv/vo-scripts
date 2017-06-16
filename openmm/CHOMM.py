@@ -192,7 +192,7 @@ if 1:
      xmlfile;
      dprint("Setting orthorhombic cell lengths from file '",xmlfile,"'")
      dx, dy, dz=get_box_size_xml(xmlfile);
-    except Die:
+    except NameError:
      derror("Could not set periodic cell size.")
 #
   try:
@@ -376,18 +376,18 @@ if 1:
                                                     volume=pbc, separator=' \t '));
   dprint("Running MD simulation for ",nsteps," steps");
   simulation.step(nsteps);
-  dprint("Writing simulation restart files");
-  simulation.saveState(outputName+'.xml');
-  simulation.saveCheckpoint(outputName+'.chk');
-#==== write periodic box vectors
-  state=simulation.context.getState();
-  a,b,c=state.getPeriodicBoxVectors();
-  fxsc=open(outputName+'.xsc','w');
-  fxsc.write("#CHOMMPy.xsc stub\n");
-  fxsc.write(str(nsteps)+" "+str(a[0].value_in_unit(u.angstrom))+" 0 0 0 "+str(b[1].value_in_unit(u.angstrom))+" 0 0 0 "+str(c[2].value_in_unit(u.angstrom))+" 0 0 0 0 0 0 0 0 0\n");
-  fxsc.close();
+#==== move dcd file to destination file
+  move('output.dcd', outputName+'.dcd');
 
+ dprint("Writing simulation restart files");
+ simulation.saveState(outputName+'.xml');
+ simulation.saveCheckpoint(outputName+'.chk');
+#==== write periodic box vectors
+ state=simulation.context.getState();
+ a,b,c=state.getPeriodicBoxVectors();
+ fxsc=open(outputName+'.xsc','w');
+ fxsc.write("#CHOMMPy.xsc stub\n");
+ fxsc.write(str(nsteps)+" "+str(a[0].value_in_unit(u.angstrom))+" 0 0 0 "+str(b[1].value_in_unit(u.angstrom))+" 0 0 0 "+str(c[2].value_in_unit(u.angstrom))+" 0 0 0 0 0 0 0 0 0\n");
+ fxsc.close();
 #==== reset switching distance
  del switchdist;
-#==== move dcd file to destination file
- move('output.dcd', outputName+'.dcd');

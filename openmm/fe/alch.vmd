@@ -1,0 +1,28 @@
+#!/bin/vmd
+# mark fep atoms in beta and occupancy of a pdb file
+
+set name traf-lig27 ;
+
+mol load psf struc/${name}_sn.psf
+exec ~/scripts/omm2xyz scratch/${name}10mini.xml
+
+set all [ atomselect top "all"];
+set m [ $all get mass ];
+mol addfile ./scratch/${name}10mini.xyz ;# reading xyz destroys masses !
+$all set mass $m ;
+
+package require pbctools
+set xscfile "scratch/${name}10mini.xsc"
+pbc readxst "$xscfile" -now
+pbc wrap -compound res -center com -centersel "segid LIG1"
+
+set fep [ atomselect top "segid LIG1"];
+
+$all set occupancy 0;
+$all set beta 0;
+#
+$fep set beta -1 ;
+$fep set occupancy -1 ;
+#
+# write out fer pdb
+$all writepdb ${name}-fep.pdb
