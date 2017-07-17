@@ -3,11 +3,10 @@
 % this version is unsophisticated : 
 % we simply read the two PDBs side by side and transfer residue and segment names
 
-pdbfile0='G120-ALL.pdb';
+pdbfile0='ESTA-ALL.pdb';
 % note that is is unclear which model is the "best" one
-%pdbfile1='G120-ALL.BL00010001.pdb';
-pdbfile1='G120-ALL.B99990002.pdb';
-pdboutfile='G120-MODEL.pdb';
+pdbfile1='ESTA-ALL.B99990007.pdb';
+pdboutfile='ESTA-MODEL.pdb';
 
 disp(['==>Reading pdb structure from file ',pdbfile0,' ...']);
 mol0=pdbread(pdbfile0);
@@ -21,7 +20,8 @@ anum     = [pdb0.AtomSerNo]';
 chainid  = [pdb0.chainID];
 rname    = {pdb0.resName}' ;
 resid    = [pdb0.resSeq]' ;
-insertion= char({pdb0.iCode});
+%insertion= char({pdb0.iCode});
+insertion= {pdb0.iCode}';
 segid    = {pdb0.segID}' ;
 natom    = length(pdb0);
 

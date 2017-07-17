@@ -8,7 +8,11 @@ for fname = dcdnames
  disp(['==> Processing file ',dcdfile]);
  h=read_dcdheader(dcdfile) ;
 % loop over frames
- nframes=fix(h.NSET/dcdstep);
+ if (exist('maxframes'))
+  nframes=fix(maxframes/dcdstep);
+ else
+  nframes=fix(h.NSET/dcdstep);
+ end
  xdcd=zeros(natom,nframes);
  ydcd=zeros(natom,nframes);
  zdcd=zeros(natom,nframes);
