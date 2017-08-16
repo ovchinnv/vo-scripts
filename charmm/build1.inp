@@ -10,6 +10,12 @@ stream @{clib}/readpsf36.str
 
 read sequ pdb name @name.pdb
 generate @{name} setup warn first @pfirst last @plast
+! apply patches, if supplied
+if @?patchfile ne 0 then
+ stream @patchfile
+ autogen angl dihe
+endif
+
 !
 set last ?nres
 !
@@ -18,6 +24,11 @@ rename atom O sele type OT1  .and. resid @last end
 rename atom OXT sele type OT2  .and. resid @last end
 
 read coor pdb name @name.pdb resid
+! to orient with a reference structure
+if @?refpdb ne 0 then
+ read coor pdb name @refpdb resid comp
+ coor orie rms mass
+endif
 
 rename atom CD  sele type CD1 .and. resname ILE end
 rename atom OT1 sele type O  .and. resid @last end
@@ -38,13 +49,12 @@ ic fill preserve
 ic build
 print coor select .not. (init .or. hydrogen) end
 
-energy
-
 coor init sele hydro end
 
-!stop
 hbuild
 print coor sele .not. init end
+
+energy
 
 write psf card name @{name}.psf
 write coor card name @name.cor

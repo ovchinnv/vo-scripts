@@ -1,5 +1,5 @@
 % compute FE from double half-harmonic window simulations
-% In this version (2) we ocmpute the fe derivative from the average force 
+% In this version (2) we compute the fe derivative from the average force 
 % obtained form histogram data
 %
 close all;

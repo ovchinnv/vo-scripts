@@ -22,11 +22,11 @@ if @?ionpdb .ne. 0 then
  read coor pdb name @{ionpdb} resid
 ! copy to all residues
  if @ionsneeded .gt. 1 then
-  set i 2
+  set j 2
   label resloop
-   coor dupl sele segid @{ionseg} .and. resid 1 end sele segid @{ionseg} .and. resid @i end
-   incr i
-   if @i .le. @ionsneeded -
+   coor dupl sele segid @{ionseg} .and. resid 1 end sele segid @{ionseg} .and. resid @j end
+   incr j
+   if @j .le. @ionsneeded -
   goto resloop
  endif
 else
@@ -47,10 +47,10 @@ join wrpl renu ! renumber residues
 
 set inum 1
 label add_ion
- calc i = int ( ?rand * @repl ) + 1
- coor axis sele segid @{ionseg} .and. resid @inum end sele atom wrpl @i OH2 end
+ calc j = int ( ?rand * @repl ) + 1
+ coor axis sele segid @{ionseg} .and. resid @inum end sele atom wrpl @j OH2 end
  coor trans axis sele segid @{ionseg} .and. resid @inum end
- delete atom select atom wrpl @i * end ! delete that water residue 
+ delete atom select atom wrpl @j * end ! delete that water residue 
  
  incr repl by -1
  incr inum by 1
@@ -61,5 +61,5 @@ goto add_ion
 
 if @repl .ne. 0 join WAT wrpl renu
 
-label skip_ion 
+label skip_ion
 

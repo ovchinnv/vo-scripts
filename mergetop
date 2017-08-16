@@ -23,6 +23,8 @@ awk 'BEGIN \
   if        ( substr($1,0,4) ~ /[Mm][Aa][Ss][Ss]/) { 
      readmass=1 ; outfile="_mass"
      print $0 >> outfile
+  } else if ( substr($1,0,5) ~ /[Aa][Tt][Oo][Mm][Ss]/) { 
+     exit 0 # hack to avoid reading parameter section of .str files which could have duplicate atom definitions
   }
  }
  ' $arg
