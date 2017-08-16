@@ -148,6 +148,8 @@ end
 dfave=mean(dfc,1);
 dfstd=std(dfc,1);
 plot(rc,dfstd,'ko-','linewidth',lw);
+% approximate error in the FE : 
+['RMSD error : ',num2str(norm(dfstd)),' kcal/mol']
 
 %
 legend(leg,4);
