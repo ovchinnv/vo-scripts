@@ -1,6 +1,6 @@
 function [xall,yall,zall,rmsd]=bestfit(xall,yall,zall,xref,yref,zref,wgt,inds)
 % perform alignment using procrustes
-% does not implement mass weighting correctly but error is small for mopst purposes
+% does not implement mass weighting correctly but error is small for most purposes
 % not quite the same as VMD/CHARMM because weights cannot be passed into the procrastes routine
 % thus, until Procrustes gets fixed, only a uniformly-weighted fit is possible
 %

@@ -1,0 +1,77 @@
+* embed emr protein inside membrane
+*
+!
+!
+ioformat extended
+!
+
+! read topology/parameters here
+set nucl
+stream ~/scripts/charmm/readpsf36.str
+
+! read psf and coordinates here
+
+set outname rab11a_gdp
+
+read psf card name ../rab11a_sn.psf
+read coor card name ../rab11a_msn.cor
+
+! call script to write out pdbs
+stream pdbout.str
+!
+delete atom select all end
+!
+! now read pdbs and rebuild below
+set iseg 1
+label combine
+set seg segid@iseg
+if @?{segid@@iseg} eq 0 goto done
+set seg @segid@@iseg
+set pdb @{seg}.pdb
+
+set other ! nothing
+if @seg eq RAB set other first nter last cter
+if @seg eq M5 set other first nter last cter
+if @seg eq WAT   set other noangl nodihe
+if @seg eq XWAT  set other noangl nodihe
+if @seg eq ION3  set other noangl nodihe
+if @seg eq ION4  set other noangl nodihe
+if @seg eq GTP then
+ set seg GDP ! rename
+ system "sed -i 's/GTP/GDP/g' gtp.pdb"
+endif
+
+read sequ pdb name @pdb
+
+generate @seg setup warn @other
+
+read coor pdb name @pdb resid
+
+incr iseg
+
+goto combine
+
+label done
+
+! since GDP is less negative by 1 need to remove one positive ion
+define pot sele type SOD end
+delete atom sele bynum ?selatom end
+!
+!
+! write out psf here
+write psf card name @{outname}.psf
+write coor card name @{outname}.cor ! charmm coordinate format
+write coor pdb name @{outname}.pdb ! pdb coordinate format
+
+! now, substitute gdp+MG from other PDB and write out
+read coor pdb name gdp.pdb resid comp
+read coor pdb name mg-gdp.pdb resid comp
+!
+coor orie rms mass sele segid GDP end comp
+coor copy sele segid GDP .or. segid MG end
+!
+hbuild
+!
+write coor card name @{outname}1.cor ! charmm coordinate format
+write coor pdb name @{outname}1.pdb ! pdb coordinate format
+

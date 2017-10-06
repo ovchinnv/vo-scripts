@@ -214,8 +214,11 @@ if 1:
    nbondMethod=app.CutoffPeriodic
    dprint("PME is off");
  else:
-  psf.setBox(1000*u.angstrom, 1000*u.angstrom, 1000*u.angstrom) # set to a very large box to eliminate wrapping
-  nbondMethod=app.CutoffNonPeriodic
+  if (cutoff>0):
+   nbondMethod=app.CutoffNonPeriodic
+   psf.setBox(1000*u.angstrom, 1000*u.angstrom, 1000*u.angstrom) # set to a very large box to eliminate wrapping
+  else:
+   nbondMethod=app.NoCutoff
 #===================================================== SHAKE
  if (shake==1):
   cons=app.HBonds
