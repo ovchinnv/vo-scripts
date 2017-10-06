@@ -234,10 +234,23 @@ if 1:
   dprint("Hydrogen mass is ",hmass*u.amu)
 
  if (implicitSolvent==1):
+  try :
+   implicitSoventModel
+  except NameError:
+   implicitSolventModel='OBC2';
+#
+  if (implicitSolventModel.lower() == 'obc2') :
+   implicitModel=app.OBC2;
+  elif (implicitSolventModel.lower() == 'obc1') :
+   implicitModel=app.OBC1;
+  else :
+   dprint("Unknown implicit solvent model specified ",implicitSolventModel);
+   implicitModel=None
+
   system=psf.createSystem(params,
                          nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
                          constraints=cons, rigidWater=rigidWater, removeCMMotion=False, hydrogenMass=hmass*u.amu,
-                         implicitSolvent=app.OBC2,
+                         implicitSolvent=implicitModel,
                          verbose=False);
  else:
   system=psf.createSystem(params,
