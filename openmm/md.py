@@ -80,6 +80,7 @@ for i in range(numrun):
  restartfile=name+str(irun-1)+flag+'.xml';
  outputName=name+str(irun)+flag ;
 #
- exec(open('CHOMM.py').read())
+ from os.path import expanduser
+ exec(open(expanduser('~/scripts/openmm/CHOMM.py')).read())
  restart=1
 # check if run was successful, rerun if not
