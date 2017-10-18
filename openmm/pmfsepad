@@ -1,0 +1,301 @@
+#!/bin/bash
+#
+# same as pmfsep but with adaptive window selection
+qadwin=1 ;# adaptive window determination
+#
+# openmp thread parameters
+export OMP_NUM_THREADS=1
+export OMP_SCHEDULE=static
+export OMP_NESTED=false
+# load utility functions :
+source ~/scripts/struna.sh
+source system
+#
+template=template.py
+stringtemplate=template.sm
+temptemplate=temp.in  ;# template file for tempering
+#
+assert_exists "calc"
+assert_exists "catdcd"
+assert_exists "bc"
+assert_exists "python2"
+#
+datadir=data
+dcddir=scratch
+usdir=$datadir
+#
+#
+mkdir -p $datadir
+mkdir -p $dcddir
+#
+#================ MD configuration parameters :
+cutoff=9
+switchdist=7.5
+pmefreq=1
+hmass=4
+dt=4
+shake=1
+temperature=300
+thermostat=1
+friction=0.1
+barostat=0
+restraints=1
+restraintfile=$pdbfile
+restraintscale=1
+restraintcol=1
+stringpdb=g120-ab-trunc_sm.pdb
+
+# box sizes for starting from scratch
+sizex=112.24
+sizey=93.56
+sizez=81.92
+
+nsteps=10000 ; #also, replica exchange frequency ( if rex on )
+ministeps=0 ; # optional initial minimization
+freq=10000 ;    # output frequency
+#
+# restraint potential parameters :
+kdist=100 ;
+krmsd=5 ;
+fbw1=0.5;
+fbw2=5
+#
+#
+index=1 # simulation "index"
+#================== string replica parameters
+#
+brep=1  # first window index
+erep=15 # last  window index
+outputbase=pmfsep$index
+
+firstrun=801 ; # index of run ; facilitates restarting
+numrun=400 ;
+#================== Hamiltonian replica exchange ==========================================
+qrex=0; # whether replica exchange is on ; swap attempts every nsteps
+temprex0=10000 ; #initial rex temp
+temprex1=$temprex0 ; #final rex temp
+#temprex1=$temperature ; # final rex temp
+dtemprex=20 ; # temp increment/decrement for annealing/heating
+rexlog=${outputbase}.rex.log
+#
+#================== Adaptive tempering
+qtemp=0 # whether tempering is on
+#------------------------------- plugin options
+Tini=$temperature  ;# temperature that will be used for initialization if restart_file=MONE, or if qtemp=0
+temprestart=NONE  ;# name of restart file
+tempfreq=50       ;# how frequently to call the plugin
+#==============================================================================
+# erase replica exchange log
+if [ $qrex -eq 1 ]; then
+ if [ -f $rexlog ]; then
+  mv $rexlog ${rexlog}.old
+ fi
+ temprex=$temprex0 ;# initialize replica exchange annealing
+fi
+#
+#outer loop over number of runs
+lastrun=$((firstrun+numrun-1))
+for irun in `seq $firstrun $lastrun`; do 
+ echo " ===> Run $irun (will quit after $lastrun) "
+ echo " ========================="
+
+if [ $qadwin -eq 1 ]; then
+ rm -f nextwin.dat
+ octave < dfe.m >> octave.log 2>&1
+ if [ -f nextwin.dat ] ; then
+  wins=(`cat nextwin.dat`);
+  frep=`calc "int(${wins[0]})"`
+  lrep=$frep
+ else
+  frep=$brep
+  lrep=$erep
+ fi
+else
+ frep=$brep
+ lrep=$erep
+fi
+#echo $frep
+#echo $lrep
+#exit
+#if [ 0 -eq 1 ]; then
+ for irep in `seq $frep $lrep`; do
+# run each window sequentially
+  iprev=$((irep - 1)) # previous window
+# prepare input file from template
+  config=${outputbase}_${irep}
+  output=${config}.out
+  stringfile=${config}.smcv
+  stringout=${stringfile}.out
+  if [ $qtemp -eq 1 ]; then
+   tempconfig=${config}.temp
+   templog=${tempconfig}.out
+  fi
+
+  config=${config}.py
+  echo -n > $config
+  echo -n > $stringfile
+#
+  vecs=(`cat cv.vec`)
+  vec1="${vecs[@]:0:3}"
+  bfgp120=1.0 # value of bfactor column to mark gp120
+  bfab=2.0 # value of bfactor column to mark antibody
+# left and right replicas for exchange :
+  ileft=`ileft   $irep $brep $erep`
+  iright=`iright $irep $brep $erep`
+#
+  irestart=$irep
+# prepare config files
+# different behavior on first run :
+  outputname=${outputbase}_${irep}
+  outputprev=${outputbase}_${iprev}
+  if [ $irun -gt 1 ]; then
+   windowappend=wiap # append to stat files
+   histappend=happ
+   reneappend=reap
+   ministeps=0
+   restart=1
+   restartname=$dcddir/$outputname
+  else # first run in this window
+   windowappend="" # do not append to statistics files
+   histappend=""
+   reneappend=""
+   if [ $irep -eq 1 ]; then # this is the first simulation, so start from scratch
+# use e.g. equilibrated
+     restart=0
+     pdbfile=scratch/3ngb9eq.pdb ;# unsure why this was needed ; probably, due to wrapping, but why ? BECAUSE of absolute harmonic pos restraints ?
+#    restart=1
+#    restartname=../3ngb9eq
+#    restartname=$dcddir/$outputname
+#    restartname=../pmfsep2/scratch/$outputname
+   else
+# take restart files from a previous window
+    restart=1
+    restartname=$dcddir/$outputprev
+#    restartname=$dcddir/$outputname
+#    restartname=../pmfsep2/scratch/$outputname
+   fi
+   irestart=$iprev # to restart from a previous window
+  fi
+  restartfile=$restartname.xml
+# dirty hack to create new hist files
+#  if [ $irun -eq 101 ] ; then
+#   histappend=""
+#  fi 
+#
+# for string method config file
+  cat $stringtemplate >> $stringfile
+
+  for var in \
+    stringpdb \
+    datadir usdir bfgp120 bfab vec1 kdist krmsd fbw1 fbw2 \
+    windowappend histappend reneappend freq irep irestart ileft iright ; \
+   do
+    update $stringfile $var
+  done
+#exit# update tempering parameters :
+  if [ $qtemp -eq 1 ]; then
+   temp_output=${tempconfig}_${irun}.txt
+   temp_series=${tempconfig}_${irun}.series.txt
+# determine restart temperature
+   if [ $irun -eq 1 ]; then
+    temp_restart=NONE
+    T=$Tini
+   else
+    temp_restart=${tempconfig}_$((irun-1)).txt
+    T=`grep '^.temperature=' $temp_restart | awk '{print $2}'` ;# extract temperature from restart file
+   fi
+#========== write tempering config ======================
+   cat $temptemplate > $tempconfig
+   for var in temp_restart temp_output temp_series ; do
+    update $tempconfig $var
+   done
+# set simulation temperature to match tempering file
+   temperature=$T
+  fi # tempering
+#========== write main MD config file ===================
+  cat $template >> $config
+  update $config sminput $stringfile
+  update $config smlog $stringout
+#========== update tempering parameters
+  update $config qtemp
+  if [ $qtemp -eq 1 ]; then
+   for var in tempconfig templog tempfreq ; do update $config "$var" ; done
+  fi
+  for var in \
+   restart restartfile topfile \
+   prmfile psffile pdbfile dt shake cutoff switchdist \
+   pmefreq restraints restraintfile restraintcol hmass prmfile \
+   restraintscale ministeps nsteps freq temperature \
+   thermostat friction barostat sizex sizey sizez ;
+   do
+    update $config "$var"
+  done
+#
+  update $config outputname "$dcddir\/$outputname"
+#
+# run calculation
+  echo "  ===> Running replica #$irep ..."
+#
+#exit
+  python $config >& $output
+#exit
+####### save dcd file
+  dcdfile=$dcddir/$outputname.dcd
+  dcdall=$dcddir/${outputname}_all.dcd
+# append to running dcd
+  if [ ! -f $dcdall ] || [ $irun -eq 1 ]; then
+    mv -f $dcdfile $dcdall
+  else
+    catdcd -o temp.dcd $dcdall $dcdfile > catdcd.out
+    mv -f temp.dcd $dcdall
+  fi
+# ^ save dcd
+ done
+#fi
+ if [ $qrex -eq 1 ] ; then
+# perform replica exchange :
+# (1) decide which way to try exchange:
+  xdir=`sm_rex_dir`
+# loop over all exchange pairs
+  ibeg=$((brep + xdir))
+  iend=$((erep - 1))
+  for ifirst in `seq $ibeg 2 $iend` ; do
+   isecond=$((ifirst+1))
+   echo -n "  ===> Attempting replica exchange : $ifirst <==> $isecond :"
+#=================================== read energy file for first replica
+   efile=$datadir/sm_ene${ifirst}.dat
+   edata=(`cat $efile`);
+# extract energies
+   efirst_old=${edata[2]}
+# (right shift)
+   efirst_new=${edata[8]}
+#=================================== read energy file for second replica
+   efile=$datadir/sm_ene${isecond}.dat
+   edata=(`cat $efile`);
+# extract energies
+   esecond_old=${edata[2]}
+# (left shift)
+   esecond_new=${edata[5]}
+# total energy change :
+   esum="$efirst_new - $efirst_old + $esecond_new - $esecond_old"
+   de=`echo print $esum | python2` # energy difference in kcal/mol
+   echo -n " dE = $de, ";
+# apply metropolis
+   success=`metropolis $de $temprex`
+   echo " T=$temprex,  accept ? : $success"
+# if move is accepted, replicas exchange simulation restrart files
+   if [ $success -eq 1 ] ; then
+    for ext in xsc xml chk ; do
+     mv -f $dcddir/${outputbase}_${ifirst}.${ext} _tmp_
+     mv -f $dcddir/${outputbase}_${isecond}.${ext} $dcddir/${outputbase}_${ifirst}.${ext}
+     mv -f _tmp_ $dcddir/${outputbase}_${isecond}.${ext}
+    done
+# update exchange log
+    echo -e "$ifirst \t $isecond \t $((irun*nsteps))" >> $rexlog
+   fi # success
+  done # over all exchange pairs
+# update rex temperature
+  temprex=`calc "if ($temprex1 > $temprex0) { t = min($temprex1, $temprex + abs($dtemprex)) } else { t = max($temprex1, $temprex - abs($dtemprex)) } ; print t"`
+ fi # rex on
+#
+done # over all runs
