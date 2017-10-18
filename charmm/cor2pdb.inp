@@ -1,13 +1,12 @@
 * charmm script to generate a pdb file from cor file; 
 * the beta column in the pdb file is read by vmd
 
-set version 19
+set version 36
 
-set psffile prigor19
-set corfile prigor19
+set psffile g120-ab-r71a-trunc
+set corfile g120-ab-r71a-trunc-res
 
-stream readpsf.str
+stream ~/scripts/charmm/readpsf36.str
 
 write coor pdb name @corfile.pdb
-read coor card name prigor19_3.cor
-write coor pdb name prigor19_3.pdb
+
