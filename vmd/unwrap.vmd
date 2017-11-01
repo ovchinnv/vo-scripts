@@ -7,7 +7,13 @@ foreach c $cell { break; }
 foreach {dx dy dz} $c break;
 puts "$dx $dy $dz"
 pbc set "$dx $dy $dz" -all
-pbc unwrap -sel "protein" -first first
-pbc wrap -compound res -center com -centersel "protein and noh" -all
+
+if { ![info exists "pbcfirst"] } {
+ set pbcfirst 0
+}
+
+pbc join res -sel "not ( water or ion )" -first 0 -last $pbcfirst -verbose
+pbc unwrap -sel "protein" -first [expr { $pbcfirst + 1 }]
+#pbc wrap -compound res -center com -centersel "protein and noh" -all
 #pbc wrap -compound seg -center com -centersel "protein and noh" -all
 

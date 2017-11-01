@@ -3,15 +3,18 @@
 
 set version 36
 
-set psffile @name
-set corfile @psffile
+if @?psffile eq 0 set psffile @name
+if @?corfile eq 0 set corfile @psffile
 
 if @?clib eq 0 set clib ~/scripts/charmm
 stream @{clib}/readpsf36.str
 
+if @?qfacts ne 0 stream @{clib}/facts.str
+
 coor copy comp
 
-cons harm sele prop wmain .eq. 1 end force 200
+! reason to use wcomp is that, with FACTS, wmain is overwritten with radii
+cons harm sele prop wcomp .eq. 1 end force 200
 
 set imini 1
 set nmini 5
@@ -27,7 +30,7 @@ coor chir check fix
 incr imini
 if @imini lt @nmini goto mini
 
-cons harm sele prop wmain .eq. 1 end force 10
+cons harm sele prop wcomp .eq. 1 end force 10
 
 set imini 1
 set nmini 5
@@ -43,8 +46,12 @@ coor chir check fix
 incr imini
 if @imini lt @nmini goto mini2
 
-mini abnr nstep 20
+if @?qnores ne 0 cons harm clear
+
+mini abnr nstep 100
 
 write coor card name @corfile_m.cor
 
 coor orie rms mass
+
+
