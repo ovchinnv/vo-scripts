@@ -43,6 +43,12 @@ if 1:
  except NameError:
   pbc=0
 #
+ if (pbc):
+  try :
+   resetcell
+  except NameError:
+   resetcell=0
+#
  try :
   pme
  except NameError:
@@ -162,7 +168,7 @@ if 1:
 #========================================================
  if (pbc):
   dprint("Periodic boundary conditions will be used")
-  if (not restart):
+  if (not restart or resetcell):
    try :
     dx; dy; dz; # check if dimensions are specified manually
    except NameError:

@@ -7,8 +7,8 @@ stringtemplate="template.sm"
 smpdb="traf-lig27-mini.pdb"
 
 # specify number and indices of runs to perform
-brun=1
-erun=2
+brun=2
+erun=3
 flag="fep"
 ######### prescribe lambda below #####
 
@@ -70,9 +70,12 @@ for irun in `seq $brun $erun` ; do
   lambda1=${lambdas[$((ind+1))]}
 #
   if [ $irun -eq 1 ]; then
-   restartfile=scratch/${name}10mini.xml
+#   restartfile=scratch/${name}10mini.xml
+# beware of wrapping in XML files
+   restart=0
   else
    iprev=$((irun-1))
+   restart=1
    restartfile=scratch/${name}${flag}${iprev}-${lambda0}-${lambda1}.xml
   fi
 #
@@ -89,7 +92,7 @@ for irun in `seq $brun $erun` ; do
   cp $template $config
   cp $stringtemplate $smconfig
 #
-  for key in lambda0 lambda1 restartfile outputname alchout ; do
+  for key in lambda0 lambda1 restart restartfile outputname alchout ; do
     update $config $key
   done
   update $config strunaConfig ${smconfig}
