@@ -284,10 +284,14 @@ if 1:
   dprint("Harmonic force constants will be scaled uniformly by x"+str(constraintscaling));
   system.addForce(force)
 #
-#================= string plugin
+#================= string plugin (baskward compatibility)
  if (struna==1) :
   from openmmstruna import *
   system.addForce(StrunaForce(strunaConfig, strunaLog))
+#================= dynamo (master) plugin
+ if (dynamo==1) :
+  from openmmdynamo import *
+  system.addForce(DynamoForce(dynamoConfig, dynamoLog))
 #================= add integrator :
  dprint("Configuring integrator");
 # first, add barostat if requested :
