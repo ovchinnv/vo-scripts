@@ -4,8 +4,7 @@ import simtk.openmm.app as app
 import simtk.openmm as mm
 import simtk.unit as u
 from sys import stdout, stderr, exit
-from shutil import copyfile
-
+from shutil import move
 #=====================================================================#
 # define parameters that may not have been defined by user
 #
@@ -29,6 +28,10 @@ if 1:
   constraints
  except NameError:
   constraints=0
+ try :
+  conscol
+ except NameError:
+  conscol=1
 #
  try :
   switchdist
@@ -39,6 +42,12 @@ if 1:
   pbc
  except NameError:
   pbc=0
+#
+ if (pbc):
+  try :
+   resetcell
+  except NameError:
+   resetcell=0
 #
  try :
   pme
@@ -64,10 +73,20 @@ if 1:
   membrane_on=0
 #
  try :
-  platform
+  implicitSolvent
  except NameError:
-# use CUDA unless variable 'platform' defined
-  platform="CUDA"
+  implicitSolvent=0
+#
+ try :
+  struna
+ except NameError:
+  struna=0
+#
+ try :
+  platformName
+ except NameError:
+# use CUDA unless variable 'platformName' defined
+  platformName="CUDA"
 #
 #========================== Subroutines
 #==========================
@@ -91,7 +110,7 @@ if 1:
    state=simulation.context.getState(getEnergy=True, groups=1<<forceGroups[key]) ;
    ener[key]=state.getPotentialEnergy().value_in_unit(u.kilocalories_per_mole);
 # total potential energy
-   ener['PE']=simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(u.kilocalories_per_mole);
+  ener['PE']=simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(u.kilocalories_per_mole);
 # print
   for key in ['Bond', 'Angle', 'Dihed', 'UB', 'IMPR', 'CMAP', 'NBOND', 'PE']:
    print(key, end="\t\t\t");
@@ -144,12 +163,12 @@ if 1:
 #========================== Initialize simulation system
  dprint("Reading PSF from file '", psffile, "'");
  psf=app.CharmmPsfFile(psffile);
- dprint("Reading parameter file '", paramfile,"'");
- params=app.CharmmParameterSet(paramfile, permissive=True); # need permissive to avoid providing atom types ( a la xplor psf )
+ dprint("Reading topology from file '",topfile,"' and parameters from file '", paramfile,"'");
+ params=app.CharmmParameterSet(topfile, paramfile, permissive=False); # running without atom typing (via mass entries in the topology) often leads to ERRORS !
 #========================================================
  if (pbc):
   dprint("Periodic boundary conditions will be used")
-  if (not restart):
+  if (not restart or resetcell):
    try :
     dx; dy; dz; # check if dimensions are specified manually
    except NameError:
@@ -171,11 +190,16 @@ if 1:
        derror("Could not set periodic cell size.")
   else:
    try:
-    xmlfile;
-    dprint("Setting orthorhombic cell lengths from file '",xmlfile,"'")
-    dx, dy, dz=get_box_size_xml(xmlfile);
-   except Die:
-    derror("Could not set periodic cell size.")
+    restartfile;
+    dprint("Setting orthorhombic cell lengths from file '",restartfile,"'")
+    dx, dy, dz=get_box_size_xml(restartfile);
+   except NameError:
+    try:
+     xmlfile;
+     dprint("Setting orthorhombic cell lengths from file '",xmlfile,"'")
+     dx, dy, dz=get_box_size_xml(xmlfile);
+    except NameError:
+     derror("Could not set periodic cell size.")
 #
   try:
    dprint("Periodic cell dimensions are (", dx*u.angstrom, ")x(", dy*u.angstrom, ")x(", dz*u.angstrom,")")
@@ -189,31 +213,50 @@ if 1:
   else:
    nbondMethod=app.CutoffPeriodic
    dprint("PME is off");
- else :
-  nbondMethod=app.CutoffNonPeriodic
+ else:
+  if (cutoff>0):
+   nbondMethod=app.CutoffNonPeriodic
+   psf.setBox(1000*u.angstrom, 1000*u.angstrom, 1000*u.angstrom) # set to a very large box to eliminate wrapping
+  else:
+   nbondMethod=app.NoCutoff
 #===================================================== SHAKE
  if (shake==1):
   cons=app.HBonds
+  rigidWater=True
   dprint("Will constrain all bonds involving hydrogens");
  elif (shake>1):
   cons=app.AllBonds
+  rigidWater=True
   dprint("Will constrain all bond lengths");
  else:
   cons=None
+  rigidWater=False
  dprint("Initializing simulation system");
  dprint("Nonbonded cutoff is ",cutoff*u.angstrom,". Switching is active at ",switchdist*u.angstrom)
  if (hmass>1):
   dprint("Hydrogen mass is ",hmass*u.amu)
- system=psf.createSystem(params,
+
+ if (implicitSolvent==1):
+  system=psf.createSystem(params,
                          nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
-                         constraints=cons, removeCMMotion=False, hydrogenMass=hmass*u.amu,
-                         verbose=True);
+                         constraints=cons, rigidWater=rigidWater, removeCMMotion=False, hydrogenMass=hmass*u.amu,
+                         implicitSolvent=app.OBC2,
+                         verbose=False);
+ else:
+  system=psf.createSystem(params,
+                         nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
+                         constraints=cons, removeCMMotion=False, hydrogenMass=hmass*u.amu, rigidWater=rigidWater,
+                         verbose=False);
 
 #================= harmonic restraints from file, a la NAMD/ACEMD
  if (constraints) :
-  dprint("Adding absolute positional harmonic restraints to atoms marked in beta column of PDB file '"+consfile+"'");
-  force=mm.CustomExternalForce("s*0.5*k*periodicdistance(x,y,z,x0,y0,z0)");
-#  force=CustomExternalForce("s*0.5*k*( (x-x0)^2 + (y-y0)^2 + (z-z0)^2 )");
+  if (conscol==1): # beta
+   dprint("Adding absolute positional harmonic restraints to atoms marked in the beta column of PDB file '"+consfile+"'");
+  elif (conscol==2): #occupancy
+   dprint("Adding absolute positional harmonic restraints to atoms marked in the occupancy column of PDB file '"+consfile+"'");
+
+  force=mm.CustomExternalForce("s*0.5*k*periodicdistance(x,y,z,x0,y0,z0)^2");
+#  force=mm.CustomExternalForce("s*0.5*k*( (x-x0)^2 + (y-y0)^2 + (z-z0)^2 )");
   force.addPerParticleParameter("k");
   force.addPerParticleParameter("x0");
   force.addPerParticleParameter("y0");
@@ -223,17 +266,28 @@ if 1:
   res=app.PDBFile(consfile);
   iatom=0; icons=0;
   for r, o, b  in zip(res.positions, res.occupancy, res.temperature_factor) :
-   bnodim=b/u.angstrom/u.angstrom; # have to deal with units, which are A^2 for B-factors
-   if ( bnodim > 0 ) :
+   if (conscol==1): # beta
+    bnodim=b/u.angstrom/u.angstrom; # have to deal with units, which are A^2 for B-factors
+   elif (conscol==2): #occupancy
+    bnodim=o
+
+   if (bnodim > 0) :
     icons+=1;
-    k=bnodim*constraintscaling*u.kilocalorie/u.mole/u.angstrom/u.angstrom
+    k=bnodim*u.kilocalorie/u.mole/u.angstrom/u.angstrom
 #   dprint(" Adding restraint on atom ",iatom," with force constant ", k );
-    force.addParticle(iatom, [k,r[0],r[1],r[2]]);
+    x0=r[0].value_in_unit(u.nanometer)
+    y0=r[1].value_in_unit(u.nanometer)
+    z0=r[2].value_in_unit(u.nanometer)
+    force.addParticle(iatom, [k,x0,y0,z0]);
    iatom+=1;
   dprint("Added restraints on ", icons, " atoms");
   dprint("Harmonic force constants will be scaled uniformly by x"+str(constraintscaling));
   system.addForce(force)
 #
+#================= string plugin
+ if (struna==1) :
+  from openmmstruna import *
+  system.addForce(StrunaForce(strunaConfig, strunaLog))
 #================= add integrator :
  dprint("Configuring integrator");
 # first, add barostat if requested :
@@ -262,7 +316,7 @@ if 1:
 # note that createSystem puts different psf sections into different force groups for ease of energy decomposition;
   for f in system.getForces() :
 # put all forces into the same group (note that this will make energy decomposition impossible)
-# we should be able to use many groups withe same substep in the RESPA init, but that might slow it down
+# we should be able to use many groups with the same substep in the RESPA init, but that might slow it down
    f.setForceGroup(0);
 # reciprocal forces get a separate group for RESPA
    if isinstance(f,mm.NonbondedForce) :
@@ -284,14 +338,14 @@ if 1:
    integrator=mm.VerletIntegrator(dt*u.femtosecond);
 #====================================================
 #
- dprint("Initializing compute platform ",platform);
- platform=mm.Platform.getPlatformByName(platform);
+ dprint("Initializing compute platform ",platformName);
+ platform=mm.Platform.getPlatformByName(platformName);
  properties={'CudaPrecision': 'mixed'};
  dprint("Preparing simulation topology");
- if (platform=="CUDA") :
+ if (platformName=="CUDA") :
   simulation=app.Simulation(psf.topology, system, integrator, platform, properties);
  else :
-  simulation=app.Simulation(psf.topology, system, integrator);
+  simulation=app.Simulation(psf.topology, system, integrator, platform);
 #
  if (restart == 0) :
   if (corfile!=None):
@@ -303,8 +357,13 @@ if 1:
    dprint("Setting simulation coordinates from file '",pdbfile,"'");
    simulation.context.setPositions(pdb.positions);
  else :
-  dprint("Setting simulation coordinates from file '",restartfile,"'");
-  simulation.loadState(restartfile);
+  dprint("Setting simulation restart data from file '",restartfile,"'");
+  with open(restartfile, 'r') as f:
+   xml=f.read();
+   oldstate=mm.XmlSerializer.deserialize(xml)
+   simulation.context.setPositions(oldstate.getPositions());
+   simulation.context.setVelocities(oldstate.getVelocities());
+   simulation.context.setTime(oldstate.getTime());
 #
 #================ Print initial energy compoments :
  dprint("Initial Potential energy" );
@@ -320,18 +379,21 @@ if 1:
  if (nsteps>0):
   simulation.reporters.append(app.DCDReporter('output.dcd',dcdfreq));
   simulation.reporters.append(app.StateDataReporter(stdout, outputfreq, step=True, potentialEnergy=True, kineticEnergy=True, speed=True, temperature=True, 
-                                                    volume=True, separator=' '));
+                                                    volume=pbc, separator=' \t '));
   dprint("Running MD simulation for ",nsteps," steps");
   simulation.step(nsteps);
-  dprint("Writing simulation restart files");
-  simulation.saveState(outputName+'.xml');
-  simulation.saveCheckpoint(outputName+'.chk');
-  copyfile('output.dcd', outputName+'.dcd');
-#==== write periodic box vectors
-  state=simulation.context.getState();
-  a,b,c=state.getPeriodicBoxVectors();
-  fxsc=open(outputName+'.xsc','w');
-  fxsc.write("#CHOMMPy.xsc stub\n");
-  fxsc.write(str(nsteps)+" "+str(a[0].value_in_unit(u.angstrom))+" 0 0 0 "+str(b[1].value_in_unit(u.angstrom))+" 0 0 0 "+str(c[2].value_in_unit(u.angstrom))+" 0 0 0 0 0 0 0 0 0\n");
-  fxsc.close();
+#==== move dcd file to destination file
+  move('output.dcd', outputName+'.dcd');
 
+ dprint("Writing simulation restart files");
+ simulation.saveState(outputName+'.xml');
+ simulation.saveCheckpoint(outputName+'.chk');
+#==== write periodic box vectors
+ state=simulation.context.getState();
+ a,b,c=state.getPeriodicBoxVectors();
+ fxsc=open(outputName+'.xsc','w');
+ fxsc.write("#CHOMMPy.xsc stub\n");
+ fxsc.write(str(nsteps)+" "+str(a[0].value_in_unit(u.angstrom))+" 0 0 0 "+str(b[1].value_in_unit(u.angstrom))+" 0 0 0 "+str(c[2].value_in_unit(u.angstrom))+" 0 0 0 0 0 0 0 0 0\n");
+ fxsc.close();
+#==== reset switching distance
+ del switchdist;
