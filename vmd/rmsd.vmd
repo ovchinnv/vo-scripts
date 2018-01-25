@@ -1,54 +1,54 @@
 #!/bin/vmd
-# assume that the trajectory has been loaded
-# assume that domains have been defined
-set cons noh
-set dir rmsd
-#
-set nf  [molinfo $ab get numframes];
-set all [atomselect $ab all];
-#
-# prepare atom selections
-#
-set domains { heavy light all }
-#
-set k 0
-foreach R $domains {
- set a($k) [ atomselect top "$R and $cons"];
- set b($k) [ atomselect top "$R and $cons" frame 0 ] ;# first frams
-# set b($k) [ atomselect top "$R and $cons" frame [expr {$nf - 1}]] ;# last frams
- set rmsd($k) {}; # initialize
- incr k
-} ;# foreach
 
-#
-#
-for {set i 0} {$i<$nf} {incr i} {
- puts "Processing frame: $i"
- for {set j 0} {$j<$k} {incr j} {
-#
-  set orient   $a($j)
-  set template $b($j)
-#
-  $orient frame $i
-  $orient update
-#
-  $all frame $i
-  $all update
-#
-  $all move [measure fit $orient $template weight mass]
-#
-  lappend rmsd($j) [measure rmsd $orient $template weight mass]
- } ; # j
-#
-} ; # i
+package require pbctools
 
-# prepare output file
-set fid [ open $dir/rmsd_${name}.dat w];
-for {set j 0} {$j<$k} {incr j} {
-  puts $fid " [lindex $domains $j] $rmsd($j)"
+mol delete all
+set name adk1-dp
+mol load psf ../struc/ak1-d_sn.psf
+mol addfile  ../struc/ak1-dsn.pdb
+
+set itraj 10
+set etraj 29
+
+set step 10
+for {set i $itraj } { $i <= $etraj } {incr i} {
+ mol addfile ./${name}${i}nvt.dcd waitfor all step $step
 }
+mol addfile output.dcd waitfor all step $step
+
+#source unwrap.vmd ; # should be safe to omit because only the ligands jump across box
+
+set id [ molinfo top ];
+set nf [molinfo $id get numframes];
+#set selection "protein or resname GTP or resname MG"
+set orientation "protein" ;
+set rms "protein" ;
+set cons "beta 1 and backbone"
+#set cons "beta 1"
+#set cons "noh"
+
+set all      [atomselect $id all];
+set orient   [atomselect $id "$orientation and $cons"]
+set template [atomselect $id "$orientation and $cons" frame 0] 
+set rmsd     [atomselect $id "$rms and $cons"]
+set ref      [atomselect $id "$rms and $cons" frame 0] 
 #
+#
+set fid [open "rmsd.dat" w+];
+set rms_ {};
+#
+for { set i 0 } { $i<$nf } { incr i } {
+ $orient frame $i
+# $orient update
+ $rmsd frame $i
+# $rmsd update
+ $all frame $i
+# $all update
+ $all move [measure fit $orient $template]
+ set r [measure rmsd $rmsd $ref];
+ lappend rms_ $r
+ puts $fid "$r"
+}
 close $fid
-unset rmsd
-unset a
-unset b
+#
+puts ${rms_}
