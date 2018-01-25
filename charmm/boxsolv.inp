@@ -17,19 +17,31 @@ coor stat select solute end ! select the active site region
 
 ! compute center of water box
 if @?xmin eq 0 calc xmin = ?xmin
-if @?ymin eq 0 calc ymin = ?ymin 
-if @?zmin eq 0 calc zmin = ?zmin 
+if @?ymin eq 0 calc ymin = ?ymin
+if @?zmin eq 0 calc zmin = ?zmin
 if @?xmax eq 0 calc xmax = ?xmax
-if @?ymax eq 0 calc ymax = ?ymax 
-if @?zmax eq 0 calc zmax = ?zmax 
+if @?ymax eq 0 calc ymax = ?ymax
+if @?zmax eq 0 calc zmax = ?zmax
 !include xwat in solvation
 define solute select all end
 update atom cutnb 15 ctonnb 10 ctofnb 12 vdw vshift fshift cdie
 
 nobomb
+if @?cube eq 1 set method cube ! backward compatibility
 if @?overlap eq 0 set overlap 2.5
-if @?cube eq 1 stream @{clib}/wcube.str
-if @?cube eq 0 stream @{clib}/wbox.str
+if @?method eq 0 set method box
+
+if @method eq BOX then
+ stream @{clib}/wboxfast.str
+else
+ if @method eq CUBE then
+  stream @{clib}/wcubefast.str
+ else
+  if @method eq SHELL then
+   stream @{clib}/wshell.str
+  endif
+ endif
+endif
 
 rename segid wat select segid w* end ! rename all waters
 
@@ -61,11 +73,19 @@ write coord pdb name @{corfile}s.pdb
 *
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 open write card unit 66 name @{psffile}.str
+if @method eq SHELL then
+write title unit 66
+** solvated in a watershell of thickness
+* set a @maxdist
+
+else
 write title unit 66
 ** solvated in an orthorhombic box of the following dimensions
 * set a  @xl
 * set b  @yl
 * set c  @zl
+
+endif
 close unit 66
 
 !!!! STOP HERE !!!!!!!!!!!

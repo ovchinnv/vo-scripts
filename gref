@@ -9,7 +9,7 @@ if [ -z "$1" ]; then
  exit
 fi
 
-pyP2B_ROOT=/home/taly/pyP2B
+pyP2B_ROOT=~/pyP2B
 
 nargs=${#@};
 # test for year :
@@ -21,7 +21,7 @@ fi
 authors=${@:1:$nargs}
 #echo ${authors[@]}
 
-qbase="http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?&db=pubmed"
+qbase="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?&db=pubmed"
 qend="&retmode=xml&rettype=medline&retmax=100"
 
 query="&term=";

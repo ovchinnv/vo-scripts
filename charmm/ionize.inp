@@ -52,11 +52,16 @@ write psf @format name @{psffile}n.psf xplor
 ! standard psf
 write psf oldpsf @format name @{psffile}no.psf
 write coor @format name @{corfile}n.cor  
+
+! put radii into occupancy column for watershell plugin
+scalar OCCU = RADIUS
+
 write coor pdb name @{corfile}n.pdb
 !write coor pdb name myosolv.pdb
 !if ( ?CGTOT .ae. 0 ) system "echo ERROR: could not balance charge"
 
 show ?CGTOT
+
 
 goto kill
 
