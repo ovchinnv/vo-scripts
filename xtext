@@ -1,0 +1,40 @@
+#!/bin/bash
+# extract text from text file
+if [ -z $2 ] ; then 
+ echo " USAGE : xtext <filename> <start_pattern> <end_pattern>"
+ exit 1;
+else
+ file=$1
+ from=$2
+fi
+
+# allow offsets to beginning and ending lines
+if [ -z $4 ]; then
+ boff=0
+else
+ boff=$4
+fi
+
+if [ -z $5 ]; then
+ eoff=0
+else
+ eoff=$5
+fi
+
+lbeg=`grep -En --text "${from}" $file|awk '{print $0}'`
+lbeg=`expr ${lbeg%%:*} + $boff`
+
+if [ -z $3 ]; then
+ lend=`wc $file | awk '{print $1}'`
+else
+ to=$3
+ lend=`grep -En --text "${to}" $file|awk '{print $0}'`
+ lend=`expr ${lend%%:*} + $eoff`
+fi
+lquit=`expr $lend + 1`
+#echo $lbeg
+#echo $lend
+scmd="${lbeg},${lend}p;${lquit}q"
+#echo $scmd
+#echo $ssymb
+sed -n "$scmd" $file
