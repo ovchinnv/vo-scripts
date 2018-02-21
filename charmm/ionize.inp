@@ -51,12 +51,13 @@ stream @{clib}/addions.str
 write psf @format name @{psffile}n.psf xplor
 ! standard psf
 write psf oldpsf @format name @{psffile}no.psf
-write coor @format name @{corfile}n.cor  
-
+if @?corfile ne 0 set outfile @corfile
+if @?pdbfile ne 0 set outfile @pdbfile
 ! put radii into occupancy column for watershell plugin
 scalar OCCU = RADIUS
+write coor @format name @{outfile}n.cor
+write coor pdb name @{pdbfile}n.pdb
 
-write coor pdb name @{corfile}n.pdb
 !write coor pdb name myosolv.pdb
 !if ( ?CGTOT .ae. 0 ) system "echo ERROR: could not balance charge"
 
