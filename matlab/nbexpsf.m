@@ -11,8 +11,9 @@
 % read by this program, and so are not taken into account
 %
 
-natom=44 ;
-nbxfile='groups' ;
+% test :
+%natom=44 ;
+%nbxfile='groups' ;
 
 if ~exist('natom');
  error "'natom' undefined. Abort."
@@ -70,7 +71,7 @@ for i=1:ngrp
  end
 %
 end
-printf('%s %d %s\n',info,ngrp,'groups found...')
+%printf('%s %d %s\n',info,ngrp,'groups found...')
 %
 % now create nonbonded ecxlusion list
 %
@@ -119,14 +120,16 @@ for i=iatom:natom
 end
 
 % now can write the exclusion list :
+nnbx=length(nbxlist);
+%
 fid=fopen(outfile,'w');
 if (qext)
   fmt_nbx='%10d%10d%10d%10d%10d%10d%10d%10d\n'; % extended PSF format
+  fprintf(fid,'\n%10d',nnbx) ; fprintf(fid,'%s\n',' !NNB')
 else
   fmt_nbx='%8d%8d%8d%8d%8d%8d%8d%8d\n';
+  fprintf(fid,'\n%8d',nnbx) ; fprintf(fid,'%s\n',' !NNB')
 end
-nnbx=length(nbxlist);
-fprintf(fid,'\n%8d',nnbx) ; fprintf(fid,'%s\n',' !NNB')
 fprintf(fid,fmt_nbx,nbxlist)
 if (nnbx==0 || mod(nnbx,8)>0 ) ; fprintf(fid,'\n') ; end
 %print IBLO array
