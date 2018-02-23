@@ -83,6 +83,11 @@ if 1:
   struna=0
 #
  try :
+  dynamo
+ except NameError:
+  dynamo=0
+#
+ try :
   platformName
  except NameError:
 # use CUDA unless variable 'platformName' defined
@@ -246,7 +251,7 @@ if 1:
   system=psf.createSystem(params,
                          nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
                          constraints=cons, removeCMMotion=False, hydrogenMass=hmass*u.amu, rigidWater=rigidWater,
-                         verbose=False);
+                         verbose=True);
 
 #================= harmonic restraints from file, a la NAMD/ACEMD
  if (constraints) :
