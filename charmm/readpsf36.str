@@ -34,17 +34,17 @@ endif
 !==============================================================
 ! protein
 if @?imm1 eq 0 then
- @string open unit 1 read form name "@TOPPAR/top_all36_prot.rtf"
+ @string open unit 1 read form name @TOPPAR/top_all36_prot.rtf
  read rtf card unit 1
  @string close unit 1
- @string open unit 1 read form name "@TOPPAR/par_all36_prot.prm"
+ @string open unit 1 read form name @TOPPAR/par_all36_prot.prm
  read param card flex unit 1
  @string close unit 1
 else
- @string open unit 1 read form name "@TOPPAR/top_all36_prot_lipid_eef1.1.rtf"
+ @string open unit 1 read form name @TOPPAR/top_all36_prot_lipid_eef1.1.rtf
  read rtf card unit 1
  @string close unit 1
- @string open unit 1 read form name "@TOPPAR/par_all36_prot_lipid_eef1.1.prm"
+ @string open unit 1 read form name @TOPPAR/par_all36_prot_lipid_eef1.1.prm
 ! read param card unit 1
  read param card unit 1 flex
  @string close unit 1
@@ -85,31 +85,31 @@ else
  set na 1
 endif
 if @na eq 1 then
- @string open unit 1 read form name "@TOPPAR/top_all36_na.rtf"
+ @string open unit 1 read form name @TOPPAR/top_all36_na.rtf
  read rtf card unit 1 append
  @string close unit 1
 !
- @string open unit 1 read form name "@TOPPAR/par_all36_na.prm"
+ @string open unit 1 read form name @TOPPAR/par_all36_na.prm
  read param card flex unit 1 append
  @string close unit 1
 endif
 !
 if @lipid eq 1 then
- @string open unit 1 read form name "@TOPPAR/top_all36_lipid.rtf"
+ @string open unit 1 read form name @TOPPAR/top_all36_lipid.rtf
  read rtf card unit 1 append
  @string close unit 1
 !
- @string open unit 1 read form name "@TOPPAR/par_all36_lipid.prm"
+ @string open unit 1 read form name @TOPPAR/par_all36_lipid.prm
  read param card flex unit 1 append
  @string close unit 1
 endif
 !
 if @carb eq 1 then
- @string open unit 1 read form name "@TOPPAR/top_all36_carb.rtf"
+ @string open unit 1 read form name @TOPPAR/top_all36_carb.rtf
  read rtf card unit 1 append
  @string close unit 1
 !
- @string open unit 1 read form name "@TOPPAR/par_all36_carb.prm"
+ @string open unit 1 read form name @TOPPAR/par_all36_carb.prm
  read param card flex unit 1 append
  @string close unit 1
 endif
@@ -134,10 +134,10 @@ else
  set cgenff 1
 endif
 if @cgenff eq 1 then 
- @string open unit 1 read form name "@TOPPARCGENFF/top_all36_cgenff.rtf"
+ @string open unit 1 read form name @TOPPARCGENFF/top_all36_cgenff.rtf
  read rtf card unit 1 append
  @string close unit 1
- @string open unit 1 read form name "@TOPPARCGENFF/par_all36_cgenff.prm"
+ @string open unit 1 read form name @TOPPARCGENFF/par_all36_cgenff.prm
  read param card flex unit 1 append
  @string close unit 1
 endif
@@ -151,31 +151,31 @@ endif
 !
 !====== additional parameters if requested =====================
 if @?adpar ne 0 then
- @string open unit 1 read form name "@{ADPAR}.rtf"
+ @string open unit 1 read form name @{ADPAR}.rtf
  read rtf card unit 1 append
  @string close unit 1
- @string open unit 1 read form name "@{ADPAR}.prm"
+ @string open unit 1 read form name @{ADPAR}.prm
  read param card flex unit 1 append
  @string close unit 1
 endif
 !===============================================================
 if @?adstr ne 0 then
- @string open unit 11 read form name "@{ADSTR}"
+ @string open unit 11 read form name @{ADSTR}
  stream unit 11 parser local
 endif
 !===============================================================
 if @?adstr1 ne 0 then
- @string open unit 11 read form name "@{ADSTR1}"
+ @string open unit 11 read form name @{ADSTR1}
  stream unit 11 parser local
 endif
 !===============================================================
 if @?adstr2 ne 0 then
- @string open unit 11 read form name "@{ADSTR2}"
+ @string open unit 11 read form name @{ADSTR2}
  stream unit 11 parser local
 endif
 !===============================================================
 if @?adstr3 ne 0 then
- @string open unit 11 read form name "@{ADSTR3}"
+ @string open unit 11 read form name @{ADSTR3}
  stream unit 11 parser local
 endif
 !===============================================================
