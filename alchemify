@@ -53,4 +53,4 @@ cat ${tmpfile} #>> $psfout
 echo #>> $psfout # extra line
 # part of psf after exclusions and through to the end
 ~/scripts/xtext $psfin '!NGRP' #>> $psfout
-#rm ${tmpfile}
+rm ${tmpfile}

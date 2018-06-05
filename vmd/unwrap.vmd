@@ -12,8 +12,9 @@ if { ![info exists "pbcfirst"] } {
  set pbcfirst 0
 }
 
-pbc join res -sel "not ( water or ion )" -first 0 -last $pbcfirst -verbose
+#pbc join res -sel "not ( water or ion )" -first 0 -last $pbcfirst -verbose
 pbc unwrap -sel "protein" -first [expr { $pbcfirst + 1 }]
-#pbc wrap -compound res -center com -centersel "protein and noh" -all
+pbc wrap -compound res -center com -centersel "protein and noh" -all
+pbc unwrap -sel "protein" -first [expr { $pbcfirst + 1 }]
 #pbc wrap -compound seg -center com -centersel "protein and noh" -all
 
