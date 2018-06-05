@@ -83,6 +83,11 @@ if 1:
   struna=0
 #
  try :
+  dynamo
+ except NameError:
+  dynamo=0
+#
+ try :
   platformName
  except NameError:
 # use CUDA unless variable 'platformName' defined
@@ -246,7 +251,7 @@ if 1:
   system=psf.createSystem(params,
                          nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
                          constraints=cons, removeCMMotion=False, hydrogenMass=hmass*u.amu, rigidWater=rigidWater,
-                         verbose=False);
+                         verbose=True);
 
 #================= harmonic restraints from file, a la NAMD/ACEMD
  if (constraints) :
@@ -284,10 +289,14 @@ if 1:
   dprint("Harmonic force constants will be scaled uniformly by x"+str(constraintscaling));
   system.addForce(force)
 #
-#================= string plugin
+#================= string plugin (baskward compatibility)
  if (struna==1) :
   from openmmstruna import *
   system.addForce(StrunaForce(strunaConfig, strunaLog))
+#================= dynamo (master) plugin
+ if (dynamo==1) :
+  from openmmdynamo import *
+  system.addForce(DynamoForce(dynamoConfig, dynamoLog))
 #================= add integrator :
  dprint("Configuring integrator");
 # first, add barostat if requested :

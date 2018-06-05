@@ -252,7 +252,7 @@ if 1:
                          nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
                          constraints=cons, removeCMMotion=False, hydrogenMass=hmass*u.amu, rigidWater=rigidWater,
                          verbose=True);
-
+# NOTE : I prefer not to use the COM motion removal above
 #================= harmonic restraints from file, a la NAMD/ACEMD
  if (constraints) :
   if (conscol==1): # beta
