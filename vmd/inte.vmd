@@ -1,0 +1,50 @@
+#!/bin/vmd
+package require namdenergy
+
+mol delete all
+mol load psf ../struc/emr-tpp-dmpcn-x.psf
+#mol addfile ../struc/emr-tpp-dmpcn-m.pdb
+
+set resids { 14 18 40 44 47 60 63 };
+set selections {}
+set sels {}
+set fnames {}
+for { set iseg 1 } { $iseg <=2 } { incr iseg } {
+ foreach resid $resids {
+  puts $resid
+  set selection " ( resid $resid and segid EMR$iseg ) "
+  set sel [atomselect top $selection ]
+  set fname inte${resid}.${iseg}.dat
+  touch $fname
+  lappend selections $selection 
+  lappend sels $sel
+  lappend fnames $fname
+ }
+}
+
+
+puts "Will use selections $selections"
+#puts $sels
+set tpp [atomselect top "segid TPP"] ;
+
+set parfile "../param/emr-tpp-dmpc.prm"
+
+set itraj 13
+set etraj 54
+
+set step 1
+
+set flag nvt
+for {set i $itraj } { $i <= $etraj } {incr i} {
+ if {$i >= 0 } { set flag nvt }
+ mol addfile ../scratch/emr${i}${flag}.dcd waitfor all step $step
+#
+ foreach sel $sels fname $fnames {
+  namdenergy -elec -vdw -sel ${sel} ${tpp} -exe [pwd]/namd -diel 1.0 -cutoff 12 -switch 10 -ofile _temp -par $parfile -debug
+  cat _temp >> $fname
+  rm _temp
+#
+ }
+ animate delete all
+}
+rm _temp
