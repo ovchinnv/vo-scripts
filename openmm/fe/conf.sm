@@ -6,15 +6,17 @@ output {
 smcv_init {
  structure=traf-lig27-mini.pdb
  defer_init_dyna=yes ! initialization commands (:) will be executed during the first dynamics timestep
- : add rmsd orient sele occupancy > 0 end rms sele beta > 0 end force 3.69142391158873843123 mass
+ : add rmsd orient sele occupancy > 0 end rms sele beta > 0 end force 3.69142391158873843123 mass 
  : list
  : set weight 1 all
- : set cvz 0 all   ! rmsd target is 0
- : list
  : fill
+! : test grad step 0.001
  : write name cv.ini
+ : set cvz 0 all   ! rmsd target is 0
+ : stat hist hnam hist.dat hcol inst
+ : dyna rstr -  ! simple restrained dynamics
+!   hisf 10 -
+!   stat staf 100
+
 }
 
-smcv_dyna {
- : dyna rstr ! simple restrained dynamics
-}

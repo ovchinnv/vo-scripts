@@ -1,0 +1,54 @@
+#!/bin/vmd
+# assume that the trajectory has been loaded
+# assume that domains have been defined
+set cons noh
+set dir rmsd
+#
+set nf  [molinfo $ab get numframes];
+set all [atomselect $ab all];
+#
+# prepare atom selections
+#
+set domains { heavy light all }
+#
+set k 0
+foreach R $domains {
+ set a($k) [ atomselect top "$R and $cons"];
+ set b($k) [ atomselect top "$R and $cons" frame 0 ] ;# first frams
+# set b($k) [ atomselect top "$R and $cons" frame [expr {$nf - 1}]] ;# last frams
+ set rmsd($k) {}; # initialize
+ incr k
+} ;# foreach
+
+#
+#
+for {set i 0} {$i<$nf} {incr i} {
+ puts "Processing frame: $i"
+ for {set j 0} {$j<$k} {incr j} {
+#
+  set orient   $a($j)
+  set template $b($j)
+#
+  $orient frame $i
+  $orient update
+#
+  $all frame $i
+  $all update
+#
+  $all move [measure fit $orient $template weight mass]
+#
+  lappend rmsd($j) [measure rmsd $orient $template weight mass]
+ } ; # j
+#
+} ; # i
+
+# prepare output file
+set fid [ open $dir/rmsd_${name}.dat w];
+for {set j 0} {$j<$k} {incr j} {
+  puts $fid " [lindex $domains $j] $rmsd($j)"
+}
+#
+close $fid
+unset rmsd
+unset a
+unset b

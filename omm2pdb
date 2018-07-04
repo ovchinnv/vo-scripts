@@ -1,0 +1,48 @@
+#!/bin/bash
+# write structure file for Desmond
+
+if [ -z $1 ] ; then 
+ echo "USAGE : omm2pdb <psf file> <xmlfile> <xscfile(optional)>"
+ exit 1;
+else
+ psffile=$1
+fi
+#
+if [ -z $2 ] ; then
+ echo "USAGE : omm2pdb <psf file> <xmlfile> <xscfile(optional)>"
+else
+ xmlfile=$2
+fi
+
+~/scripts/omm2xyz $xmlfile
+xyzfile=${xmlfile%%.xml}.xyz
+
+
+echo "
+ mol load psf $psffile
+ mol addfile $xyzfile type xyz
+ " > _temp_
+
+# note: the xsc file MUST be named <something>.xsc, otherwise VMD will not read the cell properly
+if [ ! -z $3 ] ; then
+ xscfile=$3
+ echo "
+ package require pbctools
+ pbc readxst \"$xscfile\" -now
+ set cell [pbc get -now];
+ foreach {dx dy dz} \$cell break;
+# puts \"\$dx \$dy \$dz\"
+ pbc wrap -compound res -sel \"water or ion\"
+ " >> _temp_
+fi
+pdbfile=${xyzfile%.*}.pdb
+
+echo "
+ animate write pdb $pdbfile
+ " >> _temp_
+
+vmd -dispdev text < _temp_
+rm -f _temp_
+
+# make sure to remove CRYST1 because OMM will use it to set crystal cell parameters
+sed -i "s/CRYST1/REMARK/" $pdbfile

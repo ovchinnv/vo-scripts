@@ -1,0 +1,83 @@
+* build structure files
+*
+
+set version 36
+
+if @?clib eq 0 set clib ~/scripts/charmm
+if @?plast eq 0 set plast cter
+
+stream @{clib}/readpsf36.str
+
+if @?nseg eq 0 set nseg 1
+
+set iseg 1
+label segloop
+
+set name @segid@@{iseg}
+set file @file@@{iseg}
+
+read sequ pdb name @file.pdb
+generate @{name} setup warn first @pfirst last @plast
+! apply patches, if supplied
+if @?patchfile ne 0 then
+ stream @patchfile
+ autogen angl dihe
+endif
+!
+!
+set last ?nres
+!
+if @?fixpdb ne 0 then
+ rename atom CD1 sele type CD .and. resname ILE end ! could already be done in getchain
+ rename atom O sele type OT1  .and. resid @last end
+ rename atom OXT sele type OT2  .and. resid @last end
+endif
+
+read coor pdb name @file.pdb resid
+! to orient with a reference structure
+if @?refpdb ne 0 then
+ read coor pdb name @refpdb resid comp
+ coor orie rms mass
+endif
+
+if @?fixpdb ne 0 then
+ rename atom CD  sele type CD1 .and. resname ILE end
+ rename atom OT1 sele type O  .and. resid @last end
+ rename atom OT2 sele type OXT  .and. resid @last end
+endif
+
+join @name renu
+
+incr iseg by 1
+
+if @iseg le @nseg -
+goto segloop
+
+
+! missing
+print coor sele .not. ( init .or. hydrogen ) end
+! add disulfides
+stream @{clib}/disu.str
+autogen angl dihe
+
+define xray sele init end
+scalar wmain set 1 sele xray end
+print coor select .not. (init .or. hydrogen) end
+
+ic param
+ic fill preserve
+ic build
+print coor select .not. (init .or. hydrogen) end
+
+coor init sele hydro end
+
+hbuild
+print coor sele .not. init end
+
+energy
+
+set name @output
+write psf card name @{name}.psf
+write coor card name @name.cor
+write coor pdb name @name.pdb ! overwrite original pdb
+

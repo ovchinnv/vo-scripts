@@ -1,7 +1,7 @@
 * script to create a water box of prescribed dimensions; i.e. to solvate a protein
 *
 ! NAMES WAT* must not be taken
-!
+! (notre : script not necessarily faster than wcube)
 !
 if @?toppar .ne. 0 goto skiptop ! skip topology reading
 

@@ -13,12 +13,12 @@ stream @{clib}/readpsf36.str
 ! need to define replacement candidates & set "ionsneeded" & "ion"; segment wat needs to contain solvent molecules
 ! ionseg is the number of ion segment
 
-set protein ( .not. segid WAT )
+set protein ( .not. (segid WAT .or. segid TIP3) )
 scalar wcomp set 0 select all end
 scalar wcomp set 1 select @protein end ! this avoids long strings, which might bomb CHARMM
 set protein ( prop wcomp .eq. 1 )
 
-set candidates  .byres. (.not. ( @protein .around. 5 ) ) .and. segid wat
+set candidates  .byres. (.not. ( @protein .around. 5 ) ) .and. (segid wat .or. segid TIP3)
 
 define waters select segid wat .and. type OH2 end
 set nwat ?nsel
@@ -51,12 +51,18 @@ stream @{clib}/addions.str
 write psf @format name @{psffile}n.psf xplor
 ! standard psf
 write psf oldpsf @format name @{psffile}no.psf
-write coor @format name @{corfile}n.cor  
-write coor pdb name @{corfile}n.pdb
+if @?corfile ne 0 set outfile @corfile
+if @?pdbfile ne 0 set outfile @pdbfile
+! put radii into occupancy column for watershell plugin
+!scalar OCCU = RADIUS
+write coor @format name @{outfile}n.cor
+write coor pdb name @{pdbfile}n.pdb
+
 !write coor pdb name myosolv.pdb
 !if ( ?CGTOT .ae. 0 ) system "echo ERROR: could not balance charge"
 
 show ?CGTOT
+
 
 goto kill
 

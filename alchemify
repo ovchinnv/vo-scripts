@@ -1,0 +1,56 @@
+#!/bin/bash
+# add NB exclusions to a psf file
+# quick and dirty prototype
+
+tmpfile=_tmp;
+
+if [ -z $1 ] ; then 
+ echo "USAGE : alchemify <input_psf> <num_groups> <marked_pdb_file>"
+ exit 1;
+else
+ psfin=$1
+fi
+#
+if [ -z $2 ] ; then 
+ echo "USAGE : alchemify <input_psf> <num_groups> <marked_pdb_file>"
+ exit 1;
+else
+ ngrp=$2
+fi
+#
+if [ -z $3 ] ; then 
+ echo "USAGE : alchemify <input_psf> <num_groups> <marked_pdb_file>"
+ exit 1;
+else
+ pdbin=$3
+fi
+#
+
+
+# extract exclusion list from bfactor columns in the pdb file
+echo -n > $tmpfile
+for igrp in `seq 1 $ngrp` ; do
+ glist=(`awk -v igrp=$igrp '$10 == igrp {print $2}' $pdbin`)
+ echo ${glist[@]} >> ${tmpfile}
+done
+natoms=`grep NATOM $psfin | awk '{print $1}'`;
+
+qext=`grep EXT $psfin`;
+if [ -z "$qext" ]; then
+ qext=0;
+else
+ qext=1;
+fi
+
+# create exclusion list in matlab
+echo "natom=$natoms ; qext=$qext ; nbxfile='$tmpfile' ; outfile='$tmpfile' ; addpath('~/scripts/matlab/') ; run nbexpsf.m" | octave
+
+# write new psf : 
+# part of psf before exclusions
+~/scripts/xtext $psfin PSF '!NNB' 0 -2 #> $psfout
+# new exclusion list
+cat ${tmpfile} #>> $psfout
+echo #>> $psfout # extra line
+# part of psf after exclusions and through to the end
+~/scripts/xtext $psfin '!NGRP' #>> $psfout
+rm ${tmpfile}

@@ -1,0 +1,15 @@
+#!/bin/bash
+# extract potential energy from CHOMM.py output
+
+if [ -z "$1" ]; then
+ echo "USAGE : ./gete <output file>";
+ exit 1;
+fi
+
+files=${@}
+
+for f in $files ; do
+# echo $f
+#assume that the valid lines have time steps that are multiples of 10; convert to kcal / mol
+ grep -e "^[1-9][0-9]*00\+ " $f | awk '{print $1" " $2 / 4.184 }'
+done

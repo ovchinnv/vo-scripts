@@ -1,0 +1,7 @@
+to patch : 
+
+generate 
+diff --text --unified=3 p.py pdbfile.py > pdbfile.diff 
+
+apply
+patch -El < pdbfile.diff 

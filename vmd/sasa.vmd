@@ -28,7 +28,7 @@ for { set i 0 } { $i<$nf } { incr i } {
 # save to file
 if { ![info exists "sasaname"] } {
  set d [exec date +%d-%m-%y];
- set sasname "sasa$d.dat"
+ set sasaname "sasa$d.dat"
 }
 set fid [open "$sasaname" w+];
 foreach s $sasa { puts $fid "$s" }

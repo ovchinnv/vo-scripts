@@ -43,6 +43,12 @@ if 1:
  except NameError:
   pbc=0
 #
+ if (pbc):
+  try :
+   resetcell
+  except NameError:
+   resetcell=0
+#
  try :
   pme
  except NameError:
@@ -75,6 +81,11 @@ if 1:
   struna
  except NameError:
   struna=0
+#
+ try :
+  dynamo
+ except NameError:
+  dynamo=0
 #
  try :
   platformName
@@ -162,7 +173,7 @@ if 1:
 #========================================================
  if (pbc):
   dprint("Periodic boundary conditions will be used")
-  if (not restart):
+  if (not restart or resetcell):
    try :
     dx; dy; dz; # check if dimensions are specified manually
    except NameError:
@@ -208,8 +219,11 @@ if 1:
    nbondMethod=app.CutoffPeriodic
    dprint("PME is off");
  else:
-  psf.setBox(1000*u.angstrom, 1000*u.angstrom, 1000*u.angstrom) # set to a very large box to eliminate wrapping
-  nbondMethod=app.CutoffNonPeriodic
+  if (cutoff>0):
+   nbondMethod=app.CutoffNonPeriodic
+   psf.setBox(1000*u.angstrom, 1000*u.angstrom, 1000*u.angstrom) # set to a very large box to eliminate wrapping
+  else:
+   nbondMethod=app.NoCutoff
 #===================================================== SHAKE
  if (shake==1):
   cons=app.HBonds
@@ -237,8 +251,8 @@ if 1:
   system=psf.createSystem(params,
                          nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
                          constraints=cons, removeCMMotion=False, hydrogenMass=hmass*u.amu, rigidWater=rigidWater,
-                         verbose=False);
-
+                         verbose=True);
+# NOTE : I prefer not to use the COM motion removal above
 #================= harmonic restraints from file, a la NAMD/ACEMD
  if (constraints) :
   if (conscol==1): # beta
@@ -275,10 +289,14 @@ if 1:
   dprint("Harmonic force constants will be scaled uniformly by x"+str(constraintscaling));
   system.addForce(force)
 #
-#================= string plugin
+#================= string plugin (baskward compatibility)
  if (struna==1) :
   from openmmstruna import *
   system.addForce(StrunaForce(strunaConfig, strunaLog))
+#================= dynamo (master) plugin
+ if (dynamo==1) :
+  from openmmdynamo import *
+  system.addForce(DynamoForce(dynamoConfig, dynamoLog))
 #================= add integrator :
  dprint("Configuring integrator");
 # first, add barostat if requested :

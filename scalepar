@@ -1,0 +1,133 @@
+#!/bin/bash
+# scale parameters for RLES; based loosely on mergepar
+#
+
+narg=${#@}; # number of arguments
+info=" SCALEPAR: ====>";
+
+if [ $narg -lt 2 ] ; then
+ echo "$info USAGE : ./scalepar <parfile_1>...<parfile_n> <scale>"
+ exit
+fi
+
+scale=$BASH_ARGV;# last argument
+# test whether last argument is numeric :
+re='^[0-9]*([.][0-9]*)?$'
+if ! [[ $scale =~ $re ]] ; then
+ echo "$info Invalid scaling value ($scale) received"
+ echo "$info USAGE : ./scalepar <parfile_1>...<parfile_n> <scale>"
+else
+ scale=`echo "scale=10 ; 1 * $scale" | bc -l`
+ echo "$info Will change parameter values to scale energy by x $scale"
+ if [ "x$scale" == "x0" ] ; then
+  echo "$info Surely, you must be kidding. Bye"
+  exit
+ fi
+fi
+
+outpar=scaledpar.par
+echo -n > $outpar
+
+echo "* combined CHARMM parameter file; generated automatically for ${outpar}" > _header
+echo -n > _bond
+echo -n > _angl
+echo -n > _dihe
+echo -n > _impr
+echo -n > _cmap
+echo -n > _nbnd
+echo -n > _nbfx
+
+args=($@)
+for iarg in `seq 0 $((narg-2))` ; do
+ arg=${args[$iarg]}
+ echo "$info Processing file "$arg"..."
+
+awk 'BEGIN \
+{
+     readbond=0 ; readangl=0 ; readdihe=0 ; readcmap=0 ; readnbnd=0 ; readnbfx=0 ; readimpr=0 ; outfile="/dev/null";
+     prmfile=ARGV[1];
+}
+{
+  if        ( substr($1,0,5) ~ /[Bb][Oo][Nn][Dd][Ss]/) { 
+     readbond=1 ; readangl=0 ; readdihe=0 ; readcmap=0 ; readnbnd=0 ; readnbfx=0 ; readimpr=0  ; outfile="_bond";
+  } else if ( substr($1,0,6) ~ /[Aa][Nn][Gg][Ll][Ee][Ss]/) { 
+     readbond=0 ; readangl=1 ; readdihe=0 ; readcmap=0 ; readnbnd=0 ; readnbfx=0 ; readimpr=0  ; outfile="_angl";
+  } else if ( substr($1,0,4) ~ /[Dd][Ii][Hh][Ee]/) { 
+     readbond=0 ; readangl=0 ; readdihe=1 ; readcmap=0 ; readnbnd=0 ; readnbfx=0 ; readimpr=0  ; outfile="_dihe";
+  } else if ( substr($1,0,4) ~ /[Ii][Mm][Pp][Rr]/) { 
+     readbond=0 ; readangl=0 ; readdihe=0 ; readcmap=0 ; readnbnd=0 ; readnbfx=0 ; readimpr=1  ; outfile="_impr";
+  } else if ( substr($1,0,4) ~ /[Cc][Mm][Aa][Pp]/) { 
+     readbond=0 ; readangl=0 ; readdihe=0 ; readcmap=1 ; readnbnd=0 ; readnbfx=0 ; readimpr=0  ; outfile="_cmap";
+  } else if ( substr($1,0,4) ~ /[Nn][Oo][Nn][Bb]/) { 
+     readbond=0 ; readangl=0 ; readdihe=0 ; readcmap=0 ; readnbnd=1 ; readnbfx=0 ; readimpr=0  ; outfile="_nbnd";
+  } else if ( substr($1,0,4) ~ /[Nn][Bb][Ff][Ii]/) { 
+     readbond=0 ; readangl=0 ; readdihe=0 ; readcmap=0 ; readnbnd=1 ; readnbfx=1 ; readimpr=0  ; outfile="_nbfx";
+  } else if ( ( substr($1,0,3) ~ /[Ee][Nn][Dd]/) || (substr($1,0,2) ~ /[Ii][Cc]/) || (substr($1,0,5) ~ /[Dd][Oo][Nn][Oo]/) \
+     || (substr($1,0,4) ~ /[Aa][Cc][Cc][Ee]/) ) { 
+     readbond=0 ; readangl=0 ; readdihe=0 ; readcmap=0 ; readnbnd=0 ; readnbfx=1 ; readimpr=0  ; outfile="/dev/null";
+  }
+    else if ((substr($1,0,1)!="!") && (substr($1,0,5) !~ /[Cc][Uu][Tt][Nn][Bb]/) && (substr($1,0,5) !~ /[Hh][Bb][Oo][Nn][Dd]/)) {
+     print $0 >> outfile
+  }
+ }
+ ' $arg
+
+done
+#
+# ad hoc : remove nbfix entry
+#SOD    OCL      -0.075020   3.190 ! For lipid carboxylate groups
+#sed -i 's/.*For lipid carboxylate groups//' _nbfx
+
+# now scale all energy terms
+echo "! NOTE : ALL BONDED ENERGIES WILL BE SCALED BY x$scale" >> _header
+echo "! RELATIVE TO THE ORIGINAL UNMODIFIED PARAMETERS" >> _header
+echo "! NONBONDED PARAMETERS ARE NOT SCALED BECAUSE OF GEOMETRIC">> _header
+echo "! EPSILON COMBINATION RULE, WHICH MAKES THE VDW ENERGY NONLINEAR" >>_header
+echo "! IN THEM" >> _header
+echo "!" >> _header
+# make sure the header makes it clear this is not a good parameter file
+fmt='"%.5f"';
+cmapfmt='"%8.6f"';
+# bonds :
+awk -v scale=$scale "{ if (NF > 1 ) {V=sprintf($fmt,\$3*scale); sub(\$3,V); print}}" _bond >__bond
+# angles :
+#awk -v scale=$scale "{ if (NF > 1 ) {V=sprintf($fmt,\$4*scale); sub(\$4,V)};print}" _angl >__angl
+#awk -v scale=$scale "{ if (NF > 1 ) {V=sprintf($fmt,\$4*scale); sub(\$4,V); if (NF>6) {if ( \$6 != \"!\" ) {V=sprintf($fmt,\$6*scale); sub(\$6,V)}}}; print}" _angl >__angl #! incl UB
+awk -v scale=$scale "{ if (NF > 1 ) {V=sprintf($fmt,\$4*scale); sub(\$4,V); if (NF>6) {if ( \$6 != \"!\" ) {V=sprintf($fmt,\$6*scale); sub(\" \"\$6,\" \"V)}}}; print}" _angl >__angl #! incl UB
+#exit
+# dihedrals :
+awk -v scale=$scale "{ if (NF > 1 ) {V=sprintf($fmt,\$5*scale); sub(\$5,V)}; print}" _dihe >__dihe
+# impropers :
+awk -v scale=$scale "{ if (NF > 1 ) {V=sprintf($fmt,\$5*scale); sub(\$5,V)}; print}" _impr >__impr
+# CMAP (slighty more complicated)
+#awk -v scale=$scale "{ for (i=1 ; i<=NF ; i++ ) { if (\$i ~ /^[0-9]*([.][0-9]+)?\$/) {V=sprintf($cmapfmt,\$i*scale); sub(\$i,V)}}; print}" _cmap >__cmap
+#awk -v scale=$scale "{ for (i=1 ; i<=NF ; i++ ) { if (\$i ~ /^(-)?[0-9]*([.][0-9]+)?\$/) {V=sprintf($cmapfmt,\$i*scale); sub(\$i,V)}}; print}" _cmap >__cmap
+awk -v scale=$scale "{ for (i=1 ; i<=NF ; i++ ) { if (\$i ~ /^(-)?[0-9]*[.][0-9]+\$/) {V=sprintf($cmapfmt,\$i*scale); sub(\$i,V)}}; print}" _cmap >__cmap
+#nonbnded :
+# NOTE : this is not so useful b/c of geometric eps combination rules which make the vdw energy nonlinear in the parameters
+# better to simply use alcemical functionalities (i.e. annihilate elect + vdw ; keep bonded, which are scaled explicitly)
+awk -v scale=$scale "{ if (NF > 1 ) {V=sprintf($fmt,\$3*scale); sub(\$3,V)}; print}" _nbnd >__nbnd
+#nbfix :
+awk -v scale=$scale "{ if (NF > 1 ) {V=sprintf($fmt,\$3*scale); sub(\$3,V)}; print}" _nbfx >__nbfx
+
+#exit
+# now concatenate
+cat _header     >$outpar
+echo BONDS     >>$outpar
+cat __bond      >>$outpar
+echo ANGLES    >>$outpar
+cat __angl      >>$outpar
+echo DIHEDRALS >>$outpar
+cat __dihe      >>$outpar
+echo IMPROPERS >>$outpar
+cat __impr      >>$outpar
+echo CMAP      >>$outpar
+cat __cmap      >>$outpar
+echo NONBONDED >>$outpar
+cat _nbnd      >>$outpar # use orig
+echo NBFIX     >>$outpar
+cat _nbfx      >>$outpar # use orig
+echo END       >>$outpar
+
+rm -f *_header *_bond *_angl *_dihe *_impr *_cmap *_nbfx *_nbnd
+

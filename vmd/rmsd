@@ -1,0 +1,20 @@
+#!/bin/bash
+
+skip=10;
+vmd -dispdev text <rmsd.vmd
+#echo 'plot "rmsd.dat" w lines ; pause 10; '|gnuplot
+echo 'd=load("rmsd.dat"); plot(d); pause(0);'|octave
+exit 1
+echo '\
+d=load("rmsd.dat");\
+ t=(1:length(d))*0.2;\
+ plot(t,d); \
+ xlabel("t(ns)", "fontsize",14); \
+ ylabel("RMSD(Ang)", "fontsize",14); \
+ set(gca,"fontsize",14); \
+ title("RMSD from initial structure");\
+ title("RMSD from initial structure");\
+ %print(gcf,"-depsc2","rmsd-fad.eps");\
+ '|octave
+gv rmsd.eps
+

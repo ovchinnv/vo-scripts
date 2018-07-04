@@ -21,7 +21,7 @@ awk '
   if (chainID == chain) {
    atomcount=atomcount+1
 
-#   if ($6 == "HIS") sub("HIS", "HSD");
+   if ($6 == "HIS") sub("HIS", "HSD");
    if ($4 == " OXT") sub(" OXT", " OT1");                         # carboxylic end
    if (($6 == "ILE") && ($4 == " CD1")) {
      sub("CD1","CD ");
