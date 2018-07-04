@@ -8,6 +8,6 @@ foreach {dx dy dz} $c break;
 puts "$dx $dy $dz"
 pbc set "$dx $dy $dz" -all
 pbc unwrap -sel "protein" -first first
-pbc wrap -compound res -center com -centersel "protein and noh" -all
+pbc wrap -compound res -center com -centersel "protein and name CA" -all
 #pbc wrap -compound seg -center com -centersel "protein and noh" -all
 

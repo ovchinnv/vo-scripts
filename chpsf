@@ -6,9 +6,17 @@ if [ -z $1 ]; then
  exit 1
 fi
 
-awk 'BEGIN { 
- q=0 ; qatom=0; 
- print " *** Computing total charge in structure file '"$1"'...";
+if [ ! -z $2 ]; then
+ qshow=$2
+else
+ qshow=0;
+fi
+
+awk -v qshow=$qshow 'BEGIN { 
+ q=0 ; qatom=0;
+ if ( !qshow ) {
+  print " *** Computing total charge in structure file '"$1"'...";
+ }
 };
 { 
  if ( $0 ~ /^\s*[0-9]+\s*!\s*[Nn][Aa][Tt][Oo][Mm]*/ ) {
@@ -18,9 +26,12 @@ awk 'BEGIN {
   exit
  } else if ( NF>=7) {
   q+=$7;
+  if ( qshow ) { print $7 };
  }
 }
-END { 
- print " *** "q
+END {
+ if ( !qshow ) {
+  print " *** "q
+ }
 }
 ' $1
