@@ -7,7 +7,7 @@ set clib ~/scripts/charmm
 !set cgenff
 
 stream @{clib}/readpsf36.str
-
+!write coor pdb name debug.pdb
 ! add ions
 ! replace some of the atoms in the selection below
 ! need to define replacement candidates & set "ionsneeded" & "ion"; segment wat needs to contain solvent molecules
@@ -56,7 +56,7 @@ if @?pdbfile ne 0 set outfile @pdbfile
 ! put radii into occupancy column for watershell plugin
 !scalar OCCU = RADIUS
 write coor @format name @{outfile}n.cor
-write coor pdb name @{pdbfile}n.pdb
+write coor pdb name @{outfile}n.pdb
 
 !write coor pdb name myosolv.pdb
 !if ( ?CGTOT .ae. 0 ) system "echo ERROR: could not balance charge"

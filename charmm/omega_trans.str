@@ -1,0 +1,33 @@
+* apply restraints to protein omega angles to
+* keep them near the trans conformation
+*
+
+cons cldh
+
+define todo sele omegas end
+if ?nsel eq 0 then
+ error nothing to do
+endif
+
+if @?kf eq 0  set kf 10 ! the restraints should be as weak as possible (but effective)
+
+label rloop
+
+set residi ?selresi
+set segidi ?selsegi
+
+! next residue :
+define todo sele todo .and. .not. ( segid @segidi .and. resid @residi ) end
+
+set residj ?selresi
+set segidj ?selsegi
+set resname ?selresn
+
+if @resname .eq. PRO goto skip
+if @segidj .ne. @segidi goto skip
+
+cons dihe @segidi @residi CA @segidi @residi C @segidj @residj N @segidj @residj CA min 180 force @kf
+
+label skip
+if ?nsel gt 0 -
+goto rloop
