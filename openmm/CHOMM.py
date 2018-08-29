@@ -78,6 +78,11 @@ if 1:
   implicitSolvent=0
 #
  try :
+  removeCOM
+ except NameError:
+  removeCOM=0
+#
+ try :
   struna
  except NameError:
   struna=0
@@ -221,7 +226,7 @@ if 1:
  else:
   if (cutoff>0):
    nbondMethod=app.CutoffNonPeriodic
-   psf.setBox(1000*u.angstrom, 1000*u.angstrom, 1000*u.angstrom) # set to a very large box to eliminate wrapping
+#   psf.setBox(1000*u.angstrom, 1000*u.angstrom, 1000*u.angstrom) # set to a very large box to eliminate wrapping
   else:
    nbondMethod=app.NoCutoff
 #===================================================== SHAKE
@@ -240,17 +245,17 @@ if 1:
  dprint("Nonbonded cutoff is ",cutoff*u.angstrom,". Switching is active at ",switchdist*u.angstrom)
  if (hmass>1):
   dprint("Hydrogen mass is ",hmass*u.amu)
-
+#
  if (implicitSolvent==1):
   system=psf.createSystem(params,
                          nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
-                         constraints=cons, rigidWater=rigidWater, removeCMMotion=False, hydrogenMass=hmass*u.amu,
+                         constraints=cons, rigidWater=rigidWater, removeCMMotion=removeCOM, hydrogenMass=hmass*u.amu,
                          implicitSolvent=app.OBC2,
-                         verbose=False);
+                         verbose=True);
  else:
   system=psf.createSystem(params,
                          nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
-                         constraints=cons, removeCMMotion=False, hydrogenMass=hmass*u.amu, rigidWater=rigidWater,
+                         constraints=cons, removeCMMotion=removeCOM, hydrogenMass=hmass*u.amu, rigidWater=rigidWater,
                          verbose=True);
 # NOTE : I prefer not to use the COM motion removal above
 #================= harmonic restraints from file, a la NAMD/ACEMD
@@ -260,8 +265,11 @@ if 1:
   elif (conscol==2): #occupancy
    dprint("Adding absolute positional harmonic restraints to atoms marked in the occupancy column of PDB file '"+consfile+"'");
 
-  force=mm.CustomExternalForce("s*0.5*k*periodicdistance(x,y,z,x0,y0,z0)^2");
-#  force=mm.CustomExternalForce("s*0.5*k*( (x-x0)^2 + (y-y0)^2 + (z-z0)^2 )");
+  if (pbc) :
+   force=mm.CustomExternalForce("s*0.5*k*periodicdistance(x,y,z,x0,y0,z0)^2");
+  else :
+   force=mm.CustomExternalForce("s*0.5*k*( (x-x0)^2 + (y-y0)^2 + (z-z0)^2 )");
+#
   force.addPerParticleParameter("k");
   force.addPerParticleParameter("x0");
   force.addPerParticleParameter("y0");
