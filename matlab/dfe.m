@@ -1,4 +1,6 @@
 % compute FE from double half-harmonic window simulations
+% in this version, plot only the forces, not the FE integral
+% to see which windows are converging
 %
 
 close all;
@@ -25,6 +27,7 @@ end
 if (read)
 %%%%%%%%%% process windows
  fbw=0.5; % only applies to the first position component
+ iwin=1; % can be 0 or 1 depending on whether the equilibrium point is included
  nwin=15;
 % nsamples=4;
 % [status, result]=system('grep "will quit" pmf3.out | tail -n1 | awk ''{print $3}'''); nsamples=str2num(result)-1 ; nsamples=nsamples-31 ; % screwed up counts due to crash
@@ -33,11 +36,11 @@ if (read)
  rcind=1 ; %cv index corresponding to the reaction coordinate
 
  clear df ;
- rc=zeros(1,nwin); % reaction coordinate
- for j=1:nwin
+ rc=zeros(1,nwin+1-iwin); % reaction coordinate
+ for j=1:nwin+1-iwin;
 
    ncv=3;
-   fname=['data/fbwin',num2str(j),'.dat'];
+   fname=['data/fbwin',num2str(j-1+iwin),'.dat'];
    dnew=load(fname) ;
    if exist('nsamples')
     d=dnew(1:2*ncv*nsamples,:); % i.e. 2*ncv lines per samples
@@ -55,7 +58,7 @@ if (read)
 %
 % sample limits and number of boxes
    ie   = niter
-%   ib   = 2; % skip per equilibration (10 is the minimum -- old restraints are gradually advanced over 10 iterations)
+   ib   = 2; % skip per equilibration (10 is the minimum -- old restraints are gradually advanced over 10 iterations)
 %   ib = 200 ;
    ib=max(1,round(ie * 0.5));
 %
@@ -64,7 +67,7 @@ if (read)
    end
 % loop over all cvs, and compute PMF derivative
 % first, need the reference position -- open cv.dat file :
-   cvs0 = load(['cv',num2str(j),'.dat']);
+   cvs0 = load(['cv',num2str(j-1+iwin),'.dat']);
    cvs0 = cvs0(rcind);
    rc(j) = cvs0;
 %
@@ -122,52 +125,44 @@ if (read)
 end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % we know that only one cv is present
-dfc=reshape(df(:,1,:), nwin, nbox)' ;
+dfc=reshape(df(:,1,:), nwin+1-iwin, nbox)' ;
 rc0=rc;
 if (0)
 % append 0th point, at which we assume df to be zero (stable eq. simulation)
 % however, this may not be true is the initial condition is not perfect, or the CVs are not perfect
 % in some cases it is best to omit 0th point
- dfc=[zeros(nbox,1) dfc];
+ dfc0=[zeros(nbox,1) dfc0];
  rc0 =[2*rc0(1) - rc0(2), rc0]; % assume uniform interval
 end
 
-% trapezoidal rule
-% compute center derivative
-dfc = 0.5 * ( dfc(:,1:end-1) + dfc(:,2:end) );
-%integral
-fe = [ zeros(nbox,1)  cumsum( dfc.*(ones(nbox,1)*diff(rc0)), 2) ];
-
-%============= PLOT FE =============
+%============= PLOT =============
 if ~nofig
  close all;
  figure('position',[200,200,450,350]); hold on; box on;
 end
 %
 for i=1:nbox
- plot(rc0,fe(i,1:end),[char(styles(mod(i-1,length(styles))+1)),''], 'linewidth', lw)
+% plot(rc,dfc(i,1:end),[char(styles(mod(i-1,length(styles))+1)),''], 'linewidth', lw)
 end
 %
-fave=mean(fe,1);
-fstd=std(fe,1);
-%mean
-%plot(rc0,fave,'k--','linewidth',lw);
-%std
-%plot(alpha,fave+fstd,'k--','linewidth',1);
-%plot(alpha,fave-fstd,'k--','linewidth',1);
-%leg=[leg {['Average']}];
+dfave=mean(dfc,1);
+dfstd=std(dfc,1);
+plot(rc,dfstd,'ko-','linewidth',lw);
+% approximate error in the FE : 
+['RMSD error : ',num2str(norm(dfstd)),' kcal/mol']
 
+%
 legend(leg,4);
 box on;
-ylabel('\it F(\alpha) (kcal/mol)', 'fontsize',14);
+ylabel('\it dF/dx(\alpha) (kcal/mol/A)', 'fontsize',14);
 xlabel('\it x', 'fontsize',14);
 %
 %xlim([0 1]);
 %ylim([0 9]);
 %set(gcf, 'paperpositionmode', 'auto');
-print(gcf, '-dpsc', 'wfe.eps');
+print(gcf, '-dpsc', 'dfe.eps');
 %
-fe-repmat(min(fe,[],2),1,size(fe,2))
-%fe-repmat(fe(:,3),1,size(fe,2))
-mean(ans)
-pause(10)
+% save force std to a text file :
+%dfstd=dfstd'; % transpose
+save -ascii dfe.dat dfstd
+gwin ;% calculate windows to sample
