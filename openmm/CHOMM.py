@@ -5,6 +5,7 @@ import simtk.openmm as mm
 import simtk.unit as u
 from sys import stdout, stderr, exit
 from shutil import move
+import random
 #=====================================================================#
 # define parameters that may not have been defined by user
 #
@@ -98,6 +99,11 @@ if 1:
 # use CUDA unless variable 'platformName' defined
   platformName="CUDA"
 #
+ try :
+  qrandname
+# randomize temporary dcd names to avoid overwrite if running in parallel
+ except NameError:
+  qrandname=1
 #========================== Subroutines
 #==========================
  def dprint(*args):
@@ -394,13 +400,18 @@ if 1:
   printe(simulation);
 #=============== MD simulation
  if (nsteps>0):
-  simulation.reporters.append(app.DCDReporter('output.dcd',dcdfreq));
+  if (qrandname):
+   outdcd='output_'+str(random.randint(1,10000))+'.dcd';
+  else:
+   outdcd='output.dcd'
+#
+  simulation.reporters.append(app.DCDReporter(outdcd,dcdfreq));
   simulation.reporters.append(app.StateDataReporter(stdout, outputfreq, step=True, potentialEnergy=True, kineticEnergy=True, speed=True, temperature=True, 
                                                     volume=pbc, separator=' \t '));
   dprint("Running MD simulation for ",nsteps," steps");
   simulation.step(nsteps);
 #==== move dcd file to destination file
-  move('output.dcd', outputName+'.dcd');
+  move(outdcd, outputName+'.dcd');
 
  dprint("Writing simulation restart files");
  simulation.saveState(outputName+'.xml');
