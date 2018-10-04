@@ -14,11 +14,11 @@ read coor card name @corfile
 !
 ! domains
 !
+define consdist sele type CA end
 !define cons sele type CA .or. type N .or. type C .or. type CB end
 !define cons sele type C* end
-!define cons sele type CA end
-! more elaborate constrains on many side chain atoms ; exclude atoms related by symmetry as well as amide O/N
-define cons sele .not. hydrogen .and. .not. -
+! more elaborate restraint : 
+define consrmsd sele .not. hydrogen .and. .not. -
 ( ( ( resname PHE .or. resname TYR ) .and. ( type CD* .or. type CE* ) ) -
  .or. -
  ( ( resname GLU .or. resname ASP .or. resname GLN .or. resname ASN ) .and. ( type OD* .or. type OE* .or. type ND* .or. type NE*) ) -
@@ -33,25 +33,26 @@ define cons sele .not. hydrogen .and. .not. -
  .or. ( type OT1 .or. type OT2 ) -
  .or. ( type N .or. type C .or. type O ) -
 ) end
-!
-define gp120 select ( segid SOS* .or. segid G120 ) .and. cons end
-define ab    select ( segid LC* .or. segid HC* ) .and. cons end
+
+!stream ~/scripts/charmm/resatom.str ! do not know why this does not work
+define ha    select ( segid HA* ) end
+define ab    select ( segid LC* .or. segid HC* ) end
 define move  select ( segid LC* .or. segid HC* ) end
 !
 ! write a pdb with the coordinates marked for restraints
 scalar wmain set 0
-scalar wmain set 1 sele gp120 end
-scalar wmain set 2 sele ab end
+scalar wmain set 1 sele ha .and. consrmsd end
+scalar wmain set 2 sele ab .and. consrmsd end
 write coor pdb name @{name}_sm.pdb
-!write coor card name @{name}_sm.cor ! need a coordinate file because the number of atoms is too large for PDB format
+write coor card name @{name}_sm.cor ! need a coordinate file because the number of atoms is too large for PDB format
 !
 ! compute displacement coordinates
-coor stat sele gp120 end mass ! will be pushing away from this fragment
+coor stat sele ha .and. consdist end mass ! will be pushing away from this fragment
 set x0 ?xave
 set y0 ?yave
 set z0 ?zave
 
-coor stat sele ab end mass ! will be pushing this fragment
+coor stat sele ab .and. consdist end mass ! will be pushing this fragment
 set x1 ?xave
 set y1 ?yave
 set z1 ?zave
@@ -83,17 +84,17 @@ set S string colvar
 @S init
 
 ! to express in a local frame :
-!@S add frame sele gp120 end ! distance vector will be expressed in this frame
+!@S add frame sele ha end ! distance vector will be expressed in this frame
 ! write initial frame
 !@S frame fill
 !@S frame write name iframe.dat
 !stop
-@S add dist_com sele gp120 end sele ab end frame 0 vector 0 0 0 ! @dx1 @dy1 @dz1 ! vector will be computed upon first calculation
-@S add dist_com sele gp120 end sele ab end frame 0 ortho vector 0 0 0 ! @dx1 @dy1 @dz1
+@S add dist_com sele ha .and. consdist end sele ab .and. consdist end frame 0 vector 0 0 0 ! @dx1 @dy1 @dz1 ! vector will be computed upon first calculation
+@S add dist_com sele ha .and. consdist end sele ab .and. consdist end frame 0 ortho vector 0 0 0 ! @dx1 @dy1 @dz1
 ! also add orientation rmsd
-@S add rmsd orient sele ab end mass rms sele ab end noro
+@S add rmsd orient sele ab .and. consrmsd end mass rms sele ab .and. consrmsd end noro
 ! also add rmsd restraint for antigen
-@S add rmsd orient sele gp120 end mass rms sele gp120 end noro notr
+@S add rmsd orient sele ha .and. consrmsd end mass rms sele ha .and. consrmsd end noro notr
 !
 !@S frame list
 @S fill ! compute cv values (and projection vector above)
@@ -125,13 +126,15 @@ label win
 goto skipmini
 ! save coordinates after short minimization
  cons harm clear
- cons harm sele type CA end force 5
+ cons harm sele type CA end force 10
  mini conj nstep 100
  mini abnr nstep 100
 label skipmini
-! write coor pdb name @{name}_@{iwin}.pdb
+ write coor pdb name @{name}_@{iwin}.pdb
 !
  incr iwin
- if @iwin .le. @nwin -
+! "cheat" to add an extra window:
+ calc im1 = @iwin - 1
+! if @iwin .le. @nwin -
+ if @im1 .le. @nwin -
 goto win
-
