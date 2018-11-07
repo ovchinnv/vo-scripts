@@ -1,7 +1,9 @@
 % compute FE from double half-harmonic window simulations
 % plot pmf at the last point as a function of time
 %
-
+clear graphics_toolkit;
+graphics_toolkit('gnuplot');
+%
 close all;
 
 if ~exist('styles')
@@ -26,12 +28,12 @@ end
 if (read)
 %%%%%%%%%% process windows
  fbw=0.5; % only applies to the first position component
- iwin=1; % can be 0 or 1 depending on whether the equilibrium point is included
+ iwin=0; % can be 0 or 1 depending on whether the equilibrium point is included
  nwin=8;
 % nsamples=4;
 % [status, result]=system('grep "will quit" pmf3.out | tail -n1 | awk ''{print $3}'''); nsamples=str2num(result)-1 ; nsamples=nsamples-31 ; % screwed up counts due to crash
 % [status, result]=system('grep "will quit" pmf2.log | tail -n1 | awk ''{print $3}'''); nsamples=str2num(result)-251 ;
- nbox=2; % number of statistical samples
+ nbox=4; % number of statistical samples
  rcind=1 ; %cv index corresponding to the reaction coordinate
 
  clear df ;
@@ -41,7 +43,7 @@ if (read)
  rc=zeros(1,nwin+1-iwin); % reaction coordinate
  for j=1:nwin+1-iwin;
 
-  ncv=3;
+  ncv=4;
   fname=['data/fbwin',num2str(j-1+iwin),'.dat'];
   dnew=load(fname) ;
   if exist('nsamples')
@@ -71,7 +73,7 @@ end % read
 % loop over sample limits
 ncv=1;
 maxiter=min(niters);
-miniter=floor(maxiter*0.01);
+miniter=floor(maxiter*0.1);
 istep=100;
 tfac=40/1000 ; %time interval per slice
 fmax=[];
@@ -163,10 +165,14 @@ for niter = miniter:istep:maxiter
 %integral
  fe = [ zeros(nbox,1)  cumsum( dfc.*(ones(nbox,1)*diff(rc0)), 2) ];
 
+% (optional) : loop over all fe curve instances, and set minimum FE to zero before averaging
+ for i=1:nbox
+  fe(i,:)=fe(i,:)-min(fe(i,:));
+ end
 %
  fave=mean(fe,1);
  fstd=std(fe,1);
- fmax=[fmax fave(end)];
+ fmax=[fmax fave(end)-min(fave)];
  ferr=[ferr fstd(end)];
 %
 end % time
@@ -175,16 +181,31 @@ end % time
 if ~nofig
  close all;
  figure('position',[200,200,450,350]); hold on; box on;
+ errorbar(tsamp,-fmax,ferr,'ko-');
+%
+% figure('position',[200,200,450,350]); hold on; box on;
+% plot(tsamp,ferr,'kx'); hold on ; 
+% plot(tsamp,tsamp.^(-1/2) * ferr(1) * sqrt(tsamp(1)) ,'k--'); % theoretical curve
+% set(gca, 'xscale','log');
+% set(gca, 'yscale','log');
 end
-errorbar(tsamp,fmax,ferr);
+
+%errorbar(tsamp,-fmax,'ko-'); % does not work w/o line style !
 leg='FE of AB/AG separation';
-legend(leg,1);
+legend(leg,4);
 box on;
 ylabel('\it F(t) (kcal/mol)', 'fontsize',14);
 xlabel('\it t(ns)', 'fontsize',14);
 
 set(gcf, 'paperpositionmode', 'auto');
-print(gcf, '-dpsc', 'wfet.eps');
-
+%print(gcf, '-depsc2', 'wfet.eps', '-tight');
+%graphics_toolkit('fltk') ; %grashes gs
+%graphics_toolkit('gnuplot') ; %grashes gs
+print('wfet.eps', '-depsc2');
+%
 fmax
 ferr
+pause(1000)
+
+save -mat wfet.mat tsamp fmax ferr
+
