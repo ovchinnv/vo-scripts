@@ -1,0 +1,25 @@
+#!/bin/bash
+# plot surface energy from watershell log file
+
+if [ -z "$1" ]; then
+ echo "USAGE : ./getse <watershell log file(s)>";
+ exit 1;
+fi
+
+files=${@}
+
+sefile="se.dat"
+echo -n > $sefile
+
+for f in $files ; do
+# echo $f
+ grep -e "Surface energy" $f | awk '{print $3}' >> $sefile
+done
+
+echo "graphics_toolkit('gnuplot');\
+      e=load('$sefile'); \
+      fprintf('%12.5f',mean(e));\
+      fprintf('+/-%12.5f\n',std(e));\
+      hist(e,20) ;\
+       pause(10);" | octave
+
