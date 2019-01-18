@@ -1,0 +1,80 @@
+--- charmmpsffile.py	2018-10-30 16:01:31.000000000 -0400
++++ charmmpsffile.py	2018-10-30 17:02:04.865295608 -0400
+@@ -128,6 +128,7 @@
+     - cmap_list
+     - donor_list    # hbonds donors?
+     - acceptor_list # hbond acceptors?
++    - nonbonded exclusion list (added by VO 2.18)
+     - group_list    # list of nonbonded interaction groups
+ 
+     Four additional lists for Drude psf:
+@@ -335,6 +336,27 @@
+             id2 = holder[2*i+1] - 1
+             acceptor_list.append(AcceptorDonor(atom_list[id1], atom_list[id2]))
+         acceptor_list.changed = False
++        # Read nonbonded exclusion list (VO)
++        nnbx = conv(psfsections['NNB'][0], int, 'number of nonbonded exclusions')
++        holder = psfsections['NNB'][1]
++        nbx_list = TrackedList()
++        if len(holder) != nnbx + natom: # the NNB list is followed by indices/pointers into the NNB list that correspond to the list end for each atom
++            raise CharmmPSFError('Got %d entries for nonbonded exclusion section, expected %d' %
++                                 (len(holder), nnbx + natom))
++#debug print
++#        print(*holder);
++#        print(" DEBUG ====> Number of exclusions in the PSF:", nnbx)
++        for i in range(nnbx): # read exclusion list
++            id1 = holder[i] - 1;
++            nbx_list.append(atom_list[id1]);
++        nbx_list.changed=False;
++        # Read exclusion pointer list
++        nbxptr_list = TrackedList()
++        for i in range(natom):
++            id1 = holder[i+nnbx]; # note no offset here
++            nbxptr_list.append(id1);
++        nbxptr_list.changed=False;
++        # End read nonbonded exclusion list (VO)
+         # Now get the group sections
+         group_list = TrackedList()
+         try:
+@@ -441,6 +463,8 @@
+         self.cmap_list = cmap_list
+         self.donor_list = donor_list
+         self.acceptor_list = acceptor_list
++        self.nbx_list = nbx_list ; # nonbonded exclusion list
++        self.nbxptr_list = nbxptr_list ; # nonbonded exclusion pointer list
+         self.group_list = group_list
+         self.title = title
+         self.flags = psf_flags
+@@ -1334,6 +1358,9 @@
+                         for j in range(i):
+                             force.addException(excludeterm[j], excludeterm[i], 0.0, 0.1, 0.0)
+         # Exclude all bonds and angles, as well as the lonepair/Drude attached onto them
++        if verbose: print("Adding nonbonded exclusions from PSF...")
++        nbex=0; # keep track of number of exceptions
++        nbx_ptr_beg=0 ; # pointer to the beginning of the excluded atom list ; VO 2/18
+         for atom in self.atom_list:
+             for atom2 in atom.bond_partners:
+                 if atom2.idx > atom.idx:
+@@ -1350,6 +1377,22 @@
+                 if ((atom.idx, atom2.idx) in excluded_atom_pairs):
+                     continue
+                 force.addException(atom.idx, atom2.idx, 0.0, 0.1, 0.0)
++            # Add exclusions from PSF (VO)
++            idx1=atom.idx ; # index of this atom
++            nbx_ptr_end=self.nbxptr_list[idx1];
++            for i in range(nbx_ptr_beg, nbx_ptr_end):
++                atom2=self.nbx_list[i] ; # index of second atom in pairwise exception
++#                print("Adding nonbonded exception between atom #",atom.idx, "and atom #",atom2.idx);
++                # make sure that the exclusion is not already added
++                if atom2 in atom.bond_partners: continue
++                if atom2 in atom.angle_partners: continue
++                if atom2 in atom.dihedral_partners: continue # in this case, preserve scaled 1/4 interactions, rather than deleting them (rather arbitrary idea)
++                force.addException(idx1, atom2.idx, 0.0, 0.1, 0.0) ; # attempt to add exclusions as in the list, assuming no errors in PSF
++                nbex+=1;
++            nbx_ptr_beg=nbx_ptr_end; # beginning index for the next atom
++        if verbose: print("Added",nbex,"nonbonded exclusions from PSF...")
++        # End add exclusions from PSF (VO)
++
+         system.addForce(force)
+ 
+         # Add Drude particles (Drude force)
