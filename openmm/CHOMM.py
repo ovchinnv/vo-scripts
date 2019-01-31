@@ -363,9 +363,12 @@ if 1:
 #
  dprint("Initializing compute platform ",platformName);
  platform=mm.Platform.getPlatformByName(platformName);
- properties={'CudaPrecision': 'mixed'};
  dprint("Preparing simulation topology");
  if (platformName=="CUDA") :
+  properties={'CudaPrecision': 'mixed'};
+  simulation=app.Simulation(psf.topology, system, integrator, platform, properties);
+ elif (platformName=="OpenCL") :
+  properties={'OpenCLPrecision': 'mixed'};
   simulation=app.Simulation(psf.topology, system, integrator, platform, properties);
  else :
   simulation=app.Simulation(psf.topology, system, integrator, platform);
