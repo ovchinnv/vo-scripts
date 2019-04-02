@@ -378,10 +378,18 @@ if 1:
    cor=app.CharmmCrdFile(corfile);
    dprint("Setting simulation coordinates from file '",corfile,"'");
    simulation.context.setPositions(cor.positions);
+   if (velcorfile!=None):
+    vel=app.CharmmCrdFile(velcorfile);
+    dprint("Setting simulation velocities from file '",velcorfile,"'");
+    simulation.context.setVelocities(vel.positions);
   else:
    pdb=app.PDBFile(pdbfile);
    dprint("Setting simulation coordinates from file '",pdbfile,"'");
    simulation.context.setPositions(pdb.positions);
+   if (velpdbfile!=None):
+    vel=app.PDBFile(velpdbfile);
+    dprint("Setting simulation velocities from file '",velpdbfile,"'");
+    simulation.context.setVelocities(vel.positions);
  else :
   dprint("Setting simulation restart data from file '",restartfile,"'");
   with open(restartfile, 'r') as f:
@@ -428,3 +436,8 @@ if 1:
  fxsc.close();
 #==== reset switching distance
  del switchdist;
+ if (dynamo): # dynamo is somewhat problematic upon run continuation, need a complete reinit because the end of each run destroys the dynamo object
+  del system;
+  del simulation;
+#  if (alch):
+#   del alchsystem;
