@@ -26,5 +26,5 @@ echo "graphics_toolkit('gnuplot');\
       e=e(:,4) ; \
       fprintf('%12.5f',mean(e));\
       fprintf('+/-%12.5f\n',std(e));\
-      hist(e,25) ;\
+      hist(e,10) ;\
       pause(100);" | octave
