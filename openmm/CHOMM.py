@@ -251,17 +251,28 @@ if 1:
  dprint("Nonbonded cutoff is ",cutoff*u.angstrom,". Switching is active at ",switchdist*u.angstrom)
  if (hmass>1):
   dprint("Hydrogen mass is ",hmass*u.amu)
-#
- if (implicitSolvent==1):
-  system=psf.createSystem(params,
+  if (implicitSolvent==1):
+   system=psf.createSystem(params,
                          nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
                          constraints=cons, rigidWater=rigidWater, removeCMMotion=removeCOM, hydrogenMass=hmass*u.amu,
                          implicitSolvent=app.OBC2,
                          verbose=True);
- else:
-  system=psf.createSystem(params,
+  else:
+   system=psf.createSystem(params,
                          nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
                          constraints=cons, removeCMMotion=removeCOM, hydrogenMass=hmass*u.amu, rigidWater=rigidWater,
+                         verbose=True);
+ else:
+  if (implicitSolvent==1):
+   system=psf.createSystem(params,
+                         nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
+                         constraints=cons, rigidWater=rigidWater, removeCMMotion=removeCOM,
+                         implicitSolvent=app.OBC2,
+                         verbose=True);
+  else:
+   system=psf.createSystem(params,
+                         nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
+                         constraints=cons, removeCMMotion=removeCOM, rigidWater=rigidWater,
                          verbose=True);
 # NOTE : I prefer not to use the COM motion removal above
 #================= harmonic restraints from file, a la NAMD/ACEMD
@@ -428,3 +439,6 @@ if 1:
  fxsc.close();
 #==== reset switching distance
  del switchdist;
+ if (dynamo):
+  del simulation;
+  del system;
