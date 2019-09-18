@@ -1,5 +1,4 @@
 #!/bin/tcl
-
 pbc readxst ${xscfile} -all
 set cell [pbc get -first first -last 0];
 # now set the same cell on all frames
