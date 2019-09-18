@@ -16,6 +16,11 @@ if 1:
   corfile=None
 #
  try :
+  velpdbfile
+ except NameError:
+  velpdbfile=None
+#
+ try :
   outputName
  except NameError:
   outputName='output'
@@ -33,6 +38,15 @@ if 1:
   conscol
  except NameError:
   conscol=1
+#
+ try :
+  fixedAtoms
+ except NameError:
+  fixedAtoms=0
+ try :
+  fixedcol
+ except NameError:
+  fixedcol=1
 #
  try :
   switchdist
@@ -264,6 +278,29 @@ if 1:
                          constraints=cons, removeCMMotion=removeCOM, hydrogenMass=hmass*u.amu, rigidWater=rigidWater,
                          verbose=True);
 # NOTE : I prefer not to use the COM motion removal above
+#================= fixed atoms
+ if (fixedAtoms) :
+  if (fixedcol==1): # beta
+   dprint("Fixing atoms marked in the beta column of PDB file '"+fixedfile+"'");
+  elif (fixedcol==2): #occupancy
+   dprint("Fixing atoms marked in the occupancy column of PDB file '"+fixedfile+"'");
+
+# read per atom :
+  res=app.PDBFile(fixedfile);
+  iatom=0; icons=0;
+  for o, b  in zip(res.occupancy, res.temperature_factor) :
+   if (fixedcol==1): # beta
+    bnodim=b/u.angstrom/u.angstrom; # have to deal with units, which are A^2 for B-factors
+   elif (fixedcol==2): #occupancy
+    bnodim=o
+
+   if (bnodim > 0) :
+    icons+=1;
+#   dprint(" Fixing atom ",iatom );
+    system.setParticleMass(iatom, 0*u.dalton);
+   iatom+=1;
+  dprint("Fixed ", icons, " atoms");
+#
 #================= harmonic restraints from file, a la NAMD/ACEMD
  if (constraints) :
   if (conscol==1): # beta
