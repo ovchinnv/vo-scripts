@@ -1,7 +1,5 @@
 % compute FE from double half-harmonic window simulations
 %
-clear graphics_toolkit;
-graphics_toolkit('gnuplot');
 
 close all;
 
@@ -27,26 +25,38 @@ end
 if (read)
 %%%%%%%%%% process windows
  fbw=0.5; % only applies to the first position component
- iwin=0; % can be 0 or 1 depending on whether the equilibrium point is included
- nwin=8;
+ iwin=1; % can be 0 or 1 depending on whether the equilibrium point is included
+ nwin=7;
 % nsamples=4;
 % [status, result]=system('grep "will quit" pmf3.out | tail -n1 | awk ''{print $3}'''); nsamples=str2num(result)-1 ; nsamples=nsamples-31 ; % screwed up counts due to crash
 % [status, result]=system('grep "will quit" pmf2.log | tail -n1 | awk ''{print $3}'''); nsamples=str2num(result)-251 ;
- nbox=3; % number of statistical samples
+ nbox=2; % number of statistical samples
  rcind=1 ; %cv index corresponding to the reaction coordinate
+ irun=1;
+ erun=2;
 
  clear df ;
  rc=zeros(1,nwin+1-iwin); % reaction coordinate
  for j=1:nwin+1-iwin;
 %
-   ncv=4;
-   fname=['data/fbwin',num2str(j-1+iwin),'.dat'];
+  ncv=4;
+  for k=irun:erun
+   fname=['./fbwin',num2str(k),'_',num2str(j-1+iwin),'.dat'];
    dnew=load(fname) ;
    if exist('nsamples')
-    d=dnew(1:2*ncv*nsamples,:); % i.e. 2*ncv lines per samples
+    if k==irun
+     d=dnew(1:2*ncv*nsamples,:); % i.e. 2*ncv lines per samples
+    else
+     d=[d;dnew(1:2*ncv*nsamples,:)]; % i.e. 2*ncv lines per samples
+    end
    else
-    d=dnew;
+    if k==irun
+     d=dnew;
+    else
+     d=[d;dnew];
+    end
    end
+  end
 %
    data=reshape(d,ncv,[])' ;
 %
@@ -142,9 +152,8 @@ dfc = 0.5 * ( dfc0(:,1:end-1) + dfc0(:,2:end) );
 %integral
 fe = [ zeros(nbox,1)  cumsum( dfc.*(ones(nbox,1)*diff(rc0)), 2) ];
 
-% to offset from the end
-%feoff=mean(fe(:,end/2:end),2);
-feoff=min(fe,[],2);
+% to offset from the end : this should expose that the initial replicas are not converging
+feoff=mean(fe(:,end/2:end),2);
 feoffs=repmat(feoff,1,size(fe,2));
 %fe=fe-feoffs;
 %============= PLOT FE =============
@@ -155,17 +164,17 @@ end
 %
 for i=1:nbox
 % plot(rc0,fe(i,1:end),[char(styles(mod(i-1,length(styles))+1)),'o'], 'linewidth', lw)
-%plot(rc0,fe(i,1:end),'ko-');
+ plot(rc0,fe(i,1:end),'ko-');
 end
 %
-fave=mean(fe-feoffs,1);
-fstd=std(fe-feoffs,1);
+fave=mean(fe,1);
+fstd=std(fe,1);
 %mean
-plot(rc0,fave,'k-','linewidth',lw);
+%plot(rc0,fave,'k--','linewidth',lw);
 %std
-plot(rc0,fave+fstd,'k--','linewidth',1);
-plot(rc0,fave-fstd,'k--','linewidth',1);
-leg=[leg {['Average']}];
+%plot(alpha,fave+fstd,'k--','linewidth',1);
+%plot(alpha,fave-fstd,'k--','linewidth',1);
+%leg=[leg {['Average']}];
 
 legend(leg,4);
 box on;
@@ -174,18 +183,15 @@ xlabel('\it x', 'fontsize',14);
 %
 %xlim([0 1]);
 %ylim([0 9]);
-%
 set(gcf, 'paperpositionmode', 'auto');
 print('wfe.eps', '-depsc2')
 %
+feoff=min(fe,[],2);
+feoffs=repmat(feoff,1,size(fe,2));
 fe-feoffs
+%fe-repmat(fe(:,3),1,size(fe,2))
 mean(ans)
-% integrate PMF over binding basin (interface) :
-efe=exp(-(fe-feoffs)/(kboltz*Temp)) ; % exponential factor
-bfe=-kboltz * Temp * log ( diff(rc0) * 0.5*(efe(:,1:end-1)+efe(:,2:end))')
-bfea=mean(bfe)
-bfes=std(bfe)
-
-pause(100)
+pause(10)
 
 save -mat wfe.mat fe feoffs fave fstd rc0 niters
+

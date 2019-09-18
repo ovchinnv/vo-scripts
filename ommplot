@@ -29,8 +29,12 @@ echo "d=load(\"_temp\"); \
  ibeg=round(0.1*length(d(:,step)))
  t=d(ibeg:end,step)
  e=d(ibeg:end,$term)
+ hist(e);
+ figure;
  plot(t, e);
- mean(e)
+ ea=mean(e);
+ es=std(e);
+ fprintf([num2str(ea),' +/- ',num2str(es)]);
  " > _plote;
 #
  if [ ! -z $3 ] && [ ! -z $4 ]; then

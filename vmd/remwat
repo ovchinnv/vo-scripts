@@ -1,21 +1,23 @@
 #!/bin/vmd
 mol delete all
 
-set fpath struc/27/namd/
-set psffile $fpath/../clpx-3hwsi-sn-x
+set fpath .
+set psffile $fpath/struc/dhfr_sn
 mol load psf ${psffile}.psf
 
-set solute  [atomselect top "protein or resname ADP or resname MG or segid XWAT"];
-set solvent [atomselect top "not (protein or resname ADP or resname MG or segid XWAT)"];
+set solute  [atomselect top "protein"];
+set solvent [atomselect top "not protein"];
 
-set nowfile $fpath/clpx_npt_now
+set nowfile $fpath/dhfr-now.dcd
 set nowfiles {}
-set step 5
-set ifile 10
-set nfile 30
-for { set i $ifile } { $i <= $nfile } { incr i } {
+set step 1
+set ifile 0
+set efile 3
+set flag eq
+for { set i $ifile } { $i <= $efile } { incr i } {
+ if { $i > 0 } { set flag nvt } ;
 # read dcd
- set dcdfile $fpath/clpx_npt${i}rd
+ set dcdfile $fpath/dhfr${i}${flag}
  animate read  dcd $dcdfile.dcd beg 0 skip $step waitfor all
  animate write dcd ${dcdfile}_now.dcd beg 0 skip 1 waitfor all sel $solute
  lappend nowfiles ${dcdfile}_now
@@ -25,6 +27,7 @@ for { set i $ifile } { $i <= $nfile } { incr i } {
 foreach dcdfile $nowfiles {break;}
 puts "appending file $dcdfile ..."
 exec catdcd -o $nowfile.dcd $dcdfile.dcd
+exec rm -f $dcdfile.dcd
 #
 for { set i 1 } { $i < [llength $nowfiles] } { incr i } {
  set dcdfile [lindex $nowfiles $i];
@@ -33,3 +36,4 @@ for { set i 1 } { $i < [llength $nowfiles] } { incr i } {
  exec catdcd -o $nowfile.dcd temp $dcdfile.dcd
  exec rm -f $dcdfile.dcd
 }
+exec rm -f temp.dcd
