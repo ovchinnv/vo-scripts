@@ -1,0 +1,63 @@
+#!/bin/vmd
+package require pbctools
+
+set psffile psmr-eth-dmpcn
+set pdbfile psmr-eth-dmpcn-m
+
+mol load psf ${psffile}.psf
+#mol addfile ${pdbfile}.pdb ;# optional initial coordinate file for initial alignment
+set id [ molinfo top ] ;
+
+set qomm 1 ;
+
+if { $qomm == 1} {
+ set basename ../psmr-eth-dmpcn
+ set outname psmr
+ set flag nvt
+ set ifile 109
+ set efile 133
+} else {
+ set basename ../psmr
+ set outname psmr
+ set flag npt
+ set ifile 101
+ set efile 108
+}
+set step 1
+
+for { set i $ifile } { $i <= $efile } { incr i } {
+ set nini [molinfo $id get numframes] ;# initial number of frames
+ set dcdfile ${basename}${i}${flag}
+ animate read dcd $dcdfile.dcd skip $step waitfor all
+ set nfr [molinfo $id get numframes]
+ set xscfile cell.xsc ;# this particular file only has one cell, to abe applied to all frames
+# source unwrap.vmd
+# inlined unwrap :
+#==============================================================================
+ pbc readxst ${xscfile} -all
+ set cell [pbc get -first first -last 0];
+# now set the same cell on all frames
+ foreach c $cell { break; }
+ foreach {dx dy dz} $c break;
+ puts "$dx $dy $dz"
+ pbc set "$dx $dy $dz" -all
+
+ if { ![info exists "pbcfirst"] } {
+  set pbcfirst 0
+ }
+#
+#pbc join res -sel "not ( water or ion )" -first 0 -last $pbcfirst -verbose
+pbc unwrap -sel "protein" -first [expr { $pbcfirst }]
+pbc wrap -compound res -center com -centersel "protein and noh" -all
+#pbc unwrap -sel "protein" -first [expr { $pbcfirst + 1 }]
+#pbc wrap -compound seg -center com -centersel "protein and noh" -all
+#==============================================================================
+# set dcdout ${outname}${i}${flag} ;
+ set dcdout ${basename}${i}${flag} ;# to overwrite
+ animate write dcd ${dcdout}.dcd beg $nini skip $step waitfor all
+# have to choose one or ther other below ; 1 if continuous traj. file history ; two will fail if first frame incorrect
+# (1) 
+ animate delete beg 0 end [expr {$nfr-2}]; # leave one frame behind to facilitate orientation
+# (2) 
+# animate delete beg 0 end [expr {$nfr-1}]; # more robust to delete all but do join on first frame of every traj.
+}

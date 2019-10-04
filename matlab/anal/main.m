@@ -1,5 +1,6 @@
 % MATLAB routines for trajectory analysis
 %
+addpath('~/scripts/matlab/anal')
 name='3bnc60at';
 
 name='ch103t';

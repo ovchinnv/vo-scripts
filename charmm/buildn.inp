@@ -1,23 +1,51 @@
 * build structure files
 *
 
-set version 36
+if @?version set version 36
 
 if @?clib eq 0 set clib ~/scripts/charmm
-if @?plast eq 0 set plast cter
 
-stream @{clib}/readpsf36.str
+if @?nopar eq 0 stream @{clib}/readpsf36.str
 
 if @?nseg eq 0 set nseg 1
 
 set iseg 1
 label segloop
 
-set name @segid@@{iseg}
-set file @file@@{iseg}
+set nm @segid@@{iseg}
 
-read sequ pdb name @file.pdb
-generate @{name} setup warn first @pfirst last @plast
+if @?file@@{iseg} eq 0 then
+ set file @{nm}
+else
+ set file @file@@{iseg}
+endif
+
+if @?seqfile@@{iseg} eq 0 then
+ set seqfile @{nm}
+else
+ set seqfile @seqfile@@{iseg}
+endif
+
+if @?npatch@@{iseg} eq 0 then
+ set pfirst none
+else
+ set pfirst @npatch@@{iseg}
+endif
+
+if @?cpatch@@{iseg} eq 0 then
+ set plast none
+else
+ set plast @cpatch@@{iseg}
+endif
+
+if @?gen@@{iseg} eq 0 then
+ set egen
+else
+ set egen @gen@@{iseg}
+endif
+
+read sequ pdb name @seqfile.pdb
+generate @{nm} setup warn first @pfirst last @plast @egen
 ! apply patches, if supplied
 if @?patchfile ne 0 then
  stream @patchfile
@@ -35,9 +63,11 @@ endif
 
 read coor pdb name @file.pdb resid
 ! to orient with a reference structure
-if @?refpdb ne 0 then
- read coor pdb name @refpdb resid comp
- coor orie rms mass
+if @?refpdb@@{iseg} ne 0 then
+ read coor pdb name @refpdb@@{iseg} resid comp
+ coor swap sele segid @nm end
+ coor orie rms mass comp sele segid @nm end
+ coor swap sele segid @nm end
 endif
 
 if @?fixpdb ne 0 then
@@ -46,7 +76,8 @@ if @?fixpdb ne 0 then
  rename atom OT2 sele type OXT  .and. resid @last end
 endif
 
-join @name renu
+! to renumber residues:
+if @?qrenu eq 1 join @nm renu
 
 incr iseg by 1
 
@@ -57,8 +88,8 @@ goto segloop
 ! missing
 print coor sele .not. ( init .or. hydrogen ) end
 ! add disulfides
-stream @{clib}/disu.str
-autogen angl dihe
+if @?qdisu ne 0 stream @{clib}/disu.str
+!autogen angl dihe
 
 define xray sele init end
 scalar wmain set 1 sele xray end
@@ -76,8 +107,10 @@ print coor sele .not. init end
 
 energy
 
-set name @output
-write psf card name @{name}.psf
-write coor card name @name.cor
-write coor pdb name @name.pdb ! overwrite original pdb
-
+open unit 7 card name @{output}.psf
+write psf card unit 7
+open unit 7 card name @{output}.cor
+write coor card unit 7
+open unit 7 card name @{output}.pdb
+write coor pdb unit 7
+close unit 7
