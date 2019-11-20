@@ -8,10 +8,11 @@ if @?corfile eq 0 set corfile @psffile
 
 if @?clib eq 0 set clib ~/scripts/charmm
 stream @{clib}/readpsf36.str
+coor copy comp
+scalar WCOMP = WMAIN
 
 if @?qfacts ne 0 stream @{clib}/facts.str
 
-coor copy comp
 
 ! reason to use wcomp is that, with FACTS, wmain is overwritten with radii
 cons harm sele prop wcomp .eq. 1 end force 200
