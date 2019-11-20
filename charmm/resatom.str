@@ -1,0 +1,18 @@
+!charmm
+! more elaborate constrains on many side chain atoms ; exclude atoms related by symmetry as well as amide O/N
+define cons sele .not. hydrogen .and. .not. -
+( ( ( resname PHE .or. resname TYR ) .and. ( type CD* .or. type CE* ) ) -
+ .or. -
+ ( ( resname GLU .or. resname ASP .or. resname GLN .or. resname ASN ) .and. ( type OD* .or. type OE* .or. type ND* .or. type NE*) ) -
+ .or. -
+ ( ( resname TRP ) .and. (type *D* .or. type *E* .or. type *Z* ) ) -
+ .or. - 
+ ( ( resname ARG ) .and. (type NH*) ) -
+ .or. -
+ ( ( resname HIS .or. resname HSD .or. resname HSE ) .and. (type *D* .or. type *E*) ) -
+ .or. -
+ ( ( resname ARG ) .and. (type NH*) ) -
+ .or. ( type OT1 .or. type OT2 ) -
+ .or. ( type N .or. type C .or. type O ) -
+) end
+!

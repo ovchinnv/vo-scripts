@@ -1,21 +1,30 @@
 * build structure files
 *
 
-set version 36
+if @?version eq 0 set version 36
 
-if @?psffile eq 0 set psffile @name
+if @?psffile eq 0 then 
+ set psffile @name
+endif
 if @?corfile eq 0 set corfile @psffile
 
 if @?clib eq 0 set clib ~/scripts/charmm
-stream @{clib}/readpsf36.str
+
+if @version eq 36 then
+ stream @{clib}/readpsf36.str
+else
+ stream @{clib}/readpsf.str
+endif
+
 coor copy comp
 scalar WCOMP = WMAIN
+>>>>>>> 919f3f548d7362a1aabe684cb77400bc919c1ca2
 
 if @?qfacts ne 0 stream @{clib}/facts.str
-
-
+if @?qfixcis ne 0 stream @{clib}/omega_trans.str
+if @?kf eq 0 set kf 100
 ! reason to use wcomp is that, with FACTS, wmain is overwritten with radii
-cons harm sele prop wcomp .eq. 1 end force 200
+cons harm sele prop wcomp .eq. 1 end force @kf
 
 set imini 1
 set nmini 5
@@ -31,7 +40,8 @@ coor chir check fix
 incr imini
 if @imini lt @nmini goto mini
 
-cons harm sele prop wcomp .eq. 1 end force 10
+calc kf = @kf / 10
+cons harm sele prop wcomp .eq. 1 end force @kf
 
 set imini 1
 set nmini 5
@@ -44,12 +54,29 @@ mini abnr nstep 10
 
 coor chir check fix
 
+calc kf = @kf / 10
+cons harm sele prop wcomp .eq. 1 end force @kf
+
+set imini 1
+set nmini 5
+
+label mini3
+
+mini sd nstep 20
+mini conj nstep 20
+mini abnr nstep 10
+
+coor chir check fix
+
 incr imini
-if @imini lt @nmini goto mini2
+if @imini lt @nmini goto mini3
 
 if @?qnores ne 0 cons harm clear
+if @?qfixcis ne 0 cons cldh
 
 mini abnr nstep 100
+
+coor chir check fix
 
 write coor card name @corfile_m.cor
 

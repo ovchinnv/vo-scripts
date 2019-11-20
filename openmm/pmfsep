@@ -1,0 +1,168 @@
+#!/bin/bash
+#
+# openmp thread parameters
+export OMP_NUM_THREADS=6
+export OMP_SCHEDULE=static
+export OMP_NESTED=false
+# load utility functions :
+source ~/scripts/struna.sh
+source system
+#
+template=template.py
+stringtemplate=template.sm
+#
+datadir=data
+dcddir=scratch
+usdir=$datadir
+#
+#
+mkdir -p $datadir
+mkdir -p $dcddir
+#
+#================ MD configuration parameters :
+cutoff=9
+switchdist=7.5
+pmefreq=1
+hmass=4
+dt=4
+shake=1
+temperature=300
+thermostat=1
+friction=0.1
+barostat=0
+restraints=0
+restraintfile=$pdbfile
+restraintscale=1
+restraintcol=1
+stringpdb=cr9114-4900_sm.pdb
+
+# box sizes for starting from scratch
+sizex=93
+sizey=93
+sizez=66
+
+#nsteps=10000 ; # 40ps at dt=4fs
+nsteps=100000 ; # 400ps at dt=4fs
+nsteps=1000000 ; # 4ns at dt=4fs # switching to this after 800 runs
+ministeps=0 ; # optional initial minimization
+freq=10000 ;    # output frequency
+#
+# restraint potential parameters :
+kdist=100 ;
+krmsd=10 ;
+fbw1=0.5;
+fbw2=0
+#
+index=1 # simulation "index"
+#================== string replica parameters
+#
+brep=8  # first window index
+erep=8 # last  window index # switching to this after 800 runs -- as of run 801
+outputbase=pmfsep$index
+
+firstrun=1 ; # index of run ; facilitates restarting
+numrun=10 ;
+#
+#==============================================================================
+#
+#outer loop over number of runs
+lastrun=$((firstrun+numrun-1))
+for irun in `seq $firstrun $lastrun`; do 
+ echo " ===> Run $irun (will quit after $lastrun) "
+ echo " ========================="
+#if [ 0 -eq 1 ]; then
+ for irep in `seq $brep $erep`; do
+# run each window sequentially
+  iprev=$((irep - 1)) # previous window
+# prepare input file from template
+  config=${outputbase}_${irep}
+  output=${config}.out
+  pluginfile=${config}.sm
+  pluginout=${pluginfile}.out
+  config=${config}.py
+  echo -n > $config
+  echo -n > $pluginfile
+#
+  vecs=(`cat cv.vec`)
+  vec1="${vecs[@]:0:3}"
+  bfha=1.0 # value of bfactor column to mark antigen
+  bfab=2.0 # value of bfactor column to mark antibody
+#
+  irestart=$irep
+  minimize=0
+# prepare config files
+# different behavior on first run :
+  outputname=${outputbase}_${irep}
+  outputprev=${outputbase}_${iprev}
+  if [ $irun -gt 1 ]; then
+   windowappend=wiap # append to stat files
+   histappend=happ
+   reneappend=reap
+   ministeps=0
+   restart=1
+   restartname=$dcddir/$outputname
+  else # first run in this window
+   windowappend="" # do not append to statistics files
+   histappend=""
+   reneappend=""
+   if [ $irep -eq 0 ]; then # this is the first simulation, so start from scratch
+    restart=0 ;# start from pdb coords
+    minimize=1
+   else
+# take restart files from a previous window
+    restart=1
+    outputprev=${outputbase}_${iprev}
+    restartname=$dcddir/$outputprev
+    irestart=$iprev # to restart from a previous window
+   fi
+  fi
+  restartfile=$restartname.xml
+#
+# for string method config file
+  cat $stringtemplate >> $pluginfile # use cpp to process includes
+
+  for var in \
+    stringpdb \
+    datadir usdir bfha bfab vec1 kdist krmsd fbw1 fbw2 \
+    windowappend histappend reneappend freq irep irestart ; \
+   do
+    update $pluginfile $var
+  done
+#exit
+# for MD config file
+  cat template.py >> $config
+  update $config sminput $pluginfile
+  update $config smlog $pluginout
+
+  for var in \
+   restart restartfile topfile \
+   prmfile psffile pdbfile dt shake cutoff switchdist \
+   pmefreq restraints restraintfile restraintcol hmass prmfile \
+   restraintscale minimize ministeps nsteps freq temperature \
+   thermostat friction barostat sizex sizey sizez ;
+   do
+    update $config "$var"
+  done
+#
+  update $config outputname "$dcddir\/$outputname"
+# run calculation
+  echo "  ===> Running replica #$irep ..."
+#
+#exit
+  python $config >& $output
+#exit
+####### save dcd file
+  dcdfile=$dcddir/$outputname.dcd
+  dcdall=$dcddir/${outputname}_all.dcd
+# append to running dcd
+  if [ ! -f $dcdall ] || [ $irun -eq 1 ]; then
+    mv -f $dcdfile $dcdall
+  else
+    catdcd -o temp.dcd $dcdall $dcdfile > catdcd.out
+    mv -f temp.dcd $dcdall
+  fi
+# ^ save dcd
+ done
+#fi
+#
+done # over all runs

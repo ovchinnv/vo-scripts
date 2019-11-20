@@ -1,0 +1,65 @@
+* Add dihedral angles restrain to all protein omega angles 
+* to avoid (and correct) CIS peptide bonds.
+* To use: stream this file and run minimization.
+* Simone Conti 22 February 2019
+* 
+
+if @?kforce .eq. 0 set kforce 50
+
+! Define the residues to check (all of them -- non protein residues are filtered out afterwards)
+define tocheck sele all end
+
+set totchains 0
+set totresidues 0
+set totcons 0
+
+label label_startloop
+if ?NSEL .eq. 0 goto label_endloop
+
+set segname ?SELSEGI
+
+! Check if this chain is a protein or not
+define temp sele segid @segname .and. ( resname ARG .or. resname HSD .or. resname LYS -
+    .or. resname HIS .or. resname HSE .or. resname HSP .or. resname HSC -
+    .or. resname ASP .or. resname GLU .or. resname SER .or. resname THR -
+    .or. resname ASN .or. resname GLN .or. resname CYS .or. resname GLY -
+    .or. resname PRO .or. resname ALA .or. resname ILE .or. resname LEU -
+    .or. resname MET .or. resname PHE .or. resname TRP .or. resname TYR -
+    .or. resname VAL) end
+if ?NSEL .eq. 0 then
+    ! it is not, so remove it from the tocheck selection and loop back at the beginning
+    define tocheck sele tocheck .and. .not. segid @segname end
+    goto label_startloop
+endif
+
+! It is a protein so we loop every residue and add dihedral restrain
+define temp sele segid @segname .and. type CA end
+set nres ?NSEL
+calc totchains = @totchains + 1
+calc totresidues = @totresidues + @nres
+set residi ?SELRESI
+label rloop
+    calc residj = @residi + 1
+    cons dihe @segname @residi CA @segname @residi C @segname @residj N @segname @residj CA min 180 force @kforce
+    calc totcons = @totcons + 1
+    incr residi
+    if @residi .lt. @nres goto rloop
+
+! Remove this segment from residues to check and loop back at beginning
+define tocheck sele tocheck .and. .not. segid @segname end
+goto label_startloop
+
+! No more residues to check! Prin list of restrains and return.
+label label_endloop
+echo "LIST OF CONSTRAINS TO DIHEDRAL ANGLES"
+print cons
+
+! Check that we add the correct number of restrains
+calc checksum = @totresidues - @totchains - @totcons
+if @checksum .ne. 0 then
+    echo "WRONG CHECKSUM! SOMETHING WENT WRONG!"
+    raise error
+endif
+
+return
+

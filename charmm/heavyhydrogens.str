@@ -15,7 +15,7 @@ label loop_h
     ! compute mass increase
     calc dmass = @hmass - ?save
     ! decrease bonded atom mass
-    define bonded sele .bonded. this_h end
+    define bonded sele .bonded. this_h .and. .not. hydrogen end ! make sure to ignore CHARMM TIP3 H-H bonds
     scalar mass stat sele bonded end
     calc newmass = ?save - @dmass
     scalar mass set @newmass sele bonded end

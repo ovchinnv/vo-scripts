@@ -1,0 +1,49 @@
+* build missing loops by combining the structures
+*
+
+set version 19
+set psffile myo6ppsgfp_19
+stream ../readpsf.str
+
+! 1
+! bkh based on bki (rigor)
+
+read coor card name myo6ppsgfp19.cor resid
+read coor card name ../myo6rig_bki_tr19.cor resid comp
+
+!
+define missing1 select segid HC .and.  .byres. ( ( resid 622 .or. resid 639 ) .around. 3 ) .and. prop wmain .eq. 1  end
+coor orient rms select segid HC .and.  missing1 end comp
+coor copy select segid HC .and.  resid 623:638 end
+scalar wmain set 2 select segid HC .and.  resid 623:638 end
+!
+define missing2 select segid HC .and.  .byres. ( ( resid 394 .or. resid 408 ) .around. 3 ) .and. prop wmain .eq. 1  end
+coor orient rms select segid HC .and.  missing2 end comp
+coor copy select segid HC .and.  resid 395:407 end
+scalar wmain set 2 select segid HC .and.  resid 395:407 end
+!
+define missing3 select segid HC .and.  .byres. ( ( resid 4:5 ) .around. 3 ) .and. prop wmain .eq. 1  end
+coor orient rms select segid HC .and.  missing3 end comp
+coor copy select segid HC .and.  resid 1:3 end
+scalar wmain set 2 select segid HC .and.  resid 1:3 end
+!
+define missing4 select segid HC .and.  .byres. ( ( resid 34 .or. resid 39 ) .around. 3 ) .and. prop wmain .eq. 1  end
+coor orient rms select segid HC .and.  missing4 end comp
+coor copy select segid HC .and.  resid 35:38 end
+scalar wmain set 2 select segid HC .and.  resid 35:38 end
+!
+define missing5 select segid HC .and.  .byres. ( ( resid 174 .or. resid 178 ) .around. 3 ) .and. prop wmain .eq. 1  end
+coor orient rms select segid HC .and.  missing5 end comp
+coor copy select segid HC .and.  resid 175:177 end
+scalar wmain set 2 select segid HC .and.  resid 175:177 end
+!
+define missing6 select segid HC .and.  .byres. ( ( resid 354 .or. resid 362 ) .around. 3 ) .and. prop wmain .eq. 1  end
+coor orient rms select segid HC .and.  missing6 end comp
+coor copy select segid HC .and.  resid 355:361 end
+scalar wmain set 2 select segid HC .and.  resid 355:361 end
+
+coor orie
+write coor pdb  name myo6ppsgfp19_.pdb
+write coor card  name myo6ppsgfp19_.cor
+
+

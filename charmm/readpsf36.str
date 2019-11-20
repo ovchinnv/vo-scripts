@@ -27,7 +27,7 @@ if @?format eq 0 set format card
 if @?string eq 0 then 
  set string
 else
- set string string
+ if '@{STRING}' .ne. '' set string string
 endif
 !
 !!!!!!!! read files

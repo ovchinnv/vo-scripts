@@ -23,7 +23,7 @@ if @?overlap eq 0 set overlap 2.8
 ! read initial water box (216 molecules)
 read sequ tip3 216
 generate wat0 noangle nodihe
-stream read-watbox.str ! this script written by nilssen
+stream ~/scripts/charmm/read-watbox.str ! this script written by nilssen
 set box 18.856  ! size of cubic water box
 
 !read small water box (125 molecules)

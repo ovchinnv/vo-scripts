@@ -1,0 +1,140 @@
+* make cv input files for smcv plugin
+* assume that parameter and topology files are defined
+* assume also that psffile and pdbfile are defined
+*
+
+set maxdist 8 ! maximum distance through which the antibody will be displaced
+set nwin 7    ! number of windows
+set str 1.2   ! 1 : no stretching near origin ( use > 1.0 to cluster points)
+
+read rtf card name @topfile
+read param card name @prmfile
+read psf card name @psffile
+read coor card name @corfile
+!
+! domains
+!
+define consdist sele type CA end
+!define cons sele type CA .or. type N .or. type C .or. type CB end
+!define cons sele type C* end
+! more elaborate restraint : 
+define consrmsd sele .not. hydrogen .and. .not. -
+( ( ( resname PHE .or. resname TYR ) .and. ( type CD* .or. type CE* ) ) -
+ .or. -
+ ( ( resname GLU .or. resname ASP .or. resname GLN .or. resname ASN ) .and. ( type OD* .or. type OE* .or. type ND* .or. type NE*) ) -
+ .or. -
+ ( ( resname TRP ) .and. (type *D* .or. type *E* .or. type *Z* ) ) -
+ .or. - 
+ ( ( resname ARG ) .and. (type NH*) ) -
+ .or. -
+ ( ( resname HIS .or. resname HSD .or. resname HSE ) .and. (type *D* .or. type *E*) ) -
+ .or. -
+ ( ( resname ARG ) .and. (type NH*) ) -
+ .or. ( type OT1 .or. type OT2 ) -
+ .or. ( type N .or. type C .or. type O ) -
+) end
+
+!stream ~/scripts/charmm/resatom.str ! do not know why this does not work
+define ha    select ( segid HA* ) end
+define ab    select ( segid LC* .or. segid HC* ) end
+define move  select ( segid LC* .or. segid HC* ) end
+!
+! write a pdb with the coordinates marked for restraints
+scalar wmain set 0
+scalar wmain set 1 sele ha .and. consrmsd end
+scalar wmain set 2 sele ab .and. consrmsd end
+write coor pdb name @{name}_sm.pdb
+write coor card name @{name}_sm.cor ! need a coordinate file because the number of atoms is too large for PDB format
+!
+! compute displacement coordinates
+coor stat sele ha .and. consdist end mass ! will be pushing away from this fragment
+set x0 ?xave
+set y0 ?yave
+set z0 ?zave
+
+coor stat sele ab .and. consdist end mass ! will be pushing this fragment
+set x1 ?xave
+set y1 ?yave
+set z1 ?zave
+!
+calc dx1 = @x1 - @x0
+calc dy1 = @y1 - @y0
+calc dz1 = @z1 - @z0
+! normalize
+calc n2 = @dx1 * @dx1 + @dy1 * @dy1 + @dz1 * @dz1
+calc n = sqrt ( @n2 )
+calc dx1 = @dx1 / @n
+calc dy1 = @dy1 / @n
+calc dz1 = @dz1 / @n
+!
+! NOTE : the displacement vector is computed above, but we also will
+! to restrain the position in the perpendicular directions
+!
+! NOTE : in a relative frame, the above vector is useless because it is in absolute coordinates, and we need it in relative coords
+! write vector to file
+open write card name cv.vec unit 1
+write title unit 1
+* @dx1 @dy1 @dz1
+!
+!
+! use string to generate cv coordinates
+nobomb
+mcom string 1 by 1
+set S string colvar
+@S init
+
+! to express in a local frame :
+!@S add frame sele ha end ! distance vector will be expressed in this frame
+! write initial frame
+!@S frame fill
+!@S frame write name iframe.dat
+!stop
+@S add dist_com sele ha .and. consdist end sele ab .and. consdist end frame 0 vector 0 0 0 ! @dx1 @dy1 @dz1 ! vector will be computed upon first calculation
+@S add dist_com sele ha .and. consdist end sele ab .and. consdist end frame 0 ortho vector 0 0 0 ! @dx1 @dy1 @dz1
+! also add orientation rmsd
+@S add rmsd orient sele ab .and. consrmsd end mass rms sele ab .and. consrmsd end noro
+! also add rmsd restraint for antigen
+@S add rmsd orient sele ha .and. consrmsd end mass rms sele ha .and. consrmsd end noro notr
+!
+!@S frame list
+@S fill ! compute cv values (and projection vector above)
+@S list
+!
+coor copy comp ! save coords
+! now perform displacement
+!stop
+!
+set iwin 0
+calc i = ( @iwin / @nwin ) ** @str
+label win
+! restore original coords if vector below is computed from initial structure
+! coor copy
+ set iprev @i
+ calc i = ( @iwin / @nwin ) ** @str
+ calc dist =  (@i - @iprev ) * @maxdist
+ calc vx = @dist * @dx1
+ calc vy = @dist * @dy1
+ calc vz = @dist * @dz1
+! move :
+ scalar X add @vx sele move end
+ scalar Y add @vy sele move end
+ scalar Z add @vz sele move end
+!
+! save cvs
+ @S fill
+ @S write name cv@{iwin}.dat
+goto skipmini
+! save coordinates after short minimization
+ cons harm clear
+ cons harm sele type CA end force 10
+ mini conj nstep 100
+ mini abnr nstep 100
+label skipmini
+ write coor pdb name @{name}_@{iwin}.pdb
+!
+ incr iwin
+! "cheat" to add an extra window:
+ calc im1 = @iwin - 1
+! if @iwin .le. @nwin -
+ if @im1 .le. @nwin -
+goto win

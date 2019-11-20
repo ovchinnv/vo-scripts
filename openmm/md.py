@@ -1,39 +1,41 @@
 #!/bin/python
+from __future__ import print_function
+import fileinput
+import sys
+from os import mkdir, path
 #requires the file CHOMM.py, which is simple wrapper function to run MD using OpenMM using CHARMM parameters
 #=====================================================================================
 #
 # aux parameters (e.g. they help define the required ones, but are not themselves used by CHOMM)
-firstrun=11   ;# initial run index
-numrun=10    ;# numbef of runs
-name='3h109l' ; #prefix for output files
-#platformName='CPU' ; #optional; default os 'CUDA'
+firstrun=0   ;# initial run index
+numrun=4
+name='dhfr'
+#platformName='CPU' ; #optional; default is 'CUDA'
 #==============================
 # parameters required by CHOMM (some have default values)
-restart=1 ; # 0 -- start from PDB coordinates; 1 -- restart from native xml file
-restartfile=None ;
-#restartfile='3h109l5nvt.xml';
+if not (path.exists('scratch')):
+ mkdir('scratch');
+psffile='./struc/'+name+'_sn.psf' ;
+pdbfile='./struc/'+name+'_msn.pdb' ;
+topfile='./struc/'+name+'36.top';
+paramfile='./struc/'+name+'36.par';
 
-psffile='struc/3h109l.psf' ;
-pdbfile='struc/3h109l.pdb' ;
-topfile='sosip36.top';
-paramfile='sosip36.par' ;
+implicitSolvent=0 ;# run OBC2 implicit solvent simulation
 
-implicitSolvent=1 ;# run OBC2 implicit solvent simulation
-
-xmlfile=restartfile ;        # to obtain cell vectors from xml file produced with OMM (default option if restart file is provided)
 xscfile='.xsc' ;         # to obtain cell vectors from last line of xsc file
-boxfile='struc/sosip.str'; # to obtain cell vectors from str file used in structure solvation
+boxfile='./struc/'+name+'.str'; # to obtain cell vectors from str file used in structure solvation
 
 # specify larger box manually
-#dx=112 ;
-#dy=112 ;
-#dz=112 ;
+#dx=72 ;
+#dy=72 ;
+#dz=72 ;
 
-hmass=1;       # amu, can use heavy hydrogens
-friction=1     # 1/ps, thermostat coupling
-dt=1;        # timestep in fs
+hmass=4;       # amu, can use heavy hydrogens
+friction=1   # 1/ps, thermostat coupling
+dt=4;          # timestep in fs
 pmefreq=1;     # >1 requires multiple timestepping, which _dramatically_ slows down the code
-cutoff=20;     # nonbonded cutoff
+cutoff=9;      # nonbonded cutoff
+switchdist=7.5 ; # (optional) switching distance
 
 constraints=1;   # harmonic positional restraints for equilibration
 constraintscaling=1; # to scale hatmonic restraints uniformly
@@ -51,36 +53,78 @@ membrane_on=0; # whether to use a barostat for membrane simulations (z-axis is t
 pme=0; # whether to use PME
 pbc=0; # whether periodic boundary conditions are on
 
-mini=1;          # whether to minimize before dynamics
-ministeps=100;   # number of minimization iterations
+dynamo=1
+dynamoTemplate='watershell.dyn'
+watershell_restart='NONE'
 
-nsteps=100000;    # number of simulation steps
-outputfreq=1000; # frequency of generating output
-dcdfreq=10000;   # frequency of dcd output
+mini=1;          # whether to minimize before dynamics
+ministeps=0;   # number of minimization iterations
+
+numeq=1             # number of equilibration runs
+numeqsteps=10000000; # number of equilibration steps
+nummdsteps=100000000; # number of production steps
+#nummdsteps=20000
+outputfreq=10000;  # frequency of generating output
+dcdfreq=10000;     # frequency of dcd output
 
 flag='eq'
-outputName=name+str(firstrun)+flag ;
+nsteps=numeqsteps;
+#
+if (firstrun==0):
+ restart=0 ; # 0 -- start from PDB coordinates; 1 -- restart from native xml file
+ restartfile=None ;
+else:
+ restart=1 ;
+ if (firstrun>1):
+  flag='nvt'
+ restartfile='./scratch/'+name+str(firstrun-1)+flag+'.xml';
+#restartfile= ;# to override
+ xmlfile=restartfile ;        # to obtain cell vectors from xml file produced with OMM (default option if restart file is provided)
 #
 # run MD simulations with different parameters one after the other
 #
-for i in range(numrun):
- irun=i+firstrun;
+irun=firstrun
+while irun < firstrun + numrun :
+
+
  print(" =============================");
- print(" Run ", irun, "(will quit after", firstrun+numrun-1,")");
+ print(" Run ", irun, "(will quit after", numrun-1,")");
 # set some run-specific options
 # constraintscaling = (90-10*irun) ;# turn off gradually by run 10
- if irun > 0:
+ if irun >= numeq:
    flag='nvt'
    constraints=0 ;# to remove equilibration restraints
-   nsteps=10000000 ;# increase number of steps
+   nsteps=nummdsteps ;# increase number of steps
    hmass=4.0
    dt=4.0
-#   cutoff=9 ;# to decrease cutoff
+   mini=0
+   shake=1
+   barostat=0 ;# turn off barostat
+   pmefreq=1 ; # using MTS does not improve speed in my experience
+#   cutoff=9 ;# to change cutoff
 #
- restartfile=name+str(irun-1)+flag+'.xml';
- outputName=name+str(irun)+flag ;
+# dynamo section :
 #
+ watershell_output='watershell'+str(irun)+'.restart.txt'
+ if (irun>0):
+   watershell_restart='watershell'+str(irun-1)+'.restart.txt'
+#
+ dynamoConfig='watershell'+str(irun)+'.in'
+# modify config template :
+ df=open(dynamoTemplate,'r');
+ dd=df.read()
+ dd=dd.replace('@{restart_file}',watershell_restart)
+ dd=dd.replace('@{output_file}',watershell_output)
+ df=open(dynamoConfig,'w');
+ df.write(dd);
+ df.close();
+ dynamoLog=dynamoConfig+'.log';
+ outputName='scratch/'+name+str(irun)+flag ;
  from os.path import expanduser
+# sys.exit()
  exec(open(expanduser('~/scripts/openmm/CHOMM.py')).read())
+# to do : check if run was successful, rerun if not
+ irun=irun+1
+ restartfile=outputName+'.xml'
+ xmlfile=restartfile
  restart=1
-# check if run was successful, rerun if not

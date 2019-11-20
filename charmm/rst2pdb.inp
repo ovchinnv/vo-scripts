@@ -1,18 +1,15 @@
 * create pdb files from restart files
 *
 
-set psffile exr_dry22c
-read psf card name @psffile.psf
+bomblev -4
 
-set i 1
-label loop
- read coor dynr curr name exr_@i.rst
- write coor pdb name exr_@i.pdb
- read coor dynr curr name dmx_@i.rst
- write coor pdb name dmx_@i.pdb
- incr i
- if @i lt 1 -
-goto loop
+if @?xplor eq 0 set xplor
 
- 
- 
+read psf card name @{psffile}.psf @{xplor}
+
+read coor dynr curr name @{rstfile}.rst
+
+if @?pdbfile eq 0 set pdbfile @{rstfile}
+
+write coor pdb name @{pdbfile}.pdb
+

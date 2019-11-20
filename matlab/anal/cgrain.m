@@ -1,33 +1,24 @@
 % MATLAB routines for trajectory analysis
 % coarse-grain by putting average residue coordinates into CA
 %
-name='3bnc60glt';
-name='3bnc60t';
-%name='3bnc60at';
-name='ch103t' ;
-name='ch103-i3.2t' ;
-%name='ch103ucat' ;
+addpath('~/scripts/matlab/anal');
+name='traf-rank';
 
-name='gl121t';
-name='3h109lt';
-name='pgt121t';
-
-
-pdbfile=['../../struc/',name,'_now.pdb']; % in lieu of a "structure" file
+pdbfile=['/home/taly/vmd/prepare/traf/rank/traf-rank.pdb']; % in lieu of a "structure" file
 
 struc ;
 % define some selections
 select ;
 
 % dcd trajectory names :
-basename=['../../dcd/',name];
-flag='_now';
+basename=['wsh7-ndt-rf/',name];
+flag='-now';
 ext='dcd';
 %
-inds=1:5 ;
+inds=1 ;
 dcdnames={};
 for i = inds
- dcdnames=[dcdnames { [basename,'-',num2str(i),flag,'.',ext] } ];
+ dcdnames=[dcdnames { [basename,flag,'.',ext] } ];
 end
 %
 % read dcds :
@@ -50,7 +41,8 @@ cainds=find(typeCA);
 ncg=length(cainds);
 
 for caind = cainds'
- resinds = find( resid==resid(caind) & insertion==insertion(caind) & ismember(segid,segid(caind))); % make sure to match the segid also
+% resinds = find( resid==resid(caind) & insertion==insertion(caind) & ismember(segid,segid(caind))); % make sure to match the segid also
+ resinds = find( resid==resid(caind) & ismember(segid,segid(caind))); % sometimes the insertion code is blank
  wgt=mass(resinds); wgt=wgt/sum(wgt);
 % length(resinds)
  xpdbcg(caind) = wgt'*xpdb(resinds);
@@ -64,11 +56,11 @@ end
 %
 % write out light and heavy chain files separately (as in main)
 %
-cahc=find(typeCA & heavy);
-calc=find(typeCA & light);
-inds={cahc, calc} ;
+catraf=find(typeCA & traf);
+carank=find(typeCA & rnk);
+inds={catraf, carank} ;
 
-names={'-cg-hc', '-cg-lc'};
+names={'-cg-traf', '-cg-rank'};
 
 %
 for i=1:length(inds)
@@ -78,7 +70,7 @@ for i=1:length(inds)
 %
  [x, y, z, rmsd]=bestfit(xcg,ycg,zcg,xpdbcg,ypdbcg,zpdbcg,mass,ind);
 % compute average structure & realign :
- for i=1:5
+ for j=1:5
   xave=mean(x,2);
   yave=mean(y,2);
   zave=mean(z,2);

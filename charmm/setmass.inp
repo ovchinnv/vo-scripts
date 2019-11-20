@@ -1,0 +1,18 @@
+* put masses in beta column for dasystat
+*
+
+if @?clib eq 0 set clib ~/scripts/charmm
+
+stream @{clib}/readpsf36.str
+
+scalar wmain set 0 sele all end ! reset
+!scalar wmain = mass sele type CLA .or. type SOD .or. type POT .or. type MG end
+scalar wmain = mass sele segid ION* end
+scalar wmain set 18.02 sele resname TIP3 .and. type OH2 end ! put all water mass onto oxygen
+
+if @?corfile ne 0 set outfile @corfile
+if @?pdbfile ne 0 set outfile @pdbfile
+
+write coor pdb name @{outfile}-mass.pdb
+write coor card name @{outfile}-mass.cor
+
