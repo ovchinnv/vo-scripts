@@ -33,8 +33,8 @@ if @?zmin eq 0 calc zmin = ?zmin
 if @?xmax eq 0 calc xmax = ?xmax
 if @?ymax eq 0 calc ymax = ?ymax
 if @?zmax eq 0 calc zmax = ?zmax
-!include xwat in solvation
-define solute select all end
+if @?solute eq 0 set solute all
+define solute select ( @solute ) end
 update atom cutnb 15 ctonnb 10 ctofnb 12 vdw vshift fshift cdie
 
 nobomb
