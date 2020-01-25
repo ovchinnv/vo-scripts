@@ -103,6 +103,7 @@ for i=cid
   r1s=num2str(r1);
   r2s=num2str(r2);
 %
+% decide which patch to write ; cover only links that involve a 'C1'
   if (ismember(a2,'C1')) % glycan link to C1
    if     (ismember(a1,'O1'))
     cmd=['patch 11aa ',segid,' ',r1s,' ',segid,' ',r2s,' setup warn ! sugar link' ];
@@ -118,15 +119,52 @@ for i=cid
 % to change segid to match the ASN (this hack works if the peptidoglycan link is always at the top) :
 %    segid=sprintf('a%-3d',r1);
     seg=ch2seg(c1);
-    cmd=['patch NGLA ',seg,' ',r1s,' ',segid,' ',r2s,' setup warn ! peptidoglycan link' ];
+    if ~isempty(seg)
+     cmd=['patch NGLA ',seg,' ',r1s,' ',segid,' ',r2s,' setup warn ! peptidoglycan link' ];
+    else
+     cmd=['! patch NGLA ',seg,' ',r1s,' ',segid,' ',r2s,' setup warn ! peptidoglycan link for an invalid segment id'];
+    end
    elseif (ismember(a1,'NE2')) % link from GLN to sugar
 % to change segid to match the GLN (this hack works if the peptidoglycan link is always at the top) :
 %    segid=sprintf('a%-3d',r1);
     seg=ch2seg(c1);
-    cmd=['patch QGLA ',seg,' ',r1s,' ',segid,' ',r2s,' setup warn ! peptidoglycan link' ];
+    if ~isempty(seg)
+     cmd=['patch QGLA ',seg,' ',r1s,' ',segid,' ',r2s,' setup warn ! peptidoglycan link' ];
+    else
+     cmd=['! patch QGLA ',seg,' ',r1s,' ',segid,' ',r2s,' setup warn ! peptidoglycan link for an invalid segment id'];
+    end
+   end
+  elseif (ismember(a1,'C1')) % reverse residue order
+   if     (ismember(a2,'O1'))
+    cmd=['patch 11aa ',segid,' ',r2s,' ',segid,' ',r1s,' setup warn ! sugar link' ];
+   elseif (ismember(a2,'O2'))
+    cmd=['patch 12aa ',segid,' ',r2s,' ',segid,' ',r1s,' setup warn ! sugar link' ];
+   elseif (ismember(a2,'O3'))
+    cmd=['patch 13aa ',segid,' ',r2s,' ',segid,' ',r1s,' setup warn ! sugar link' ];
+   elseif (ismember(a2,'O4'))
+    cmd=['patch 14aa ',segid,' ',r2s,' ',segid,' ',r1s,' setup warn ! sugar link' ];
+   elseif (ismember(a2,'O6'))
+    cmd=['patch 16ab ',segid,' ',r2s,' ',segid,' ',r1s,' setup warn ! sugar link' ];
+   elseif (ismember(a2,'ND2')) % link from ASN to sugar
+% to change segid to match the ASN (this hack works if the peptidoglycan link is always at the top) :
+%    segid=sprintf('a%-3d',r1);
+    seg=ch2seg(c2);
+    if ~isempty(seg)
+     cmd=['patch NGLA ',seg,' ',r2s,' ',segid,' ',r1s,' setup warn ! peptidoglycan link' ];
+    else
+     cmd=['! patch NGLA ',seg,' ',r2s,' ',segid,' ',r1s,' setup warn ! peptidoglycan link for an invalid segment id' ];
+    end
+   elseif (ismember(a2,'NE2')) % link from GLN to sugar
+% to change segid to match the GLN (this hack works if the peptidoglycan link is always at the top) :
+%    segid=sprintf('a%-3d',r1);
+    seg=ch2seg(c2);
+    if ~isempty(seg)
+     cmd=['patch QGLA ',seg,' ',r2s,' ',segid,' ',r1s,' setup warn ! peptidoglycan link' ];
+    else
+     cmd=['! patch QGLA ',seg,' ',r2s,' ',segid,' ',r1s,' setup warn ! peptidoglycan link for an invalid segment id' ];
+    end
    end
   end
-
 %
   if ~isempty(cmd)
    fprintf(fpatch, '%s\n', cmd);
@@ -141,4 +179,3 @@ for i=cid
  pdbout(mol3,[strtrim(segid),'.pdb'],xpdb,ypdb,zpdb,[],[],inds);
 end
 %
-
