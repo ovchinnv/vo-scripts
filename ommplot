@@ -1,0 +1,46 @@
+#!/bin/bash
+
+if [ -z $1 ] ; then 
+ files=`ls *out`;
+ farr=($files)
+ last=${#farr[@]}
+ f=${farr[$last - 1 ]}
+ echo "Reading from file $f ..."
+else
+ f=$1
+fi
+#
+if [ -z $2 ] ; then 
+ term=temp
+else
+ term=$2
+fi
+#
+~/scripts/xtext $f "Step" | grep -E ^[1-9] > _temp
+# CHOMMPY :
+#"Step" 	 "Potential Energy (kJ/mole)" 	 "Kinetic Energy (kJ/mole)" 	 "Temperature (K)" 	 "Speed (ns/day)"
+
+echo "d=load(\"_temp\"); \
+ step=1;
+ pe=2;
+ ke=3;
+ temp=4;
+ speed=5;
+ ibeg=round(0.1*length(d(:,step)))
+ t=d(ibeg:end,step)
+ e=d(ibeg:end,$term)
+ hist(e);
+ figure;
+ plot(t, e);
+ ea=mean(e);
+ es=std(e);
+ fprintf([num2str(ea),' +/- ',num2str(es)]);
+ " > _plote;
+#
+ if [ ! -z $3 ] && [ ! -z $4 ]; then
+  echo "ylim([$3 $4])" >> _plote;
+ fi
+#
+ echo "pause(10)" >> _plote;
+
+octave < _plote;

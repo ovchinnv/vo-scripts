@@ -3,7 +3,7 @@
 
 echo "* three-letter amino acid sequence"
 echo "*"
-echo `wc $1 | awk '{print $3}'` ;# print sequence length
+echo `cat $1 | tr -d '\n' | wc -c ` ;# print sequence length
 
 awk 'BEGIN {
 

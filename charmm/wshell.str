@@ -100,9 +100,10 @@ label mama
 ! delete template box
 delete atom sele segid w0 end
 ! delete solvent molecules overlapping with solute
+if @?allowoverlap .ne. 0 goto skipovldel
 delete atom select .byres. (segid wat0 .and. resname TIP3 .and. type OH2 .and. -
                            ( (solute .and. .not. (hydrogen .or. lone) ) .around. @overlap ) ) end
-
+label skipovldel
 ! delete solvent molecules too far away from solute (two stars delete xwat also)
 delete atom select .byres. (segid *w* .and. resname TIP3 .and. type OH2 .and. -
                            .not. ( (solute .and. .not. (hydrogen .or. lone) ) .around. @maxdist ) ) end

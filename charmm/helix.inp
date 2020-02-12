@@ -1,0 +1,38 @@
+*constraints on alpha helicity helices definitions are approximate;
+*defined on the basis of the  crystal structure ; domains defined above
+*are assumed to be contiguous; incorrect behavior will result if this is
+*not so
+*
+
+set fc 500
+
+set sel1 (segid EMR1 .and. resid 6:22)
+set sel2 (segid EMR1 .and. resid 32:50)
+set sel3 (segid EMR1 .and. resid 57:75)
+set sel4 (segid EMR1 .and. resid 89:104)
+set sel5 (segid EMR2 .and. resid 6:20)
+set sel6 (segid EMR2 .and. resid 31:50)
+set sel7 (segid EMR2 .and. resid 60:76)
+set sel8 (segid EMR2 .and. resid 86:99)
+
+set nsel 8
+set isel 1
+label hcons
+ set sel @sel@@isel
+ define dumb sele @sel .and. type CA end
+ calc nres = ?NSEL - 1
+ set ires ?selresi ! resid of first residue in selection 
+ set seg ?selsegi
+ calc fres = ( @ires + @nres - 1 )! resid of final residue in selection
+
+ label hloop
+  calc iresp = @ires + 1
+  cons dihe @seg @{ires} C @seg @{iresp} N @seg @{iresp} CA @seg @{iresp} C min -57 force @fc width 10 ! note : I think width should be in radians !
+  cons dihe @seg @{ires} N @seg @{ires}  CA @seg @{ires} C  @seg @{iresp} N min -47 force @fc width 10
+  incr ires
+  if @ires le @fres -
+ goto hloop
+ incr isel
+ if @isel le @nsel -
+goto hcons
+

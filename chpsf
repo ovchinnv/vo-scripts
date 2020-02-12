@@ -17,7 +17,7 @@ awk 'BEGIN {
  } else if ( $0 ~ /^\s*[0-9]+\s*!\s*[Nn][Bb][Oo][Nn][Dd]*/ ) {
   exit
  } else if ( NF>=7) {
-  q+=$7;
+  q+=$7; print q;
  }
 }
 END { 

@@ -1,0 +1,50 @@
+#!/bin/bash
+
+if [ -z $1 ] ; then 
+ files=`ls npt[6-9]* npt1[0-7]* -f | sed 's/.*crash//'`; # do not sort; excluding crash files
+ farr=($files)
+ last=${#farr[@]}
+ f=${farr[$last - 1 ]}
+ echo "Reading from file $f ..."
+else
+ f=$1
+fi
+#
+if [ -z $2 ] ; then 
+ term=prav
+else
+ term=$2
+fi
+#
+grep -ve "^[TCL|#]" $f > _temp
+
+#     Step      Bond     Angle     Dihed      Elec       VDW        PE        KE  Externa     Total      Temp      Pres   PresAve
+
+echo "d=load(\"_temp\"); \
+ step=1;
+ bond=2;
+ angl=3;
+ dihe=4;
+ elec=5;
+ vdw=6;
+ pe=7;
+ ke=8;
+ exte=9;
+ total=10;
+ temp=11;
+ pres=12;
+ prav=13;
+ ibeg=round(0.1*length(d(:,step)))
+ t=d(ibeg:end,step)
+ e=d(ibeg:end,$term)
+ plot(t, e);
+ mean(e)
+ " > _plote;
+#
+ if [ ! -z $3 ] && [ ! -z $4 ]; then
+  echo "ylim([$3 $4])" >> _plote;
+ fi
+#
+ echo "pause(10)" >> _plote;
+
+octave < _plote;
