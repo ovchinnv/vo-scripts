@@ -35,6 +35,11 @@ if 1:
   conscol=1
 #
  try :
+  cutoff
+ except NameError:
+  cutoff=-1; # run without cutoff
+#
+ try :
   switchdist
  except NameError:
   switchdist=cutoff-1.5;
@@ -248,7 +253,10 @@ if 1:
   cons=None
   rigidWater=False
  dprint("Initializing simulation system");
- dprint("Nonbonded cutoff is ",cutoff*u.angstrom,". Switching is active at ",switchdist*u.angstrom)
+ if (cutoff>0):
+  dprint("Nonbonded cutoff is ",cutoff*u.angstrom,". Switching is active at ",switchdist*u.angstrom)
+ else:
+  dprint("Nonbonded cutoff is infinite")
  if (hmass>1):
   dprint("Hydrogen mass is ",hmass*u.amu)
 #
@@ -428,3 +436,6 @@ if 1:
  fxsc.close();
 #==== reset switching distance
  del switchdist;
+ if (dynamo): # dynamo is somewhat problematic upon run continuation, need a complete reinit because the end of each run destroys the dynamo object
+  del system;
+  del simulation;
