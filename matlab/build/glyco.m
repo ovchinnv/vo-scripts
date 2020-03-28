@@ -36,44 +36,56 @@ slink = not ( plink ) ; % sugar links : assume that there are only two types
 % group linked residues by connectivity into segments
 
 nlinks=length(links);
-clusters=[1:nlinks]; % initial number of clusters ; one cluster per link, numbered sequentially
+% initial number of clusters ; one cluster per link, numbered sequentially :
+clusters=cell(nlinks,1);
+for i=1:nlinks
+ clusters{i}=i;
+end
+nc=length(clusters);
 
 qchanged=1;
 while qchanged
  qchanged=0;
- for i=1:nlinks
-  r1=resid1(i);
-  c1=chainid1(i);
-  i1=insertion1(i);
-% find if this index has been connected to
-  ind=find( ismember(resid2(:),r1) & ismember(chainid2(:),c1) & ismember(insertion2(:),i1) ) ;
-  if ~isempty(ind)
-   j=ind(1); % take the first one
-   if (clusters(i)~=clusters(j))
-    qchanged=1;
-    clusters(i)=clusters(j);
-   end
-  end % isempty
+ for i=1:nc
+  linds1=(clusters{i}); % links in ith cluster
+  for j=i+1:nc
+   linds2=(clusters{j}); % links in jth cluster
+% check if links have a common atom
+   for k=linds1
+    r1=resid1(k); % first link atom in ith cluster
+    c1=chainid1(k);
+    i1=insertion1(k);
+    r2=resid2(k); % 2nd link atom in ith cluster
+    c2=chainid2(k);
+    i2=insertion2(k);
+    for l=linds2
+     r3=resid1(l); % first link atom in jth cluster
+     c3=chainid1(l);
+     i3=insertion1(l);
+     r4=resid2(l); % 2nd link atom in jth cluster
+     c4=chainid2(l);
+     i4=insertion2(l);
+     if ( (r1==r3 & c1==c3 & i1==i3)|(r1==r4 & c1==c4 & i1==i4)|(r2==r3 & c2==c3 & i2==i3)|(r2==r4 & c2==c4 & i2==i4) )
+% absorb cluster j into cluster i ; set cluster j to empty
+      clusters{i}=[ (clusters{i}) (clusters{j}) ];
+      clusters{j}=[];
+      qchanged=1;
+     end %if
+    end %for
+   end %for
+  end %for
  end %for
 end %while
-
-% label clusters
-cid=unique(clusters) ;
-% relabel clusters so that the numbering is adjacent
-id=1;
-for i=cid
- clinks = find(clusters==i);
- clusters(clinks)=-id ; % negative to make sure that we do not merge clusters by accident
- id=id+1;
-end
-clusters=-clusters; % convert negative entries
-cid=unique(clusters) ; % recompute labels
 %
-% group links into clusters
+id=0;
 % write pdbs corresponding to the clusters, taking care not to include protein atoms
-for i=cid
- clinks = find(clusters==i);
- segid=sprintf('S%-3d',i);
+for i=1:nc
+ clinks = clusters{i}; %links in this cluster
+ if isempty(clinks)
+  continue
+ end
+ id=id+1; % increment segment count
+ segid=sprintf('S%-3d',id);
  inds=zeros(length(pdbh),1);
  fpatch=fopen([strtrim(segid),'.str'],'w');
  fprintf(fpatch, '* polysaccharide links\n');
@@ -103,6 +115,7 @@ for i=cid
   r1s=num2str(r1);
   r2s=num2str(r2);
 %
+% decide which patch to write ; cover only links that involve a 'C1'
   if (ismember(a2,'C1')) % glycan link to C1
    if     (ismember(a1,'O1'))
     cmd=['patch 11aa ',segid,' ',r1s,' ',segid,' ',r2s,' setup warn ! sugar link' ];
@@ -118,15 +131,52 @@ for i=cid
 % to change segid to match the ASN (this hack works if the peptidoglycan link is always at the top) :
 %    segid=sprintf('a%-3d',r1);
     seg=ch2seg(c1);
-    cmd=['patch NGLA ',seg,' ',r1s,' ',segid,' ',r2s,' setup warn ! peptidoglycan link' ];
+    if ~isempty(seg)
+     cmd=['patch NGLA ',seg,' ',r1s,' ',segid,' ',r2s,' setup warn ! peptidoglycan link' ];
+    else
+     cmd=['! patch NGLA ',seg,' ',r1s,' ',segid,' ',r2s,' setup warn ! peptidoglycan link for an invalid segment id'];
+    end
    elseif (ismember(a1,'NE2')) % link from GLN to sugar
 % to change segid to match the GLN (this hack works if the peptidoglycan link is always at the top) :
 %    segid=sprintf('a%-3d',r1);
     seg=ch2seg(c1);
-    cmd=['patch QGLA ',seg,' ',r1s,' ',segid,' ',r2s,' setup warn ! peptidoglycan link' ];
+    if ~isempty(seg)
+     cmd=['patch QGLA ',seg,' ',r1s,' ',segid,' ',r2s,' setup warn ! peptidoglycan link' ];
+    else
+     cmd=['! patch QGLA ',seg,' ',r1s,' ',segid,' ',r2s,' setup warn ! peptidoglycan link for an invalid segment id'];
+    end
+   end
+  elseif (ismember(a1,'C1')) % reverse residue order
+   if     (ismember(a2,'O1'))
+    cmd=['patch 11aa ',segid,' ',r2s,' ',segid,' ',r1s,' setup warn ! sugar link' ];
+   elseif (ismember(a2,'O2'))
+    cmd=['patch 12aa ',segid,' ',r2s,' ',segid,' ',r1s,' setup warn ! sugar link' ];
+   elseif (ismember(a2,'O3'))
+    cmd=['patch 13aa ',segid,' ',r2s,' ',segid,' ',r1s,' setup warn ! sugar link' ];
+   elseif (ismember(a2,'O4'))
+    cmd=['patch 14aa ',segid,' ',r2s,' ',segid,' ',r1s,' setup warn ! sugar link' ];
+   elseif (ismember(a2,'O6'))
+    cmd=['patch 16ab ',segid,' ',r2s,' ',segid,' ',r1s,' setup warn ! sugar link' ];
+   elseif (ismember(a2,'ND2')) % link from ASN to sugar
+% to change segid to match the ASN (this hack works if the peptidoglycan link is always at the top) :
+%    segid=sprintf('a%-3d',r1);
+    seg=ch2seg(c2);
+    if ~isempty(seg)
+     cmd=['patch NGLA ',seg,' ',r2s,' ',segid,' ',r1s,' setup warn ! peptidoglycan link' ];
+    else
+     cmd=['! patch NGLA ',seg,' ',r2s,' ',segid,' ',r1s,' setup warn ! peptidoglycan link for an invalid segment id' ];
+    end
+   elseif (ismember(a2,'NE2')) % link from GLN to sugar
+% to change segid to match the GLN (this hack works if the peptidoglycan link is always at the top) :
+%    segid=sprintf('a%-3d',r1);
+    seg=ch2seg(c2);
+    if ~isempty(seg)
+     cmd=['patch QGLA ',seg,' ',r2s,' ',segid,' ',r1s,' setup warn ! peptidoglycan link' ];
+    else
+     cmd=['! patch QGLA ',seg,' ',r2s,' ',segid,' ',r1s,' setup warn ! peptidoglycan link for an invalid segment id' ];
+    end
    end
   end
-
 %
   if ~isempty(cmd)
    fprintf(fpatch, '%s\n', cmd);
@@ -141,4 +191,3 @@ for i=cid
  pdbout(mol3,[strtrim(segid),'.pdb'],xpdb,ypdb,zpdb,[],[],inds);
 end
 %
-

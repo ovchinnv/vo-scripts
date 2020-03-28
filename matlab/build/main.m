@@ -1,10 +1,12 @@
 % MATLAB routines for trajectory analysis
 %
-name='5cez';
+addpath('~/scripts/matlab/build')
+%
+name='1eo8';
 
 % segment ids for the protein chains : (optional)
-chain_segid={ 'H', 'L', 'G', 'B', 'D' 'E' ; ...
-              'HC  ', 'LC  ','G120','G40 ', 'HC1 ', 'LC1 ' };
+chain_segid={ 'H', 'L', 'A', 'B' ; ...
+              'HC  ', 'LC  ','HA1 ', 'HA2 ' };
 
 ch2seg= @(x) char(chain_segid(1+find(ismember(chain_segid(:), x)))); % get segment ID from chainID
 ch2segt= @(x) strtrim(char(chain_segid(1+find(ismember(chain_segid(:), x))))); % get segment ID from chainID; trimmed to removed leading/trailing spaces
@@ -38,28 +40,11 @@ chainid=[pdb.chainID];
 element=[pdb.element];
 natom=length(pdb);
 %
-chainG=ismember(chainid,'G');
-segid=ch2seg('G');
-for i=find(chainG)
- pdb(i).segID=segid;
-end
-%
-chainB=ismember(chainid,'B');
-segid=ch2seg('B');
-for i=find(chainB)
- pdb(i).segID=segid;
-end
-%
-chainL=ismember(chainid,'L');
-segid=ch2seg('L');
-for i=find(chainL)
- pdb(i).segID=segid;
-end
-%
-chainH=ismember(chainid,'H');
-segid=ch2seg('H');
-for i=find(chainH)
- pdb(i).segID=segid;
+% mark all chains (replacement of explicit code)
+for ch = chain_segid(1,:)
+ cch=char(ch)
+ mcmd=['chain',cch,'=ismember(chainid,''',cch,'''); segid=ch2seg(''',cch,''');for i=find(chain',cch,'); pdb(i).segID=segid; end']
+ eval(mcmd);
 end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -72,82 +57,89 @@ if (1)
 pdbout(mol2,[ch2segt('H'),'.pdb'],xpdb,ypdb,zpdb,[],[],find(chainH));
 pdbout(mol2,[ch2segt('L'),'.pdb'],xpdb,ypdb,zpdb,[],[],find(chainL));
 pdbout(mol2,[ch2segt('B'),'.pdb'],xpdb,ypdb,zpdb,[],[],find(chainB));
-pdbout(mol2,[ch2segt('G'),'.pdb'],xpdb,ypdb,zpdb,[],[],find(chainG));
+pdbout(mol2,[ch2segt('A'),'.pdb'],xpdb,ypdb,zpdb,[],[],find(chainA));
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%% now process heterogeneous atom entries %%%%%%%%%%%%
-pdbh=molecule.Model.HeterogenAtom;
-anum= [pdbh.AtomSerNo]';
-aname={pdbh.AtomName}' ;
-rname={pdbh.resName}' ;
-segid={pdbh.segID}' ;
-resid=[pdbh.resSeq]' ;
-insertion=char({pdbh.iCode});
-occu =[pdbh.occupancy]' ;
-bet  =[pdbh.tempFactor]' ;
-xpdb =[pdbh.X]';
-ypdb =[pdbh.Y]';
-zpdb =[pdbh.Z]';
-chainid=[pdbh.chainID];
-element=[pdbh.element];
+if (isfield(molecule.Model,'HeterogenAtom'))
+ pdbh=molecule.Model.HeterogenAtom;
+ anum= [pdbh.AtomSerNo]';
+ aname={pdbh.AtomName}' ;
+ rname={pdbh.resName}' ;
+ segid={pdbh.segID}' ;
+ resid=[pdbh.resSeq]' ;
+ insertion=char({pdbh.iCode});
+ occu =[pdbh.occupancy]' ;
+ bet  =[pdbh.tempFactor]' ;
+ xpdb =[pdbh.X]';
+ ypdb =[pdbh.Y]';
+ zpdb =[pdbh.Z]';
+ chainid=[pdbh.chainID];
+ element=[pdbh.element];
 %
 % water
-water=ismember(rname,'HOH');
-resnum=1; % renumber residues
-for i=find(water)'
- pdbh(i).resName='TP3';
- pdbh(i).AtomNameStruct.chemSymbol='O';
- pdbh(i).AtomNameStruct.remoteInd='H';
- pdbh(i).AtomNameStruct.branch='2';
- pdbh(i).segID='XWAT';
- pdbh(i).element='';
- pdbh(i).resSeq=resnum;%sprintf('%5d',resnum);
- resnum=resnum+1; % renumber residues
-end
+ water=ismember(rname,'HOH');
+ resnum=1; % renumber residues
+ for i=find(water)'
+  pdbh(i).resName='TP3';
+  pdbh(i).AtomNameStruct.chemSymbol='O';
+  pdbh(i).AtomNameStruct.remoteInd='H';
+  pdbh(i).AtomNameStruct.branch='2';
+  pdbh(i).segID='XWAT';
+  pdbh(i).element='';
+  pdbh(i).resSeq=resnum;%sprintf('%5d',resnum);
+  resnum=resnum+1; % renumber residues
+ end
 
-mol3.Model.Atom=pdbh;
+ mol3.Model.Atom=pdbh;
 % write out pdb files
-pdbout(mol3,'xwat.pdb',xpdb,ypdb,zpdb,[],[],find(water));
+ pdbout(mol3,'xwat.pdb',xpdb,ypdb,zpdb,[],[],find(water));
 
 % rename NAG atoms to match CHARMM carbohydrate force field
 %
-nag=ismember(rname,'NAG');
-nagc8=nag & ismember(aname,'C8') ;
-nago7=nag & ismember(aname,'O7') ;
-nagc7=nag & ismember(aname,'C7') ;
-nagn2=nag & ismember(aname,'N2') ;
+ nag=ismember(rname,'NAG');
+ nagc8=nag & ismember(aname,'C8') ;
+ nago7=nag & ismember(aname,'O7') ;
+ nagc7=nag & ismember(aname,'C7') ;
+ nagn2=nag & ismember(aname,'N2') ;
 
-for i=find(nagc8)'
- pdbh(i).AtomNameStruct.chemSymbol='C';
- pdbh(i).AtomNameStruct.remoteInd='T';
-end
+ for i=find(nagc8)'
+  pdbh(i).AtomNameStruct.chemSymbol='C';
+  pdbh(i).AtomNameStruct.remoteInd='T';
+ end
 
-for i=find(nago7)'
- pdbh(i).AtomNameStruct.chemSymbol='O';
- pdbh(i).AtomNameStruct.remoteInd='';
-end
+ for i=find(nago7)'
+  pdbh(i).AtomNameStruct.chemSymbol='O';
+  pdbh(i).AtomNameStruct.remoteInd='';
+ end
 
-for i=find(nagc7)'
- pdbh(i).AtomNameStruct.chemSymbol='C';
- pdbh(i).AtomNameStruct.remoteInd='';
-end
+ for i=find(nagc7)'
+  pdbh(i).AtomNameStruct.chemSymbol='C';
+  pdbh(i).AtomNameStruct.remoteInd='';
+ end
 
-for i=find(nagn2)'
- pdbh(i).AtomNameStruct.chemSymbol='N';
- pdbh(i).AtomNameStruct.remoteInd='';
-end
+ for i=find(nagn2)'
+  pdbh(i).AtomNameStruct.chemSymbol='N';
+  pdbh(i).AtomNameStruct.remoteInd='';
+ end
 
-mol3.Model.Atom=pdbh;
+ mol3.Model.Atom=pdbh;
 
 % process glycans
-glyco;
+ glyco;
+end
 % create pdbs for missing loops
 missing;
 %
-%return
+% note : the missing residues are all at the ends, so omit them
+return
 % write pdbs with missing coordinates included
-%
-pdbs={'G120.pdb', 'G120-MISSING-1.pdb', 'G120-MISSING-2.pdb', 'G120-MISSING-3.pdb'};%, 'G120-MISSING-4.pdb'};
+% note: will only model one internal missing loop in HA1 and HA2
+pdbs={'HA1.pdb', 'HA1-MISSING-2.pdb'}
 molout=combine_pdbs(pdbs);
-pdbwrite('G120-ALL.pdb', molout); system('echo END >> G120-ALL.pdb');
+pdbwrite('HA1-ALL.pdb', molout); system('echo END >> HA1-ALL.pdb');
+%
+pdbs={'HA2.pdb', 'HA2-MISSING-2.pdb'}
+molout=combine_pdbs(pdbs);
+pdbwrite('HA2-ALL.pdb', molout); system('echo END >> HA2-ALL.pdb');
 %

@@ -1,12 +1,23 @@
 * protein solvation component
 *
 
-set clib ~/scripts/charmm
+if @?clib eq 0 set clib ~/scripts/charmm
 
 !set adpar ../inhib/@{drugfile}/@{drugfile}i
 !set cgenff
 
-stream @{clib}/readpsf36.str
+if @?version eq 0 set version 36
+
+if @?nopar eq 0 set nopar 0
+if @nopar ne 0 goto skippar
+
+if @version eq 36 then
+ stream @{clib}/readpsf36.str
+else
+ stream @{clib}/readpsf.str
+endif
+
+label skippar
 
 if @?buf eq 0 set buf 11.  ! solvation radius
 
@@ -22,8 +33,8 @@ if @?zmin eq 0 calc zmin = ?zmin
 if @?xmax eq 0 calc xmax = ?xmax
 if @?ymax eq 0 calc ymax = ?ymax
 if @?zmax eq 0 calc zmax = ?zmax
-!include xwat in solvation
-define solute select all end
+if @?solute eq 0 set solute all
+define solute select ( @solute ) end
 update atom cutnb 15 ctonnb 10 ctofnb 12 vdw vshift fshift cdie
 
 nobomb
@@ -39,13 +50,18 @@ else
  else
   if @method eq SHELL then
    stream @{clib}/wshell.str
+  else
+   if @method eq BALL then
+    stream @{clib}/wball.str
+   endif
   endif
  endif
 endif
 
 rename segid wat select segid w* end ! rename all waters
 
-!goto write ! skip minimization
+if @?skipmini ne 0 -
+goto write ! skip minimization
 
 cons harm force 30 select solute .and. .not. hydrogen end
 ! cons fix select onlysolute .and. .not. hydrogen end
@@ -66,12 +82,18 @@ label write
 
 write psf @format name @{psffile}_s.psf
 write psf @format name @{psffile}_s-x.psf xplor
-write coord @format name @{corfile}s.cor
-write coord pdb name @{corfile}s.pdb
-* solvated in a box of dimension
-* xmin=@xmi ymin=@ymi zmin=@zmi 
-* xmax=@xma ymax=@yma zmax=@zma 
-*
+!
+if @?corfile ne 0 then
+ write coord @format name @{corfile}s.cor
+ write coord pdb name @{corfile}s.pdb
+else
+ write coord @format name @{pdbfile}s.cor
+ write coord pdb name @{pdbfile}s.pdb
+endif
+!* solvated in a box of dimension
+!* xmin=@xmi ymin=@ymi zmin=@zmi 
+!* xmax=@xma ymax=@yma zmax=@zma 
+!*
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 open write card unit 66 name @{psffile}.str
 if @method eq SHELL then
@@ -80,12 +102,23 @@ write title unit 66
 * set a @maxdist
 
 else
+ if @method eq BALL then
+ write title unit 66
+** Solvated in a sphere of radius and center
+* set R @R
+* set xcen @xcen
+* set ycen @ycen
+* set zcen @zcen
+
+ else
+
 write title unit 66
 ** solvated in an orthorhombic box of the following dimensions
 * set a  @xl
 * set b  @yl
 * set c  @zl
 
+ endif
 endif
 close unit 66
 
@@ -96,4 +129,4 @@ goto kill
 !!!!!!!!! FINISHED !!!!!!!!!!!!
 
 label kill
-stop
+return

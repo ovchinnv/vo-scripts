@@ -6,14 +6,21 @@ set clib ~/scripts/charmm
 !set adpar ../inhib/@{drugfile}/@{drugfile}i
 !set cgenff
 
-stream @{clib}/readpsf36.str
+if @?version eq 0 set version 36
+
+if @version eq 36 then
+ stream @{clib}/readpsf36.str
+else
+ stream @{clib}/readpsf.str
+endif
+
 !write coor pdb name debug.pdb
 ! add ions
 ! replace some of the atoms in the selection below
 ! need to define replacement candidates & set "ionsneeded" & "ion"; segment wat needs to contain solvent molecules
 ! ionseg is the number of ion segment
 
-set protein ( .not. (segid WAT .or. segid TIP3) )
+if @?protein .eq. 0 set protein ( .not. (segid WAT .or. segid TIP3) )
 scalar wcomp set 0 select all end
 scalar wcomp set 1 select @protein end ! this avoids long strings, which might bomb CHARMM
 set protein ( prop wcomp .eq. 1 )
@@ -39,13 +46,17 @@ if @?negative eq 0 calc negative = @positive + ?CGTOT
 !
 ! add potassium or sodium
 set ionsneeded  @positive
-set ion SOD
-set ionseg ion1
+if @?posion eq 0 set posion SOD
+set ion @posion
+if @?segpos eq 0 set segpos ION1
+set ionseg @segpos
 stream @{clib}/addions.str
 ! add chlorine
 set ionsneeded  @negative
-set ion CLA
-set ionseg ion2
+if @?negion eq 0 set negion CLA
+set ion @negion
+if @?segneg eq 0 set segneg ION2
+set ionseg @segneg
 stream @{clib}/addions.str
 !
 write psf @format name @{psffile}n.psf xplor

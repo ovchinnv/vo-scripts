@@ -1,0 +1,20 @@
+* write cor file for restart
+*
+
+set dcdfile output_8332
+
+read psf card name struc/am1_sno.psf
+
+open read file name @{dcdfile}.dcd unit 1
+traj query unit 1
+
+set skip ?skip
+set nfile ?nfile
+calc begin = @skip * ( @nfile - 1 )
+
+traj iread 1 begin @begin nfile @nfile
+
+traj read
+!traj read  ! fails; to prove that we've read the last frame
+write coor card name equil.cor
+ 

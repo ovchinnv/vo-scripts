@@ -1,4 +1,4 @@
 #!/bin/bash
 #translate vmd selection command to charmm (best guess)
 
-sed -e 's/atomselect macro/define/' -e 's/{/sele ( /' -e 's/}/ ) end/' -e 's/to/\:/' -e 's/"/ /g' -e 's/\.//g' -e 's/^#/!/'g  -e 's/and/\.and\./' -e 's/or/\.or\./' $1
+sed -e 's/atomselect macro/define/' -e 's/{/sele ( /' -e 's/}/ ) end/' -e 's/to/\:/' -e 's/"/ /g' -e 's/\.//g' -e 's/^#/!/g'  -e 's/and/\.and\./g' -e 's/or/\.or\./g' $1

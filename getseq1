@@ -23,7 +23,7 @@ BEGIN {
        seq=seq"\n\n"
        seq1=seq1"\n\n"
      }
-     print $9": "$6" "AA[$6]
+#     print $9": "$6" "AA[$6]
      seq=seq" "$6
      pos=pos" "substr(blank,0,3-length($9))""$9
      seq1=seq1""AA[$6]
@@ -33,7 +33,7 @@ BEGIN {
 }
 END {
 print seq1
-print seq
+#print seq
 #  print seq" "pos
 } ' $1   
 

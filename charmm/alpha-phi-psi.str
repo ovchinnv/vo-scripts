@@ -2,15 +2,16 @@
 * keep them near the trans conformation
 *
 
-cons cldh
+!cons cldh
 
+if @?dphi eq 0 calc dphi = 7 / 180 * ?pi
 
-define todo sele (@{omegas}) end
+define todo sele (@{alphas}) end
 if ?nsel eq 0 then
  error nothing to do
 endif
 
-if @?kfcis eq 0  set kfcis 100 ! the restraints should be as weak as possible (but effective)
+if @?kfalpha eq 0  set kfalpha 100 ! the restraints should be as weak as possible (but effective)
 
 label rloop
 
@@ -27,7 +28,8 @@ set resname ?selresn
 if @resname .eq. PRO goto skip
 if @segidj .ne. @segidi goto skip
 
-cons dihe @segidi @residi CA @segidi @residi C @segidj @residj N @segidj @residj CA min 180 force @kfcis
+cons dihe @segidi @residi C @segidj @residj N @segidj @residj CA @segidj @residj C min -57 period 0 width @dphi force @kfalpha ! phi
+cons dihe @segidi @residi N @segidi @residi CA @segidi @residi C  @segidj @residj N min -47 period 0 width @dphi force @kfalpha ! psi
 
 label skip
 if ?nsel gt 0 -

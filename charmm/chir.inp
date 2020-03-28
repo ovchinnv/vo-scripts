@@ -1,0 +1,16 @@
+* Build ribosome
+*
+
+stream /home/simone/opt/ff/charmmff_jul18.str
+
+read psf  card name ribosome.psf
+read coor card name ribosome.cor
+
+open unit 99 name rna.chir read form
+coor chir read unit 99
+close unit 99
+
+coor chir check
+
+stop
+

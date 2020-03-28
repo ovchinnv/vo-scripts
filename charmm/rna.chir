@@ -1,0 +1,32 @@
+* Chirality rules for RNA and DNA. 
+* For DNA the rule aroud C2' is pseudo.
+* Rules are each for all nucleotides.
+* Simone Conti February 2019
+*
+!
+GUA C3' C2' C1' H1'  0. -1 H1'  C1'
+GUA C4' C3' C2' H2'' 0. +1 H2'' C2'
+GUA O4' C4' C3' H3'  0. +1 H3'  C3'
+GUA C1' O4' C4' H4'  0. -1 H4'  C4'
+!
+CYT C3' C2' C1' H1'  0. -1 H1'  C1'
+CYT C4' C3' C2' H2'' 0. +1 H2'' C2'
+CYT C4' C4' C3' H3'  0. +1 H3'  C3'
+CYT C1' O4' C4' H4'  0. -1 H4'  C4'
+!
+ADE C3' C2' C1' H1'  0. -1 H1'  C1'
+ADE C4' C3' C2' H2'' 0. +1 H2'' C2'
+ADE O4' C4' C3' H3'  0. +1 H3'  C3'
+ADE C1' O4' C4' H4'  0. -1 H4'  C4'
+!
+URA C3' C2' C1' H1'  0. -1 H1'  C1'
+URA C4' C3' C2' H2'' 0. +1 H2'' C2'
+URA O4' C4' C3' H3'  0. +1 H3'  C3'
+URA C1' O4' C4' H4'  0. -1 H4'  C4'
+!
+THY C3' C2' C1' H1'  0. -1 H1'  C1'
+THY C4' C3' C2' H2'' 0. +1 H2'' C2'
+THY O4' C4' C3' H3'  0. +1 H3'  C3'
+THY C1' O4' C4' H4'  0. -1 H4'  C4'
+!
+END

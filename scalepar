@@ -93,7 +93,9 @@ awk -v scale=$scale "{ if (NF > 1 ) {V=sprintf($fmt,\$3*scale); sub(\$3,V); prin
 # angles :
 #awk -v scale=$scale "{ if (NF > 1 ) {V=sprintf($fmt,\$4*scale); sub(\$4,V)};print}" _angl >__angl
 #awk -v scale=$scale "{ if (NF > 1 ) {V=sprintf($fmt,\$4*scale); sub(\$4,V); if (NF>6) {if ( \$6 != \"!\" ) {V=sprintf($fmt,\$6*scale); sub(\$6,V)}}}; print}" _angl >__angl #! incl UB
-awk -v scale=$scale "{ if (NF > 1 ) {V=sprintf($fmt,\$4*scale); sub(\$4,V); if (NF>6) {if ( \$6 != \"!\" ) {V=sprintf($fmt,\$6*scale); sub(\" \"\$6,\" \"V)}}}; print}" _angl >__angl #! incl UB
+#awk -v scale=$scale "{ if (NF > 1 ) {V=sprintf($fmt,\$4*scale); sub(\$4,V); if (NF>6) {if ( \$6 != \"!\" ) {V=sprintf($fmt,\$6*scale); sub(\" \"\$6,\" \"V)}}}; print}" _angl >__angl #! incl UB
+# comments without space between ! and text
+awk -v scale=$scale "{ if (NF > 1 ) {V=sprintf($fmt,\$4*scale); sub(\$4,V); if (NF>6) {if ( substr(\$6,1,1) != \"!\" ) {V=sprintf($fmt,\$6*scale); sub(\" \"\$6,\" \"V)}}}; print}" _angl >__angl #! incl UB
 #exit
 # dihedrals :
 awk -v scale=$scale "{ if (NF > 1 ) {V=sprintf($fmt,\$5*scale); sub(\$5,V)}; print}" _dihe >__dihe
