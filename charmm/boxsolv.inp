@@ -65,6 +65,7 @@ energy
 label write
 
 write psf @format name @{psffile}_s.psf
+write psf @format name @{psffile}_s-x.psf xplor
 write coord @format name @{corfile}s.cor
 write coord pdb name @{corfile}s.pdb
 * solvated in a box of dimension
