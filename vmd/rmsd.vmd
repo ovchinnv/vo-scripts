@@ -1,38 +1,54 @@
-#!/bin/vmd
+#!/bin/tcl
 
-package require pbctools
-
+set name rpol-rna
 mol delete all
-set name adk1-dp
-mol load psf ../struc/ak1-d_sn.psf
-mol addfile  ../struc/ak1-dsn.pdb
+mol load psf struc/${name}_sn.psf
+mol addfile struc/${name}_msn.pdb
 
-set itraj 10
-set etraj 29
+set itraj 0
+set etraj 2
 
-set step 10
-for {set i $itraj } { $i <= $etraj } {incr i} {
- mol addfile ./${name}${i}nvt.dcd waitfor all step $step
+if {$argc == 0} {
+ set step 1;
+} else {
+ set step [lindex $argv 0];
 }
-mol addfile output.dcd waitfor all step $step
+set flag eq
+for {set i $itraj } { $i <= $etraj } {incr i} {
+# if {$i >= 6 } { set flag npt }
+ if {$i >=1 } { set flag nvt }
+ mol addfile scratch/${name}${i}${flag}.dcd waitfor all step $step
+}
 
-#source unwrap.vmd ; # should be safe to omit because only the ligands jump across box
+mol addfile output_656.dcd waitfor all step $step
 
 set id [ molinfo top ];
 set nf [molinfo $id get numframes];
 #set selection "protein or resname GTP or resname MG"
 set orientation "protein" ;
-set rms "protein" ;
-set cons "beta 1 and backbone"
-#set cons "beta 1"
-#set cons "noh"
+#set orientation "nucleic" ;
+#set orientation "protein or nucleic" ;
+#set orientation "segname \"HA.*\""
+#set orientation "protein or ( segid TPP and name P1 )"
+#set rms "protein" ;
+#set rms "nucleic" ;
+set rms $orientation
+#set rms "segid CTP"
 
+#set cons "beta 1 and backbone"
+set cons "beta 1"
+set cons "noh"
+set cons "backbone"
+#set cons "name CA"
+
+puts $cons
 set all      [atomselect $id all];
 set orient   [atomselect $id "$orientation and $cons"]
 set template [atomselect $id "$orientation and $cons" frame 0] 
 set rmsd     [atomselect $id "$rms and $cons"]
 set ref      [atomselect $id "$rms and $cons" frame 0] 
 #
+puts "[$orient num] atoms selected for orientation ...\n";
 #
 set fid [open "rmsd.dat" w+];
 set rms_ {};
