@@ -3,7 +3,7 @@
 file='gdata.dat';
 
 % extract grid
-system(['gdata ',restart_file,' > ',file]);
+system([gdatapath,'/gdata ',restart_file,' > ',file]);
 
 d=load(file);
 
@@ -35,7 +35,7 @@ if (exist('restart_subtract'))
 end
 %
 %
-%return ;
+return ;
 
 % check that averages are correct
 fh=99;
