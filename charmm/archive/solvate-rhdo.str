@@ -1,0 +1,44 @@
+*FILENAME: solvate-rhdo.str
+*PURPOSE: solvate system in rhombic dodecahdron
+*AUTHOR: Lennart Nilsson, Karolinska Institutet, 2007
+*
+!RESULTS:
+! Sets up crystal, defines basic image centering, which may have to be adjusted for production use
+! Deletes all residues with at least one non-hydrogen atom outside the RHDO.
+! The RHDO is centered at the origin exactly
+
+!ASSUMPTIONS:
+! The parameter A is the center-center distance between adjacent boxes
+! Selection SOLUTE should be defined as your solute(will not be subject to image centering)
+! You need something like this in your unix shell:
+! export CHM_STREAM=/applic/charmm/scripts
+! NB!Comparison coordinates and WCOMP are overwritten
+
+!USAGE EXAMPLE:
+!
+!set A 40
+!define SOLUTE select segid PROT end
+!stream $CHM_STREAM/solvate-rhdo.str
+!! for subsequent jobs the crystal and image centering have to be setup again
+!END OF USAGE EXAMPLE-----------------------------------------
+! for same volume as RHDO w/ size A the sphere should have radius 0.553*A
+! we make the the sphere somewhat larger, so that we are sure the RHDO fits
+! inside the sphere that is used to fill the RHDO with water
+calc radius = @a * 0.65
+stream $CHM_STREAM/solvent-sphere.str ! NOTE: Script uses WATn segids
+
+! RHDO
+crystal define rhdo @a @a @a 60.0 90.0 60.0
+crystal build cutoff 14.0 noper 0
+image byresidue select .not. SOLUTE end
+! done with crystal and image centering definitions, now do the trimming of the system to
+! fit in the desired primary shape.
+coor copy comp
+update cutim 14.0
+! find and delete residues that have changed position,
+! they are the ones that are outside the primary box
+coor diff comp
+coor dist comp weig
+delete atom sele .byres. (.not. hydrogen .and. prop wcomp .gt. 0.0) end
+
+return

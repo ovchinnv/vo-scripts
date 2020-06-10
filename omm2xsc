@@ -1,0 +1,19 @@
+#!/bin/bash
+# write cell file
+if [ -z $1 ] ; then 
+ echo "USAGE : omm2pdb <xmlfile> <xscfile(optional)>"
+ exit 1;
+else
+ xmlfile=$1
+ if [ ! -z $2 ] ; then
+  xscfile=$2
+ else
+  xscfile=${xmlfile%%.xml}.xsc
+ fi
+fi
+#
+scale=10 ; # AA/nm
+echo -n 0 > $xscfile ;# timestep
+grep "<A " $xmlfile  | sed -e s/.=/\ /g -e s/\"//g -e s.\/\>.. | awk "{printf \"%10.5f %10.5f %10.5f\", \$2*$scale, \$3*$scale, \$4*$scale}" >>  $xscfile
+grep "<B " $xmlfile  | sed -e s/.=/\ /g -e s/\"//g -e s.\/\>.. | awk "{printf \"%10.5f %10.5f %10.5f\", \$2*$scale, \$3*$scale, \$4*$scale}" >> $xscfile
+grep "<C " $xmlfile  | sed -e s/.=/\ /g -e s/\"//g -e s.\/\>.. | awk "{printf \"%10.5f %10.5f %10.5f\n\", \$2*$scale, \$3*$scale, \$4*$scale}" >> $xscfile

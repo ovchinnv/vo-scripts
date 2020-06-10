@@ -1,20 +1,10 @@
 
-pdbin='HH_2.0_47.pdb'
-pdbout='HH_47'
-
+%pdbin='../HC.pdb'
+%pdbout='HC'
 % mutations to make (for now, a single file)
-% (1) - unfolds at Cterm
-mresid=[ 20 26 28 ];
-mrname={ 'ASP' 'GLN' 'GLN' };
-% (2) -- further atempts to stabilize the helix neat C-term
-mresid=[ 20 26 28 ];
-mrname={ 'ASP' 'GLN' 'ASP' }; % unfolds
-
-mresid=[ 20 28 ];
-mrname={ 'ASP' 'ASP' }; % unstable; similar to previous case
-
-mresid=[ 28 ];
-mrname={ 'GLN' }; % original, most successful mutation
+%mresid=[ 71 ];
+%minsert={ ' ' } ;
+%mrname={ 'ALA' };
 
 %%%%%%%%%%%%%%%%%%%%%%%
 aas={ 'ALA' 'ARG' 'ASP' 'GLN' 'LEU' 'THR' 'GLU' 'ILE' 'PHE' 'LYS' 'SER' 'VAL' 'MET' 'ASN' 'PRO' 'TYR' 'HIS' 'HSD' 'HSE' 'GLY' 'TRP' 'CYS' ;
@@ -26,25 +16,33 @@ aa3= @(x) char(aas(find(ismember(aas(:), x))-1)); % get 3 letter code from 1 let
 mol=pdbread(pdbin);
 pdb=mol.Model.Atom;
 resid=[pdb(:).resSeq];
+insertion=char({pdb.iCode});
+if isempty(insertion)
+ insertion(:,1)=' '; % compat
+end
 rname={pdb(:).resName};
 
 mstr='';
 
 for i=1:length(mresid)
  id=mresid(i);
+ ins=char(minsert(i));
+ if isempty(ins)
+  ins(:,1)=' '; % compat
+ end
  name=char(mrname(i));
- minds=find( resid==id );
+ minds=find( resid(:)==id & insertion==ins ) ;
  if (~isempty(minds))
   oldname=rname(minds(1));
-  for ind=minds
+  for ind=minds'
    pdb(ind).resName=name;
   end
-  mstr=[mstr,'_',aa1(oldname),num2str(id),aa1(name)];
+  mstr=[mstr,'_',aa1(oldname),num2str(id),strtrim(ins),aa1(name)];
  end
 end
 
 if (~isempty(mstr))
- if (isempty(pdbout))
+ if (~exist('pdbout'))
   pdbout=pdbin;
  end
  ind=strfind(pdbout,'.');

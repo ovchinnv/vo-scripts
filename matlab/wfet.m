@@ -28,8 +28,8 @@ end
 if (read)
 %%%%%%%%%% process windows
  fbw=0.5; % only applies to the first position component
- iwin=0; % can be 0 or 1 depending on whether the equilibrium point is included
- nwin=8;
+ iwin=1; % can be 0 or 1 depending on whether the equilibrium point is included
+ nwin=7;
 % nsamples=4;
 % [status, result]=system('grep "will quit" pmf3.out | tail -n1 | awk ''{print $3}'''); nsamples=str2num(result)-1 ; nsamples=nsamples-31 ; % screwed up counts due to crash
 % [status, result]=system('grep "will quit" pmf2.log | tail -n1 | awk ''{print $3}'''); nsamples=str2num(result)-251 ;

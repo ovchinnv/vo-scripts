@@ -24,9 +24,10 @@ set residj ?selresi
 set segidj ?selsegi
 set resname ?selresn
 
+if @?noskip .eq. 1 goto noskip
 if @resname .eq. PRO goto skip
-if @segidj .ne. @segidi goto skip
-
+if @segidj .ne. @segidi goto skip ! assume no connection
+label noskip
 cons dihe @segidi @residi CA @segidi @residi C @segidj @residj N @segidj @residj CA min 180 force @kfcis
 
 label skip

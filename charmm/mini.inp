@@ -29,47 +29,49 @@ set imini 1
 set nmini 5
 
 label mini
-
 mini sd nstep 20
 mini conj nstep 20
 mini abnr nstep 10
-
 coor chir check fix
-
 incr imini
 if @imini lt @nmini goto mini
-
+!=======================
 calc kf = @kf / 10
 cons harm sele prop wcomp .eq. 1 end force @kf
-
 set imini 1
 set nmini 5
-
 label mini2
-
 mini sd nstep 20
 mini conj nstep 20
 mini abnr nstep 10
-
 coor chir check fix
-
+incr imini
+if @imini lt @nmini goto mini2
+!=======================
 calc kf = @kf / 10
 cons harm sele prop wcomp .eq. 1 end force @kf
-
 set imini 1
 set nmini 5
-
 label mini3
-
 mini sd nstep 20
 mini conj nstep 20
 mini abnr nstep 10
-
 coor chir check fix
-
 incr imini
 if @imini lt @nmini goto mini3
-
+!=======================
+calc kf = @kf / 10
+cons harm sele prop wcomp .eq. 1 end force @kf
+set imini 1
+set nmini 5
+label mini4
+mini sd nstep 20
+mini conj nstep 20
+mini abnr nstep 10
+coor chir check fix
+incr imini
+if @imini lt @nmini goto mini4
+!=======================
 if @?qnores ne 0 cons harm clear
 if @?qfixcis ne 0 cons cldh
 
@@ -78,7 +80,6 @@ mini abnr nstep 100
 coor chir check fix
 
 write coor card name @corfile_m.cor
+write coor pdb name @corfile_m.pdb
 
 coor orie rms mass
-
-

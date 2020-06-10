@@ -1,5 +1,9 @@
 #!/bin/vmd
-source gname.tcl
+if { ![info exists "path"] } {
+ set path "$env(HOME)/scripts/vmd"
+}
+
+source ${path}/gname.tcl
 
 mol load psf ${name}_sn.psf
 mol addfile ${name}_msn.pdb
@@ -17,3 +21,5 @@ $owat set beta 18.0154 ;
 
 
 $all writepdb ${name}-bmass.pdb
+# note : may need to remove the unit cell line from this pdb if running without PBC :
+exec sed -i /CRYST/d ${name}-bmass.pdb
