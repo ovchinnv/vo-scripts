@@ -93,6 +93,8 @@ scalar Y add -?YMIN
 scalar Z add -?ZMIN
 
 write psf @format name @{psffile}_s.psf
+write psf @format name @{psffile}_s-x.psf xplor
+!
 if @?corfile ne 0 then
  write coord @format name @{corfile}s.cor
  write coord pdb name @{corfile}s.pdb
