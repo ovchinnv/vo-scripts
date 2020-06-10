@@ -1,6 +1,8 @@
 % compute FE from double half-harmonic window simulations
 % plot pmf at the last point as a function of time
 %
+clear graphics_toolkit;
+graphics_toolkit('gnuplot');
 
 close all;
 
@@ -27,7 +29,8 @@ if (read)
 %%%%%%%%%% process windows
  fbw=0.5; % only applies to the first position component
  iwin=1; % can be 0 or 1 depending on whether the equilibrium point is included
- nwin=8;
+ nwin=7;
+ fmaxind=7;
 % nsamples=4;
 % [status, result]=system('grep "will quit" pmf3.out | tail -n1 | awk ''{print $3}'''); nsamples=str2num(result)-1 ; nsamples=nsamples-31 ; % screwed up counts due to crash
 % [status, result]=system('grep "will quit" pmf2.log | tail -n1 | awk ''{print $3}'''); nsamples=str2num(result)-251 ;
@@ -41,8 +44,8 @@ if (read)
  rc=zeros(1,nwin+1-iwin); % reaction coordinate
  for j=1:nwin+1-iwin;
 
-  ncv=3;
-  fname=['data/fbwin',num2str(j-1+iwin),'.dat'];
+  ncv=4;
+  fname=['fbwin_',num2str(j-1+iwin),'.dat'];
   dnew=load(fname) ;
   if exist('nsamples')
     d=dnew(1:2*ncv*nsamples,:); % i.e. 2*ncv lines per samples
@@ -71,21 +74,21 @@ end % read
 % loop over sample limits
 ncv=1;
 maxiter=min(niters);
-miniter=floor(maxiter*0.01);
-istep=100;
+miniter=floor(maxiter*0.4);
+istep=50;
 tfac=40/1000 ; %time interval per slice
 fmax=[];
 ferr=[];
 tsamp=[];
 %
 for niter = miniter:istep:maxiter
-  df=zeros(nwin,ncv,nbox);
+  df=zeros(nwin-iwin+1,ncv,nbox);
   tsamp=[tsamp niter*tfac] ;
   fprintf(['Sampling time (ns) :',num2str(tfac*niter),'\n']);
   for j=1:nwin+1-iwin;
    ie   = niter;
    ib   = 2; % skip per equilibration (10 is the minimum -- old restraints are gradually advanced over 10 iterations)
-   ib   = max(1,round(ie * 0.5));
+   ib   = max(1,round(ie * 0.2)); % NOTE : here the higher seems to be the better -- a long transient  (b/c higher friction ?)
 %
    cvs=cvsall(:,j);
    nsamp=nsampall(:,j);
@@ -166,8 +169,8 @@ for niter = miniter:istep:maxiter
 %
  fave=mean(fe,1);
  fstd=std(fe,1);
- fmax=[fmax fave(end)];
- ferr=[ferr fstd(end)];
+ fmax=[fmax fave(fmaxind-iwin+1)];
+ ferr=[ferr fstd(fmaxind-iwin+1)];
 %
 end % time
 
@@ -176,15 +179,25 @@ if ~nofig
  close all;
  figure('position',[200,200,450,350]); hold on; box on;
 end
-errorbar(tsamp,fmax,ferr);
-leg='FE of AB/AG separation';
-legend(leg,1);
+errorbar(tsamp,fmax,ferr,'ko-');
+%errorbar(tsamp,-fmax,'ko-'); % does not work w/o line style !
+leg='FE of protein/ligand separation';
+legend(leg,2);
+legend boxoff;
 box on;
+ylim([0 20]);
 ylabel('\it F(t) (kcal/mol)', 'fontsize',14);
 xlabel('\it t(ns)', 'fontsize',14);
 
 set(gcf, 'paperpositionmode', 'auto');
-print(gcf, '-dpsc', 'wfet.eps');
-
+%print(gcf, '-depsc2', 'wfet.eps', '-tight');
+%graphics_toolkit('fltk') ; %grashes gs
+%graphics_toolkit('gnuplot') ; %grashes gs
+print('wfet.eps', '-depsc2');
+%
 fmax
 ferr
+%pause(100)
+save -mat wfet.mat tsamp fmax ferr
+data=[tsamp ; fmax ; ferr]'
+save -ascii dg.txt data
