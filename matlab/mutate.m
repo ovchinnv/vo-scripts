@@ -12,6 +12,10 @@ aas={ 'ALA' 'ARG' 'ASP' 'GLN' 'LEU' 'THR' 'GLU' 'ILE' 'PHE' 'LYS' 'SER' 'VAL' 'M
 aa1= @(x) char(aas(find(ismember(aas(:), x))+1)); % get 1 letter code from 3 letter code
 aa3= @(x) char(aas(find(ismember(aas(:), x))-1)); % get 3 letter code from 1 letter code
 
+nts={ 'ADE' 'THY' 'CYT' 'GUA' 'URA' ;
+      'A'   'T'   'C'   'G'   'U' } ;
+nt1= @(x) char(nts(find(ismember(nts(:), x))+1)); % get 1 letter code from 3 letter code
+nt3= @(x) char(nts(find(ismember(nts(:), x))-1)); % get 3 letter code from 1 letter code
 
 mol=pdbread(pdbin);
 pdb=mol.Model.Atom;

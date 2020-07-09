@@ -56,6 +56,13 @@ if version eq 36 then
  read param card append unit 1
 endif
 !
+!
+!===============================================================
+if @?adstr ne 0 then
+ @string open unit 11 read form name @{ADSTR}
+ stream unit 11 parser local
+endif
+!
 label read_psf
 if @?psffile eq 0 return
 @string open unit 1 read @format name @psffile.psf
