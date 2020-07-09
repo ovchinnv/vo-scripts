@@ -16,6 +16,11 @@ if 1:
   corfile=None
 #
  try :
+  velcorfile
+ except NameError:
+  velcorfile=None
+#
+ try :
   velpdbfile
  except NameError:
   velpdbfile=None

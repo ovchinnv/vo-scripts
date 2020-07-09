@@ -59,7 +59,7 @@ endif
 label read_psf
 if @?psffile eq 0 return
 @string open unit 1 read @format name @psffile.psf
-read psf @format unit 1
+read psf @format unit 1 @xplor
 @string close unit 1
 if @?cor eq 0 set cor 1 
 if @?crd eq 0 set crd 1 
