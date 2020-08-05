@@ -12,11 +12,34 @@ read rtf card unit 1
 read param card unit 3
 label skiptop
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+if @?buf eq 0 set buf 10 ! buffer region on each side
+if @?overlap eq 0 set overlap 2.8
+if @?xmin eq 0 set xmin -10
+if @?ymin eq 0 set ymin -10
+if @?zmin eq 0 set zmin -10
+if @?xmax eq 0 set xmax  10
+if @?ymax eq 0 set ymax  10
+if @?zmax eq 0 set zmax  10
+calc xmi = @xmin - @buf 
+calc xma = @xmax + @buf 
+calc ymi = @ymin - @buf 
+calc yma = @ymax + @buf 
+calc zmi = @zmin - @buf 
+calc zma = @zmax + @buf 
+!
+calc xl = ( @xma - @xmi )
+calc yl = ( @yma - @ymi )
+calc zl = ( @zma - @zmi )
+!
+!************ find diameter
+set l @xl
+if  @yl .gt. @l  set l @yl 
+if  @zl .gt. @l  set l @zl 
+if @?R eq 0 calc R = 0.5 * @{l} ! radius
 
-if @?R eq 0 set R 25 ! radius
-if @?xcen eq 0 set xcen 0 ! center
-if @?ycen eq 0 set ycen 0
-if @?zcen eq 0 set zcen 0
+if @?xcen eq 0 calc xcen = 0.5 * ( @xma + @xmi ) 
+if @?ycen eq 0 calc ycen = 0.5 * ( @yma + @ymi ) 
+if @?zcen eq 0 calc zcen = 0.5 * ( @zma + @zmi ) 
 if @?overlap eq 0 set overlap 2.8
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

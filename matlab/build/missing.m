@@ -104,7 +104,7 @@ for iseq=1:nseqs
   mpdb(ind).segID=msegid;
  end
 % print this pdb :
- mol4.Model.Atom=mpdb;
+ mol4.Model.Atom=fixcharmm(mpdb);
  mind=sum(char(mchain(mseqs(1:iseq,1)))==mchainid); % current number of missing loops for this chain
  mname=[strtrim(msegid),'-MISSING-',num2str(mind),'.pdb']; % missing loop file name
  pdbwrite(mname, mol4);

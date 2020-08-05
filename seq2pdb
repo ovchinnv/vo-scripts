@@ -35,7 +35,8 @@ gawk 'BEGIN {
    aa=substr($i, j, 1)
    resname=A3[aa];
 # write pdb entry:
-   printf "%-6s%5d%3s%6s%6d%4s%8.3f%8.3f%8.3f%6.2f%6.2f \n", "ATOM", iatom, "CA", resname, ires,"    ", 0,0,0,0,0
+#   printf "%-6s%5d%3s%6s%6d%4s%8.3f%8.3f%8.3f%6.2f%6.2f \n", "ATOM", iatom, "CA", resname, ires,"    ", 0,0,0,0,0
+   printf "%-6s%5d%3s%6s%6d%4s%8.3f%8.3f%8.3f%6.2f%6.2f \n", "ATOM", iatom, "CA", resname, ires,"    ", 9999,9999,9999,0,0
    iatom=iatom+1;
    ires=ires+1;
 # example PDB line :

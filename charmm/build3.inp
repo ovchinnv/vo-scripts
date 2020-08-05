@@ -1,0 +1,200 @@
+* build HIV gp120+gp40+AB structure
+*
+
+set name fluab
+!set nosugar
+!set nowat
+
+set lib ~/scripts/charmm
+
+set carb
+set adstr ~/charmm/parameters/c36/nag-bma-man.str
+set adstr1 ~/charmm/parameters/c36/stream/toppar_all36_carb_glycopeptide.str
+stream @{lib}/readpsf36.str
+
+set nprot 2
+set prot1 HA1
+set prot2 HA2
+set prot3 HC
+set prot4 LC
+
+set file1 HA1-ALL
+!set file1o HA1-ALL
+!set nmodel1 10      ! number of models to consider
+set file2 HA2
+!set file2o HA2-ALL   ! auxiliary file (with missing coordinates)
+!set nmodel2 10
+set file3 HC
+set file4 LC
+
+set genpar1 setup warn first nter last cter
+set genpar2 setup warn first glyp last cter
+set genpar3 setup warn first nter last cter
+set genpar4 setup warn first nter last cter
+
+set nsymm 3 ! there are six operations, but we only care about the trimer
+set symm1 1
+set symm2 2
+set symm3 3
+!
+set isymm 1
+label symm
+!
+! generate proteins
+set fileo 0 ! this is not a user-defined flag
+set iprot 1
+label prot
+ set segid @prot@@iprot
+ set file @file@@iprot
+!
+!
+ set fileo @file@@{iprot}o ! if this results in an error, the previous value of fileo is used
+ if @fileo ne 0 then
+! save prev (original) coordinates
+  write coor card name tmp.cor comp
+  read sequ pdb name "@FILEO.pdb"
+  generate @segid @genpar@@iprot
+  coor init sele segid @segid end
+  read coor pdb name "@FILEO.pdb" resid ! read original pdb coordinates with missing atoms
+! loop over all models and choose the one with the least rmsd to the original coords
+  set minrmsd 999999
+  set irmsd 0
+  set imodel 1
+  label lmodel
+   read coor pdb name "@{FILE}@{IMODEL}.pdb" resid comp
+   coor orie rms mass sele segid @segid .and. .not. HYDROGEN end comp ! NOTE : orientation will also change (destroy) orientation of previous segments !
+   if ?RMS le @minrmsd then
+    set minrmsd ?RMS
+    set irmsd @imodel
+   endif
+   incr imodel by 1
+   if @imodel le @nmodel@@{iprot} -
+  goto lmodel
+! override model selection :
+!  if @iprot eq 1 set irmsd 5 ! a reasonable, though not perfect, model
+  read coor pdb name "@{FILE}@{IRMSD}.pdb" resid comp
+  coor orie rms mass sele segid @segid .and. type CA end comp
+  coor swap sele segid @segid end ! aligned coordinates in main ; original in comp
+! read coordinates of previous segments that have been destroyed by orientation
+  if @iprot gt 1 read coor card name tmp.cor comp
+  set fileo 0 ! reset for next segment
+ else
+  read sequ pdb name "@FILE.pdb"
+  generate @segid @genpar@@iprot
+  read coor pdb name "@FILE.pdb" resid
+  coor copy comp sele segid @segid end
+ endif
+!stop
+! note that I am putting complete coords into comp so that
+! I can flag incomplete ones in main below
+ incr iprot
+ if @iprot le @nprot -
+goto prot
+
+
+! sugars
+if @?nosugar eq 1 goto skipsugar
+set nsugar 5
+set isugar 1
+label sugar
+ set segid S@isugar
+ read sequ pdb name "@SEGID.pdb"
+ generate @segid setup warn
+! apply patches :
+ stream "@SEGID.str"
+ read coor pdb name "@SEGID.pdb" resid
+ coor copy comp sele segid @segid end
+ incr isugar
+ if @isugar le @nsugar -
+goto sugar
+label skipsugar
+!
+! done with this monomer: rename segments and proceed to next monomer
+set iprot 1
+label prot1
+ set segid @prot@@iprot
+ rename segid @{segid}@symm@@isymm sele segid @segid end
+ incr iprot
+ if @iprot le @nprot -
+goto prot1
+!
+if @?nosugar eq 1 goto skipsugar1
+set isugar 1
+label sugar1
+ set segid S@isugar
+ rename segid @{segid}@symm@@isymm sele segid @segid end
+ incr isugar
+ if @isugar le @nsugar -
+goto sugar1
+label skipsugar1
+!
+ic param
+ic fill preserve
+ic build ! pretty bad placement of ASN  hydrogens
+! rotate
+set move segid *@symm@@isymm
+coor copy comp sele ( @move ) end ! save the unrotated coords for a hack later
+stream rotate@{isymm}.str
+stream @{lib}/../matlab/build/wrap.str ! pack into the same unit cell
+!
+incr isymm
+if @isymm le @nsymm -
+goto symm
+!
+!coor init sele hydrogen end
+!hbuild
+!
+! flag missing coordinates :
+coor swap ! incomplete original coords (if any) are in comp
+scalar wmain set 0
+scalar wmain set 1 sele init end
+scalar wcomp = wmain ! also mark known atoms in the comparison set
+print coor sele .not. ( init .or. hydrogen ) end
+coor swap
+! disulfides :
+! should we put them in on the basis of comp coords ? No, because some sulphur atoms could be missing
+!coor swap
+set dcut 5.5
+stream @{lib}/disu.str
+!coor swap
+!
+autogenerate angle dihe
+!
+set isymm 1
+label symmw
+coor copy sele segid *@symm@@isymm end ! restore coords (we needed the rotated ones for S-S to work, etc )
+if @?nowat eq 1 goto skipwat
+! x waters must be treated here separately because they are incompatibel with autogen
+ set segid XWAT
+ set file XWAT
+ system "sed -i 's/TP3 /TIP3/g' @FILE.pdb"
+ read sequ pdb name "@FILE.pdb"
+ generate @segid noangl nodihe
+ read coor pdb name "@FILE.pdb" resid
+ coor copy comp sele segid @segid end
+! rename
+ rename segid XWT@symm@@isymm sele segid @segid end
+label skipwat
+! rotate
+ set move segid *@symm@@isymm
+ stream rotate@{isymm}.str
+ stream @{lib}/../matlab/build/wrap.str ! pack into the same unit cell
+!
+incr isymm
+if @isymm le @nsymm -
+goto symmw
+coor init sele hydrogen end
+hbuild
+!
+goto skipmini
+mini sd nstep 30  ! step 0.00001
+mini conj nstep 20 ! step 0.00001
+mini abnr nstep 20 ! step 0.00001
+label skipmini
+
+write coor pdb name @{name}x3.pdb
+write coor pdb name @{name}0x3.pdb comp
+write coor card name @{name}x3.cor
+
+write psf card name @{name}x3.psf
+

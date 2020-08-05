@@ -1,0 +1,59 @@
+! charmm
+! dynamo plugin input file for rles
+
+ output {
+  minwarnlev=-1
+ }
+!
+ smcv_init {
+  structure=struc/hp35c27_msn4.pdb
+!  defer_init_dyna=yes
+  pbc=no
+  : init maxcv 1
+  : add rmsd2av nset 4 sele segid=rep1 end sele segid=rep2 end sele segid=rep3 end sele segid=rep4 end mass noro notr force 0
+  : set weight 1 all
+!  : list
+!  : test grad
+  : fill col dyna ! restart coordinates
+  : print name cv.ini col main
+  : set ind 1 cvz 0 col main
+!  : set ind 1 cvz 5 col main ! to decorrelate
+  : copy main dyna
+  : stat hist hnam hist@{irun}.dat hcol inst -
+         rene renm rene@{irun}.dat
+  : dyna rstr reeq 10000 -
+         hisf 100 - 
+         stat staf 1000 -
+         smd
+ }
+!
+
+smcv_done {
+ : print name cv.fin col inst
+ : test grad
+}
+
+!
+adaptive_kforce {
+ cvind=1
+ average_damping_constant=0.9 ! (optional) 0.1 is the default ; this roughly means discard this fraction of samples
+ minimum_kforce=0.1
+ maximum_kforce=10
+ kforce=1 ! since we are starting from an overlapped structure, this is appropriate
+ timestep=0.002
+ kforce_distribution=powerlaw
+ kforce_distribution_exponent=-1
+ kforce_diffusion_exponent=1
+ kforce_diffusion_offset=0.5
+ kforce_gridsize=500
+ output_file_freq=10000
+ stat_add_freq=100 ! how often to append to the time series
+ stat_output_freq=10000
+ skip_iterations=200000
+
+ stat_output_file=adaptive.series@{irun}.txt
+
+ restart_file=@{restart_file}
+ output_file=@{output_file}
+
+}

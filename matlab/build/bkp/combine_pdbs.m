@@ -5,8 +5,8 @@ function molout=combine(pdbs);
 % read first pdb:
 npdbs=length(pdbs);
 if (npdbs<=1)
- warning(' Number of PDBs to combine should be greater than one');
-% return; % can still proceed
+ error(' Number od PDBs to combine must be greater than one');
+ return;
 end
 
 pdbfile=char(pdbs(1));

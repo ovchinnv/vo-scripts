@@ -4,7 +4,7 @@ dir=${PWD##*/}
 echo $dir
 skip=10;
 p=100 ;
-vmd -dispdev text -args $skip <rmsd.vmd
+vmd -dispdev text <rmsd.vmd
 #echo 'plot "rmsd.dat" w lines ; pause 10; '|gnuplot
 #echo "clear graphics_toolkit;graphics_toolkit('gnuplot');d=load(\"rmsd.dat\"); plot(d); pause($p);"|octave
 #echo "d=load(\"rmsd.dat\"); plot(d); ylim([0 10.0]) ; pause($p);"|octave
@@ -13,7 +13,7 @@ echo "\
 clear graphics_toolkit;\
 graphics_toolkit('gnuplot');\
 d=load('rmsd.dat');\
- t=(1:length(d))*0.04 * $skip;\
+ t=(1:length(d))*0.04;\
  plot(t,d); \
  xlabel('t(ns)', 'fontsize',14); \
  ylabel('RMSD(Ang)', 'fontsize',14); \

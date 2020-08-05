@@ -40,28 +40,11 @@ chainid=[pdb.chainID];
 element=[pdb.element];
 natom=length(pdb);
 %
-chainA=ismember(chainid,'A');
-segid=ch2seg('A');
-for i=find(chainA)
- pdb(i).segID=segid;
-end
-%
-chainB=ismember(chainid,'B');
-segid=ch2seg('B');
-for i=find(chainB)
- pdb(i).segID=segid;
-end
-%
-chainL=ismember(chainid,'L');
-segid=ch2seg('L');
-for i=find(chainL)
- pdb(i).segID=segid;
-end
-%
-chainH=ismember(chainid,'H');
-segid=ch2seg('H');
-for i=find(chainH)
- pdb(i).segID=segid;
+% mark all chains (replacement of explicit code)
+for ch = chain_segid(1,:)
+ cch=char(ch)
+ mcmd=['chain',cch,'=ismember(chainid,''',cch,'''); segid=ch2seg(''',cch,''');for i=find(chain',cch,'); pdb(i).segID=segid; end']
+ eval(mcmd);
 end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

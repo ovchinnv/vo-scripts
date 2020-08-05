@@ -82,7 +82,7 @@ label mx
    scalar X add @xdisp select w1 end
    scalar Y add @ydisp select w1 end
    scalar Z add @zdisp select w1 end
-  
+
    incr index by 1
    calc offset = @offset + @nwatres
    incr k by 1
@@ -104,9 +104,10 @@ if @?allowoverlap .ne. 0 goto skipovldel
 delete atom select .byres. (segid wat0 .and. resname TIP3 .and. type OH2 .and. -
                            ( (solute .and. .not. (hydrogen .or. lone) ) .around. @overlap ) ) end
 label skipovldel
+define water sele .byres.  ( type OH2 ) end
 ! delete solvent molecules too far away from solute (two stars delete xwat also)
 delete atom select .byres. (segid *w* .and. resname TIP3 .and. type OH2 .and. -
-                           .not. ( (solute .and. .not. (hydrogen .or. lone) ) .around. @maxdist ) ) end
+                           .not. ( (solute .and. .not. (water .or. hydrogen .or. lone) ) .around. @maxdist ) ) end
 
 delete atom select .byres. (segid *w* .and. resname TIP3 .and. type OH2 .and. - ! two stars delete xwat also
 (  property x .lt. @xmi .or. property x .gt. @xma .or. -
