@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#PDBS=($1)
 PDBS=(${@:1})
 
 if [[ -z $PDBS ]]; then

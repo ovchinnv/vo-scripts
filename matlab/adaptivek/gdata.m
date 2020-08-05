@@ -1,10 +1,13 @@
 % process tempering files
 
 file='gdata.dat';
-
+if ~exist('gdatapath','var')
+ gdatapath='.';
+end
+%
 % extract grid
 system([gdatapath,'/gdata ',restart_file,' > ',file]);
-
+%
 d=load(file);
 
 xmap=d(:,1); % this is the parameter (e.g. temperature, kforce) transformed (e.g. using beta rather than T, or w=log(kforce) rather than kforce)

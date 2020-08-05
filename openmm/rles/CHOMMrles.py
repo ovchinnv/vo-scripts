@@ -456,3 +456,9 @@ if 1:
  fxsc.close();
 #==== reset switching distance
  del switchdist;
+ if (dynamo):
+  del simulation;
+  del system;
+  del factory;
+  del alchsystem;
+  

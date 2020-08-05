@@ -18,6 +18,7 @@ endif
 
 coor copy comp
 scalar WCOMP = WMAIN
+>>>>>>> 919f3f548d7362a1aabe684cb77400bc919c1ca2
 
 if @?qfacts ne 0 stream @{clib}/facts.str
 if @?qfixcis ne 0 stream @{clib}/omega_trans.str

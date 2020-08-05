@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [ -z $1 ] ; then
+ echo "USAGE: ./addsegid <segid>"
+ exit 1
+fi
+
+awk ' BEGIN { segid=ARGV[1]; ARGV[1]="" ; space="                                                                        " }
+
+{
+     if (($1 == "ATOM")||(substr($1,1,6) == "HETATM")) {
+      l=72-length($0)
+      if ( l < 0 ) { l=0 }
+      print substr($0,1,72)""substr(space,1,l)""segid
+     }
+}     
+' $1 $2      
