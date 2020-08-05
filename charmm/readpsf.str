@@ -20,46 +20,78 @@ else
  set string string
 endif
 
-!!!!!!!! TOPOLOGY/PARAMS
-if version eq 36 @string open unit 1 read form name "@TOPPAR/top_all36_prot.rtf"
-if version eq 27 @string open unit 1 read form name "@TOPPAR/top_all27_prot_na.rtf"
-if version eq 22 @string open unit 1 read form name "@TOPPAR/top_all22_prot@{CMAP}.rtf"
-if version eq 19 @string open unit 1 read form name "@TOPPAR/toph19.inp"
-if version eq eef1 open unit 1 read form name "~/scripts/charmm/toph19_eef1_na.inp"
+if @?xplor eq 0 then
+ set xplor
+else
+ set xplor xplor
+endif
+
+! main topology
+if @version eq 36 @string open unit 1 read form name @TOPPAR/top_all36_prot.rtf
+if @version eq 27 @string open unit 1 read form name @TOPPAR/top_all27_prot_na.rtf
+if @version eq 22 @string open unit 1 read form name "@TOPPAR/top_all22_prot@{CMAP}.rtf"
+if @version eq 19 @string open unit 1 read form name "@TOPPAR/toph19.inp"
+if @version eq eef1 open unit 1 read form name "~/scripts/charmm/toph19_eef1_na.inp"
 read rtf card unit 1
 @string close unit 1
+! main parameters
+if @version eq 36 @string open unit 1 read form name @TOPPAR/par_all36_prot.prm
+if @version eq 27 @string open unit 1 read form name @TOPPAR/par_all27_prot_naflex.prm
+if @version eq 22 @string open unit 1 read form name "@TOPPAR/par_all22_prot@{CMAP}.prm"
+if @version eq 19 @string open unit 1 read form name "@TOPPAR/param19.inp"
+if @version eq eef1 open unit 1 read form name "~/scripts/charmm/param19_eef1_na.inp"
+read param card unit 1 flex
+@string close unit 1
 !
+! cgenff
 label cgenff
 if @?cgenff ne 0 then 
- @string open unit 1 read form name "@TOPPARCGENFF/top_all36_cgenff.rtf"
+ @string open unit 1 read form name @TOPPARCGENFF/top_all36_cgenff.rtf
  read rtf card unit 1 append
+ @string close unit 1
+ @string open unit 1 read form name @TOPPARCGENFF/par_all36_cgenff.prm
+ read param card flex unit 1 append
  @string close unit 1
 endif
 
-!
-if version eq 36 @string open unit 1 read form name "@TOPPAR/par_all36_prot.prm"
-if version eq 27 @string open unit 1 read form name "@TOPPAR/par_all27_prot_na.prm"
-if version eq 22 @string open unit 1 read form name "@TOPPAR/par_all22_prot@{CMAP}.prm"
-if version eq 19 @string open unit 1 read form name "@TOPPAR/param19.inp"
-if version eq eef1 open unit 1 read form name "~/scripts/charmm/param19_eef1_na.inp"
-read param card unit 1
-@string close unit 1
-
 ! ATP parameters
-if @?toppar1 ne 0 if @version eq 27 stream @toppar1/toppar_all27_na_nad_ppi.str
+if @?ntp ne 0 then
+ if @?toppar1 ne 0 if @version eq 27 stream @toppar1/toppar_all27_na_nad_ppi.str
+endif
 !
 ! fix to read other c36 pars
-if version eq 36 then
- @string open unit 1 read form name "@TOPPAR/top_all36_na.rtf"
- read rtf card unit 1 append
- @string open unit 1 read form name "@TOPPAR/par_all36_na.prm"
- read param card append unit 1
+if @version eq 36 then
+!===============================================================
+! nucleic acids, if needed
+label na
+if @?na eq 0 then
+ set na 0
+else
+ set na 1
 endif
+if @na eq 1 then
+ @string open unit 1 read form name @TOPPAR/top_all36_na.rtf
+ read rtf card unit 1 append
+ @string open unit 1 read form name @TOPPAR/par_all36_na.prm
+ read param card flex unit 1 append
+endif
+endif
+!
+!====== additional parameters if requested =====================
+if @?adpar ne 0 then
+ @string open unit 1 read form name @{ADPAR}.rtf
+ read rtf card unit 1 append
+ @string close unit 1
+ @string open unit 1 read form name @{ADPAR}.prm
+ read param card flex unit 1 append
+ @string close unit 1
+endif
+!===============================================================
 !
 label read_psf
 if @?psffile eq 0 return
 @string open unit 1 read @format name @psffile.psf
-read psf @format unit 1
+read psf @format unit 1 @xplor
 @string close unit 1
 if @?cor eq 0 set cor 1 
 if @?crd eq 0 set crd 1 

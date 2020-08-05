@@ -13,3 +13,4 @@ axes location off
 # tachyon renderer
 render default Tachyon
 render options Tachyon "/usr/local/lib/vmd/tachyon_LINUXAMD64" -aasamples 32 -trans_vmd -fullshade %s -format TARGA -o %s.tga
+display stereo Off
