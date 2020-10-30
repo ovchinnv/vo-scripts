@@ -459,7 +459,7 @@ if 1:
 # NOTE : I have been unable to use the minimizer when both maxIterations and tolerance are specified (OpenMM7)
  if (mini) :
   dprint("Minimizing energy for ",ministeps," steps");
-  simulation.minimizeEnergy(maxIterations=ministeps); # optional iterations, tolerance
+  simulation.minimizeEnergy(maxIterations=ministeps); # optional maxIterations, tolerance
   dprint("Potential energy after minimization");
   printe(simulation);
 #=============== MD simulation
@@ -479,7 +479,7 @@ if 1:
 
  dprint("Writing simulation restart files");
  simulation.saveState(outputName+'.xml');
- simulation.saveCheckpoint(outputName+'.chk');
+# simulation.saveCheckpoint(outputName+'.chk'); # usually do not need this file
 #==== write periodic box vectors
  state=simulation.context.getState();
  a,b,c=state.getPeriodicBoxVectors();
