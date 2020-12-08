@@ -1,6 +1,6 @@
 #!/bin/vmd
 if { ![info exists "path"] } {
- set path "$(env(HOME)/scripts/vmd"
+ set path "$env(HOME)/scripts/vmd"
 }
 
 source ${path}/gname.tcl
