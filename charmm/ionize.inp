@@ -33,7 +33,7 @@ set nwat ?nsel
 if @?istrength eq 0 set istrength 0.15 ! 0.150 mM
 !calc totion = int ( ?nsel * @istrength / ( 55 + @istrength ) )
 ! account for ions already present:
-define ipresent select segid ion* end
+define ipresent select segid ion* .or. resname SOD .or. resname POT .or. resname CLA end
 calc totion = int ( @nwat * @istrength / ( 55 + @istrength ) ) - ?nsel
 
 ! see if we can put enough ions to cancel the charge & maintain proper ion conc.

@@ -12,10 +12,14 @@ aas={ 'ALA' 'ARG' 'ASP' 'GLN' 'LEU' 'THR' 'GLU' 'ILE' 'PHE' 'LYS' 'SER' 'VAL' 'M
 aa1= @(x) char(aas(find(ismember(aas(:), x))+1)); % get 1 letter code from 3 letter code
 aa3= @(x) char(aas(find(ismember(aas(:), x))-1)); % get 3 letter code from 1 letter code
 
-nts={ 'ADE' 'THY' 'CYT' 'GUA' 'URA' ;
-      'A'   'T'   'C'   'G'   'U' } ;
-nt1= @(x) char(nts(find(ismember(nts(:), x))+1)); % get 1 letter code from 3 letter code
-nt3= @(x) char(nts(find(ismember(nts(:), x))-1)); % get 3 letter code from 1 letter code
+nts={ 'ADE' 'THY' 'CYT' 'GUA' 'URA' 'RDV';
+      'A'   'T'   'C'   'G'   'U' 'R'} ; % add remdesivir (RDV), though nonstandard !
+nt1= @(x) char(nts(find(ismember(nts(:), x))+1));
+nt3= @(x) char(nts(find(ismember(nts(:), x))-1));
+
+res=[aas nts];
+res1= @(x) char(res(find(ismember(res(:), x))+1));
+res3= @(x) char(res(find(ismember(res(:), x))-1));
 
 mol=pdbread(pdbin);
 pdb=mol.Model.Atom;
@@ -41,7 +45,7 @@ for i=1:length(mresid)
   for ind=minds'
    pdb(ind).resName=name;
   end
-  mstr=[mstr,'_',aa1(oldname),num2str(id),strtrim(ins),aa1(name)];
+  mstr=[mstr,'_',res1(oldname),num2str(id),strtrim(ins),res1(name)];
  end
 end
 
