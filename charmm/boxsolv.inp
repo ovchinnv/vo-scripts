@@ -1,6 +1,8 @@
 * protein solvation component
 *
 
+dimens chsize 1000000
+
 if @?clib eq 0 set clib ~/scripts/charmm
 
 !set adpar ../inhib/@{drugfile}/@{drugfile}i

@@ -21,9 +21,11 @@ label disuloop1
  set res2 ?selresi
  ! compute distance
  quick sele bynum @{s1} end sele bynum @{s2} end
- echo ?dist
+ set dist ?dist
  if ?dist lt @dcut then ! update patch script
-  system "echo 'patch disu @{SEG1} @{RES1} @{SEG2} @{RES2} setup warn' >> @CMDFILE "
+!  system "echo 'patch disu @{SEG1} @{RES1} @{SEG2} @{RES2} setup warn' >> @CMDFILE "
+!  system "echo 'patch disu @{SEG1} @{RES1} @{SEG2} @{RES2} setup warn ! @{DIST} < @{DCUT} ' >> @CMDFILE "
+  system "echo -e 'patch disu @{SEG1} @{RES1} @{SEG2} @{RES2} setup warn \041 @{DIST} < @{DCUT} ' >> @CMDFILE "
   define sgs sele sgs .and. .not. bynum @{s2} end
   goto break
  endif

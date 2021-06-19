@@ -1,7 +1,7 @@
 * build structure files
 *
 
-if @?version set version 36
+if @?version eq 0 set version 36
 
 if @?clib eq 0 set clib ~/scripts/charmm
 
@@ -44,7 +44,7 @@ else
  set egen @gen@@{iseg}
 endif
 
-read sequ pdb name @seqfile.pdb
+read sequ pdb name "@SEQFILE.pdb"
 generate @{nm} setup warn first @pfirst last @plast @egen
 ! apply patches, if supplied
 if @?patchfile ne 0 then
@@ -61,7 +61,7 @@ if @?fixpdb ne 0 then
  rename atom OXT sele type OT2  .and. resid @last end
 endif
 
-read coor pdb name @file.pdb resid
+read coor pdb name "@FILE.pdb" resid
 ! to orient with a reference structure
 if @?refpdb@@{iseg} ne 0 then
  read coor pdb name @refpdb@@{iseg} resid comp

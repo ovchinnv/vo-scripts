@@ -12,13 +12,13 @@ function pdbout(pdbname,x,y,z,occupancy,temp,inds);
   yy=y(inds);
   zz=z(inds);
   if (exist('occupancy','var') && ~isempty(occupancy) ) ; occu=occupancy(inds) ; end
-  if (exist('temp','var') && ~ isempty(temp) ) ; tfact=temp(inds) ; end
+  if (exist('temp','var') && ~isempty(temp) ) ; tfact=temp(inds) ; end
  else
   xx=x;
   yy=y;
   zz=z;
   if (exist('occupancy','var') && ~isempty(occupancy) ) ; occu=occupancy ; end
-  if (exist('temp','var') && ~ isempty(temp) ) ; tfact=temp ; end
+  if (exist('temp','var') && ~isempty(temp) ) ; tfact=temp ; end
  end
 %
  n=length(xx);
@@ -36,7 +36,7 @@ function pdbout(pdbname,x,y,z,occupancy,temp,inds);
 %
  if (exist('temp','var') && ~isempty(temp))
   for i=1:n
-   tempModel.Model.Atom(i).temp=tfact(i);
+   tempModel.Model.Atom(i).tempFactor=tfact(i);
   end
  end
 %
