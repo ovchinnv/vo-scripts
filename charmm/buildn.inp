@@ -44,14 +44,9 @@ else
  set egen @gen@@{iseg}
 endif
 
+!read sequ pdb name "@SEQFILE.pdb"
 read sequ pdb name "@SEQFILE.pdb"
 generate @{nm} setup warn first @pfirst last @plast @egen
-! apply patches, if supplied
-if @?patchfile ne 0 then
- stream @patchfile
- autogen angl dihe
-endif
-!
 !
 set last ?nres
 !
@@ -83,8 +78,14 @@ incr iseg by 1
 
 if @iseg le @nseg -
 goto segloop
-
-
+!
+! apply patches, if supplied
+if @?patchfile ne 0 then
+ stream @patchfile
+ autogen angl dihe
+endif
+!
+!
 ! missing
 print coor sele .not. ( init .or. hydrogen ) end
 ! add disulfides
