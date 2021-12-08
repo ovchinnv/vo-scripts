@@ -1,4 +1,4 @@
- function yes=pdbgt(atom1, atom2); % check whether atom1 is further in sequence than atom
+ function yes=pdbeq(atom1, atom2); % check whether atom1 is further in sequence than atom
  % note: only the chain ID, residue number and insertion code are used, atom numbers are ignored
  % this might change in the future, however, atom ordering within a residue is not important
  c1=atom1.chainID;
@@ -16,13 +16,13 @@
  if isempty(i1) ;i1=' '; end
  if isempty(i2) ;i2=' '; end
 
- yes=(c1>c2) | ...
-       (c1==c2) & ( (r1>r2) | ...
-                    (r1==r2) & ( ~isspace(i1) & ( isspace(i2) | ( ~isspace(i2) & i1>i2 ) ) ) ...
+ no=(c1~=c2) | ...
+       (c1==c2) & ( (r1~=r2) | ...
+                    (r1==r2) & ( ~isspace(i1) & ( isspace(i2) | ( ~isspace(i2) & i1~=i2 ) ) ) ...
                   );
 %c1,c2,c1>c2
 %r1,r2,r1>r2
 %i1,i2,i1>i2
 %isempty(i1)
 %isempty(i2)
-%yes
+yes=~no ;

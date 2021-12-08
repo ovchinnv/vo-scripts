@@ -105,7 +105,7 @@ if 1:
  try :
   hmass
  except NameError:
-  hmass=1
+  hmass=1.
 #
  try :
   struna

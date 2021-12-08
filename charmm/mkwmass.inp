@@ -1,0 +1,34 @@
+* mark solvent atoms for watershell
+*
+
+dimens chsize 1000000
+
+if @?clib eq 0 set clib ~/scripts/charmm
+
+!set adpar ../inhib/@{drugfile}/@{drugfile}i
+!set cgenff
+
+if @?version eq 0 set version 36
+
+if @?nopar eq 0 set nopar 0
+if @nopar ne 0 goto skippar
+
+if @version eq 36 then
+ stream @{clib}/readpsf36.str
+else
+ stream @{clib}/readpsf.str
+endif
+
+label skippar
+
+scalar wmain set 0
+scalar wmain = mass sele type CLA .or. type SOD .or. type POT end
+scalar wmain set 18.0155 sele resn TIP3* .and. type OH2 end
+
+if @?corfile ne 0 then
+ write coord card name @{corfile}-mass.cor
+ write coord pdb name @{corfile}-mass.pdb
+else
+ write coord card name @{pdbfile}-mass.cor
+ write coord pdb name @{pdbfile}-mass.pdb
+endif

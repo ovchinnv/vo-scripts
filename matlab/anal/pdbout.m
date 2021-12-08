@@ -1,8 +1,6 @@
 % output x,y,z coordinates in PDB format
 %
-function pdbout(pdbname,x,y,z,occupancy,temp,inds);
-%
- global molecule;
+function pdbout(molecule,pdbname,x,y,z,occupancy,temp,inds);
 %
  tempModel=molecule;
  if (exist('inds','var'))
@@ -12,13 +10,13 @@ function pdbout(pdbname,x,y,z,occupancy,temp,inds);
   yy=y(inds);
   zz=z(inds);
   if (exist('occupancy','var') && ~isempty(occupancy) ) ; occu=occupancy(inds) ; end
-  if (exist('temp','var') && ~ isempty(temp) ) ; tfact=temp(inds) ; end
+  if (exist('temp','var') && ~isempty(temp) ) ; tfact=temp(inds) ; end
  else
   xx=x;
   yy=y;
   zz=z;
   if (exist('occupancy','var') && ~isempty(occupancy) ) ; occu=occupancy ; end
-  if (exist('temp','var') && ~ isempty(temp) ) ; tfact=temp ; end
+  if (exist('temp','var') && ~isempty(temp) ) ; tfact=temp ; end
  end
 %
  n=length(xx);
@@ -36,10 +34,11 @@ function pdbout(pdbname,x,y,z,occupancy,temp,inds);
 %
  if (exist('temp','var') && ~isempty(temp))
   for i=1:n
-   tempModel.Model.Atom(i).temp=tfact(i);
+   tempModel.Model.Atom(i).tempFactor=tfact(i);
   end
  end
 %
  pdbwrite(pdbname,tempModel)
+ fid=fopen(pdbname,'A'); fprintf(fid,'END\n'); fclose(fid); % append END to the file because CHARMM needs at least one line after the last coordinate
 %
 end

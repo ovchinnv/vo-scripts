@@ -1,6 +1,8 @@
 * Script to add ions into a solvated box by replacing some waters 
 *
 
+dimens chsize 1000000
+
 set clib ~/scripts/charmm
 
 !set adpar ../inhib/@{drugfile}/@{drugfile}i

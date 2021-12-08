@@ -28,11 +28,14 @@ fwrite(fid, 84, 'int32');
 
 fwrite(fid, 164, 'int32'); 
 fwrite(fid, 2, 'int32');     % number of 80-character lines in the title
-count = fprintf(fid, 'REMARKS FILENAME=%s CREATED BY MATLAB',filename);
+% ok, who the fuck cares what the original name was, what are you the FBI?
+remark = sprintf('REMARKS FILENAME=%s CREATED BY MATLAB',filename);
+count = fprintf(fid, '%s', remark(1:min(80,length(remark))));
 for i = count+1:80
   fwrite(fid, ' ', 'uchar');
 end
-count = fprintf(fid, 'REMARKS DATE: %s ', datestr(now));
+remark = sprintf('REMARKS DATE: %s ', datestr(now));
+count = fprintf(fid, '%s', remark(1:min(80,length(remark))));
 for i = count+1:80
   fwrite(fid, ' ', 'uchar');
 end
