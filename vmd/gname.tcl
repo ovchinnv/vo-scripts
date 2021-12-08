@@ -1,3 +1,3 @@
 #!/bin/vmd
-set name [exec ls | grep _msn.pdb | awk -F "_" "{print \$1}"]
+set name [exec ls | grep sn.pdb | sed -E s/_m?sn.pdb//]
 puts $name
