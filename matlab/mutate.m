@@ -1,12 +1,12 @@
+%pdbin='3lzg-5naz-fus|hux-candidate-3.pdb'
+%pdbout='mut-ss';
+%mresid=[ 310 93 ] ;
+%minsert={ ' ' ' ' } ;
+%mrname={ 'CYS' 'CYS' } ;
+%msegid={ 'HA11' 'HA31' } ;
 
-%pdbin='../HC.pdb'
-%pdbout='HC'
-% mutations to make (for now, a single file)
-%mresid=[ 71 ];
-%minsert={ ' ' } ;
-%mrname={ 'ALA' };
 
-%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 aas={ 'ALA' 'ARG' 'ASP' 'GLN' 'LEU' 'THR' 'GLU' 'ILE' 'PHE' 'LYS' 'SER' 'VAL' 'MET' 'ASN' 'PRO' 'TYR' 'HIS' 'HSD' 'HSE' 'GLY' 'TRP' 'CYS' ;
       'A'   'R'   'D'   'Q'   'L'   'T'   'E'   'I'   'F'   'K'   'S'   'V'   'M'   'N'   'P'   'Y'   'H'   'H'   'H'   'G'   'W'   'C' } ;
 aa1= @(x) char(aas(find(ismember(aas(:), x))+1)); % get 1 letter code from 3 letter code
@@ -24,6 +24,7 @@ res3= @(x) char(res(find(ismember(res(:), x))-1));
 mol=pdbread(pdbin);
 pdb=mol.Model.Atom;
 resid=[pdb(:).resSeq];
+segid={pdb.segID}' ;
 insertion=char({pdb.iCode});
 if isempty(insertion)
  insertion(:,1)=' '; % compat
@@ -32,6 +33,8 @@ rname={pdb(:).resName};
 
 mstr='';
 
+qseg=exist('msegid');
+
 for i=1:length(mresid)
  id=mresid(i);
  ins=char(minsert(i));
@@ -39,13 +42,24 @@ for i=1:length(mresid)
   ins(:,1)=' '; % compat
  end
  name=char(mrname(i));
- minds=find( resid(:)==id & insertion==ins ) ;
+ if (qseg)
+  seg=char(msegid(i));
+  fprintf('%s%d%s%s%s...','Looking for residue ',id,ins,'in segment ',seg)
+  minds=find( resid(:)==id & insertion==ins & ismember(segid,seg)) ;
+ else
+  fprintf('%s%d%s...','Looking for residue ',id,ins)
+  minds=find( resid(:)==id & insertion==ins ) ;
+ end
  if (~isempty(minds))
   oldname=rname(minds(1));
   for ind=minds'
    pdb(ind).resName=name;
   end
-  mstr=[mstr,'_',res1(oldname),num2str(id),strtrim(ins),res1(name)];
+  newmut=[res1(oldname),num2str(id),strtrim(ins),res1(name)];
+  fprintf(['Made mutation ', newmut,'\n']);
+  mstr=[mstr,'_',newmut];
+ else
+  fprintf('not found\n')
  end
 end
 

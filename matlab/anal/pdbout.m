@@ -1,8 +1,6 @@
 % output x,y,z coordinates in PDB format
 %
-function pdbout(pdbname,x,y,z,occupancy,temp,inds);
-%
- global molecule;
+function pdbout(molecule,pdbname,x,y,z,occupancy,temp,inds);
 %
  tempModel=molecule;
  if (exist('inds','var'))
@@ -41,5 +39,6 @@ function pdbout(pdbname,x,y,z,occupancy,temp,inds);
  end
 %
  pdbwrite(pdbname,tempModel)
+ fid=fopen(pdbname,'A'); fprintf(fid,'END\n'); fclose(fid); % append END to the file because CHARMM needs at least one line after the last coordinate
 %
 end
