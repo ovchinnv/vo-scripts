@@ -7,6 +7,10 @@ function seq2pdb(seq,ibeg,pdbname,mins,mchainid,msegid )
  ires=ibeg
  if (~exist('mchainid')) ; mchainid=''; end
  if (~exist('msegid')) ; msegid=''; end
+ if (length(msegid)<4) ;
+  blank4='    ';
+  msegid=[msegid,blank4(1:4-length(msegid))];
+ end
  if (~exist('mins')) ; ins=''; else ; ins=mins ; end
  ind=1;
  for a1=seq

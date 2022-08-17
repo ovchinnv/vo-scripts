@@ -25,12 +25,8 @@ awk -v qshow=$qshow 'BEGIN {
  } else if ( $0 ~ /^\s*[0-9]+\s*!\s*[Nn][Bb][Oo][Nn][Dd]*/ ) {
   exit
  } else if ( NF>=7) {
-<<<<<<< HEAD
   q+=$7;
   if ( qshow ) { print $7 };
-=======
-  q+=$7; print q;
->>>>>>> 919f3f548d7362a1aabe684cb77400bc919c1ca2
  }
 }
 END {
