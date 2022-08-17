@@ -128,6 +128,18 @@ if 1:
 # randomize temporary dcd names to avoid overwrite if running in parallel
  except NameError:
   qrandname=1
+#
+# 2/22 : try to use new langevin "middle" integrator
+ try:
+  newLangevin
+ except NameError:
+  newLangevin=1
+ if (newLangevin==1) :
+  try:
+   mm.LengevinMiddleIntegrator()
+  except AttributeError:
+   newLangevin=0
+#
 #========================== Subroutines
 #==========================
  def dprint(*args):
@@ -412,8 +424,12 @@ if 1:
     dprint("Initializing Verlet integrator with timestep ",dt*u.femtosecond);
     integrator=mm.VerletIntegrator(dt*u.femtosecond);
    else:
-    dprint("Initializing Langevin thermostatted integrator with timestep ",dt*u.femtosecond," coupled to bath with friction ",friction/u.picosecond," at temperature ",temperature*u.kelvin);
-    integrator=mm.LangevinIntegrator(temperature*u.kelvin, friction/u.picosecond, dt*u.femtosecond);
+    if (newLangevin==1):
+     dprint("Initializing Langevin (Middle) thermostatted integrator with timestep ",dt*u.femtosecond," coupled to bath with friction ",friction/u.picosecond," at temperature ",temperature*u.kelvin);
+     integrator=mm.LangevinMiddleIntegrator(temperature*u.kelvin, friction/u.picosecond, dt*u.femtosecond);
+    else:
+     dprint("Initializing Langevin thermostatted integrator with timestep ",dt*u.femtosecond," coupled to bath with friction ",friction/u.picosecond," at temperature ",temperature*u.kelvin);
+     integrator=mm.LangevinIntegrator(temperature*u.kelvin, friction/u.picosecond, dt*u.femtosecond);
   else:
    dprint("Initializing Verlet integrator with timestep ",dt*u.femtosecond);
    integrator=mm.VerletIntegrator(dt*u.femtosecond);
