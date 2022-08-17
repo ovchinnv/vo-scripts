@@ -19,8 +19,8 @@ gawk 'BEGIN {
 
         A3["A"]="ALA";A3["R"]="ARG";A3["D"]="ASP";A3["Q"]="GLN";A3["L"]="LEU";A3["T"]="THR";A3["E"]="GLU";A3["I"]="ILE";
         A3["F"]="PHE";A3["K"]="LYS";A3["S"]="SER";A3["V"]="VAL";A3["M"]="MET";A3["N"]="ASN";A3["P"]="PRO";A3["Y"]="TYR";
-        A3["H"]="HIS";                           ;A3["G"]="GLY";A3["W"]="TRP";A3["C"]="CYS";
-        A3["H"]="HSD";
+        A3["H"]="HSD";                           ;A3["G"]="GLY";A3["W"]="TRP";A3["C"]="CYS";
+        A3["H"]="HIS";
 
         ires=ARGV[2] ;# number of first residue
         ARGV[2]=""

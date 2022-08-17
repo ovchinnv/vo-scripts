@@ -108,6 +108,9 @@ print coor sele .not. init end
 
 energy
 
+if @?qalign eq 0 set qalign 0
+if @qalign eq 1 coor orie sele .not. ( type OH2 .or. type 
+
 open unit 7 card name @{output}.psf
 write psf card unit 7
 open unit 7 card name @{output}.cor

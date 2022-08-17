@@ -1,0 +1,41 @@
+* link protein chains with a GLY linker
+*
+
+calc lp1 = @llen + 1
+calc lp2 = @llen + 2 ! add 2 for overlap
+
+read sequ GLY @lp2
+generate @lnm setup warn first none last none
+ic seed @lnm 1 N @lnm 1 CA @lnm 1 C
+ic build
+
+define bb sele type C .or. type CA .or. type N .or. type O end
+! type of orientation (unsolved issue : one major defect of the charmm selection is that the order does not matter)
+if @?qo eq 0 set qo B
+if @qo .eq. N then ! nter
+ define template sele bb .and. ( ( segid @snt .and. resid @rnt ) ) end
+ define orient   sele bb .and. ( ( segid @lnm .and. resid 1 )  ) end
+else
+ if @qo .eq. C then
+  define template sele bb .and. ( segid @sct .and. resid @rct ) end
+  define orient   sele bb .and. ( segid @lnm .and. resid @lp2 ) end
+ else ! both ends
+  define template sele bb .and. ( ( segid @snt .and. resid @rnt ) .or.  ( segid @sct .and. resid @rct ) ) end
+  define orient   sele bb .and. ( ( segid @lnm .and. resid 1 )    .or.  ( segid @lnm .and. resid @lp2 ) ) end
+ endif
+endif
+!
+coor copy comp sele segid @lnm end
+coor dupl sele template end sele orient end
+coor orie rms sele orient end comp ! orient in comp set
+coor copy sele segid @lnm end
+!
+! delete overlaps:
+delete atom sele segid @lnm .and. ( resid 1 .or. resid @lp2 ) end
+! topological link:
+patch link @snt @rnt @lnm 2
+patch link @lnm @lp1 @sct @rct
+!
+scalar wmain set 0 sele segid @lnm end
+scalar wcomp = wmain sele segid @lnm end
+
