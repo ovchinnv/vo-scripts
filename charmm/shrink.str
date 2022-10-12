@@ -1,0 +1,25 @@
+* generate ic tables ; shrink bond entries, and rebuild;
+* the purpose is to shrink side chains after interpolation
+*
+
+set bb ( type N .or. type C .or. type CA )  ! omit these backbone atoms
+set sugar ( resname NAG .or. resname BMA .or. resname MAN .or. resname FUC ) ! sugar residues 
+
+nobomb ! don't bomb on empty selections
+
+if @?haveic eq 0 set haveic 0
+if @haveic eq 0 then
+ ic gene ! generate ic table entries
+ set haveic 1
+endif
+ic fill ! fill ic table from main coordinates
+
+! shrink the side chain bonds (fischer's approach) & rebuild structures
+
+ic fill ! fill ic table from main coordinates
+if @?bsc eq 0 set bsc 0.5
+ic scale bond @bsc
+
+coor init select .not. ( @bb .or. @sugar ) end
+if ?nsel eq ?natom ic seed 1 CA 1 C 2 N  ! if all atoms were initialized, need to seed before build
+ic build

@@ -1,6 +1,8 @@
 * protein solvation component
 *
 
+dimens chsize 1000000
+
 if @?clib eq 0 set clib ~/scripts/charmm
 
 !set adpar ../inhib/@{drugfile}/@{drugfile}i
@@ -53,6 +55,12 @@ else
   else
    if @method eq BALL then
     stream @{clib}/wball.str
+   else
+    if @method eq SPHERE then
+     stream @{clib}/wball.str
+    else
+     echo "METHOD @{METHOD} NOT RECOGNIZED. AVALABLE METHODS ARE BOX, CUBE, SHELL, BALL"
+    endif
    endif
   endif
  endif
@@ -60,7 +68,8 @@ endif
 
 rename segid wat select segid w* end ! rename all waters
 
-if @?skipmini ne 0 -
+if @?skipmini eq 0 set skipmini 0
+if @skipmini ge 1 then
 goto write ! skip minimization
 
 cons harm force 30 select solute .and. .not. hydrogen end
@@ -68,19 +77,23 @@ cons harm force 30 select solute .and. .not. hydrogen end
 ! mini sd nstep 100
 mini conj nstep 10
 mini abnr nstep 10
- 
 label unconstrained_mini ! no constraints in reaction zone 
 cons harm clear
 mini conj nstep 10
 minimize abnr nstep 10
-
-
+!
 label skipmini
 energy
-
 label write
+! shift corner to origin
+coor stat
+scalar X add -?XMIN
+scalar Y add -?YMIN
+scalar Z add -?ZMIN
 
 write psf @format name @{psffile}_s.psf
+write psf @format name @{psffile}_s-x.psf xplor
+!
 if @?corfile ne 0 then
  write coord @format name @{corfile}s.cor
  write coord pdb name @{corfile}s.pdb
@@ -109,13 +122,25 @@ else
 * set zcen @zcen
 
  else
+  if @method eq SPHERE then
+ write title unit 66
+** Solvated in a sphere of radius and center
+* set R @R
+* set xcen @xcen
+* set ycen @ycen
+* set zcen @zcen
 
+  else
 write title unit 66
 ** solvated in an orthorhombic box of the following dimensions
 * set a  @xl
 * set b  @yl
 * set c  @zl
+* set alpha 90.0
+* set beta 90.0
+* set gamma 90.0
 
+  endif
  endif
 endif
 close unit 66

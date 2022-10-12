@@ -34,7 +34,7 @@ label segs
  set protein ( prop wcomp .eq. 1 )
  set candidates  .byres. (.not. ( @protein .around. 5 ) ) .and. segid wat
 !
-! add ligans using ionization scripts
+! add ligands using ionization scripts
  set ionsneeded @numlig
  set ion @seg@@iseg
  set ionseg @seg@@iseg

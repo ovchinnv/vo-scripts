@@ -1,5 +1,5 @@
 #!/bin/bash
-# write structure file for Desmond
+# convert xml files used by openmm to pdb
 
 if [ -z $1 ] ; then 
  echo "USAGE : omm2pdb <psf file> <xmlfile> <xscfile(optional)>"

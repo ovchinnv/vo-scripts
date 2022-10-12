@@ -1,0 +1,21 @@
+#!/bin/vmd
+if { ![info exists "path"] } {
+ set path "$env(HOME)/scripts/vmd"
+}
+
+source ${path}/gname.tcl
+
+mol load psf ${name}_sn.psf
+mol addfile ${name}_msn.pdb
+
+# add masses to ions and OH2 atoms of water only ; note that I will set the mass of the latter at 18
+
+set all [atomselect top "all" ];
+$all set beta 0
+
+set res [atomselect top " protein and noh " ];
+$res set beta 1 ;
+
+$all writepdb ${name}-res.pdb
+# note : may need to remove the unit cell line from this pdb if running without PBC :
+exec sed -i /CRYST/d ${name}-res.pdb

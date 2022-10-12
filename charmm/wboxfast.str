@@ -101,6 +101,9 @@ delete atom sele segid w0 end
 ! delete molecules overlapping with solute
 delete atom select .byres. (segid wat0 .and. resname TIP3 .and. type OH2 .and. -
                            ( (solute .and. .not. (hydrogen .or. lone) ) .around. @overlap ) ) end
+! delete atoms that are too close to crystal water (if present as segid XWAT)
+delete atom select .byres. (segid wat0 .and. resname TIP3 .and. type OH2 .and. -
+                           ( (segid XWAT .and. .not. (hydrogen .or. lone) ) .around. 0.99 ) ) end
 
 delete atom select .byres. (segid *w* .and. resname TIP3 .and. type OH2 .and. - ! two stars delete xwat also
 (  property x .lt. @xmi .or. property x .gt. @xma .or. -

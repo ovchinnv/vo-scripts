@@ -1,0 +1,86 @@
+* generate 27 file fron 19 file
+*
+
+if @?format eq 0 set format card
+if @?outname eq 0 set outname myo6pps_rigc_tr27
+
+set version eef1
+set psffile c19/myo6pps_tr19
+set pdbfile c19/myo6pps_rigc_tr19_
+set resid
+stream ./readpsf.str
+
+! restore original orientation so that can put in ADP + PI + water
+read coor pdb name c19/pps/myo6pps_.pdb resid comp
+coor orie rms !
+
+write coor pdb name hc.pdb   select segid HC  end
+write coor pdb name lc.pdb   select segid LC  end
+
+! change histidine notation
+!HC
+system "awk ' { sub(" HSD ", " HSE "); print $0 } ' hc.pdb  > hc1.pdb"
+system "awk ' { sub(" HIS ", " HSD "); print $0 } ' hc1.pdb > hc2.pdb"
+!
+! PHOS
+system "awk ' { sub(" O5 ", " O2 "); sub(" H6 ", " H2 ");sub(" P2 ", " P1 "); sub(" PIH ", " P_1 ");print $0 } ' c19/pps/phos_.pdb  > phos1.pdb"
+!
+
+! now build everything fropm PDB files
+
+delete atom select all end
+set version 27
+set toppar   ~/charmm/c34a2/toppar
+set toppar1 ~/charmm/c34a2/toppar/stream/
+format card
+
+if version eq 27 open unit 1 read form name "@TOPPAR/top_all27_prot_na.rtf"
+read rtf card unit 1
+close unit 1
+if version eq 27 open unit 1 read form name "@TOPPAR/par_all27_prot_na.prm"
+read param card unit 1
+close unit 1
+! ATP parameters
+if @?toppar1 ne 0 if @version eq 27 stream @toppar1/toppar_all27_na_nad_ppi.str
+stream pi.str ! phosphate
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+open read card unit 1 name hc2.pdb
+read sequ pdb unit 1
+generate HC setup warn
+read coor pdb unit 1 resid
+!
+open read card unit 1 name c19/pps/adp_.pdb
+read sequ pdb unit 1
+generate ADP setup warn
+read coor pdb unit 1 resid
+!
+open read card unit 1 name phos1.pdb
+read sequ pdb unit 1
+generate PHOS setup warn
+read coor pdb unit 1 resid
+! reorient phosphate group so that a deprotonated oxygen coordinates MG2+
+
+!
+open read card unit 1 name c19/pps/mg.pdb
+read sequ pdb unit 1
+generate MG setup warn
+read coor pdb unit 1 resid
+!
+open read card unit 1 name c19/pps/xwat_.pdb
+read sequ pdb unit 1
+generate XWAT setup warn nodih noang
+read coor pdb unit 1 resid
+
+hbuild
+! delete waters except if they coordinate MG
+delete atom select .byres. (segid XWAT .and. .not. ( segid MG .around. 4 ) ) end
+!autogen angle dihe ! for testing -- passed
+
+write psf card name @outname.psf
+write coor card name @outname.cor
+write coor pdb name @outname.pdb
+
+
+
+

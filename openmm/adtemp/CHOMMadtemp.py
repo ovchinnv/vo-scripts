@@ -198,7 +198,7 @@ if 1:
     xmlfile;
     dprint("Setting orthorhombic cell lengths from file '",xmlfile,"'")
     dx, dy, dz=get_box_size_xml(xmlfile);
-   except Die:
+   except NameError:
     derror("Could not set periodic cell size.")
 #
   try:
@@ -442,3 +442,5 @@ if 1:
  if (adTemp):
   dprint("Finalizing Adaptive Tempering Plugin")
   tempering.done()
+  del simulation;
+  del system;

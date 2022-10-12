@@ -1,0 +1,35 @@
+#!/bin/vmd
+# for use with C6 influenza designs
+
+set id [molinfo top];
+set nf [molinfo $id get numframes];
+
+set only "name CA"
+set selection "segid C62 C63" ;# collagens are sufficient
+set orient   [atomselect $id "($selection) and $only"]
+set template [atomselect $id "($selection) and $only" frame 0] 
+
+set m2 [ atomselect $id {segid ".*2"} ]
+set m3 [ atomselect $id {segid ".*3"} ]
+
+for { set i 1 } { ${i}<$nf } { incr i } {
+ $orient frame ${i}
+ set rmsd [ measure rmsd $orient $template ];
+ if  { $rmsd > 7 } { # swap
+  $m2 frame $i
+  $m3 frame $i
+#
+  set x2 [ $m2 get x];
+  $m2 set x [ $m3 get x];
+  $m3 set x $x2
+#
+  set y2 [ $m2 get y];
+  $m2 set y [ $m3 get y];
+  $m3 set y $y2
+#
+  set z2 [ $m2 get z];
+  $m2 set z [ $m3 get z];
+  $m3 set z $z2
+ };#if
+};#for
+unset only selection template orient ;

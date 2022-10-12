@@ -53,7 +53,7 @@ for i=1:length(inds)
   [x, y, z, rmsd]=bestfit(x,y,z,xave,yave,zave,mass,ind);
  end
 %
- pdbout([name,nm,'.pdb'], xpdb, ypdb, zpdb, [], [], ind)
+ pdbout(molecule,[name,nm,'.pdb'], xpdb, ypdb, zpdb, [], [], ind)
 % write new dcd :
- writedcd([name,nm,'.dcd'], x(ind,:), y(ind,:), z(ind,:));
+ writedcd(molecule,[name,nm,'.dcd'], x(ind,:), y(ind,:), z(ind,:));
 end

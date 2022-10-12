@@ -1,4 +1,4 @@
-function z=smooth(x,y,delta)
+function z=smooth1(x,y,delta)
 
 sx=size(x);
 if(sx(1)>1);  xtemp=x'; else ; xtemp=x; end ;
@@ -13,10 +13,10 @@ for n=1:delta
   
   
   if (tempx(1)>x(1))
-   tempx=[x(1) tempx];tempy=[y(1) tempy];
+   tempx=[x(1) tempx(:)'];tempy=[y(1) tempy(:)'];
   end  
   if (tempx(end)<x(end))
-   tempx=[tempx x(end) ];tempy=[tempy y(end)];
+   tempx=[tempx(:)' x(end) ];tempy=[tempy(:)' y(end)];
   end  
   
   z=z+interp1(tempx,tempy,xtemp);

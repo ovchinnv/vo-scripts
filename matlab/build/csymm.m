@@ -31,7 +31,7 @@ symm=r290(i:j-1,:);
 nrot=max(nrot);
 
 % rearrange data as rotations and translations
-Arot=reshape( [a1,a2,a3]', 3,3,nrot ); % note : transpose os the inverse, which is what we actually need for CHARMM b/c LEFT hand rule
+Arot=reshape( [a1,a2,a3]', 3,3,nrot ); % note : transpose is the inverse, which is what we actually need for CHARMM b/c LEFT hand rule
 for irot=1:nrot
  Arot(:,:,irot) = Arot(:,:,irot)' ;
 end

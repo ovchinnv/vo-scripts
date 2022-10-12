@@ -1,0 +1,8 @@
+#!/bin/bash
+trimer=3n3f ;# pdb
+seq3=`~/scripts/getseq ${trimer}.pdb | grep " A " | awk '{for (i=6;i<=NF;i++) print $i}'`
+seq1=`~/scripts/seq31 <<< $seq3`
+trimerseq=`echo $seq1 | tr -d ' '`
+#trimerseq=${trimerseq#NL} ;# to remove from Nterm
+echo ">$trimer" > $trimer.fa
+echo $trimerseq >> $trimer.fa

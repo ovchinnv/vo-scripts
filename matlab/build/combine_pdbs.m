@@ -5,8 +5,8 @@ function molout=combine(pdbs);
 % read first pdb:
 npdbs=length(pdbs);
 if (npdbs<=1)
- error(' Number od PDBs to combine must be greater than one');
- return;
+ warning(' Number of PDBs to combine should be greater than one');
+% return; % can still proceed
 end
 
 pdbfile=char(pdbs(1));
@@ -29,7 +29,7 @@ for i=2:npdbs
 % binary search limits
 % find first entry in PDB1 such that j-record in PDB2 is larger
   i1=1;
-  i2=length(pdb1)+1; % pdb1 length will change because we are inserting into it ; +1 accounts for cases where all pdb1 entries are smaller
+  i2=length(pdb1);
   while i2-i1>1
    imid = fix((i1+i2)/2);
    if pdbgt(pdb1(imid),pdb2(j)) % pdb1(imid) greater than pdb2(j)
@@ -39,8 +39,17 @@ for i=2:npdbs
    end % if
   end % while
 % insert record
-  pdb1(i2+1:end+1)=pdb1(i2:end);
-  pdb1(i2)=pdb2(j);
+  if pdbgt(pdb1(i1),pdb2(j))
+   pdb1(i1+1:end+1)=pdb1(i1:end);
+   pdb1(i1)=pdb2(j);
+  elseif pdbgt(pdb1(i2),pdb2(j))
+   pdb1(i2+1:end+1)=pdb1(i2:end);
+   pdb1(i2)=pdb2(j);
+  else % insert after i2
+   pdb1(i2+2:end+1)=pdb1(i2+1:end);
+   pdb1(i2+1)=pdb2(j);
+  end
+
  end % pdb2 atoms
 end % npdbs
 % write combined pdb

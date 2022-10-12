@@ -1,0 +1,17 @@
+#!/bin/bash
+#convert orthogonal simulation cell from charmm rst format to xsc
+
+infile=$1
+
+outfile=${infile%%.rst}.xsc
+
+echo "# CONVERTED FROM $infile" > $outfile
+
+data=(`grep !CRYSTAL -A3 $infile | sed 's/D/E/g'`)
+
+dx=${data[2]}
+dy=${data[4]}
+dz=${data[7]}
+
+echo "0 $dx 0 0 0 $dy 0 0 0 $dx 0 0 0 0 0 0 0 0 0" >> $outfile
+

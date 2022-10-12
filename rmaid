@@ -1,0 +1,13 @@
+#!/bin/bash
+# remove atom id from pdb file, which will force the dynamo plugin to supply consecutive numbers starting from 1
+
+awk '
+ BEGIN {FIELDWIDTHS="6 5 65"
+    }
+{
+ if (substr($1,0,4) == "ATOM") {
+  $2="*****"
+ }
+ print $1$2$3
+} ' $1
+
