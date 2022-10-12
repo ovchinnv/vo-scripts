@@ -103,6 +103,9 @@ delete atom sele segid w0 end
 if @?allowoverlap .ne. 0 goto skipovldel
 delete atom select .byres. (segid wat0 .and. resname TIP3 .and. type OH2 .and. -
                            ( (solute .and. .not. (hydrogen .or. lone) ) .around. @overlap ) ) end
+! delete atoms that are too close to crystal water (if present as segid XWAT)
+delete atom select .byres. (segid wat0 .and. resname TIP3 .and. type OH2 .and. -
+                           ( (segid XWAT .and. .not. (hydrogen .or. lone) ) .around. 0.99 ) ) end
 label skipovldel
 define water sele .byres.  ( type OH2 ) end
 ! delete solvent molecules too far away from solute (two stars delete xwat also)

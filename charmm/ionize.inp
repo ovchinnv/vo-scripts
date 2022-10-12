@@ -61,6 +61,25 @@ if @?segneg eq 0 set segneg ION2
 set ionseg @segneg
 stream @{clib}/addions.str
 !
+
+show ?CGTOT
+if @?skipmini eq 0 set skipmini 1
+
+if @skipmini le 0 then
+write coor card name ionized-premini0.cor
+cons harm force 30 select solute .and. .not. hydrogen end ! NOTE : solute is unknown here
+! cons fix select onlysolute .and. .not. hydrogen end
+! mini sd nstep 100
+mini conj nstep 10
+mini abnr nstep 10
+label unconstrained_mini ! no constraints in reaction zone 
+cons harm clear
+mini conj nstep 10
+minimize abnr nstep 10
+label skipmini
+endif
+energy
+label write
 write psf @format name @{psffile}n.psf xplor
 ! standard psf
 write psf oldpsf @format name @{psffile}no.psf
@@ -74,13 +93,3 @@ write coor pdb name @{outfile}n.pdb
 !write coor pdb name myosolv.pdb
 !if ( ?CGTOT .ae. 0 ) system "echo ERROR: could not balance charge"
 
-show ?CGTOT
-
-
-goto kill
-
-
-!!!!!!!!!!!!!!
-
-label kill
-stop

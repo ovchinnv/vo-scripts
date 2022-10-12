@@ -68,7 +68,8 @@ endif
 
 rename segid wat select segid w* end ! rename all waters
 
-if @?skipmini ne 0 -
+if @?skipmini eq 0 set skipmini 0
+if @skipmini ge 1 then
 goto write ! skip minimization
 
 cons harm force 30 select solute .and. .not. hydrogen end
@@ -76,18 +77,14 @@ cons harm force 30 select solute .and. .not. hydrogen end
 ! mini sd nstep 100
 mini conj nstep 10
 mini abnr nstep 10
- 
 label unconstrained_mini ! no constraints in reaction zone 
 cons harm clear
 mini conj nstep 10
 minimize abnr nstep 10
-
-
+!
 label skipmini
 energy
-
 label write
-
 ! shift corner to origin
 coor stat
 scalar X add -?XMIN
