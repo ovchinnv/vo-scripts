@@ -69,8 +69,7 @@ endif
 rename segid wat select segid w* end ! rename all waters
 
 if @?skipmini eq 0 set skipmini 0
-if @skipmini ge 1 then
-goto write ! skip minimization
+if @skipmini ge 1 goto skipmini ! skip minimization
 
 cons harm force 30 select solute .and. .not. hydrogen end
 ! cons fix select onlysolute .and. .not. hydrogen end
