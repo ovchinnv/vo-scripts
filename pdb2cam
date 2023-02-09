@@ -1,0 +1,29 @@
+#!/bin/bash
+# remove protons from PDB using VMD
+# needed for camsol server
+
+if [ -z $1 ] ; then
+ echo "USAGE : $0 <pdbfile_in> <pdbfile_out>(optional)"
+ exit
+fi
+
+pdbin=$1
+if [ -z $2 ] ; then
+ name=${pdbin%.pdb}
+ pdbout=${name}-camsol.pdb 
+# echo $pdbout
+else
+ pdbout=$2
+fi
+
+vmd -dispdev text << EOF
+mol load pdb ${pdbin}
+set noh [atomselect [molinfo top] "noh"];
+\$noh num
+\$noh writepdb $pdbout
+EOF
+
+ok=`exec sed -i /CRYST/d ${pdbout}`
+#cat ${pdbout}
+# remove HSD, CD2 for ILE:
+sed -e 's/HSD/HIS/' -e 's/CD  ILE/CD1 ILE/' -e 's/OT[12] /O   /' -i ${pdbout}

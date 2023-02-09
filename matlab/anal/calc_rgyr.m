@@ -8,7 +8,7 @@ function rgyr=calc_rgyr(xall,yall,zall,wgt,inds)
  if (~exist('wgt') || isempty(wgt)) ; wgt=ones(size(xref)); end
  wgt=wgt/sum(wgt(inds));
  swgt=sqrt(wgt);
- oswgt=1./swgt(:);
+% oswgt=1./swgt(:);
 %
  nall=(size(xall,2)); %; number of frames
  rgyr=zeros(1,nall);

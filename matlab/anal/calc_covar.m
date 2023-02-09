@@ -1,4 +1,4 @@
-function CRX=calc_covar(x,y,z,w);
+function CR=calc_covar(x,y,z,w);
 % compute covariance matrix :
  [natom,nframes]=size(x);
  if (~exist('w'))
@@ -10,13 +10,14 @@ function CRX=calc_covar(x,y,z,w);
  X=[ sw.*x ; sw.*y ; sw.*z; ]' ;% concatenate coordinates ; the variables must be in different columns; the observations in different rows
 %
  disp(['Computing covariance matrix ...']);
- CX=cov(X);
+ fprintf('Found %d frames and %d atoms ...\n',nframes, natom);
+ CX=cov(X); % note that this is weighted covariance matrix (unless weights are 1)
 
 % compute variances for normalization
- VX=var(X,0);
+ VX=var(X,0); % likewise, a scaled variance
 % test:
 %SX=sqrt(VX);
-%W=CX./(SX'*SX);
+%W=CX./(SX'*SX); % to remove mass weighting
 %W2=corrcoef(X);
 %pcolor(W-W2) ;shading interp ; colorbar % this difference is 1e-15 or 1e-5 depending on how variance is normalized
 %return
@@ -34,8 +35,10 @@ function CRX=calc_covar(x,y,z,w);
 %   CR=CR+CX(indi,indj);
 %  end
  end
-% ==== 
-% same for variances : 
+% ====
+ return
+% omit normalization, because it can be done from CR later ; on the other hand, it cannot be undone without SR (diagonals)
+% same for variances (diagonal of CR) :
  VR=zeros(1,natom);
  for i=1:3 % over components
   VR=VR+VX( (i-1)*natom + 1 : i*natom );
@@ -43,4 +46,4 @@ function CRX=calc_covar(x,y,z,w);
 
  SR=sqrt(VR); % these are also root-mean-square fluctuations
  NR=SR'*SR;   % normalization matrix
- CRX=CR./NR ;
+ CRX=CR./NR ; % correlation coefficient matri

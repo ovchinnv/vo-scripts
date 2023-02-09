@@ -1,5 +1,5 @@
 #!/bin/vmd
-# align each frame for top molecule w.r.t. the preceding frame
+# align each frame for top molecule
 #
 ############################################################################
 set id [ molinfo top ];
@@ -25,12 +25,10 @@ set all      [atomselect $id all];
 #
 if { ![info exists "orient" ] } {
  set orient   [atomselect $id "($selection) and $cons"]
- set norient [$orient num];
- puts "Performing best-fit alignment based on ($selection) and $cons, which contain $norient atoms ... "
+ puts "Performing best-fit alignment based on ($selection) and $cons ... "
 }
 if { ![info exists "template"] } {
  set template [atomselect $id "($selection) and $cons" frame 0] 
- set ntemplate [$template num];
 }
 #
 set rmsd {};

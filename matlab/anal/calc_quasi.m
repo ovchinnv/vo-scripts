@@ -1,6 +1,6 @@
 function [tsquant, tsclass, nu_ps, evc, CX] =calc_quasi(x,y,z,w,temperature);
 % perform principal component analysis and quasiharmonic analysis
-% note that quasiharmonic frewquencies will be incorrect unless mass-weighting is used
+% note that quasiharmonic frequencies will be incorrect unless mass-weighting is used
 %
 % some constants :
 %
@@ -28,30 +28,34 @@ else
 end
 sw=repmat(sw,3,1);
 %
-X=[ x ; y ; z; ]' ;% concatenate coordinates ; the variables must be in different columns; the observations in different rows
+X=[ x ; y ; z ; ]' ;% concatenate coordinates ; the variables must be in different columns; the observations in different rows
 disp(['Computing ',num2str(3*natom),'x',num2str(3*natom),' covariance matrix ...']);
-CX=cov(X);
+CX=cov(X); % note that this is not the usual procedure ; we usually mass weight the coords first ;
+% note also that we are not specifying normalization ; we should use cov(x,1) to nomalize by the # samples N, not by N-1 (default)
+% however, for large numbers of samples, the difference will be unimportant
+% mean is always subtracted
 %
-% mass-weight covarianve matrix
+% mass-weight covariance matrix
 % diagonalize
 disp(['Computing eigenvalues and eigenvectors ...']);
 %
 [evc,ev]=eig( (sw*sw').*CX); % mass-weight before diagonalization
-% scale eigenvectors by inverse square root of mass to obtain Cartesian eigenvectors
+% scale eigenvectors by inverse square root of mass to obtain Cartesian eigenvectors (modes of vibration)
 osw=repmat(1./sw,1,length(sw));
 evc=osw.*evc;
 %
 % compute frequencies
-ev=diag(ev);
-ev=ev(find(ev>tol)); % throw away negative evalues;
+ev=diag(ev); % grab the diagonal entries
+ev=ev(find(ev>tol)); % throw away negative evalues or zeros; this should also remove rigid-body modes
+% note that not having enough samples will create additional zero eigenvalues
 %
 % now have raw eigenvalues from the diagonalization of the covariance matrix (units Ang^2 amu)
-% convert frequencies to s^-1 units : 
+% convert frequencies to s^-1 units :
 %
 fact  = 1./sqrt(jle * 1e-23) / (2*pi);  % 2.0455e13 ! this essentially converts kilocalories to Joules in kT
 nu_s  = sqrt(kbt./ev) .* fact ; % per second
 nu_ps = nu_s*1e-12 ;% per picosecond
-nu_icm= (nu_s/c)';% iverse wavelength per centimeter
+nu_icm= (nu_s/c)';% inverse wavelength per centimeter
 
 % Andricioaei formula
 pe=nu_s*h/kbt;           % energy of the quasiharmonic modes divided by kBT

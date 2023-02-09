@@ -1,0 +1,305 @@
+* modified residues from lysine, 1- and 2- butenes, and propene for 
+* peptide staples
+*
+
+read rtf card append
+* modified residues from lysine, 1- and 2- butenes, and propene for 
+* peptide staples
+*
+36  1
+
+DECL -CA  
+DECL -C  
+DECL -O  
+DECL +N  
+DECL +HN  
+DECL +CA  
+DEFA FIRS NTER LAST CTER   
+AUTO ANGLES DIHE
+
+RESI R8          0.00   ! modified residue for Verdine's stapled peptide
+                        ! Nterm staple leg ; note the R chirality at CA
+GROUP
+ATOM CB1  CT3    -0.27
+ATOM HB11 HA3     0.09
+ATOM HB12 HA3     0.09
+ATOM HB13 HA3     0.09
+GROUP
+ATOM N    NH1    -0.47  !             |
+ATOM HN   H       0.31  !          HN-N
+ATOM CA   CT1     0.16  !  HB13       |   HB1 HG1 HD1 HE1 HZ1 HH1 HT    HI1
+                        !      \      |   |   |   |   |   |   |   |    /
+GROUP                   ! HB11--CB1--CA--CB--CG--CD--CE--CZ--CH--CT==CI
+ATOM CB   CT2    -0.18  !      /      |   |   |   |   |   |   |        \
+ATOM HB1  HA2     0.09  !  HB12       |   HB2 HG2 HD2 HE2 HZ2 HH2       HI2
+ATOM HB2  HA2     0.09  !           O=C
+GROUP                   !             |
+ATOM CG   CT2    -0.18
+ATOM HG1  HA2     0.09
+ATOM HG2  HA2     0.09
+GROUP   
+ATOM CD   CT2    -0.18
+ATOM HD1  HA2     0.09
+ATOM HD2  HA2     0.09
+GROUP   
+ATOM CE   CT2    -0.18
+ATOM HE1  HA2     0.09
+ATOM HE2  HA2     0.09
+GROUP   
+ATOM CZ   CT2    -0.18
+ATOM HZ1  HA2     0.09
+ATOM HZ2  HA2     0.09
+GROUP   
+ATOM CH   CT2    -0.18
+ATOM HH1  HA2     0.09
+ATOM HH2  HA2     0.09
+GROUP ! from propene
+ATOM CT  CE1 -0.15
+ATOM HT  HE1  0.15
+!GROUP ! from propene
+ATOM CI  CE2 -0.42
+ATOM HI1 HE2  0.21
+ATOM HI2 HE2  0.21
+GROUP ! from protein backbone
+ATOM C    C       0.51
+ATOM O    O      -0.51
+! connectivity
+BOND CB CA   CG CB   CD CG   CE CD
+BOND CZ CE   CH CZ   CT CH   
+DOUBLE CI CT
+BOND N  HN   N  CA   C  CA   
+BOND C  +N   CA CB1  CB1 HB11 CB1 HB12 CB1 HB13 
+BOND CB HB1  CB HB2  CG HG1   CG HG2  
+BOND CD HD1  CD HD2  CE HE1   CE HE2 
+BOND CZ HZ1  CZ HZ2  CH HH1   CH HH2  
+BOND CT HT   CI HI1  CI HI2 
+
+DOUBLE   O  C   
+IMPR N -C CA HN  C CA +N O   
+CMAP -C  N  CA  C   N  CA  C  +N
+DONOR HN N   
+ACCEPTOR O C   
+
+IC -C   CA   *N   HN    1.3482 123.5700  180.0000 115.1100  0.9988
+IC -C   N    CA   C     1.3482 123.5700  180.0000 107.2900  1.5187
+IC N    CA   C    +N    1.4504 107.2900  180.0000 117.2700  1.3478
+IC +N   CA   *C   O     1.3478 117.2700  180.0000 120.7900  1.2277
+IC CA   C    +N   +CA   1.5390 117.2700  180.0000 124.9100  1.4487
+! invert chirality below (staple requires that it be R not S)
+!IC N    C    *CA  CB    1.4504 107.2900  122.2300 111.3600  1.5568
+IC N    C    *CA  CB    1.4504 107.2900  -122.2300 111.3600  1.5568
+! adding ICs for CA methylation (taken from ALA IC table)
+IC C    CA   CB1  HB11  1.5390 111.0900  177.2500 109.6000  1.1109
+IC HB1  CA  *CB1  HB12  1.1109 109.6000  119.1300 111.0500  1.1119
+IC HB1  CA  *CB1  HB13  1.1109 109.6000 -119.5800 111.6100  1.1114
+!
+! modify below for R (not S)
+!IC N    C    *CA  HA    1.4504 107.2900 -116.8800 107.3600  1.0833
+IC N    C    *CA  CB1   1.4504 107.2900  116.8800 107.3600  1.5568
+IC N    CA   CB   CG    1.4504 111.4700  180.0000 115.7600  1.5435
+! side-chain carbon ICs
+IC CA   CB   CG   CD    1.5568 115.7600  180.0000 113.2800  1.5397
+IC CB   CG   CD   CE    1.5435 113.2800  180.0000 112.3300  1.5350
+! duplicating above entry for CZ and CH (and correcting bonds+angles)
+IC CG   CD   CE   CZ    1.5568 112.3300  180.0000 113.2800  1.5435
+IC CD   CE   CZ   CH    1.5435 113.2800  180.0000 113.2800  1.5435
+! ethylene group carbons
+IC CE   CZ   CH   CT    1.5435 113.2800  180.0000 113.2800  1.5435
+IC CZ   CH   CT   CI    1.5435 113.2800  180.0000 120.0000  1.3420
+!
+! ICs involving side-chain hydrogens
+IC CG   CA   *CB  HB1   1.5435 115.7600  120.9000 107.1100  1.1146
+IC CG   CA   *CB  HB2   1.5435 115.7600 -124.4800 108.9900  1.1131
+!
+IC CD   CB   *CG  HG1   1.5397 113.2800  120.7400 109.1000  1.1138
+IC CD   CB   *CG  HG2   1.5397 113.2800 -122.3400 108.9900  1.1143
+IC CE   CG   *CD  HD1   1.5435 112.3300  122.2500 108.4100  1.1141
+IC CE   CG   *CD  HD2   1.5435 112.3300 -121.5900 108.1300  1.1146
+! duplicating above for CE, CZ, CH
+IC CZ   CD   *CE  HE1   1.5435 113.2800  122.2500 108.4100  1.1141
+IC CZ   CD   *CE  HE2   1.5435 113.2800 -121.5900 108.1300  1.1146
+IC CH   CE   *CZ  HZ1   1.5435 113.2800  122.2500 108.4100  1.1141
+IC CH   CE   *CZ  HZ2   1.5435 113.2800 -121.5900 108.1300  1.1146
+IC CT   CZ   *CH  HH1   1.5435 113.2800  122.2500 108.4100  1.1141
+IC CT   CZ   *CH  HH2   1.5435 113.2800 -121.5900 108.1300  1.1146
+! ethylene group hydrogens
+IC HT   CI   *CT  CH    1.5435 120.0000  180.0000 120.0000  1.5435
+IC CH   CT   CI   HI1   1.5435 120.0000  180.0000 120.0000  1.1000
+IC CH   CT   CI   HI2   1.5435 120.0000    0.0000 120.0000  1.1000
+
+RESI S5           0.00  ! modified residue for Verdine's stapled peptide
+                        ! Cterm staple leg : note the S chirality at CA
+GROUP
+ATOM CB1  CT3    -0.27
+ATOM HB11 HA3     0.09
+ATOM HB12 HA3     0.09
+ATOM HB13 HA3     0.09
+GROUP
+ATOM N    NH1    -0.47  !             |
+ATOM HN   H       0.31  !          HN-N
+ATOM CA   CT1     0.16  !  HB13       |   HB1 HG1 HD1 HE    HZ1
+                        !      \      |   |   |   |   |    /
+GROUP                   ! HB11--CB1--CA--CB--CG--CD--CE==CZ
+ATOM CB   CT2    -0.18  !      /      |   |   |   |        \
+ATOM HB1  HA2     0.09  !  HB12       |   HB2 HG2 HD2       HZ2
+ATOM HB2  HA2     0.09  !           O=C
+GROUP                   !             |
+ATOM CG   CT2    -0.18
+ATOM HG1  HA2     0.09
+ATOM HG2  HA2     0.09
+GROUP   
+ATOM CD   CT2    -0.18
+ATOM HD1  HA2     0.09
+ATOM HD2  HA2     0.09
+GROUP ! from propene
+ATOM CE  CE1 -0.15
+ATOM HE  HE1  0.15
+!GROUP ! from propene
+ATOM CZ  CE2 -0.42
+ATOM HZ1 HE2  0.21
+ATOM HZ2 HE2  0.21
+GROUP ! from protein backbone
+ATOM C    C       0.51
+ATOM O    O      -0.51
+! connectivity
+BOND CB CA   CG CB   CD CG   CE CD
+DOUBLE CE CZ
+BOND N  HN   N  CA   C  CA   
+BOND C  +N   CA CB1  CB1 HB11 CB1 HB12 CB1 HB13 
+BOND CB HB1  CB HB2  CG HG1   CG HG2  
+BOND CD HD1  CD HD2  CE HE
+BOND CZ HZ1  CZ HZ2 
+
+DOUBLE   O  C   
+IMPR N -C CA HN  C CA +N O   
+CMAP -C  N  CA  C   N  CA  C  +N
+DONOR HN N   
+ACCEPTOR O C   
+
+IC -C   CA   *N   HN    1.3482 123.5700  180.0000 115.1100  0.9988
+IC -C   N    CA   C     1.3482 123.5700  180.0000 107.2900  1.5187
+IC N    CA   C    +N    1.4504 107.2900  180.0000 117.2700  1.3478
+IC +N   CA   *C   O     1.3478 117.2700  180.0000 120.7900  1.2277
+IC CA   C    +N   +CA   1.5390 117.2700  180.0000 124.9100  1.4487
+IC N    C    *CA  CB    1.4504 107.2900  122.2300 111.3600  1.5568
+! adding ICs for CA methylation (taken from ALA IC table)
+IC C    CA   CB1  HB11  1.5390 111.0900  177.2500 109.6000  1.1109
+IC HB1  CA  *CB1  HB12  1.1109 109.6000  119.1300 111.0500  1.1119
+IC HB1  CA  *CB1  HB13  1.1109 109.6000 -119.5800 111.6100  1.1114
+!
+! change for methylation :
+!IC N    C    *CA  HA    1.4504 107.2900 -116.8800 107.3600  1.0833
+IC N    C    *CA  CB1   1.4504 107.2900  -116.8800 107.3600  1.5568
+IC N    CA   CB   CG    1.4504 111.4700  180.0000 115.7600  1.5435
+! side-chain carbon ICs
+IC CA   CB   CG   CD    1.5568 115.7600  180.0000 113.2800  1.5397
+! ethylene group carbons
+IC CB   CG   CD   CE    1.5435 113.2800  180.0000 113.2800  1.5435
+IC CG   CD   CE   CZ    1.5435 113.2800  180.0000 120.0000  1.3420
+! ICs involving side-chain hydrogens
+IC CG   CA   *CB  HB1   1.5435 115.7600  120.9000 107.1100  1.1146
+IC CG   CA   *CB  HB2   1.5435 115.7600 -124.4800 108.9900  1.1131
+!
+IC CD   CB   *CG  HG1   1.5435 113.2800  120.7400 109.1000  1.1138
+IC CD   CB   *CG  HG2   1.5435 113.2800 -122.3400 108.9900  1.1143
+IC CE   CG   *CD  HD1   1.5435 113.2800  122.2500 108.4100  1.1141
+IC CE   CG   *CD  HD2   1.5435 113.2800 -121.5900 108.1300  1.1146
+! ethylene group hydrogens.
+IC HE   CZ   *CE  CD    1.5435 120.0000  180.0000 120.0000  1.5435
+IC CD   CE   CZ   HZ1   1.5435 120.0000  180.0000 120.0000  1.1000
+IC CD   CE   CZ   HZ2   1.5435 120.0000    0.0000 120.0000  1.1000
+
+
+! modifications to patches in view of the removed HA (methylation)
+PRES MNTR         1.00 ! standard N-terminus
+GROUP                  ! use in generate statement
+ATOM N    NH3    -0.29 !
+ATOM HT1  HC      0.33 !          HT1
+ATOM HT2  HC      0.33 !     (+) /
+ATOM HT3  HC      0.33 !  -- CA--N--HT2
+ATOM CA   CT1     0.30 !     |    \
+DELETE ATOM HN         !           HT3
+BOND HT1 N HT2 N HT3 N   
+DONOR HT1 N   
+DONOR HT2 N   
+DONOR HT3 N   
+IC HT1  N    CA   C     0.0000  0.0000  180.0000  0.0000  0.0000
+IC HT2  CA   *N   HT1   0.0000  0.0000  120.0000  0.0000  0.0000
+IC HT3  CA   *N   HT2   0.0000  0.0000  120.0000  0.0000  0.0000
+
+! staple patch
+PRES STA7        0.0  ! patch to join peptide staple legs. Must use the correct N-term and C-term 
+                      ! residues
+                      ! follow with AUTOgenerate ANGLes DIHEdrals command
+GROUP ! from propene
+ATOM 1CT CE1 -0.15
+ATOM 1HT HE1  0.15
+GROUP ! from propene
+ATOM 2CE CE1 -0.15
+ATOM 2HE HE1  0.15
+
+DELETE ATOM 1CI
+DELETE ATOM 1HI1
+DELETE ATOM 1HI2
+DELETE ATOM 2CZ
+DELETE ATOM 2HZ1
+DELETE ATOM 2HZ2
+
+BOND 1CT 2CE
+IC 1CZ 1CH  1CT  2CE    1.5435 113.2800  180.0000 120.0000  1.3420
+IC 1CH 1CT  2CE  2CD    1.5435 120.0000  180.0000 120.0000  1.5345
+IC 1CH 1CT  2CE  2HE    1.5435 120.0000    0.0000 120.0000  1.1000
+! from the other side :
+IC 2CG 2CD  2CE  1CT    1.5435 113.2800  180.0000 120.0000  1.3420
+IC 2CD 2CE  1CT  1HT    1.5435 120.0000    0.0000 120.0000  1.1000
+
+! staple patch
+PRES STA4        0.0  ! patch to join peptide staple legs for i,i+4 staple. Must use the correct N-term and C-term 
+                      ! residues
+                      ! follow with AUTOgenerate ANGLes DIHEdrals command
+GROUP ! from propene
+ATOM 1CE CE1 -0.15
+ATOM 1HE HE1  0.15
+GROUP ! from propene
+ATOM 2CE CE1 -0.15
+ATOM 2HE HE1  0.15
+
+DELETE ATOM 1CZ
+DELETE ATOM 1HZ1
+DELETE ATOM 1HZ2
+DELETE ATOM 2CZ
+DELETE ATOM 2HZ1
+DELETE ATOM 2HZ2
+
+BOND 1CE 2CE
+IC 1CG 1CD  1CE  2CE    1.5435 113.2800  180.0000 120.0000  1.3420
+IC 1CD 1CE  2CE  2CD    1.5435 120.0000  180.0000 120.0000  1.5345
+IC 1CD 1CE  2CE  2HE    1.5435 120.0000    0.0000 120.0000  1.1000
+! from the other side :
+IC 2CG 2CD  2CE  1CE    1.5435 113.2800  180.0000 120.0000  1.3420
+IC 2CD 2CE  1CE  1HE    1.5435 120.0000    0.0000 120.0000  1.1000
+
+END
+
+read para card flex append
+* parameters taken from toppar_all36_prot_pyridines.str
+*
+
+
+ANGLES
+CE1  CT2 CT2  32.00    112.20   ! for 2-heptene from "CE1  CT2  CT3"
+
+DIHEDRALS
+HE1  CE1  CT2  CT2     0.12  3     0.00 ! from "HA1  CE1  CT2  CT3"
+! modifying below:
+!CE2  CE1  CT2x CT3x     0.50  3     0.00 ! FOR BUTENE
+!CE1  CE1  CT2x CT2x     0.50  3     0.00 ! "CE2  CE1  CT2  CT3"
+!CE1  CE1  CT2x HA2      0.03  3     0.00 ! from "CE1  CE1  CT3  HA"
+CE2  CE1  CT2  CT2     0.50  3     0.00 ! FOR BUTENE
+CE1  CE1  CT2  CT2     0.50  3     0.00 ! "CE2  CE1  CT2  CT3"
+CE1  CE1  CT2  HA2     0.03  3     0.00 ! from "CE1  CE1  CT3  HA"
+
+END
+
+return
+

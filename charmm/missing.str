@@ -1,0 +1,57 @@
+! manual structure modifications to model missing loops (based on the amaro)
+! transfer some coordinate from comp structure :
+set nmissing 10
+!
+set b1 70 ! beginning of missing loop
+set e1 79 ! end of missing loop
+set no1 2  ! number of residue for orientation on each side
+set b2 144
+set e2 164
+set no2 2
+set b3 173
+set e3 185
+set no3 2
+set b4 246
+set e4 262
+set no4 2
+set b5 445
+set e5 446
+set no5 1
+set b6 455
+set e6 461
+set no6 2
+set b7 469
+set e7 488
+set no7 2
+set b8 502
+set e8 502
+set no8 1
+set b9 621
+set e9 640
+set no9 2
+set b10 828
+set e10 853
+set no10 2
+!
+!
+set imissing 1
+label copy
+! to : skip some of them :
+set missing@imissing segid @segid .and. resid @b@@imissing : @e@@imissing
+calc obb@imissing = @b@@imissing - @no@@imissing
+calc obe@imissing = @b@@imissing - 1
+calc oeb@imissing = @e@@imissing + @no@@imissing
+calc oee@imissing = @e@@imissing + 1
+set orient@imissing segid @segid .and. ( resid @obb@@imissing : @obe@@imissing .or. resid @oeb@@imissing : @oee@@imissing )
+
+!if @imissing .eq. 2 incr imissing
+!define orie sele .byres. ( ( @orient@@imissing ) .around. 2 ) .and. prop wmain .eq. 1 .and. init end
+define orie sele ( .byres. ( @orient@@imissing ) ) end
+!stop
+define copy sele ( @missing@@imissing ) end
+coor orie rms sele orie end comp
+coor copy sele copy end
+scalar wmain set 2 sele copy end ! mark modeled coords
+incr imissing
+if @imissing .le. @nmissing -
+goto copy

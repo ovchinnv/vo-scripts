@@ -1,0 +1,110 @@
+* MD using CHARMM/OMM interface
+*
+
+if @?name eq 0 then
+ echo USAGE : charmm -i mdcube.inp name=<structure_name>
+ stop
+endif
+!
+if @?{barostat} eq 0 set barostat 1 ! needs to be here for technical reasons
+! read topology and parameters
+stream @{lib}/toppar.str
+! read structure and coordinates
+read psf card name @{name}s.psf
+read coor card name @{name}_ms.cor
+coor copy comp ! copy to comparison set
+! read cell
+stream @{name}.str
+! increase box size if desired
+set dx 1.5
+calc A = @A + @dx
+calc B = @B + @dx
+calc C = @C + @dx
+!
+! define crystal
+!
+coor stat
+crystal define cubic @A @B @C @ALPHA @BETA @GAMMA
+crystal build cutoff 12 noper 0
+
+set xcen ?xave
+set ycen ?yave
+set zcen ?zave
+
+if @?solute eq 0 set solute ( segid MDM2 .or. segid S* )
+if @?shake eq 0 set shake 1 ! shake on by default
+
+image byseg xcen @xcen ycen @ycen zcen @zcen select @{solute} end
+image byres xcen @xcen ycen @ycen zcen @zcen select segid *WAT .or. segid ION* .or. segid MG* .or. segid ZN* end ! .or. segid RNA* end
+
+!set nbparam cutnb 12 ctofnb 10.5 ctonnb 9 cutim 12 vswitch inbfrq -1 -
+!       ewald kappa 0.34 pmewald fftx 64 ffty 64 fftz 64 order 4 cdie eps 1 -
+! these are less accurate but give faster speed
+set nbparam cutnb 11 ctofnb 10 ctonnb 8.5 cutim 11 vswitch inbfrq -1 cdie eps 1 -
+!       ewald kappa 0.32 pmewald fftx 128 ffty 128 fftz 128 order 4
+
+!energy @nbparam
+!fast on
+! harmonic restraints
+if @?restrains eq 0 set restraints 0
+if @restraints eq 1 cons harm sele @{solute} end force 0.1
+!energy @nbparam
+!
+!minimize system if desired
+if @?mini eq 0 set mini 0
+if @mini eq 1 then
+ mini sd nstep 20 @nbparam
+ mini conj nstep 30 @nbparam
+ mini abnr nstep 30 @nbparam
+endif
+!
+omm on
+omm precision mixed
+!omm platform opencl
+! set up shake
+if @?shake eq 1 then
+ shake fast bonh tol 1.0e-8 para
+ set dt 0.002
+else
+ set dt 0.001
+endif
+
+!
+set start strt
+if @?nsteps eq 0 set nsteps 100000000
+set nsteps @nsteps
+
+! set up restart output
+open write card unit 69 name @{name}wat.rst
+! set up dcd output
+open write file unit 68 name @{name}wat-chm.dcd
+
+set temp 298
+set tparam langevin ilbfrq 0 gamma 0.1 ! langevin thermostat
+if @{barostat} ne 0 then
+ set prparam prmc ! monte carlo barostat from OpenMM
+else
+ set prparam ! empty
+endif
+set nout 2500
+!
+! dynamics
+dyna omm leap bycb -
+ @start -
+ @nbparam -
+ @prparam -
+ @tparam -
+ nprint @nout -
+ nsavc @nout -
+ iprfrq @nout -
+ isvfrq @nout -
+ iuncor 68 - ! trajectory dcd file
+ iunwri 69 - ! restart file
+ time @dt -
+ ntrfrq 0 - ! frequency for stopping rotation
+ echeck 1000 - ! check that energies do not fluctuate too much
+ nsteps @nsteps
+
+label write
+write coor card name @{name}wat-chm.cor
+

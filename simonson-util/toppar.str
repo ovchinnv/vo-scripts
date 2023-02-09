@@ -1,0 +1,10 @@
+* read charmm parameters
+*
+
+! set lib ! needs to be passed in
+set prmdir @{lib}/toppar
+read rtf card name @{prmdir}/top_all36_prot.rtf
+read param card flex name @{prmdir}/par_all36m_prot.prm
+stream @{prmdir}/staples-toppar.str
+stream @{prmdir}/toppar_water_ions.str
+

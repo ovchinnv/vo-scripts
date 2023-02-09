@@ -30,7 +30,7 @@ tshc=reshape(tsclass(:,2),3,3);
 figure;
 b=bar(tshc');
 
-ylabel('-TS^{cg}_{quasi}')
+ylabel('-TS^{cg}_{quasi}') ;% I think this is wrong: should be +TS, unless you are negating it somewhere else.
 set(gca,'xticklabel',labels)
 
 

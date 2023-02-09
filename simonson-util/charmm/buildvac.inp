@@ -1,0 +1,110 @@
+* create structure simulation structure using charmm FF
+*
+! read charmm topology and parameters
+stream @{lib}/toppar.str
+! build peptide :
+if @?peptide ne 0 then ! check if we need to include the peptide
+!
+! check if sequence is given :
+if @?pseq ne 0 then
+ read sequ card
+ * peptide sequence
+ @nseq ! number of residues
+ @pseq
+
+else ! assume we have a pdb
+!read sequence from PDB file
+ set pdbfile @{peptide}.pdb
+ read sequ pdb name @pdbfile
+endif
+!
+generate @{peptide} setup warn first ace last ct1 ! use acetylated termini
+! find first staple residue
+define staple select ( resname R8 .or. resname S5 ) end
+set sbeg ?selresi
+! find second staple residue
+define staple select ( resname R8 .or. resname S5 ) .and. .not. resid @sbeg end
+set send ?selresi
+!
+! perform stapling
+if @?qstaple eq 0 set qstaple 0
+if @qstaple eq 1 then
+ calc slen = ( @send - @sbeg )
+ patch sta@{slen} @{peptide} @{sbeg} @{peptide} @{send} setup warn ! apply patch to connect chains
+endif
+
+autogen angle dihe ! regenerate angles and dihedrals after patching
+
+! if we have a pdbfile read coordinates from it :
+if @?pdbfile eq 1 then
+ read coor pdb name @pdbfile resid ! read coordinates from pdb file
+else
+! otherwise, modify ic table to build as an alpha helix
+ set i 1
+ label loop
+ calc j = @i + 1
+ ic edit 
+  dihe @{peptide} @i C @{peptide} @j N @{peptide} @j CA @{peptide} @j C -57
+  dihe @{peptide} @i N @{peptide} @i CA @{peptide} @i C @{peptide} @j N -47  
+ end
+ incr i
+ if @j .lt. ?nres -
+ goto loop
+!
+ ic param
+ ic seed @{peptide} 1 N @{peptide} 1 CA @{peptide} 1 C
+ ic build
+endif
+!
+endif ! peptide
+
+if @?protein ne 0 then
+! build mdm:
+set pdbfile @{protein}.pdb
+read sequ pdb name @pdbfile
+!
+generate @{protein} setup warn first nter last cter
+read coor pdb name @pdbfile resid ! read coordinates from pdb file
+!
+endif
+!
+print coor sele .not. (init .or. hydrogen) end ! show unknown coordinates except hydrogens
+! if some coordinates are missing, can attempt to build them using two commands below
+! (note that this is an unsophisticated method)
+! it is better to use coordinates from existing structures
+ic param
+ic build
+! write structure file
+write psf card name @{outname}.psf
+! write initial coordinate file
+write coor card name @{outname}_ini.cor
+
+! check for undefined coordinates
+print coor sele .not. init end
+
+coor copy comp ! save initial coordinates
+energy ! compute initial energy
+mini sd nstep 50 ! minimize in vacuum
+mini abnr nstep 50
+write coor card name @{outname}_m.cor ! write minimized structure
+
+stop
+
+! run short MD in vacuum
+set nsteps 1000000 ! 1 ns
+
+open file name @{outname}.dcd unit 1
+dynamics leap start timestep 0.001 nstep @nsteps nprint 1000 iprfrq 10000 -
+     nsavc 10000 nsavv 0 -
+     firstt 298 twindl -5.0 twindh 5.0 -
+     ichecw 1 teminc 30.0 ihtfrq 20 ieqfrq 100 -
+     iasors 1 iasvel 1 iscvel 0  iuncrd 1 -
+     inbfrq -1 imgfrq -1 ilbfrq 0 -
+     eps 1.0 cutnb 16 ctofnb 14 ctonnb 12 vswi -
+     hoover reft 298 tmass 250 tbath 298 -     ! Constant temperature
+     iseed 1 2 3 4
+
+coor orie rms mass
+label write
+
+write coor card name @{outname}_md.cor

@@ -1,0 +1,14 @@
+#!/usr/local/bin/vmd
+# remove water from trajectory dcd file and write "dry" dcd
+# USAGE : vmd -dispdev text -argc <psffile> <dcdfile> < rmwat.vmd
+foreach { psffile dcdfile } $argv {break} ;# get from command line
+
+mol load psf ${psffile} ;
+
+set solute [atomselect top "not water or ion"];
+set step 1 ; # how many frames to skip
+
+set nowfile [file rootname ${dcdfile}]-now.dcd ;
+animate read  dcd ${dcdfile} beg 0 skip ${step} waitfor all ;
+animate write dcd ${nowfile} beg 0 skip 1 waitfor all sel ${solute} ;
+

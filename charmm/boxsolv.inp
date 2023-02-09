@@ -23,6 +23,8 @@ label skippar
 
 if @?buf eq 0 set buf 11.  ! solvation radius
 
+if @?todel ne 0 delete atom select ( @todel ) end
+
 if @?solute eq 0 set solute all
 define solute select ( @solute ) end
 coor orie select solute end ! align 

@@ -1,0 +1,70 @@
+* Conpute energies from trajectory using CHARMM/OMM interface
+*
+
+if @?name eq 0 then
+ echo USAGE : charmm -i mdene.inp name=<structure_name> dcdfile=<name> lib=<dir of toppar.str>
+ stop
+endif
+if @?dcdfile eq 0 then
+ echo USAGE : charmm -i mdene.inp psffile=<name> dcdfile=<name> lib=<dir of toppar.str>
+ stop
+endif
+if @?lib eq 0 then
+ echo USAGE : charmm -i mdene.inp psffile=<name> dcdfile=<name> lib=<dir of toppar.str>
+ stop
+endif
+!
+nobomb
+! read topology and parameters
+stream @{lib}/toppar.str
+! read structure
+read psf card name @{name}.psf
+read coor card name @{name}_m.cor
+! set up GBSW
+set cut = 20 ! nonboded cutoff
+calc cuton = @cut - 2
+calc cutoff = @cut - 1
+update atom cdie switch vdw vswitch cutnb @cut ctofnb @cutoff ctonnb @cuton
+! read GB radii :
+stream @{lib}/charmm/radius_gbsw.str
+! check for zero radii, cannot proceed, if found !
+scalar wmain stat select .not. type H* end
+define check select (.not type H* ) .and. ( prop wmain .eq. 0.0 ) show end
+if ?nsel ne 0  stop       !some heavy atom have a zero radius
+gbsw GBenergy ! make sure to print solvation energy
+!
+if @?qopenmm eq 0 set qopenmm 1 ! use openmm for speed
+!
+if @qopenmm eq 1 then
+ omm on
+! omm precision single ! somewhat faster, but mixed precision more accurate
+ omm platform cuda
+!energy omm ! test call
+endif
+! open trajectory file :
+open read file unit 1 name @{dcdfile}.dcd
+traj query unit 1
+traj firstu 1 begin 0 stop ?nfile
+!
+! open energy output file
+open write card name @{outname}.ene unit 2
+write title unit 2
+*% Nonbonded energy, including solvation component
+*
+
+!
+set ifr 0
+label ifr
+  traj read
+  coor stat
+! compute energy here
+  energy
+  calc nbond = ?vdw + ?elec + ?gben
+  write title unit 2
+  *@nbond
+! proceed to next frame
+  incr ifr
+  if @ifr .lt. ?nfile -
+goto ifr
+
+
