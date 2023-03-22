@@ -322,10 +322,11 @@ if 1:
 # we should be able to use many groups with the same substep in the RESPA init, but that might slow it down
    f.setForceGroup(0);
 # reciprocal forces get a separate group for RESPA
-   if isinstance(f,mm.NonbondedForce) :
+   if isinstance(f,mm.NonbondedForce) : # what about vdw forces, do they also enter here ?
       f.setReciprocalSpaceForceGroup(31);
   dprint("Initializing RESPA MTS integrator");
-  integrator=mm.MTSIntegrator(dt*pmefreq*u.femtosecond, [(31,1), (0,pmefreq)]);
+  integrator=mm.MTSIntegrator(dt*pmefreq*u.femtosecond, [(31,1), (0,pmefreq)]); # unclear what this does :
+  # from the OPENMM 7 doc : forcegroup 31 evaluated once per step (i.e. slow) ; fcgrp 0 evaluated pmefreq times (everything else ?)
  else :
   if (thermostat):
    if (andersen):
