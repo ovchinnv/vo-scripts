@@ -1,6 +1,12 @@
 #!/bin/bash
 # change 3-letter sequence to a 1-letter sequence
 
+if [ -z $1 ] ; then
+ input=""
+else
+ input=$1
+fi
+
 awk 'BEGIN {
 
         A1["ALA"]="A";A1["ARG"]="R";A1["ASP"]="D";A1["GLN"]="Q";A1["LEU"]="L";A1["THR"]="T";A1["GLU"]="E";A1["ILE"]="I";
@@ -20,4 +26,4 @@ awk 'BEGIN {
    seq=seq""A1[aa]""
  }
  print seq
-} ' $1
+} ' $input

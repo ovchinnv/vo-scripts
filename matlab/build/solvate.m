@@ -19,7 +19,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if ~exist('buf') buf=9 ; end
-if ~exist('overlap') overlap=2.5; end
+if ~exist('overlap') overlap=2.75; end
 if ~exist('density') density=1 ; end % g/mL
 if ~exist('solvent_pdb') solvent_pdb='WAT.pdb' ; end % g/mL
 if ~exist('segname') segname='W' ; end
