@@ -1,0 +1,37 @@
+#!/bin/bash
+#loop over lines in psf and sum up mass
+
+if [ -z $1 ]; then
+ echo " * USAGE: ./mspsf <psffile>";
+ exit 1
+fi
+
+if [ ! -z $2 ]; then
+ qshow=$2
+else
+ qshow=0;
+fi
+
+awk -v qshow=$qshow 'BEGIN { 
+ m=0 ; qatom=0;
+ if ( !qshow ) {
+  print " *** Computing total mass in structure file '"$1"'...";
+ }
+};
+{ 
+ if ( $0 ~ /^\s*[0-9]+\s*!\s*[Nn][Aa][Tt][Oo][Mm]*/ ) {
+  qatom=1;
+#  print $0;
+ } else if ( $0 ~ /^\s*[0-9]+\s*!\s*[Nn][Bb][Oo][Nn][Dd]*/ ) {
+  exit
+ } else if ( NF>=8) {
+  m+=$8;
+  if ( qshow ) { print $8 };
+ }
+}
+END {
+ if ( !qshow ) {
+  print " *** "m
+ }
+}
+' $1

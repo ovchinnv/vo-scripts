@@ -1,0 +1,31 @@
+#!/bin/vmd
+#
+############################################################################
+set id [ molinfo top ];
+set nf [molinfo $id get numframes];
+
+if { ![info exists "selection"] } {
+ set selection "all"
+}
+puts "Computing Rgyr for $selection ... "
+
+set all      [atomselect $id "all"];
+set sel      [atomselect $id $selection];
+set rg {}
+#
+for { set i 0 } { $i<$nf } { incr i } {
+ $all frame $i
+ $all update
+ $sel frame $i
+ $sel update
+ lappend rg [measure rgyr $sel]
+}
+#############################################################################
+# save to file
+if { ![info exists "rgyrname"] } {
+ set d [exec date +%d-%m-%y];
+ set rgyrname "rgyr$d.dat"
+}
+set fid [open "$rgyrname" w+];
+foreach r $rg { puts $fid "$r" }
+close $fid

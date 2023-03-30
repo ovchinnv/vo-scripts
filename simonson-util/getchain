@@ -1,0 +1,41 @@
+#!/bin/bash
+
+if [ -z $1 ] || [ -z $2 ] ; then
+ echo " Usage : getchain <pdbfile> <chainid>"
+ exit 0
+fi
+
+
+awk '
+ BEGIN {FIELDWIDTHS="6 5 1 4 1 3 1 1 4 1 3 8 8 8 6 6 6 4"
+        atomcount=0
+        chain=ARGV[2]
+        ARGV[2]=""
+        blank="                     ";
+    } 
+
+{
+ tag=$1
+ if ( (substr($1,0,4) == "ATOM") || (substr($1,0,6) == "HETATM" ) ) {
+  chainID=$8
+  if (chainID == chain) {
+   atomcount=atomcount+1
+
+   if ($6 == "HIS") sub("HIS", "HSD");
+   if ($4 == " OXT") sub(" OXT", " OT1");                         # carboxylic end
+   if (($6 == "ILE") && ($4 == " CD1")) {
+     sub("CD1","CD ");
+   }     # replace CD1 with CD in isoleucine
+
+   sub($2,substr(blank, 0, 5-length(""atomcount))""atomcount)
+
+# increment resid count
+#   sub($9,substr(blank, 0, 4-length($9+1))""$9+1)
+
+
+   if (( $5 == " ") || ($5 == "A")) {print $0} ;# print only the first coordinate (A row)
+  }
+ } 
+} ' $1 $2
+
+

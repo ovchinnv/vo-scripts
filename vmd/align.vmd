@@ -25,10 +25,12 @@ set all      [atomselect $id all];
 #
 if { ![info exists "orient" ] } {
  set orient   [atomselect $id "($selection) and $cons"]
- puts "Performing best-fit alignment based on ($selection) and $cons ... "
+ set norient [$orient num];
+ puts "Performing best-fit alignment based on ($selection) and $cons, which contain $norient atoms ... "
 }
 if { ![info exists "template"] } {
  set template [atomselect $id "($selection) and $cons" frame 0] 
+ set ntemplate [$template num];
 }
 #
 set rmsd {};

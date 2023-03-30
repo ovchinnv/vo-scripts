@@ -1,0 +1,12 @@
+#!/bin/bash
+if test -z "$1"
+then 
+ echo "USAGE: namdtime output_file"
+ exit 1
+else
+ log=$1
+fi
+
+
+grep "Benchmark time" $log | awk '{print 1/$8}' > bench.dat
+echo "d=load('bench.dat'); da=mean(d) ; de=std(d) ; fprintf([num2str(da),' +/- ',num2str(de),'\n'])" | octave

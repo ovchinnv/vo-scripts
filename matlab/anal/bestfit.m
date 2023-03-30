@@ -1,4 +1,4 @@
-function [xall,yall,zall,rmsd]=bestfit(xall,yall,zall,xref,yref,zref,wgt,inds)
+function [xall,yall,zall,rmsd,trans]=bestfit(xall,yall,zall,xref,yref,zref,wgt,inds) % only the last transformation matrix is passed out
 % perform alignment using procrustes
 % does not implement mass weighting correctly but error is small for most purposes
 % not quite the same as VMD/CHARMM because weights cannot be passed into the procrastes routine
@@ -10,7 +10,7 @@ function [xall,yall,zall,rmsd]=bestfit(xall,yall,zall,xref,yref,zref,wgt,inds)
  end
 %
  if (~exist('wgt') || isempty(wgt)) ; wgt=ones(size(xref)); end
- wgt=wgt/sum(wgt(inds));
+ wgt=wgt/sum(wgt(inds)); % this should not change the wgt that are passed in
  swgt=sqrt(wgt);
  oswgt=1./swgt(:);
  comref=[wgt(inds)'*xref(inds) wgt(inds)'*yref(inds) wgt(inds)'*zref(inds)];

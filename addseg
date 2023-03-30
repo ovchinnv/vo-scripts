@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -z $1 ] ; then
- echo "USAGE: ./addsegid <segid>"
+ echo "USAGE: ./addseg <segid>"
  exit 1
 fi
 

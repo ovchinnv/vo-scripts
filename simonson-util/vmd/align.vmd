@@ -1,0 +1,58 @@
+#!/bin/vmd
+# align each frame for top molecule
+#
+############################################################################
+set id [ molinfo top ];
+set nf [molinfo $id get numframes];
+
+if { ![info exists "selection"] } {
+ set selection "all"
+} else {
+# puts $selection
+}
+if { ![info exists "cons"] } {
+ set cons "noh"
+}
+if { ![info exists "qupdate"] } {
+ set qupdate 0
+}
+if { ![info exists "qpreceding"] } {
+ set qpreceding 0
+}
+
+#
+set all      [atomselect $id all];
+#
+if { ![info exists "orient" ] } {
+ set orient   [atomselect $id "($selection) and $cons"]
+ puts "Performing best-fit alignment based on ($selection) and $cons ... "
+}
+if { ![info exists "template"] } {
+ set template [atomselect $id "($selection) and $cons" frame 0] 
+}
+#
+set rmsd {};
+for { set i_ 0 } { ${i_}<$nf } { incr i_ } {
+ $orient frame ${i_}
+ $all frame ${i_}
+ if { $qpreceding } {
+  if { ${i_}>0 } { $template frame [expr ${i_} - 1] }
+ }
+ if { $qupdate } { $orient update ; $all update ; if { $qpreceding } { $template update; } }
+ $all move [measure fit $orient $template]
+ lappend rmsd [ measure rmsd $orient $template ];
+}
+#############################################################################
+# save to file
+if { ![info exists "rmsdname"] } {
+ set d [exec date +%d-%m-%y];
+ set rmsdname "rmsd$d.dat"
+}
+set fid [open "$rmsdname" w+];
+foreach r $rmsd { puts $fid "$r" }
+close $fid
+
+unset orient
+unset template
+unset rmsd
+unset all

@@ -1,0 +1,60 @@
+* create structure simulation structure using charmm FF
+*
+
+! read charmm topology and parameters
+stream @{lib}/toppar.str
+! read structure
+read psf card name @{psffile}.psf ! charmm psf
+read coor card name @{corfile}.cor ! charmm coordinates
+!
+if @?buf eq 0 set buf 11.  ! solvation radius
+
+if @?solute eq 0 set solute all
+define solute select ( @solute ) end
+coor orie select solute end ! align
+coor stat select solute end ! select the active site region (for computing box dimensions)
+
+! compute center of water box
+if @?xmin eq 0 calc xmin = ?xmin
+if @?ymin eq 0 calc ymin = ?ymin
+if @?zmin eq 0 calc zmin = ?zmin
+if @?xmax eq 0 calc xmax = ?xmax
+if @?ymax eq 0 calc ymax = ?ymax
+if @?zmax eq 0 calc zmax = ?zmax
+if @?solute eq 0 set solute all
+define solute select ( @solute ) end
+
+nobomb
+
+if @?overlap eq 0 set overlap 2.5 ! overlap between solute and water oxygen
+stream @{lib}/charmm/watercube.str
+rename segid wat select segid w* end ! rename all waters
+!
+cons harm force 30 select solute .and. .not. hydrogen end
+!
+mini conj nstep 10
+mini abnr nstep 10
+!
+! shift corner to origin for convenience
+!
+coor stat
+scalar X add -?XMIN
+scalar Y add -?YMIN
+scalar Z add -?ZMIN
+!
+write psf card name @{psffile}s.psf
+write coord card name @{corfile}s.cor ! CHARMM coordinate file
+!write coord pdb name @{corfile}s.pdb ! PDB coordinate file
+!
+open write card unit 66 name @{psffile}.str
+write title unit 66
+** solvated in an orthorhombic box of the following dimensions
+* set a  @xl
+* set b  @yl
+* set c  @zl
+* set alpha 90.0
+* set beta 90.0
+* set gamma 90.0
+
+close unit 66
+

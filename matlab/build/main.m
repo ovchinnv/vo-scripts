@@ -43,6 +43,8 @@ natom=length(pdb);
 % mark all chains (replacement of explicit code)
 for ch = chain_segid(1,:)
  cch=char(ch)
+% blank='   ';
+% mcmd=['chain',cch,'=ismember(chainid,''',cch,'''); segid=strtrim(ch2seg(''',cch,'''));segid=[segid,blank(1:min(length(blank),4-length(segid)))];for i=find(chain',cch,'); pdb(i).segID=segid; end']
  mcmd=['chain',cch,'=ismember(chainid,''',cch,'''); segid=ch2seg(''',cch,''');for i=find(chain',cch,'); pdb(i).segID=segid; end']
  eval(mcmd);
 end

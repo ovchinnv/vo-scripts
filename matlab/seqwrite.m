@@ -6,7 +6,7 @@ else
   seqfmt=fmt;
 end
 
-if (strcmp(upper(seqfmt),'FASTA')|strcmp(upper(seqfmt),'FST'))
+if (strcmp(upper(seqfmt),'FASTA') | strcmp(upper(seqfmt),'FST'))
  for i=1:numel(seqs)
   header=seqs(i).Header;
   if(header(1)=='>')
@@ -27,5 +27,5 @@ elseif ( strcmp(upper(seqfmt),'SELEX') | strcmp(upper(seqfmt),'SLX') )
   fprintf(fid,'%s\n',strtrim(seqs(i).Sequence));
  end
 else
- error ['format ',seqfmt,' not recognized']; 
+ error(['format ',seqfmt,' not recognized']); 
 end
