@@ -36,18 +36,49 @@ if 1:
   mini=0
 #
  try :
-  constraints
- except NameError:
-  constraints=0
- try :
-  conscol
- except NameError:
-  conscol=1
-#
- try :
   cutoff
  except NameError:
   cutoff=-1; # run without cutoff
+#
+ try :
+  constraints
+ except NameError:
+  constraints=0
+ if (constraints):
+  try :
+   conscol
+  except NameError:
+   conscol=1
+  try :
+   consfile
+  except NameError:
+   consfile=pdbfile
+#
+ try :
+  bestFitRMSD
+ except NameError:
+  bestFitRMSD=0
+ if (bestFitRMSD) :
+  try :
+   bestFitCol
+  except NameError:
+   bestFitCol=1
+  try :
+   bestFitFile
+  except NameError:
+   bestFitFile=pdbfile
+  try :
+   bestFitFlag
+  except NameError:
+   bestFitFlag=1
+  try :
+   bestFitK
+  except NameError :
+   print("RMS best fit force constant \"bestFitK\" is required, but was not specified");
+  try :
+   bestFitKperAtom
+  except NameError :
+   bestFitKperAtom=0; # false by default
 #
  try :
   fixedAtoms
@@ -144,7 +175,6 @@ if 1:
    mm.LengevinMiddleIntegrator()
   except AttributeError:
    newLangevin=0
-#
 #========================== Subroutines
 #==========================
  def dprint(*args):
@@ -160,7 +190,7 @@ if 1:
   print(""); # flush
 #==========================
  def printe(simulation):
-  forceGroups={'Bond':0, 'Angle':1, 'Dihed':2, 'UB':3, 'IMPR':4, 'CMAP':5, 'NBOND':6};
+  forceGroups={'Bond':0, 'Angle':1, 'Dihed':2, 'UB':3, 'IMPR':4, 'CMAP':5, 'NBOND':6, 'RESTRAINTS':7};
   ener={};
 # evaluate
   for key in forceGroups:
@@ -169,10 +199,10 @@ if 1:
 # total potential energy
   ener['PE']=simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(u.kilocalories_per_mole);
 # print
-  for key in ['Bond', 'Angle', 'Dihed', 'UB', 'IMPR', 'CMAP', 'NBOND', 'PE']:
+  for key in ['Bond', 'Angle', 'Dihed', 'UB', 'IMPR', 'CMAP', 'NBOND', 'RESTRAINTS','PE']:
    print(key, end="\t\t\t");
   print(); # newline
-  for key in ['Bond', 'Angle', 'Dihed', 'UB', 'IMPR', 'CMAP', 'NBOND', 'PE']:
+  for key in ['Bond', 'Angle', 'Dihed', 'UB', 'IMPR', 'CMAP', 'NBOND', 'RESTRAINTS','PE']:
    print(ener[key], end="\t");
   print();
 #========================== box dimensions from .str file produced during system preparation
@@ -350,15 +380,15 @@ if 1:
    dprint("Adding absolute positional harmonic restraints to atoms marked in the occupancy column of PDB file '"+consfile+"'");
 
   if (pbc) :
-   force=mm.CustomExternalForce("s*0.5*k*periodicdistance(x,y,z,x0,y0,z0)^2");
+   harmonicAtomForce=mm.CustomExternalForce("s*0.5*k*periodicdistance(x,y,z,x0,y0,z0)^2");
   else :
-   force=mm.CustomExternalForce("s*0.5*k*( (x-x0)^2 + (y-y0)^2 + (z-z0)^2 )");
+   harmonicAtomForce=mm.CustomExternalForce("s*0.5*k*( (x-x0)^2 + (y-y0)^2 + (z-z0)^2 )");
 #
-  force.addPerParticleParameter("k");
-  force.addPerParticleParameter("x0");
-  force.addPerParticleParameter("y0");
-  force.addPerParticleParameter("z0");
-  force.addGlobalParameter("s", constraintscaling);
+  harmonicAtomForce.addPerParticleParameter("k");
+  harmonicAtomForce.addPerParticleParameter("x0");
+  harmonicAtomForce.addPerParticleParameter("y0");
+  harmonicAtomForce.addPerParticleParameter("z0");
+  harmonicAtomForce.addGlobalParameter("s", constraintscaling);
 # read per atom restraints :
   res=app.PDBFile(consfile);
   iatom=0; icons=0;
@@ -366,7 +396,9 @@ if 1:
    if (conscol==1): # beta
     bnodim=b/u.angstrom/u.angstrom; # have to deal with units, which are A^2 for B-factors
    elif (conscol==2): #occupancy
-    bnodim=o
+    bnodim=o ;
+   else:
+    bnodim=-1 ;
 
    if (bnodim > 0) :
     icons+=1;
@@ -375,13 +407,51 @@ if 1:
     x0=r[0].value_in_unit(u.nanometer)
     y0=r[1].value_in_unit(u.nanometer)
     z0=r[2].value_in_unit(u.nanometer)
-    force.addParticle(iatom, [k,x0,y0,z0]);
+    harmonicAtomForce.addParticle(iatom, [k,x0,y0,z0]);
    iatom+=1;
   dprint("Added restraints on ", icons, " atoms");
   dprint("Harmonic force constants will be scaled uniformly by x"+str(constraintscaling));
-  system.addForce(force)
+  harmonicAtomForce.setForceGroup(7)
+  system.addForce(harmonicAtomForce)
 #
-#================= string plugin (baskward compatibility)
+#================= best fit restraints from file
+ if (bestFitRMSD) :
+  if (bestFitCol==1): # beta
+   dprint("Adding RMS best-fit restraint to atoms with value ",bestFitFlag," in the beta column of PDB file '"+bestFitFile+"'");
+  elif (conscol==2): #occupancy
+   dprint("Adding RMS best-fit restraint to atoms with value ",bestFitFlag," in the occupancy column of PDB file '"+bestFitFile+"'");
+# read restrained atom indices and reference position :
+  res=app.PDBFile(bestFitFile);
+  iatom=0; ibestfit=0; bestfitatomlist=[];
+  for r, o, b  in zip(res.positions, res.occupancy, res.temperature_factor) :
+   if (bestFitCol==1): # beta
+    bnodim=b/u.angstrom/u.angstrom; # strip units, which are A^2 for B-factors
+   elif (bestFitCol==2): #occupancy
+    bnodim=o
+   else:
+    bnodim=-1
+#
+   if (bnodim == bestFitFlag) :
+    ibestfit+=1;
+#    dprint(" Including atom ",iatom," in RMS best fit restraint");
+    bestfitatomlist.append(iatom);
+   iatom+=1;
+#
+  dprint("Adding RMSD variable computed from ", ibestfit, " atom positions");
+  rmsd=mm.RMSDForce(res.positions,bestfitatomlist);
+  bestFitEnergy=f"0.5*kRMSD*RMSD*RMSD";
+  bestFitForce=mm.CustomCVForce(bestFitEnergy);
+  bestFitForce.addCollectiveVariable('RMSD', rmsd)
+  if (bestFitKperAtom==1):
+   bestFitForce.addGlobalParameter('kRMSD',bestFitK*ibestfit*u.kilocalorie/u.mole/u.angstrom/u.angstrom);
+   dprint("Added RMS best fit restraint with per-atom force constant ",bestFitK," kcal/mol/Ang^2");
+  else:
+   bestFitForce.addGlobalParameter('kRMSD',bestFitK*u.kilocalorie/u.mole/u.angstrom/u.angstrom);
+   dprint("Added RMS best fit restraint with force constant ",bestFitK," kcal/mol/Ang^2");
+  bestFitForce.setForceGroup(7)
+  system.addForce(bestFitForce);
+#
+#================= string plugin (backward compatibility, because we now have dynamo)
  if (struna==1) :
   from openmmstruna import *
   system.addForce(StrunaForce(strunaConfig, strunaLog))
@@ -432,6 +502,8 @@ if 1:
     dprint("Initializing Verlet integrator with timestep ",dt*u.femtosecond);
     integrator=mm.VerletIntegrator(dt*u.femtosecond);
    else:
+    dprint("Initializing Langevin thermostatted integrator with timestep ",dt*u.femtosecond," coupled to bath with friction ",friction/u.picosecond," at temperature ",temperature*u.kelvin);
+    integrator=mm.LangevinIntegrator(temperature*u.kelvin, friction/u.picosecond, dt*u.femtosecond);
     if (newLangevin==1):
      dprint("Initializing Langevin (Middle) thermostatted integrator with timestep ",dt*u.femtosecond," coupled to bath with friction ",friction/u.picosecond," at temperature ",temperature*u.kelvin);
      integrator=mm.LangevinMiddleIntegrator(temperature*u.kelvin, friction/u.picosecond, dt*u.femtosecond);
@@ -503,6 +575,8 @@ if 1:
                                                     volume=pbc, separator=' \t '));
   dprint("Running MD simulation for ",nsteps," steps");
   simulation.step(nsteps);
+  dprint("Potential energy after simulation");
+  printe(simulation);
 #==== move dcd file to destination file
   move(outdcd, outputName+'.dcd');
 
