@@ -595,7 +595,7 @@ if 1:
  fxsc.write(str(nsteps)+" "+str(a[0].value_in_unit(u.angstrom))+" 0 0 0 "+str(b[1].value_in_unit(u.angstrom))+" 0 0 0 "+str(c[2].value_in_unit(u.angstrom))+" 0 0 0 0 0 0 0 0 0\n");
  fxsc.close();
 #==== reset switching distance
- del switchdist;
+# del switchdist;
  if (dynamo): # dynamo is somewhat problematic upon run continuation, need a complete reinit because the end of each run destroys the dynamo object
   del system;
   del simulation;
