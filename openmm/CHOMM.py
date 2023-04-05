@@ -506,8 +506,6 @@ if 1:
     dprint("Initializing Verlet integrator with timestep ",dt*u.femtosecond);
     integrator=mm.VerletIntegrator(dt*u.femtosecond);
    else:
-    dprint("Initializing Langevin thermostatted integrator with timestep ",dt*u.femtosecond," coupled to bath with friction ",friction/u.picosecond," at temperature ",temperature*u.kelvin);
-    integrator=mm.LangevinIntegrator(temperature*u.kelvin, friction/u.picosecond, dt*u.femtosecond);
     if (newLangevin==1):
      dprint("Initializing Langevin (Middle) thermostatted integrator with timestep ",dt*u.femtosecond," coupled to bath with friction ",friction/u.picosecond," at temperature ",temperature*u.kelvin);
      integrator=mm.LangevinMiddleIntegrator(temperature*u.kelvin, friction/u.picosecond, dt*u.femtosecond);
