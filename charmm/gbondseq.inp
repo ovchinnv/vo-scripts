@@ -1,0 +1,31 @@
+* determine aa acid sequence by connectivity
+* specify initial segid and (optionally) residue
+*
+
+if @?clib eq 0 set clib ~/scripts/charmm
+if @?psffile eq 0 set psffile 3lzg-mif
+! read psf
+stream @{clib}/readpsf36.str
+
+! determine initial segment
+if @?iseg eq 0 then
+ define all sele all end
+ set iseg ?SELSEGI
+endif
+! determine initial resid
+if @?ires eq 0 then
+ define all sele all end
+ set ires ?SELRESI
+endif
+!
+! initialize sequence :
+define this sele segid @iseg .and. resid @ires end
+open write card name seq3.txt unit 1
+
+label seqloop
+write title unit 1
+* ?SELRESN
+ define next sele .byres. ( type N .and. .bonded. ( this .and. type C ) ) end
+ define this sele next end
+if ?nsel gt 0 -
+goto seqloop

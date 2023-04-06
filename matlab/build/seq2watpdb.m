@@ -14,7 +14,7 @@ function tmpmol=seq2watpdb(x,y,z,mchainid,msegid,pdbname,qaddh)
  if (~exist('qaddh')) ; qaddh=0 ; end % whether to explicitly add hydrogens
  if (qaddh)
 % offsets relative to water oxygen
-  dhx=1.5139 * [1 0 0 ; ...
+  dhx=0.9572 * [1 0 0 ; ...
                 cos(104.52/180*pi) sin(104.52/180*pi) 0];
  end
 % matlab output cannot handle large numbers
