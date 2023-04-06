@@ -5,6 +5,7 @@ import simtk.openmm as mm
 import simtk.unit as u
 from sys import stdout, stderr, exit
 from shutil import move
+import random
 #=====================================================================#
 # define parameters that may not have been defined by user
 #
@@ -78,6 +79,11 @@ if 1:
   implicitSolvent=0
 #
  try :
+  removeCOM
+ except NameError:
+  removeCOM=0
+#
+ try :
   struna
  except NameError:
   struna=0
@@ -93,6 +99,11 @@ if 1:
 # use CUDA unless variable 'platformName' defined
   platformName="CUDA"
 #
+ try :
+  qrandname
+# randomize temporary dcd names to avoid overwrite if running in parallel
+ except NameError:
+  qrandname=1
 #========================== Subroutines
 #==========================
  def dprint(*args):
@@ -221,7 +232,7 @@ if 1:
  else:
   if (cutoff>0):
    nbondMethod=app.CutoffNonPeriodic
-   psf.setBox(1000*u.angstrom, 1000*u.angstrom, 1000*u.angstrom) # set to a very large box to eliminate wrapping
+#   psf.setBox(1000*u.angstrom, 1000*u.angstrom, 1000*u.angstrom) # set to a very large box to eliminate wrapping
   else:
    nbondMethod=app.NoCutoff
 #===================================================== SHAKE
@@ -240,19 +251,19 @@ if 1:
  dprint("Nonbonded cutoff is ",cutoff*u.angstrom,". Switching is active at ",switchdist*u.angstrom)
  if (hmass>1):
   dprint("Hydrogen mass is ",hmass*u.amu)
-
+#
  if (implicitSolvent==1):
   system=psf.createSystem(params,
                          nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
-                         constraints=cons, rigidWater=rigidWater, removeCMMotion=False, hydrogenMass=hmass*u.amu,
+                         constraints=cons, rigidWater=rigidWater, removeCMMotion=removeCOM, hydrogenMass=hmass*u.amu,
                          implicitSolvent=app.OBC2,
-                         verbose=False);
+                         verbose=True);
  else:
   system=psf.createSystem(params,
                          nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
-                         constraints=cons, removeCMMotion=False, hydrogenMass=hmass*u.amu, rigidWater=rigidWater,
+                         constraints=cons, removeCMMotion=removeCOM, hydrogenMass=hmass*u.amu, rigidWater=rigidWater,
                          verbose=True);
-
+# NOTE : I prefer not to use the COM motion removal above
 #================= harmonic restraints from file, a la NAMD/ACEMD
  if (constraints) :
   if (conscol==1): # beta
@@ -260,8 +271,11 @@ if 1:
   elif (conscol==2): #occupancy
    dprint("Adding absolute positional harmonic restraints to atoms marked in the occupancy column of PDB file '"+consfile+"'");
 
-  force=mm.CustomExternalForce("s*0.5*k*periodicdistance(x,y,z,x0,y0,z0)^2");
-#  force=mm.CustomExternalForce("s*0.5*k*( (x-x0)^2 + (y-y0)^2 + (z-z0)^2 )");
+  if (pbc) :
+   force=mm.CustomExternalForce("s*0.5*k*periodicdistance(x,y,z,x0,y0,z0)^2");
+  else :
+   force=mm.CustomExternalForce("s*0.5*k*( (x-x0)^2 + (y-y0)^2 + (z-z0)^2 )");
+#
   force.addPerParticleParameter("k");
   force.addPerParticleParameter("x0");
   force.addPerParticleParameter("y0");
@@ -349,9 +363,12 @@ if 1:
 #
  dprint("Initializing compute platform ",platformName);
  platform=mm.Platform.getPlatformByName(platformName);
- properties={'CudaPrecision': 'mixed'};
  dprint("Preparing simulation topology");
  if (platformName=="CUDA") :
+  properties={'CudaPrecision': 'mixed'};
+  simulation=app.Simulation(psf.topology, system, integrator, platform, properties);
+ elif (platformName=="OpenCL") :
+  properties={'OpenCLPrecision': 'mixed'};
   simulation=app.Simulation(psf.topology, system, integrator, platform, properties);
  else :
   simulation=app.Simulation(psf.topology, system, integrator, platform);
@@ -386,13 +403,18 @@ if 1:
   printe(simulation);
 #=============== MD simulation
  if (nsteps>0):
-  simulation.reporters.append(app.DCDReporter('output.dcd',dcdfreq));
+  if (qrandname):
+   outdcd='output_'+str(random.randint(1,10000))+'.dcd';
+  else:
+   outdcd='output.dcd'
+#
+  simulation.reporters.append(app.DCDReporter(outdcd,dcdfreq));
   simulation.reporters.append(app.StateDataReporter(stdout, outputfreq, step=True, potentialEnergy=True, kineticEnergy=True, speed=True, temperature=True, 
                                                     volume=pbc, separator=' \t '));
   dprint("Running MD simulation for ",nsteps," steps");
   simulation.step(nsteps);
 #==== move dcd file to destination file
-  move('output.dcd', outputName+'.dcd');
+  move(outdcd, outputName+'.dcd');
 
  dprint("Writing simulation restart files");
  simulation.saveState(outputName+'.xml');
@@ -406,3 +428,6 @@ if 1:
  fxsc.close();
 #==== reset switching distance
  del switchdist;
+ if (dynamo):
+  del simulation;
+  del system;
