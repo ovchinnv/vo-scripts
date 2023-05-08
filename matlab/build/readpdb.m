@@ -32,8 +32,12 @@ mol=struct('Model',{{}});
 % add text from remark fields:
 if (qloud) ; toc ; fprintf('Processing REMARK fields\n');end
 dchar=char(data(find(iremark)));
-iremark=dchar(:,8:10);
-remark=dchar(:,11:80);
+iremark=[];
+remark=[];
+if ~isempty(dchar)
+ iremark=dchar(:,8:10);
+ remark=dchar(:,11:80);
+end
 ind=0;
 for i=1:size(iremark,1);
  ir=str2num(iremark(i,:)) ;
