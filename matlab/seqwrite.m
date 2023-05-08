@@ -18,11 +18,11 @@ if (strcmp(upper(seqfmt),'FASTA') | strcmp(upper(seqfmt),'FST'))
  end
 elseif ( strcmp(upper(seqfmt),'SELEX') | strcmp(upper(seqfmt),'SLX') )
  for i=1:numel(seqs)
-  header=seqs(i).Header;
+  header=seqs(i).Header
   if(header(1)=='>')
    fprintf(fid,'%-30s',strtrim(header(2:min(30,length(header))))); % remove '>" assuming it got here in error
   else
-   fprintf(fid,'30%s',strtrim(header(1:min(29,length(header)))));
+   fprintf(fid,'%-30s',strtrim(header(1:min(29,length(header)))));
   end
   fprintf(fid,'%s\n',strtrim(seqs(i).Sequence));
  end
