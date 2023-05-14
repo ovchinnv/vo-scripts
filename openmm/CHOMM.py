@@ -51,7 +51,6 @@ if 1:
    conscol=1
   try :
    consfile=conspdb
-   conscor=None
   except NameError:
    conspdb=None
    try :
