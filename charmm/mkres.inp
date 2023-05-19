@@ -1,0 +1,16 @@
+! make coordinate file with heavy protein atoms marked in wmain for openmm restraints with large atom numbers
+!
+
+if @?name eq 0  set name b12 
+
+read rtf card name sosip36.top
+read param card name sosip36.par
+
+read psf card name @{name}_sn.psf
+read coor card name @{name}_msn.cor
+
+scalar wmain set 0 sele all end
+scalar wmain set 1 sele .not.  ( segid ION* .or. segid *WAT* .or. hydrogen ) end
+
+write coor card name @{name}-res.cor
+
