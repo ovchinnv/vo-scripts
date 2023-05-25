@@ -324,6 +324,7 @@ if 1:
   dprint("Nonbonded cutoff is infinite")
  if (hmass>1):
   dprint("Hydrogen mass is ",hmass*u.amu)
+#
   if (implicitSolvent==1):
    system=psf.createSystem(params,
                          nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
@@ -371,6 +372,18 @@ if 1:
    iatom+=1;
   dprint("Fixed ", icons, " atoms");
 #
+ if (implicitSolvent==1):
+  system=psf.createSystem(params,
+                         nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
+                         constraints=cons, rigidWater=rigidWater, removeCMMotion=removeCOM, hydrogenMass=hmass*u.amu,
+                         implicitSolvent=app.OBC2,
+                         verbose=True);
+ else:
+  system=psf.createSystem(params,
+                         nonbondedMethod=nbondMethod, nonbondedCutoff=cutoff*u.angstrom, switchDistance=switchdist*u.angstrom,
+                         constraints=cons, removeCMMotion=removeCOM, hydrogenMass=hmass*u.amu, rigidWater=rigidWater,
+                         verbose=True);
+# NOTE : I prefer not to use the COM motion removal above
 #================= harmonic restraints from file, a la NAMD/ACEMD
  if (constraints) :
   if (conscol==1): # beta
