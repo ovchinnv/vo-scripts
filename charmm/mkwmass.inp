@@ -1,7 +1,7 @@
 * mark solvent atoms for watershell
 *
 
-dimens chsize 1000000
+!dimens chsize 1000000
 
 if @?clib eq 0 set clib ~/scripts/charmm
 
