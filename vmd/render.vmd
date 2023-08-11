@@ -3,6 +3,7 @@
 
 # change default representation
 mol default material Diffuse
+mol material Diffuse
 mol default style {newcartoon 0.3 12 4 2}
 light 0 on
 light 1 on
