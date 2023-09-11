@@ -1,14 +1,23 @@
 #!/bin/bash
 
 dir=${PWD##*/}
-echo $dir
-skip=10;
+
+name=( struc/*sn.psf )
+name=${name[0]%sn*}
+name=${name##*/}
+echo $name
+
+skip=1;
 p=100 ;
-vmd -dispdev text -args $skip <rmsd.vmd
-#echo 'plot "rmsd.dat" w lines ; pause 10; '|gnuplot
+vmd -dispdev text -args $name $skip <rmsd.vmd
+gnuplot << EOF
+#set term dumb ;
+plot "rmsd.dat" w lines ; pause 100
+EOF
 #echo "clear graphics_toolkit;graphics_toolkit('gnuplot');d=load(\"rmsd.dat\"); plot(d); pause($p);"|octave
 #echo "d=load(\"rmsd.dat\"); plot(d); ylim([0 10.0]) ; pause($p);"|octave
-#exit 1
+
+exit
 echo "\
 clear graphics_toolkit;\
 graphics_toolkit('gnuplot');\
@@ -21,5 +30,5 @@ d=load('rmsd.dat');\
  title('${dir}: RMSD from initial structure');\
  print(gcf,'-depsc2','${dir}-rmsd.eps');\
  "|octave
-gv rmsd.eps
+gv ${dir}-rmsd.eps
 
