@@ -52,6 +52,10 @@ if 1:
   fixedcol
  except NameError:
   fixedcol=1
+ try:
+  cutoff
+ except NameError:
+  cutoff=-1; # run without cutoff
 #
  try :
   switchdist
@@ -284,7 +288,10 @@ if 1:
   cons=None
   rigidWater=False
  dprint("Initializing simulation system");
- dprint("Nonbonded cutoff is ",cutoff*u.angstrom,". Switching is active at ",switchdist*u.angstrom)
+ if (cutoff>0):
+  dprint("Nonbonded cutoff is ",cutoff*u.angstrom,". Switching is active at ",switchdist*u.angstrom)
+ else:
+  dprint("Nonbonded cutoff is infinite")
  if (hmass>1):
   dprint("Hydrogen mass is ",hmass*u.amu)
   if (implicitSolvent==1):
