@@ -1,6 +1,6 @@
 #!/bin/bash
 # change 3-letter sequence to a 1-letter sequence
-
+#
 if [ -z $1 ] ; then
  input=""
 else
