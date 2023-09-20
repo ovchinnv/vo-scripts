@@ -164,7 +164,6 @@ if 1:
 # randomize temporary dcd names to avoid overwrite if running in parallel
  except NameError:
   qrandname=1
-#
 # 2/22 : try to use new langevin "middle" integrator
  try:
   newLangevin

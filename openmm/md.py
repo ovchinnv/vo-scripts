@@ -8,8 +8,8 @@ from os import mkdir, path
 #
 # aux parameters (e.g. they help define the required ones, but are not themselves used by CHOMM)
 firstrun=0   ;# initial run index
-numrun=4
-name='dhfr'
+numrun=2
+name='s1amc'
 #platformName='CPU' ; #optional; default is 'CUDA'
 #==============================
 # parameters required by CHOMM (some have default values)
@@ -17,13 +17,13 @@ if not (path.exists('scratch')):
  mkdir('scratch');
 psffile='./struc/'+name+'_sn.psf' ;
 pdbfile='./struc/'+name+'_msn.pdb' ;
-topfile='./struc/'+name+'36.top';
-paramfile='./struc/'+name+'36.par';
+topfile='./struc/6vxx-cov.top';
+paramfile='./struc/6vxx-cov.par';
 
 implicitSolvent=0 ;# run OBC2 implicit solvent simulation
 
 xscfile='.xsc' ;         # to obtain cell vectors from last line of xsc file
-boxfile='./struc/'+name+'.str'; # to obtain cell vectors from str file used in structure solvation
+boxfile='./struc/s1am.str'; # to obtain cell vectors from str file used in structure solvation
 
 # specify larger box manually
 #dx=72 ;
@@ -35,7 +35,7 @@ friction=1   # 1/ps, thermostat coupling
 dt=4;          # timestep in fs
 pmefreq=1;     # >1 requires multiple timestepping, which _dramatically_ slows down the code
 cutoff=9;      # nonbonded cutoff
-switchdist=7.5 ; # (optional) switching distance
+switchdist=8 ; # (optional) switching distance
 
 constraints=1;   # harmonic positional restraints for equilibration
 constraintscaling=1; # to scale hatmonic restraints uniformly
@@ -50,10 +50,10 @@ andersen=0;    # to use Andersen instead of Langevin ; (Note that I see energy u
 barostat=0;
 pressure=1;    # units of atm
 membrane_on=0; # whether to use a barostat for membrane simulations (z-axis is the membrane normal)
-pme=0; # whether to use PME
-pbc=0; # whether periodic boundary conditions are on
+pme=1; # whether to use PME
+pbc=1; # whether periodic boundary conditions are on
 
-dynamo=1
+dynamo=0
 dynamoTemplate='watershell.dyn'
 watershell_restart='NONE'
 
@@ -61,7 +61,7 @@ mini=1;          # whether to minimize before dynamics
 ministeps=0;   # number of minimization iterations
 
 numeq=1             # number of equilibration runs
-numeqsteps=10000000; # number of equilibration steps
+numeqsteps=1000000; # number of equilibration steps
 nummdsteps=100000000; # number of production steps
 #nummdsteps=20000
 outputfreq=10000;  # frequency of generating output
@@ -86,9 +86,8 @@ else:
 irun=firstrun
 while irun < firstrun + numrun :
 
-
  print(" =============================");
- print(" Run ", irun, "(will quit after", numrun-1,")");
+ print(" Run ", irun, "(will quit after", firstrun+numrun-1,")");
 # set some run-specific options
 # constraintscaling = (90-10*irun) ;# turn off gradually by run 10
  if irun >= numeq:
@@ -105,20 +104,22 @@ while irun < firstrun + numrun :
 #
 # dynamo section :
 #
- watershell_output='watershell'+str(irun)+'.restart.txt'
- if (irun>0):
-   watershell_restart='watershell'+str(irun-1)+'.restart.txt'
+ if (dynamo>0):
+  watershell_output='watershell'+str(irun)+'.restart.txt'
+  if (irun>0):
+    watershell_restart='watershell'+str(irun-1)+'.restart.txt'
 #
- dynamoConfig='watershell'+str(irun)+'.in'
-# modify config template :
- df=open(dynamoTemplate,'r');
- dd=df.read()
- dd=dd.replace('@{restart_file}',watershell_restart)
- dd=dd.replace('@{output_file}',watershell_output)
- df=open(dynamoConfig,'w');
- df.write(dd);
- df.close();
- dynamoLog=dynamoConfig+'.log';
+  dynamoConfig='watershell'+str(irun)+'.in'
+#  modify config template :
+  df=open(dynamoTemplate,'r');
+  dd=df.read()
+  dd=dd.replace('@{restart_file}',watershell_restart)
+  dd=dd.replace('@{output_file}',watershell_output)
+  df=open(dynamoConfig,'w');
+  df.write(dd);
+  df.close();
+  dynamoLog=dynamoConfig+'.log';
+#
  outputName='scratch/'+name+str(irun)+flag ;
  from os.path import expanduser
 # sys.exit()
