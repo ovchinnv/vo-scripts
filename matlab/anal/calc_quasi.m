@@ -1,4 +1,4 @@
-function [tsquant, tsclass, nu_ps, evc, CX] =calc_quasi(x,y,z,w,temperature);
+function [tsquant, tsclass, nu_ps, evc, CX, squant_contrib, sclass_contrib, ev] =calc_quasi(x,y,z,w,temperature);
 % perform principal component analysis and quasiharmonic analysis
 % note that quasiharmonic frequencies will be incorrect unless mass-weighting is used
 %
@@ -46,25 +46,29 @@ evc=osw.*evc;
 %
 % compute frequencies
 ev=diag(ev); % grab the diagonal entries
-ev=ev(find(ev>tol)); % throw away negative evalues or zeros; this should also remove rigid-body modes
+% omit below, keeping all evs for information
+% NOTE that the RGB modes, if all is well, will be the first 6, but the modes are listed in increasing evalue, or decreasing freq, so low-freq at the end !
+%ev=ev(find(ev>tol)); % throw away negative evalues or zeros; this should also remove rigid-body modes (note that they could be at the end ...)
 % note that not having enough samples will create additional zero eigenvalues
 %
 % now have raw eigenvalues from the diagonalization of the covariance matrix (units Ang^2 amu)
 % convert frequencies to s^-1 units :
 %
 fact  = 1./sqrt(jle * 1e-23) / (2*pi);  % 2.0455e13 ! this essentially converts kilocalories to Joules in kT
-nu_s  = sqrt(kbt./ev) .* fact ; % per second
+nu_s  = zeros(size(ev)) ; squant_contrib=nu_s ; sclass_contrib=nu_s ;
+okinds = find(ev>tol) ; % conside only positive evs
+nu_s(okinds) = sqrt(kbt./ev(okinds)) .* fact ; % per second
 nu_ps = nu_s*1e-12 ;% per picosecond
 nu_icm= (nu_s/c)';% inverse wavelength per centimeter
 
 % Andricioaei formula
-pe=nu_s*h/kbt;           % energy of the quasiharmonic modes divided by kBT
+pe=nu_s(okinds)*h/kbt;           % energy of the quasiharmonic modes divided by kBT
 %directly
 %const = 1./sqrt(kbt   *4.184) * 6.62606 * 6.0221 * 0.1 / 2 / pi;
 %pe=     1./sqrt(kbt*ev*4.184) * 6.62606 * 6.0221 * 0.1 / 2 / pi;
 
-squant_contrib  =  kb2 * (pe./(exp(pe) - 1) - log (1-exp(-pe))); % this is also the same as the quasiharmonic entropy in numata & knapp
-sclass_contrib  = -kb2 * (log(pe)-1);
+squant_contrib(okinds)  =  kb2 * (pe./(exp(pe) - 1) - log (1-exp(-pe))); % this is also the same as the quasiharmonic entropy in numata & knapp
+sclass_contrib(okinds)  = -kb2 * (log(pe)-1);
 
 %plot(nu_ps,squant_contrib,'r'); hold on;
 %plot(nu_ps,sclass_contrib,'b');
