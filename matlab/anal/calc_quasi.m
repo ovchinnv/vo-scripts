@@ -57,7 +57,7 @@ ev=diag(ev); % grab the diagonal entries
 fact  = 1./sqrt(jle * 1e-23) / (2*pi);  % 2.0455e13 ! this essentially converts kilocalories to Joules in kT
 nu_s  = zeros(size(ev)) ; squant_contrib=nu_s ; sclass_contrib=nu_s ;
 okinds = find(ev>tol) ; % conside only positive evs
-nu_s(okinds) = sqrt(kbt./ev(okinds)) .* fact ; % per second
+nu_s(okinds) = sqrt(kbt./ev(okinds)) .* fact ; % per second ; see eq(49) in Brooks 95
 nu_ps = nu_s*1e-12 ;% per picosecond
 nu_icm= (nu_s/c)';% inverse wavelength per centimeter
 
@@ -68,7 +68,7 @@ pe=nu_s(okinds)*h/kbt;           % energy of the quasiharmonic modes divided by 
 %pe=     1./sqrt(kbt*ev*4.184) * 6.62606 * 6.0221 * 0.1 / 2 / pi;
 
 squant_contrib(okinds)  =  kb2 * (pe./(exp(pe) - 1) - log (1-exp(-pe))); % this is also the same as the quasiharmonic entropy in numata & knapp
-sclass_contrib(okinds)  = -kb2 * (log(pe)-1);
+sclass_contrib(okinds)  = -kb2 * (log(pe)-1); % note : this is the classical formula ; Z=1/(beta h nu) = 1/(pe) ; <E>=-d (ln Z) / dbeta) ; S=(E-F)/T
 
 %plot(nu_ps,squant_contrib,'r'); hold on;
 %plot(nu_ps,sclass_contrib,'b');
