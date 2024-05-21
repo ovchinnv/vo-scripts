@@ -1,6 +1,7 @@
 #!/bin/bash
 # change 1-letter sequence to a 3-letter sequence and generate a pdb file 
 # which is needed if you want to number the residues starting from a number other than one
+# use as : echo <seq> | ./str2pdb <#ires>
 #
 if [ -z $1 ] ; then
  ires=1 ;
@@ -21,6 +22,10 @@ gawk 'BEGIN {
         A3["F"]="PHE";A3["K"]="LYS";A3["S"]="SER";A3["V"]="VAL";A3["M"]="MET";A3["N"]="ASN";A3["P"]="PRO";A3["Y"]="TYR";
         A3["H"]="HSD";                           ;A3["G"]="GLY";A3["W"]="TRP";A3["C"]="CYS";
         A3["H"]="HIS";
+
+        # for stapled peptides:
+        A1["R8"]="J"; A1["S5"]="O";
+        A3["J"]="R8 ";A3["O"]="S5 ";
 
         ires=ARGV[1] ;# number of first residue
         ARGV[1]=""
