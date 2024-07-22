@@ -13,7 +13,7 @@ BEGIN {
         AA["ALA"]="A";AA["ARG"]="R";AA["ASP"]="D";AA["GLN"]="Q";AA["LEU"]="L";AA["THR"]="T";AA["GLU"]="E";AA["ILE"]="I";
 	AA["PHE"]="F";AA["LYS"]="K";AA["SER"]="S";AA["VAL"]="V";AA["MET"]="M";AA["ASN"]="N";AA["PRO"]="P";AA["TYR"]="Y";
 	AA["HIS"]="H";AA["HSD"]="H";AA["HSE"]="H";AA["GLY"]="G";AA["TRP"]="W";AA["CYS"]="C";
-
+	AA["MSE"]="M";
 }
 
 {

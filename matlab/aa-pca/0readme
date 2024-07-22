@@ -1,0 +1,14 @@
+12.19 : design a covariance analysis for the sequences in the DB
+12.19 : note that I kept getting the error "unsupported type" in the sqlite3/matlab plugin ; this error was caused by the fact that I created the MSA table
+without the type specifier, so that the type by default was NULL, and the default value was NULL ; when SQLite plugin runs, it encounters a null value
+and bombs ; to fix completely, we need to replace the MULLs by '' (empties) ;  this is done in rmmsanull.sql
+
+1.2020 : File descriptions
+
+aln2coor 	: function to convert multiple-sequence alignment (characters) to numerical coordinates
+gdist		: function to compute Cartesian distance between all coordinate pairs, or to a reference set
+pca		: Compute MSA & add to database for subsequent pca analysis
+mkmsa		: run pca (above) for multiple tables
+msa2proj	: starting from an MSA, compute projections onto PCA eigenvectors
+loadmsa		: load MSA and plot projections onto PCA as a scatter plot
+pcahost, pcatype, pcayear : compute PCA projections

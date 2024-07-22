@@ -10,7 +10,12 @@ if (~exist('qpdb')) ; qpdb=0 ; end
 if (~qpdb) % read pdb file
  global molecule;
  disp(['==>Reading pdb structure file ',pdbfile,' ...']);
- molecule=pdbread(pdbfile);
+ if (~exist('qoctpdb')) ; qoctpdb=0 ; end
+ if(qoctpdb)
+  molecule=readpdb(pdbfile,1); % custom partial octave-compatible (faster?) ; 2nd argument for verbosity ; might need to add a path
+ else
+  molecule=pdbread(pdbfile); % native matlab
+ end
  qpdb=1; %
 end
 

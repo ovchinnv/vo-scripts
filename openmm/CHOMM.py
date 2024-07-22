@@ -96,6 +96,10 @@ if 1:
   fixedcol
  except NameError:
   fixedcol=1
+ try:
+  cutoff
+ except NameError:
+  cutoff=-1; # run without cutoff
 #
  try :
   switchdist
