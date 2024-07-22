@@ -477,11 +477,15 @@ if 1:
 #================= string plugin (backward compatibility, because we now have dynamo)
  if (struna==1) :
   from openmmstruna import *
-  system.addForce(StrunaForce(strunaConfig, strunaLog))
+  strunaForce=StrunaForce(strunaConfig, strunaLog);
+  strunaForce.setForceGroup(7);
+  system.addForce(strunaForce);
 #================= dynamo (master) plugin
  if (dynamo==1) :
   from openmmdynamo import *
-  system.addForce(DynamoForce(dynamoConfig, dynamoLog))
+  dynamoForce=DynamoForce(dynamoConfig, dynamoLog);
+  dynamoForce.setForceGroup(7);
+  system.addForce(dynamoForce);
 #================= add integrator :
  dprint("Configuring integrator");
 # first, add barostat if requested :
