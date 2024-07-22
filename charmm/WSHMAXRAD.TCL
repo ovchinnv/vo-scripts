@@ -1,23 +1,23 @@
-set rad( ALA ) 6.07202
-set rad( ARG ) 12.0655
-set rad( ASN ) 7.20524
-set rad( ASP ) 6.88224
-set rad( CYS ) 6.89735
-set rad( GLN ) 9.02161
-set rad( GLU ) 8.3137
-set rad( GLY ) 4.16895
-set rad( HSD ) 8.8656
-set rad( HIS ) 8.8656
-set rad( HSE ) 8.8656
-set rad( HSP ) 8.8656
-set rad( ILE ) 8.70868
-set rad( LEU ) 8.37149
-set rad( LYS ) 10.9328
-set rad( MET ) 9.26048
-set rad( PHE ) 9.97992
-set rad( PRO ) 6.1806
-set rad( SER ) 5.78725
-set rad( THR ) 6.68695
-set rad( TRP ) 11.0967
-set rad( TYR ) 10.0644
-set rad( VAL ) 7.51089
+set rad(ALA) 6.07202
+set rad(ARG) 12.0655
+set rad(ASN) 7.20524
+set rad(ASP) 6.88224
+set rad(CYS) 6.89735
+set rad(GLN) 9.02161
+set rad(GLU) 8.3137
+set rad(GLY) 4.16895
+set rad(HSD) 8.8656
+set rad(HIS) 8.8656
+set rad(HSE) 8.8656
+set rad(HSP) 8.8656
+set rad(ILE) 8.70868
+set rad(LEU) 8.37149
+set rad(LYS) 10.9328
+set rad(MET) 9.26048
+set rad(PHE) 9.97992
+set rad(PRO) 6.1806
+set rad(SER) 5.78725
+set rad(THR) 6.68695
+set rad(TRP) 11.0967
+set rad(TYR) 10.0644
+set rad(VAL) 7.51089
