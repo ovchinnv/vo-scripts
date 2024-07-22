@@ -35,16 +35,16 @@ coor stat sele res end
 calc rad = sqrt ( ( ?xmax - ?xmin )**2 + ( ?ymax - ?ymin )**2 + ( ?zmax - ?zmin )**2 )
 !write title unit 1
 !* set rad( ?SELRESN ) @{RAD}
-system "echo 'set rad( ?SELRESN ) @{RAD}' >> @{NAME}"
+system "echo 'set rad( ?SELRESN ) @{RAD}' | sed 's/( /(/' | sed 's/ )/)/'  >> @{NAME}" ! sed to remove spaces
 
 if ?SELRESN .eq. HSD then
 !write title unit 1
 !* set rad( HIS ) @{RAD}
 !* set rad( HSE ) @{RAD}
 !* set rad( HSP ) @{RAD}
-system "echo 'set rad( HIS ) @{RAD}' >> @{NAME}"
-system "echo 'set rad( HSE ) @{RAD}' >> @{NAME}"
-system "echo 'set rad( HSP ) @{RAD}' >> @{NAME}"
+system "echo 'set rad(HIS) @{RAD}' >> @{NAME}"
+system "echo 'set rad(HSE) @{RAD}' >> @{NAME}"
+system "echo 'set rad(HSP) @{RAD}' >> @{NAME}"
 endif 
 
 incr ires
