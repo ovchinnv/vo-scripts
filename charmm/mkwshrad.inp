@@ -1,0 +1,60 @@
+! an algorithm to compute residue rasii for watershell
+! the idea is that we may only use CA atoms of proteins
+! as the "surface basis", but we want to account for the
+! fact that some residues are much larger than others
+! e.g. GLY vs TYR at the extreme
+* compute residue radii for watershell
+*
+
+if @?{clib} eq 0 set clib "~/scripts/charmm"
+stream @{clib}/readpsf36.str
+
+read sequ card
+* 
+22
+ALA ALA ARG ASN ASP CYS GLN GLU GLY HSD ILE LEU LYS MET PHE PRO SER THR TRP TYR VAL ALA
+
+generate aas first nter last cter setup warn 
+ic param
+ic seed 1 N 1 CA 1 C
+ic build
+
+print coor card sele .not. init end
+
+define omit sele none end
+
+set name wshmaxrad.tcl
+system "echo -n > @{NAME}"
+!open form name @name unit 1
+
+set ires 2
+calc eres = ( ?nres - 1 )
+label resloop
+define res sele ires @ires .and. .not. omit end
+coor stat sele res end
+calc rad = sqrt ( ( ?xmax - ?xmin )**2 + ( ?ymax - ?ymin )**2 + ( ?zmax - ?zmin )**2 )
+!write title unit 1
+!* set rad( ?SELRESN ) @{RAD}
+system "echo 'set rad( ?SELRESN ) @{RAD}' >> @{NAME}"
+
+if ?SELRESN .eq. HSD then
+!write title unit 1
+!* set rad( HIS ) @{RAD}
+!* set rad( HSE ) @{RAD}
+!* set rad( HSP ) @{RAD}
+system "echo 'set rad( HIS ) @{RAD}' >> @{NAME}"
+system "echo 'set rad( HSE ) @{RAD}' >> @{NAME}"
+system "echo 'set rad( HSP ) @{RAD}' >> @{NAME}"
+endif 
+
+incr ires
+if @ires .le. @eres -
+goto resloop
+
+
+!close unit 1
+
+
+
+
+

@@ -1,0 +1,21 @@
+#!/bin/vmd
+# put new radii into pdb file for watershell
+source watershell-rad.tcl ;
+
+set name traf-rank-wshell
+
+mol load psf ${name}.psf
+mol addfile ${name}.pdb
+
+set all [atomselect top "all" ];
+$all set occupancy 0
+
+foreach resn [array names rad] {
+ puts $resn
+ set res [ atomselect top "resname $resn" ];
+ $res set occupancy $rad($resn)
+# puts [ $res get resname ] ; #check to make sure selection correct
+ puts $rad($resn)
+}
+
+$all writepdb ${name}-rad.pdb
