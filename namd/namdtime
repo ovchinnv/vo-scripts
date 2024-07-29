@@ -7,6 +7,8 @@ else
  log=$1
 fi
 
-
-grep "Benchmark time" $log | awk '{print 1/$8}' > bench.dat
-echo "d=load('bench.dat'); da=mean(d) ; de=std(d) ; fprintf([num2str(da),' +/- ',num2str(de),'\n'])" | octave
+# handle both cases
+grep "Benchmark" $log | grep "days/ns" | awk '{print 1/$8}' > bench.tmp
+#grep "TIMING" $log | grep "ns/day" | awk '{print $9}' >> bench.tmp
+grep "Benchmark" $log | grep "ns/day" | awk '{print $8}' >> bench.tmp
+echo "d=load('bench.tmp'); da=mean(d) ; de=std(d) ; fprintf([num2str(da),' +/- ',num2str(de),'\n'])" | octave

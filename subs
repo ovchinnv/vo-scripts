@@ -1,0 +1,16 @@
+#!/bin/bash
+# subsample trajectories for a smaller total set
+if [ -z $1 ]; then
+ stride=10
+else
+ stride=$1
+fi
+
+if [ -z $2 ]; then
+ outname=`ls ../struc | grep _msn.pdb | awk -F '_msn' '{print \$1}'`
+else
+ outname=$2
+fi
+
+echo $outname
+catdcd -o ${outname}s.dcd -stride $stride ` ls *dcd |sort -V`
