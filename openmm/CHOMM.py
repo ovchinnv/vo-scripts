@@ -617,6 +617,12 @@ if 1:
  fxsc.close();
 #==== reset switching distance
 # del switchdist;
+# undefine constraint file names if they were set to none, otherwise, multiple constrained runs will not work
+ if (conscor==None):
+  del conscor;
+ if (conspdb==None):
+  del conspdb;
+#
  if (dynamo): # dynamo is somewhat problematic upon run continuation, need a complete reinit because the end of each run destroys the dynamo object
   del system;
   del simulation;
