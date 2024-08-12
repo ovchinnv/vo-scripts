@@ -1,34 +1,51 @@
 #!/bin/tcl
+#set name rpol-rna
+#puts $argv
+#puts $argc
 
-set name rpol-rna
-mol delete all
-mol load psf struc/${name}_sn.psf
-mol addfile struc/${name}_msn.pdb
 
-set itraj 0
-set etraj 2
-
-if {$argc == 0} {
- set step 1;
+if { $argc <= 0 } {
+ exit;
 } else {
- set step [lindex $argv 0];
+ set name [lindex $argv 0];
+ if {$argc >= 1 } {
+  set step [lindex $argv 1];
+ } else { ;#1
+  set step 1;
+ }
 }
-set flag eq
-for {set i $itraj } { $i <= $etraj } {incr i} {
+#
+mol delete all
+mol load psf struc/${name}sn.psf
+mol addfile struc/${name}_msn.cor
+#
+set dcds [exec ls scratch | grep ${name} | grep dcd | sort -V ] ;# complete dcd files
+#
+foreach dcd $dcds {
+ puts $dcd
+ mol addfile scratch/$dcd waitfor all step $step
+}
+#exit
+#set itraj 0
+#set etraj 13
+#set flag eq
+#for {set i $itraj } { $i <= $etraj } {incr i} {
 # if {$i >= 6 } { set flag npt }
- if {$i >=1 } { set flag nvt }
- mol addfile scratch/${name}${i}${flag}.dcd waitfor all step $step
-}
+# if {$i >=1 } { set flag nvt }
+# mol addfile scratch/${name}${i}${flag}.dcd waitfor all step $step
+#}
 
-mol addfile output_656.dcd waitfor all step $step
+set outdcd [lindex [exec ls | grep output] 0 ] ;# partial dcd file
+mol addfile $outdcd waitfor all step $step
 
 set id [ molinfo top ];
 set nf [molinfo $id get numframes];
 #set selection "protein or resname GTP or resname MG"
 set orientation "protein" ;
-#set orientation "nucleic" ;
+set orientation "segname \"NP.*\"" ;
 #set orientation "protein or nucleic" ;
-#set orientation "segname \"HA.*\""
+#set orientation "segid H11"
+#set orientation "segname \"C6.*\""
 #set orientation "protein or ( segid TPP and name P1 )"
 #set rms "protein" ;
 #set rms "nucleic" ;

@@ -50,9 +50,17 @@ if 1:
   except NameError:
    conscol=1
   try :
-   consfile
+   consfile=conspdb
   except NameError:
-   consfile=pdbfile
+   conspdb=None
+   try :
+    consfile=conscor
+   except NameError:
+    conscor=None
+    try :
+     consfile
+    except NameError:
+     consfile=pdbfile
 #
  try :
   bestFitRMSD
@@ -88,6 +96,10 @@ if 1:
   fixedcol
  except NameError:
   fixedcol=1
+ try:
+  cutoff
+ except NameError:
+  cutoff=-1; # run without cutoff
 #
  try :
   switchdist
@@ -374,11 +386,6 @@ if 1:
 #
 #================= harmonic restraints from file, a la NAMD/ACEMD
  if (constraints) :
-  if (conscol==1): # beta
-   dprint("Adding absolute positional harmonic restraints to atoms marked in the beta column of PDB file '"+consfile+"'");
-  elif (conscol==2): #occupancy
-   dprint("Adding absolute positional harmonic restraints to atoms marked in the occupancy column of PDB file '"+consfile+"'");
-
   if (pbc) :
    harmonicAtomForce=mm.CustomExternalForce("s*0.5*k*periodicdistance(x,y,z,x0,y0,z0)^2");
   else :
@@ -390,25 +397,45 @@ if 1:
   harmonicAtomForce.addPerParticleParameter("z0");
   harmonicAtomForce.addGlobalParameter("s", constraintscaling);
 # read per atom restraints :
-  res=app.PDBFile(consfile);
-  iatom=0; icons=0;
-  for r, o, b  in zip(res.positions, res.occupancy, res.temperature_factor) :
+  if (consfile==conscor) :
+   dprint("Adding absolute positional harmonic restraints to atoms marked in the WMAIN column of CHARMM file '"+consfile+"'");
+   res=app.CharmmCrdFile(consfile);
+   iatom=0; icons=0;
+   for r, bnodim  in zip(res.positions, res.weighting) :
+    if (bnodim > 0) :
+     icons+=1;
+     k=bnodim*u.kilocalorie/u.mole/u.angstrom/u.angstrom
+     x0=r[0].value_in_unit(u.nanometer)
+     y0=r[1].value_in_unit(u.nanometer)
+     z0=r[2].value_in_unit(u.nanometer)
+     harmonicAtomForce.addParticle(iatom, [k,x0,y0,z0]);
+    iatom+=1;
+  else :
    if (conscol==1): # beta
-    bnodim=b/u.angstrom/u.angstrom; # have to deal with units, which are A^2 for B-factors
+    dprint("Adding absolute positional harmonic restraints to atoms marked in the beta column of PDB file '"+consfile+"'");
    elif (conscol==2): #occupancy
-    bnodim=o ;
-   else:
-    bnodim=-1 ;
-
-   if (bnodim > 0) :
-    icons+=1;
-    k=bnodim*u.kilocalorie/u.mole/u.angstrom/u.angstrom
-#   dprint(" Adding restraint on atom ",iatom," with force constant ", k );
-    x0=r[0].value_in_unit(u.nanometer)
-    y0=r[1].value_in_unit(u.nanometer)
-    z0=r[2].value_in_unit(u.nanometer)
-    harmonicAtomForce.addParticle(iatom, [k,x0,y0,z0]);
-   iatom+=1;
+    dprint("Adding absolute positional harmonic restraints to atoms marked in the occupancy column of PDB file '"+consfile+"'");
+#
+   res=app.PDBFile(consfile);
+   iatom=0; icons=0;
+   for r, o, b  in zip(res.positions, res.occupancy, res.temperature_factor) :
+    if (conscol==1): # beta
+     bnodim=b/u.angstrom/u.angstrom; # have to deal with units, which are A^2 for B-factors
+    elif (conscol==2): #occupancy
+     bnodim=o ;
+    else:
+     bnodim=-1 ;
+#
+    if (bnodim > 0) :
+     icons+=1;
+     k=bnodim*u.kilocalorie/u.mole/u.angstrom/u.angstrom
+#    dprint(" Adding restraint on atom ",iatom," with force constant ", k );
+     x0=r[0].value_in_unit(u.nanometer)
+     y0=r[1].value_in_unit(u.nanometer)
+     z0=r[2].value_in_unit(u.nanometer)
+     harmonicAtomForce.addParticle(iatom, [k,x0,y0,z0]);
+    iatom+=1;
+#
   dprint("Added restraints on ", icons, " atoms");
   dprint("Harmonic force constants will be scaled uniformly by x"+str(constraintscaling));
   harmonicAtomForce.setForceGroup(7)
@@ -454,11 +481,15 @@ if 1:
 #================= string plugin (backward compatibility, because we now have dynamo)
  if (struna==1) :
   from openmmstruna import *
-  system.addForce(StrunaForce(strunaConfig, strunaLog))
+  strunaForce=StrunaForce(strunaConfig, strunaLog);
+  strunaForce.setForceGroup(7);
+  system.addForce(strunaForce);
 #================= dynamo (master) plugin
  if (dynamo==1) :
   from openmmdynamo import *
-  system.addForce(DynamoForce(dynamoConfig, dynamoLog))
+  dynamoForce=DynamoForce(dynamoConfig, dynamoLog);
+  dynamoForce.setForceGroup(7);
+  system.addForce(dynamoForce);
 #================= add integrator :
  dprint("Configuring integrator");
 # first, add barostat if requested :
@@ -590,6 +621,18 @@ if 1:
  fxsc.close();
 #==== reset switching distance
 # del switchdist;
+# undefine constraint file names if they were set to none, otherwise, multiple constrained runs will not work
+ try :
+  if (conscor==None):
+   del conscor;
+ except NameError:
+
+ try :
+  if (conspdb==None):
+   del conspdb;
+ except NameError:
+
+#
  if (dynamo): # dynamo is somewhat problematic upon run continuation, need a complete reinit because the end of each run destroys the dynamo object
   del system;
   del simulation;
