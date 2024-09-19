@@ -481,11 +481,15 @@ if 1:
 #================= string plugin (backward compatibility, because we now have dynamo)
  if (struna==1) :
   from openmmstruna import *
-  system.addForce(StrunaForce(strunaConfig, strunaLog))
+  strunaForce=StrunaForce(strunaConfig, strunaLog);
+  strunaForce.setForceGroup(7);
+  system.addForce(strunaForce);
 #================= dynamo (master) plugin
  if (dynamo==1) :
   from openmmdynamo import *
-  system.addForce(DynamoForce(dynamoConfig, dynamoLog))
+  dynamoForce=DynamoForce(dynamoConfig, dynamoLog);
+  dynamoForce.setForceGroup(7);
+  system.addForce(dynamoForce);
 #================= add integrator :
  dprint("Configuring integrator");
 # first, add barostat if requested :
@@ -617,6 +621,19 @@ if 1:
  fxsc.close();
 #==== reset switching distance
 # del switchdist;
+# undefine constraint file names if they were set to none, otherwise, multiple constrained runs will not work
+ try :
+  if (conscor==None):
+   del conscor;
+ except NameError:
+   pass
+
+ try :
+  if (conspdb==None):
+   del conspdb;
+ except NameError:
+   pass
+#
  if (dynamo): # dynamo is somewhat problematic upon run continuation, need a complete reinit because the end of each run destroys the dynamo object
   del system;
   del simulation;
