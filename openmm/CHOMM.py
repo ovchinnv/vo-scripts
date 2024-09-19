@@ -627,7 +627,7 @@ if 1:
    del conscor;
  except NameError:
   pass
-
+#
  try :
   if (conspdb==None):
    del conspdb;
