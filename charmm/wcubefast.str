@@ -27,12 +27,18 @@ if @?zmax eq 0 set zmax  10
 ! read initial water box (216 molecules)
 set nwatres 216     ! number of solvent residues
 set boxsize 18.856  ! size of cubic solvent box
+! 9/24 : note that, for a density of 0.997 g/ml, we should have 223 water molecules in a cube of side length 18.856
+! for 216 water molecules need a box with side length 18.645
+set boxsize 18.645 ! note that setting a higher density will causehigher energies during mini
 !
 read sequ tip3 @nwatres
 generate wat0 noangle nodihe
 stream ~/scripts/charmm/read-watbox.str ! this script written by nilssen
 rename segid w0 sele segid wat0 end ! this will be the template box
 
+!compute water box stats :
+coor stat sele segid w0 .and. type OH2 end ! only look at water oxygens
+!
 calc xmi = @xmin - @buf 
 calc xma = @xmax + @buf 
 calc ymi = @ymin - @buf 
@@ -40,15 +46,15 @@ calc yma = @ymax + @buf
 calc zmi = @zmin - @buf 
 calc zma = @zmax + @buf 
 !
-calc xl = ( @xma - @xmi ) ! diameter
-calc yl = ( @yma - @ymi ) ! diameter
-calc zl = ( @zma - @zmi ) ! diameter
+calc xl = ( @xma - @xmi ) ! desired box x-length (solute size + buffer on each side_
+calc yl = ( @yma - @ymi )
+calc zl = ( @zma - @zmi )
 !
 !************ make into a cube
 set l @xl
-if  @yl .gt. @l  set l @yl 
-if  @zl .gt. @l  set l @zl 
-calc xmi = @xmi - 0.5 * ( @l - @xl )
+if  @yl .gt. @l  set l @yl
+if  @zl .gt. @l  set l @zl
+calc xmi = @xmi - 0.5 * ( @l - @xl ) ! shift minimum to corner of cubic box
 calc xma = @xma + 0.5 * ( @l - @xl )
 calc ymi = @ymi - 0.5 * ( @l - @yl )
 calc yma = @yma + 0.5 * ( @l - @yl )
@@ -59,7 +65,7 @@ set yl @l
 set zl @l
 !****************** CUBE ******************
 !
-calc nx = int (@xl/@boxsize + 1 )
+calc nx = int (@xl/@boxsize + 1 ) ! adding one ensures that we get more water than needed
 calc ny = int (@yl/@boxsize + 1 )
 calc nz = int (@zl/@boxsize + 1 )
 
@@ -87,9 +93,13 @@ label mx
    define w1 sele segid wat0 .and. resi @w1b : @w1e end
    coor dupl sele w0 end sele w1 end
 
-   calc xdisp = ( @i * @boxsize + @xmi + @{boxsize}/2 ) ! move 
+   calc xdisp = ( @i * @boxsize + @xmi + @{boxsize}/2 ) ! move into position, starting from location of minimum
    calc ydisp = ( @j * @boxsize + @ymi + @{boxsize}/2 ) ! move 
    calc zdisp = ( @k * @boxsize + @zmi + @{boxsize}/2 ) ! move 
+! to start from the opposite corner :
+!   calc xdisp = ( @xma - ( @i + 0.5 ) * @{boxsize} ) ! move into position, starting from location of maximum
+!   calc ydisp = ( @yma - ( @j + 0.5 ) * @{boxsize} ) ! move
+!   calc zdisp = ( @zma - ( @k + 0.5 ) * @{boxsize} ) ! move
 
    scalar X add @xdisp select w1 end
    scalar Y add @ydisp select w1 end

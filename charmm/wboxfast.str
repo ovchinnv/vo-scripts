@@ -23,10 +23,10 @@ if @?ymax eq 0 set ymax  10
 if @?zmax eq 0 set zmax  10
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! read initial water box (216 molecules)
 set nwatres 216     ! number of solvent residues
 set boxsize 18.856  ! size of cubic solvent box
+! 9/24 : note that, for a density of 0.997 g/ml, we should have 223 water molecules in a cube of side length 18.856
 
 read sequ tip3 @nwatres
 generate wat0 noangle nodihe

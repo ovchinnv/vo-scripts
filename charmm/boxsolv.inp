@@ -87,11 +87,13 @@ label skipmini
 energy
 label write
 ! shift corner to origin
+if @?shift2origin eq 0 set shift2origin 1
+if @{shift2origin} .eq. 1 then
 coor stat
 scalar X add -?XMIN
 scalar Y add -?YMIN
 scalar Z add -?ZMIN
-
+endif
 write psf @format name @{psffile}_s.psf
 write psf @format name @{psffile}_s-x.psf xplor
 !
