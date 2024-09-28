@@ -7,5 +7,6 @@ typeC=ismember(aname,'C');
 typeN=ismember(aname,'N');
 typeO=ismember(aname,'O');
 typeH=ismember(aname,'H');
+typeOH2=ismember(aname,'OH2');
 backbone = typeCA | typeC | typeN | typeO | typeH ;
 
