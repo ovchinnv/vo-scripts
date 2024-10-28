@@ -1,0 +1,644 @@
+
+<!-- saved from url=(0068)https://www.ks.uiuc.edu/Research/vmd/script_library/scripts/userani/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"><title>UserAni</title>
+<style type="text/css" id="operaUserStyle">
+    video {
+      filter: url('data:image/svg+xml,\
+        <svg xmlns="http://www.w3.org/2000/svg">\
+          <filter id="sharpen">\
+            <feConvolveMatrix order="3" preserveAlpha="true" kernelMatrix="1 -1 1 -1 -1 -1 1 -1 1"/>\
+          </filter>\
+        </svg>#sharpen');
+    }
+  </style></head><body bgcolor="white">
+<pre>UserAni 0.92 - VMD Easy User Defined Movie Animation System
+-----------
+
+AUTHOR: Norman Geist, Greifswald 2020 (norman.geist@uni-greifswald.de)
+
+REQUIREMENTS: tested with VMD 1.9.2 and above
+
+DESCRIPTION:
+  VMD offers the Extension-&gt;Visualization:Movie Maker where one can select "user defined procedure". To actually use this feature
+  one would need to write a procedure to be called on trace of the variable "$::MovieMaker::userframe". As it requires a lot
+  of scripting effort to write detailed and reusable animation procedures in that way, 
+  especially if multiple things should happen in parallel, I developed this easy to use and to extend automatic animation system.
+  With this system its possible to create animated movies without real experience in TCL programming, as long
+  as one can stay with the animations already implemented. Creating new, own animation procedures is also quite 
+  easy, as a smart skeleton can be used.
+
+  General system keynotes :
+    - The user plans to play across all frames loaded while performing different animations, a step is possible.
+    - The user is supposed to write his animation story board to a file to be sourced to VMD console (or better TK Console).
+    - The number of frames (top mol) and the trajectory step size set in the Movie Maker window
+      control the movie duration. (Changes to the MovieMaker trj step or the top mol requires redefining the time sections,
+      which mean re-source the animation script)
+    - The user creates a timeline using time sections. The user then adds animations to this timeline.
+      The animation system will care about when to call which animation procedure automatically, internally,
+      after "Make Movie" has been clicked.
+      Two types of animations are possible:
+	1. Specially prepared "userani" procedures, useful whereever progressive threatment among frames is required,
+	   they are used with "add_userani".
+ 
+	2. Any TCL or VMD command. Use "VMD Main-&gt;File-&gt;Log TCL commands to console" to get commands for
+	   things while doing them by hand. They are added with "add_eval".
+
+  For now the most useful features of this system are: Auto-Zoom; Auto-Center; Material Fading; Rotations, 
+						       Graphical representation of the animation story,
+						       Unlimited parallel actions;
+
+
+DOWNLOAD FILE(S):
+  <a href="https://www.ks.uiuc.edu/Research/vmd/script_library/scripts/userani/userani.tcl">userani.tcl</a>
+  <a href="https://www.ks.uiuc.edu/Research/vmd/script_library/scripts/userani/exampleREMD.tcl">exampleREMD.tcl</a>
+
+
+EXAMPLE USAGE:
+    
+    test.tcl
+    --------
+    #include the animation system (should be the 1st line)
+    source userani.tcl
+
+    #example for resets on start
+    add_section kickoff -start first; 		#no end means 1 frame
+    add_eval kickoff display resetview; 	#reset view on frame 0
+
+    #some action
+    add_section rotx -after kickoff -shiftend 10%;	#no end means 1 frame + 10%
+    add_userani rotx AutoFocusAllVisible;		#Apply auto centering
+    add_userani rotx AutoScaleAllVisible;		#Apply auto zoom
+    add_userani rotx rotate x 360;			#rotate x by 360 degrees during section rotx
+
+    add_section zoomout -after rotx -shiftend 10%;
+    add_userani zoomout FadeZoomFromCurrent 0.5;	#fade out zoom to half the current start value
+
+    add_section end -after zoomout -end last -noplay;	#until end not playing trj
+    add_userani end rotate x 360;
+    add_userani end rotate y -360;
+    add_userani end rotate z 180;
+
+    #output settings on source
+    print_story
+    print_timeline 1.2
+    --------
+
+  Source to vmd after having a system loaded. Then in Movie Maker click "Make Movie" and see the magic happen.
+
+PROCEDURES:
+
+  add_section secname [-start start] [-end end] [-step step] \
+		      [-shiftstart shift] [-shiftend shift] [-shiftall shift] \
+		      [-like sectionname] || [-after sectionname] [-noplay]
+    special keywords: first,last, n% where n can be any decimal number
+    defaults for ungiven values: start = 0; step = trjstep; end = start+step (same happens if a value equals "-1")
+    args: -start start		- Define the starting time of the section.
+	  -end end		- Define the end time of the section.
+	  -step step		- Define the step within the time section.
+	  -like	secname		- Copy start,step and end value from given secname.
+	  -after secname	- Copy end value as own start from given secname.
+	  -shiftstart shift	- Add a value of shift to the start value.
+	  -shiftend shift	- Add a value of shift to the end value.
+	  -shiftall shift	- Add a value of shift to both start and end.
+	  -noplay		- Trajectory will not play (if section has an action)
+  Used to create a timeline, departing the trajectory into time sections. This sections can overlap as you like,
+  to perform parallel actions. Sections can easily be based on each other, making it easy to start one section,
+  after another specific section has finished. Order of options is important. Its for example possible to
+  use -like and change any value afterwards again f.i. by using one of the -shift* options.
+
+  expr% expression    - To make it easier calculating with "n%" values, a little wrapper function "expr%" is available, ignoring
+			the "%" signs. Using the classical modulo operator of course isn't therefore possible with it.
+  smooth window molid - Enable coordinate smoothing over <window> frames for all representations of <molid>
+  userani_maxprog     - Used to control the maxium step of the userani_Auto* functions.
+
+  add_userani secname functionname args - Add a userani_* animation to the story. The functionname is prepended with "userani_".
+  add_eval secname tclcommand		- Just add any TCL command to the story.
+  print_story				- Output a list of animation actions added.
+  print_sections			- Output a list of time sections defined.
+  print_timeline scalefactor		- Output a graphical representation of the defined time sections. (very useful)
+
+  Current userani_* list:
+
+  FadeTransparency material startvalue endvalue	- Fade the Opacity value of a given material from startvalue to endvalue.
+  FadeMaterialProperty material property startvalue endvalue - Fade the Property value of a given material from startvalue to endvalue.
+  FadeZoom startvalue endvalue			- Fade the scale (zoom) from startvalue to endvalue.
+  FadeZoomFromCurrent factor			- Fade the scale (zoom) from the current value by a factor.
+  FadeOutTranslate *				- Fade the global graphical translation offset to zero.
+  rotate x|y|z degrees				- Animated rotatation around a axis (x|y|z) for a specific angle degrees.
+						  (as this rotations are global, simultanous rotations around different
+						  axes by f.i. 360 will not recover the correct starting orientation,
+						  as the axes around which are rotated do also change)
+  rotatemol molid x|y|z degrees			- Animated (real) rotation around a axis (x|y|z) for a specific angle degrees.
+  movemol molid {x y z}				- Animated (real) translation by {x y z}.
+  AutoFocusAllVisible *				- Automatically translate the view graphically so that the COM of all
+						  visible (displayed molecules and representation) is in the middle
+						  of the graphics window.
+  AutoFocusMolidsVisible {molid molid} *	- Automatically translate the view graphically so that the COM of all
+						  visible in selected molids is in the middle
+						  of the graphics window.
+  AutoFocusMolRepVisible molid repid *		- Automatically translate the view graphically so that the COM of all
+						  visible in selected molid and repid is in the middle
+						  of the graphics window.
+  AutoScaleAllVisible [scalefactor] *		- Automatically apply a zoom factor so that all visible 
+						  (displayed molecules and representation) is inside the viewport.
+  AutoScaleMolidsVisible {molid molid} [scalefactor] *	- Automatically apply a zoom factor so that all visible 
+							  in selected molids is inside the viewport.
+  AutoScaleMolRepVisible molid repid [scalefactor] *	- Automatically apply a zoom factor so that all visible in selected molid
+							  and repid is inside the viewport.
+  raster_replicas shiftX shiftY			- Animate rastering of REMD replicas from aligned bunch.
+
+  ( * This functions knowingly don't scale among the whole time range given, building
+    a compromise between "smooth animation" and "keeping" the focus/zoom suitable while playing the trj )
+
+  Current other list:
+
+  raster_replicas shiftX shiftY			- Non animated rastering of REMD replicas from aligned bunch.
+  dummy						- Dummy function. Can be used for -noplay sections which must have
+						  an action in order to take effect.
+  TransparencyStalker				- A nice helper function thatUserAni 0.91 - VMD Easy User Defined Movie Animation System
+-----------
+
+AUTHOR: Norman Geist, Greifswald 2014 (norman.geist@uni-greifswald.de)
+
+REQUIREMENTS: tested with VMD 1.9.2, 1.9.2a35, 1.9.2b1
+
+DESCRIPTION:
+
+  VMD offers the Extension-&gt;Visualization:Movie Maker where one can select "user defined procedure". To actually use this feature
+  one would need to write a procedure to be called on trace of the variable "$::MovieMaker::userframe". As it requires a lot
+  of scripting effort to write detailed and reusable animation procedures in that way, 
+  especially if multiple things should happen in parallel, I developed this easy to use and to extend automatic animation system.
+  With this system its possible to create animated movies without real experience in TCL programming, as long
+  as one can stay with the animations already implemented. Creating new, own animation procedures is also quite 
+  easy, as a smart skeleton can be used.
+
+  General system keynotes :
+    - The user plans to play across all frames loaded while performing different animations, a step is possible.
+    - The user is supposed to write his animation story board to a file to be sourced to VMD console (or better TK Console).
+    - The number of frames (top mol) and the trajectory step size set in the Movie Maker window
+      control the movie duration. (Changes to the MovieMaker trj step or the top mol requires redefining the time sections,
+      which mean re-source the animation script)
+    - The user creates a timeline using time sections. The user then adds animations to this timeline.
+      The animation system will care about when to call which animation procedure automatically, internally,
+      after "Make Movie" has been clicked.
+      Two types of animations are possible:
+	1. Specially prepared "userani" procedures, useful whereever progressive threatment among frames is required,
+	   they are used with "add_userani".
+ 
+	2. Any TCL or VMD command. Use "VMD Main-&gt;File-&gt;Log TCL commands to console" to get commands for
+	   things while doing them by hand. They are added with "add_eval".
+
+  For now the most useful features of this system are: 
+
+	- Animated Auto-Zoom
+	- Animated Auto-Center
+	- Material Transparency Fading
+	- Material Property Fading
+	- Rotations real and graphically
+	- Graphical representation of the animation story board
+	- Unlimited parallel actions
+
+EXAMPLE USAGE:
+    
+    test.tcl
+    --------
+    #include the animation system (should be the 1st line)
+    source userani.tcl
+
+    #example for resets on start
+    add_section kickoff -start first; 		#no end means 1 frame
+    add_eval kickoff display resetview; 	#reset view on frame 0
+
+    #some action
+    add_section rotx -after kickoff -shiftend 10%;	#no end means 1 frame + 10%
+    add_userani rotx AutoFocusAllVisible;		#Apply auto centering
+    add_userani rotx AutoScaleAllVisible;		#Apply auto zoom
+    add_userani rotx rotate x 360;			#rotate x by 360 degrees during section rotx
+
+    add_section zoomout -after rotx -shiftend 10%;
+    add_userani zoomout FadeZoomFromCurrent 0.5;	#fade out zoom to half the current start value
+
+    add_section end -after zoomout -end last -noplay;	#until end not playing trj
+    add_userani end rotate x 360;
+    add_userani end rotate y -360;
+    add_userani end rotate z 180;
+
+    #output settings on source
+    print_story
+    print_timeline 1.2
+    --------
+
+  Source to vmd after having a system loaded. Then in Movie Maker click "Make Movie" and see the magic happen.
+
+PROCEDURES:
+
+  add_section secname [-start start] [-end end] [-step step] \
+		      [-shiftstart shift] [-shiftend shift] [-shiftall shift] \
+		      [-like sectionname] || [-after sectionname] [-noplay]
+    special keywords: first,last, n% where n can be any decimal number
+    defaults for ungiven values: start = 0; step = trjstep; end = start+step (same happens if a value equals "-1")
+    args: 
+	  -start start		- Define the starting time of the section.
+	  -end end		- Define the end time of the section.
+	  -step step		- Define the step within the time section.
+	  -like secname		- Copy start,step and end value from given secname.
+	  -after secname	- Copy end value as own start from given secname.
+	  -shiftstart shift	- Add a value of shift to the start value.
+	  -shiftend shift	- Add a value of shift to the end value.
+	  -shiftall shift	- Add a value of shift to both start and end.
+	  -noplay		- Trajectory will not play (if section has an action)
+  Used to create a timeline, departing the trajectory into time sections. This sections can overlap as you like,
+  to perform parallel actions. Sections can easily be based on each other, making it easy to start one section,
+  after another specific section has finished. Order of options is important. Its for example possible to
+  use -like and change any value afterwards again f.i. by using one of the -shift* options.
+
+  expr% expression - To make it easier calculating with "n%" values, a little wrapper function "expr%" is available, 
+		     ignoring the "%" signs. Using the classical modulo operator of course isn't therefore possible with it.
+
+  add_userani secname functionname args - Add a userani_* animation to the story. The functionname is prepended with "userani_".
+  add_eval secname tclcommand		- Just add any TCL command to the story.
+  print_story				- Output a list of animation actions added.
+  print_sections			- Output a list of time sections defined.
+  print_timeline scalefactor		- Output a graphical representation of the defined time sections. (very useful)
+
+  Current userani_* list:
+
+  FadeTransparency material startvalue endvalue	- Fade the Opacity value of a given material from startvalue to endvalue.
+  FadeMaterialProperty material property startvalue endvalue - Fade the Property value of a given material from startvalue to endvalue.
+  FadeZoom startvalue endvalue			- Fade the scale (zoom) from startvalue to endvalue.
+  FadeZoomFromCurrent factor			- Fade the scale (zoom) from the current value by a factor.
+  FadeOutTranslate *				- Fade the global graphical translation offset to zero.
+  rotate x|y|z degrees				- Animated rotatation around a axis (x|y|z) for a specific angle degrees.
+						  (as this rotations are global, simultanous rotations around different
+						  axes by f.i. 360 will not recover the correct starting orientation,
+						  as the axes around which are rotated do also change)
+  rotatemol molid x|y|z degrees			- Animated (real) rotation around a axis (x|y|z) for a specific angle degrees.
+  movemol molid x|y|z degrees			- Animated (real) translation by {x y z}.
+  AutoFocusAllVisible *				- Automatically translate the view graphically so that the COM of all
+					  	  visible (displayed molecules and representation) is in the middle
+					  	  of the graphics window.
+  AutoFocusMolidsVisible {molid molid} *	- Automatically translate the view graphically so that the COM of all
+						  visible in selected molids is in the middle
+						  of the graphics window.
+  AutoFocusMolRepVisible molid repid *		- Automatically translate the view graphically so that the COM of all
+						  visible in selected molid and repid is in the middle
+						  of the graphics window.
+  AutoScaleAllVisible [scalefactor] *		- Automatically apply a zoom factor so that all visible 
+						  (displayed molecules and representation) is inside the viewport.
+  AutoScaleMolidsVisible {molid molid} [scalefactor] *	- Automatically apply a zoom factor so that all visible 
+							  in selected molids is inside the viewport.
+  AutoScaleMolRepVisible molid repid [scalefactor] *	- Automatically apply a zoom factor so that all visible in selected molid
+							  and repid is inside the viewport.
+  raster_replicas shiftX shiftY			- Animate rastering of REMD replicas from aligned bunch.
+
+  ( * This functions knowingly don't scale among the whole time range given, building
+    a compromise between "smooth animation" and "keeping" the focus/zoom suitable while playing the trj )
+
+  Current other list:
+
+  raster_replicas shiftX shiftY	- Non animated rastering of REMD replicas from aligned bunch.
+  dummy				- Dummy function. Can be used for -noplay sections which must have
+				  an action in order to take effect.
+  TransparencyStalker		- A nice helper function that will automatically disables
+				  representations that are fully transparent and re-enables
+				  them if they get visible again. This is useful to save time
+				  while not passing thing to the renderer that aren't visible at all.
+
+POSSIBLE FAQ:
+
+  Can I start sectionB 10% after sectionA?
+    add_section sectionB -after sectionA -shiftstart 10%
+
+  Can I start sectionB 10 frames before sectionA?
+    add_section sectionB -like sectionA -shiftstart -10
+
+  Can I visualize the arrangement and order of my time sections?
+    print_timeline
+
+  How can I influence the width of print_timeline?
+    print_timeline 0.7
+    print_timeline 2.2
+
+  Can I use TCL scripting to generate complex animations? (see exampleREMD.*)
+    #fly and zoom from replica to replica among the raster
+    set start 15%
+    set each 4%
+    set each2 2%
+    for {set i 0} {$i &lt; $num_replicas} {incr i} {
+      if {$i == 0} {
+	add_section focus${i} -start $start -end [expr% $start+$each]
+	add_section autoscale${i} -like focus${i} -end [expr% $start+$each2]
+	add_section zoomout${i} -like autoscale${i} -shiftall $each2
+      } else {
+	add_section focus${i} -like focus[expr $i-1] -shiftall $each
+	add_section autoscale${i} -like autoscale[expr $i-1] -shiftall $each
+	add_section zoomout${i} -like zoomout[expr $i-1] -shiftall $each 
+      }
+      if {$i &lt; [expr $num_replicas -1]} {
+	add_userani zoomout${i} FadeZoomFromCurrent 0.5
+      }
+      add_userani focus${i} AutoFocusMolidsVisible $i
+      add_userani autoscale${i} AutoScaleMolidsVisible $i
+    }
+
+  How can I invert $prog so it's running from 1 to 0?
+    set prog [expr abs($prog-1)]
+
+  How will trajectory step size in Movie Maker come together with section step?
+    Both get multiplied to result in the overall section step.
+
+  If a section ends at frame X and another starts at frame X, will they interfere?
+    No. Sections are treated as: start &gt;= now &lt; end.
+
+  Why one can use n% values for frames?
+    Making animation scripts reusable for different simulations and easier to edit/adapt.
+
+  I choosed a section as -noplay but it is still playing.
+    Check if the section has an action, actually. (use f.i. add_eval secname dummy for fake action) 
+    Check if there are playing sections in the same time range.
+
+  How can I realize a slow playing of my trajectory while keeping animations smooth?
+    Simply define a noplay and a playing section for the same time range. Now select a step for
+    the playing section. Example:
+      add_section smoothrot -start first -end last -noplay
+      add_section slowplay -like slow -step 10%
+      add_userani smoothrot rotate y 360
+      add_eval slowplay dummy()
+    This will cause a smooth rotation with jumping frame changes.
+
+  Can I let several parts of my system slowly appear and disappear?
+    Just create representations with different materials and use "FadeTransparency".
+    For appearings, you need to hide the representation before, of course, usually from a kickoff section.
+    (f.i. add_eval kickoff material change opacity Glossy 0.)
+    
+  I have periodically shown representations and Auto*AllVisible* doesn seem to care?
+    Sorry, this has't been implemented, yet. If enough people complain I might do it.
+
+  How can I influence the zoom which is applied by the AutoScale* functions?
+    Usually the automatically applied zoom is quite nice. But you can control the zoom
+    by using the optional parameter zoomfactor. A value of 0.5 f.i. will cause
+    half of the default zoom to be used, so you are twice as far away.
+
+DOWNLOAD FILE(S):
+
+  userani.tcl
+  exampleREMD.tcl
+
+HOW TO WRITE OWN ANIMIATIONS:
+
+To write your own animation procedures, you just need to understand the
+principle of the smart skeleton below. A value of $prog (0 &gt; prog &lt;= 1) and $part (1/sectionframes)
+is automatically passed to such functions as arguments. This values indicate either the progress of
+the time section or a constant step. Both can be used to scale any parameter to do f.i. fading or
+animated rotating for exact degrees across multiple steps, without
+any need to care about frames and frame ranges etc. Whenever the threatment of previous calls
+to a userani_* function persists (like global rotation, translation, scale, or noplay modifications
+via atomselect) use $part, otherwise $prog is of choice.
+It might be necessary to have both variants implemented decided by $play (see userani_rotatemol,
+userani_raster_replicas) as time sections can be set -noplay, means the coordinate frame
+won't change. You will find your additional arguments in $funcargs.
+
+Skeleton:
+  proc userani_skeleton { args } {
+    set id [lindex $args 0]
+    set prog [lindex $args 1]
+    set part [lindex $args 2]
+    set play [lindex $args 3]
+    set funcargs [lindex $args 4]
+    set me [lindex [info level [info level]] 0]
+    #----
+    if {[llength $funcargs] != 2} {error "$me:improper number of arguments:should be whatever!"}
+
+    #YOUR CODE#
+  }
+
+Example for $prog use:
+  # args: material startvalue endvalue
+  proc userani_FadeTransparency { args } {
+    set id [lindex $args 0]
+    set prog [lindex $args 1]
+    set part [lindex $args 2]
+    set play [lindex $args 3]
+    set funcargs [lindex $args 4]
+    set me [lindex [info level [info level]] 0]
+    #----
+    if {[llength $funcargs] != 3} {error "$me:improper number of arguments:should be material startval endval!"}
+    
+    set val [expr [lindex $funcargs 1] + ($prog * ([lindex $funcargs 2] - [lindex $funcargs 1]))]
+    set mat [lindex $funcargs 0]
+    eval "material change opacity $mat $val"
+  }
+
+Example for $part use:
+  #args: axis degrees
+  proc userani_rotate { args } {
+    set id [lindex $args 0]
+    set prog [lindex $args 1]
+    set part [lindex $args 2]
+    set play [lindex $args 3]
+    set funcargs [lindex $args 4]
+    set me [lindex [info level [info level]] 0]
+    #----
+    if {[llength $funcargs] != 2} {error "$me:improper number of arguments:should be \[x|y|z\] degrees!"}
+
+    set val [expr $part * [lindex $funcargs 1] ]
+    eval "rotate [lindex $funcargs 0] by $val"
+  }
+
+Example for both used, decided by $play:
+  #args: molid axis degrees
+  proc userani_rotatemol { args } {
+    set id [lindex $args 0]
+    set prog [lindex $args 1]
+    set part [lindex $args 2]
+    set play [lindex $args 3]
+    set funcargs [lindex $args 4]
+    set me [lindex [info level [info level]] 0]
+    #----
+    if {[llength $funcargs] != 3} {error "$me:improper number of arguments:should be molid \[x|y|z\] degrees!"}
+
+    set molid [lindex $funcargs 0]
+    set axis [lindex $funcargs 1]
+    set degrees [lindex $funcargs 2]
+    set sel [atomselect $molid "all"]
+
+    if {[$sel num] &gt; 0} {
+      set val [expr $play == 1 ? $prog * $degrees : $part * $degrees ]
+      set center [measure center $sel]
+      set tran [trans center $center axis $axis $val ]
+      $sel move $tran
+      $sel delete
+    } else {error "$me: ups, selection was empty, does molid exist!?"}
+  }
+ will automatically disables
+						  representations that are fully transparent and re-enables
+						  them if they get visible again. This is useful to save time
+						  while not passing thing to the renderer that aren't visible at all.
+
+POSSIBLE FAQ:
+
+  Can I start sectionB 10% after sectionA?
+    add_section sectionB -after sectionA -shiftstart 10%
+
+  Can I start sectionB 10 frames before sectionA?
+    add_section sectionB -like sectionA -shiftstart -10
+
+  Can I visualize the arrangement and order of my time sections?
+    print_timeline
+
+  How can I influence the width of print_timeline?
+    print_timeline 0.7
+    print_timeline 2.2
+
+  Can I use TCL scripting to generate complex animations? (see exampleREMD.*)
+    #fly and zoom from replica to replica among the raster
+    set start 15%
+    set each 4%
+    set each2 2%
+    for {set i 0} {$i &lt; $num_replicas} {incr i} {
+      if {$i == 0} {
+	add_section focus${i} -start $start -end [expr% $start+$each]
+	add_section autoscale${i} -like focus${i} -end [expr% $start+$each2]
+	add_section zoomout${i} -like autoscale${i} -shiftall $each2
+      } else {
+	add_section focus${i} -like focus[expr $i-1] -shiftall $each
+	add_section autoscale${i} -like autoscale[expr $i-1] -shiftall $each
+	add_section zoomout${i} -like zoomout[expr $i-1] -shiftall $each 
+      }
+      if {$i &lt; [expr $num_replicas -1]} {
+	add_userani zoomout${i} FadeZoomFromCurrent 0.5
+      }
+      add_userani focus${i} AutoFocusMolidsVisible $i
+      add_userani autoscale${i} AutoScaleMolidsVisible $i
+    }
+
+  How can I invert $prog so it's running from 1 to 0?
+    set prog [expr abs($prog-1)]
+
+  How will trajectory step size in Movie Maker come together with section step?
+    Both get multiplied to result in the overall section step.
+
+  If a section ends at frame X and another starts at frame X, will they interfere?
+    No. Sections are treated as: start &gt;= now &lt; end.
+
+  Why one can use n% values for frames?
+    Making animation scripts reusable for different simulations and easier to edit/adapt.
+
+  I choosed a section as -noplay but it is still playing.
+    Check if the section has an action, actually. (use f.i. add_eval secname dummy for fake action) 
+    Check if there are playing sections in the same time range.
+
+  How can I realize a slow playing of my trajectory while keeping animations smooth?
+    Simply define a noplay and a playing section for the same time range. Now select a step for
+    the playing section. Example:
+      add_section smoothrot -start first -end last -noplay
+      add_section slowplay -like slow -step 10%
+      add_userani smoothrot rotate y 360
+      add_eval slowplay dummy()
+    This will cause a smooth rotation with jumping frame changes.
+
+  Can I let several parts of my system slowly appear and disappear?
+    Just create representations with different materials and use "FadeTransparency".
+    For appearings, you need to hide the representation before, of course, usually from a kickoff section.
+    (f.i. add_eval kickoff material change opacity Glossy 0.)
+    
+  I have periodically shown representations and Auto*AllVisible* doesn seem to care?
+    Sorry, this has't been implemented, yet. If enough people complain I might do it.
+
+  How can I influence the zoom which is applied by the AutoScale* functions?
+    Usually the automatically applied zoom is quite nice. But you can control the zoom
+    by using the optional parameter zoomfactor. A value of 0.5 f.i. will cause
+    half of the default zoom to be used, so you are twice as far away.
+
+
+HOW TO WRITE OWN ANIMIATIONS:
+
+To write your own animation procedures, you just need to understand the
+principle of the smart skeleton below. A value of $prog (0 &gt; prog &lt;= 1) and $part (1/sectionframes)
+is automatically passed to such functions as arguments. This values indicate either the progress of
+the time section or a constant step. Both can be used to scale any parameter to do f.i. fading or
+animated rotating for exact degrees across multiple steps, without
+any need to care about frames and frame ranges etc. Whenever the threatment of previous calls
+to a userani_* function persists (like global rotation, translation, scale, or noplay modifications
+via atomselect) use $part, otherwise $prog is of choice.
+It might be necessary to have both variants implemented decided by $play (see userani_rotatemol,
+userani_raster_replicas) as time sections can be set -noplay, means the coordinate frame
+won't change. You will find your additional arguments in $funcargs.
+
+Skeleton:
+  proc userani_skeleton { args } {
+    set id [lindex $args 0]
+    set prog [lindex $args 1]
+    set part [lindex $args 2]
+    set play [lindex $args 3]
+    set funcargs [lindex $args 4]
+    set me [lindex [info level [info level]] 0]
+    #----
+    if {[llength $funcargs] != 2} {error "$me:improper number of arguments:should be whatever!"}
+
+    #YOUR CODE#
+  }
+
+Example for $prog use:
+  # args: material startvalue endvalue
+  proc userani_FadeTransparency { args } {
+    set id [lindex $args 0]
+    set prog [lindex $args 1]
+    set part [lindex $args 2]
+    set play [lindex $args 3]
+    set funcargs [lindex $args 4]
+    set me [lindex [info level [info level]] 0]
+    #----
+    if {[llength $funcargs] != 3} {error "$me:improper number of arguments:should be material startval endval!"}
+    
+    set val [expr [lindex $funcargs 1] + ($prog * ([lindex $funcargs 2] - [lindex $funcargs 1]))]
+    set mat [lindex $funcargs 0]
+    eval "material change opacity $mat $val"
+  }
+
+Example for $part use:
+  #args: axis degrees
+  proc userani_rotate { args } {
+    set id [lindex $args 0]
+    set prog [lindex $args 1]
+    set part [lindex $args 2]
+    set play [lindex $args 3]
+    set funcargs [lindex $args 4]
+    set me [lindex [info level [info level]] 0]
+    #----
+    if {[llength $funcargs] != 2} {error "$me:improper number of arguments:should be \[x|y|z\] degrees!"}
+
+    set val [expr $part * [lindex $funcargs 1] ]
+    eval "rotate [lindex $funcargs 0] by $val"
+  }
+
+Example for both used, decided by $play:
+  #args: molid axis degrees
+  proc userani_rotatemol { args } {
+    set id [lindex $args 0]
+    set prog [lindex $args 1]
+    set part [lindex $args 2]
+    set play [lindex $args 3]
+    set funcargs [lindex $args 4]
+    set me [lindex [info level [info level]] 0]
+    #----
+    if {[llength $funcargs] != 3} {error "$me:improper number of arguments:should be molid \[x|y|z\] degrees!"}
+
+    set molid [lindex $funcargs 0]
+    set axis [lindex $funcargs 1]
+    set degrees [lindex $funcargs 2]
+    set sel [atomselect $molid "all"]
+
+    if {[$sel num] &gt; 0} {
+      set val [expr $play == 1 ? $prog * $degrees : $part * $degrees ]
+      set center [measure center $sel]
+      set tran [trans center $center axis $axis $val ]
+      $sel move $tran
+      $sel delete
+    } else {error "$me: ups, selection was empty, does molid exist!?"}
+  }
+
+</molid></window></pre>
+
+
+</body></html>
