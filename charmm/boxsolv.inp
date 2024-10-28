@@ -87,6 +87,7 @@ label skipmini
 energy
 label write
 ! shift corner to origin
+<<<<<<< HEAD
 if @?shift2origin eq 0 set shift2origin 0
 if @shift2origin ge 1 then
  coor stat
@@ -95,6 +96,15 @@ if @shift2origin ge 1 then
  scalar Z add -?ZMIN
 endif
 
+=======
+if @?shift2origin eq 0 set shift2origin 1
+if @{shift2origin} .eq. 1 then
+coor stat
+scalar X add -?XMIN
+scalar Y add -?YMIN
+scalar Z add -?ZMIN
+endif
+>>>>>>> 6c2fe79 (local changes)
 write psf @format name @{psffile}_s.psf
 write psf @format name @{psffile}_s-x.psf xplor
 !
