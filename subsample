@@ -1,8 +1,6 @@
 #!/bin/bash
 
-#for i in `seq 1 5` ; do
 for f in *nvt.dcd ; do
-# name=rnd-slitd0i${i}nvt
  name=${f%%.dcd}
  echo $name
  catdcd -o ${name}-10.dcd -stride 10 ${name}.dcd
