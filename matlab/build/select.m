@@ -5,6 +5,7 @@ typeCA=ismember(aname,'CA');
 typeC=ismember(aname,'C');
 typeN=ismember(aname,'N');
 typeO=ismember(aname,'O');
+typeOH2=ismember(aname,'OH2');
 typeH=ismember(aname,'H');
 typeOH2=ismember(aname,'OH2'); % TIP3P water oxygen
 backbone = typeCA | typeC | typeN | typeO | typeH ;

@@ -4,6 +4,7 @@
 % links between sugars define separate sugar segments
 % links between protein and sugars will be implemented as patches between protein and sugar segments
 
+if ~isfield(molecule,'Link') ; return ; end
 links=molecule.Link;
 
 % remove "unsupported" links that could interfere with the clustering
