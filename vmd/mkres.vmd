@@ -1,14 +1,18 @@
 #!/bin/vmd
-if { ![info exists "path"] } {
- set path "$env(HOME)/scripts/vmd"
-}
 
-source ${path}/gname.tcl
+if { $argc > 0 } {
+ set name [lindex $argv 0];
+} else {
+ if { ![info exists "path"] } {
+  set path "$env(HOME)/scripts/vmd"
+ }
+ source ${path}/gname.tcl
+}
 
 mol load psf ${name}_sn.psf
 mol addfile ${name}_msn.pdb
 
-# add masses to ions and OH2 atoms of water only ; note that I will set the mass of the latter at 18
+# mark restraints
 
 set all [atomselect top "all" ];
 $all set beta 0
