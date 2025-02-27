@@ -1,11 +1,11 @@
-function [coor,dist]=aln2coor(msamat,qgr) % take character matrix of a sequence alignment and compute numerical coordinates
+function [coor,dist]=aln2coor(msamat,qgr) 
+% take character matrix of a sequence alignment and compute numerical coordinates using an encoding
 
 if (nargin<2) ; qgr=0; end % whether to use grantham metric
 
 
-% factor definitions from Atchley et al. 2005
-
 if (~qgr)
+% encoding from Atchley et al. 2005
 % alphabet
  abet='ACDEFGHIKLMNPQRSTVWY'; % natural alphabet
  f1=[ -0.591 -1.343 1.050 1.357 -1.006 -0.384  0.336 -1.239 1.831 -1.019 -0.663 0.945 0.189 0.931 1.538 -0.228 -0.032 -1.337 -0.595 0.260 ];
@@ -15,6 +15,7 @@ if (~qgr)
  f5=[ -0.146 -0.255 -3.242 -0.837 0.412 2.064 -0.078 0.816 1.648 -0.912 1.212 0.933 -1.392 -1.853 2.897 -2.647 1.313 -1.262 -0.184 1.512 ];
  F=[f1; f2; f3; f4; f5 ]';
 else
+% encoding from Grantham 1974
 % alphabet : easier to maintain order in the grantham 74 paper
  abet='SRLPTAVGIFYCHQNKDEMW'; % natural alphabet
  a=1.833 ; b=0.1018 ; g=0.000399 ;
@@ -28,8 +29,10 @@ end
 fall=@(x) F(find(abet==x,1),:);
 
 % extend alphabet :
-aext='BJZ-';
+aext='BJZ-X'; % note: is is best not to have uncertainties, but if you must ....
 abet=[abet aext];
+% X % assume any aa is possible (unweighted average)
+F(find(abet=='X'),:) = mean(F,1); % this MUST be first
 % B
 F(find(abet=='B'),:) = 0.5 * ( fall('D') + fall('N') ) ; 
 % J
@@ -52,7 +55,13 @@ msanum=zeros(size(msamat));
 for i = 1:numel(abet)
  msanum(find(msamat==abet(i)))=i;
 end
-
+% check for invalide indices :
+for ind=find(msanum==0)
+ if (isempty(ind)) ; break ; end
+ [ibad, jbad]=ind2sub(size(msamat),ind)
+ fprintf(' ==> Found unrecognized character "%c" at position %d, %d in the MSA matrix \n', msamat(ibad,jbad), ibad, jbad)
+end
+%
 msaf1=f1(msanum);
 msaf2=f2(msanum);
 msaf3=f3(msanum);
@@ -81,4 +90,3 @@ if (nargin > 1) % yes
   ind=ind+di;
  end
 end
-

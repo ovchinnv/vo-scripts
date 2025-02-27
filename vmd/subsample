@@ -1,0 +1,6 @@
+#!/bin/bash
+
+for dcd in *nvt.dcd ; do
+ name=${dcd%%.dcd}
+ catdcd -o ${name}-10.dcd -stride 10 ${name}.dcd
+done
