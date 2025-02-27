@@ -24,6 +24,7 @@ res3= @(x) char(res(find(ismember(res(:), x),1)-1));
 if ~exist('qreadpdb') ; qreadpdb=1 ; end % assume that have a valid name in pdbin
 %
 if (qreadpdb)
+ disp(['Reading file ',pdbin,'...']);
  mol=pdbread(pdbin);
 end
 %
