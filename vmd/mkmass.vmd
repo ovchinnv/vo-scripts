@@ -3,7 +3,7 @@ if { ![info exists "path"] } {
  set path "$env(HOME)/scripts/vmd"
 }
 
-if { $argc > 0 } {
+if { $argc > 1 } {
  set name [lindex $argv 0];
 }
 
