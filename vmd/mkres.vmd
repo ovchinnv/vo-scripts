@@ -1,6 +1,6 @@
 #!/bin/vmd
 
-if { $argc > 0 } {
+if { $argc > 1 } {
  set name [lindex $argv 0];
 } else {
  if { ![info exists "path"] } {
