@@ -19,8 +19,6 @@ if { $argc == 2 } {
 mol load psf $psffile
 mol addfile $pdbfile
 
-# mark restraints
-
 set all [atomselect top "all" ];
 $all set beta 0
 
