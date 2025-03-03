@@ -5,8 +5,10 @@ if { ![info exists "path"] } {
 
 source ${path}/gname.tcl
 
-mol load psf ${name}_sn.psf
-mol addfile ${name}_msn.pdb
+foreach nm ${name} {
+
+mol load psf ${nm}_sn.psf
+mol addfile ${nm}_msn.pdb
 
 # add masses to ions and OH2 atoms of water only ; note that I will set the mass of the latter at 18
 
@@ -19,7 +21,8 @@ $ions set beta [$ions get mass] ;
 set owat [atomselect top "resname TIP3 and name OH2" ];
 $owat set beta 18.0154 ;
 
-
-$all writepdb ${name}-bmass.pdb
+$all writepdb ${nm}-bmass.pdb
 # note : may need to remove the unit cell line from this pdb if running without PBC :
-exec sed -i /CRYST/d ${name}-bmass.pdb
+exec sed -i /CRYST/d ${nm}-bmass.pdb
+
+}
