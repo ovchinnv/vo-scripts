@@ -1,0 +1,26 @@
+--- bkp/charmmcrdfiles.py	2023-05-13 17:46:39.000000000 -0400
++++ charmmcrdfiles.py	2023-05-14 14:24:18.492127599 -0400
+@@ -70,6 +70,7 @@
+         self.resno = []                    # Residue number
+         self.resname = []                  # Residue name
+         self.resid = []                    # Residue ID
++        self.insertion = []                # Insertion Code #VO
+         self.attype = []                   # Atom type
+         self.positions = []                # 3N atomic coordinates
+         self.title = []                    # .crd file title block
+@@ -114,7 +115,14 @@
+                     pos = Vec3(float(line[4]), float(line[5]), float(line[6]))
+                     self.positions.append(pos)
+                     self.segid.append(line[7])
+-                    self.resid.append(int(line[8]))
++#                    self.resid.append(int(line[8])) ;# VO take care of possible insertion codes below
++                    resid=line[8] ; last=resid[-1] ; 
++                    if last.isdigit():
++                     self.insertion.append('')
++                     self.resid.append(resid)
++                    else:
++                     self.insertion.append(last)
++                     self.resid.append(resid[0:-2]) ;# can contain a letter insertion code, which will prevent integer conversion
+                     self.weighting.append(float(line[9]))
+     
+                 if self.natom != len(self.positions):

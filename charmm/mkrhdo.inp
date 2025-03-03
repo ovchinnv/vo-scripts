@@ -1,0 +1,101 @@
+* trim sphere to make RHDO/trOCTA
+*
+
+if @?name eq 0 set name dhfr
+
+stream @{name}.str
+
+if @?psffile eq 0 set psffile dhfr_s
+if @?corfile eq 0 set corfile dhfr_ms
+
+if @?clib eq 0 set clib ~/scripts/charmm
+
+if @?version eq 0 set version 36
+
+if @?nopar eq 0 set nopar 0
+if @nopar ne 0 goto skippar
+
+if @version eq 36 then
+ stream @{clib}/readpsf36.str
+else
+ stream @{clib}/readpsf.str
+endif
+
+if @?xtype eq 0 set xtype rhdo
+
+if @?solvent eq 0 set solvent ( .byres. type OH2 )
+
+label skippar
+
+! optional minimize
+if @?skipmini eq 0 set skipmini 1
+if @skipmini ne 0 goto skipmini
+mini conj nstep 20
+label skipmini
+
+! move to center
+coor stat sele all end
+scalar X add -?xave
+scalar Y add -?yave
+scalar Z add -?zave
+!coor stat sele all end ! to check
+
+calc a = @R / 0.65
+! RHDO
+if @xtype eq octa then
+! there are several equivalent representations
+ set alpha 71.53 ! from gromacs manual
+ set beta 109.47
+ set gamma 71.53
+! set alpha 70.5 ! from berendsen book (I suspect they should be 71.53)
+! set beta  70.5
+! set gamma 70.5
+! set alpha 109.471219 ! online search
+! set beta  109.471219
+! set gamma 109.471219
+  set flag octa
+else
+ if @xtype eq rhdo then
+  set alpha 60
+  set beta  60
+  set gamma 60
+  set flag rhdo
+ else
+  echo UNKNOWN BOX TYPE SPECIFIED. USING CUBE.
+  set alpha 90
+  set beta 90
+  set gamma 90
+  set flag cube
+ endif
+endif
+crystal define triclinic @a @a @a @alpha @beta @gamma
+!
+crystal build cutoff 14.0 noper 0
+define solvent sele ( @solvent ) end
+image byresidue select solvent end
+! done with crystal and image centering definitions, now do the trimming of the system to
+! fit in the desired primary shape.
+coor copy comp
+update cutim 14.0
+! find and delete residues that have changed position,
+! they are the ones that are outside the primary box
+coor diff comp
+coor dist comp weig
+delete atom sele .byres. (.not. hydrogen .and. prop wcomp .gt. 0.0) end
+
+
+write psf card name @{name}_@{flag}.psf
+write coor card name @{name}_@{flag}.cor
+write coor pdb name @{name}_@{flag}.pdb
+
+! write crystal file
+open unit 66 name @{name}_@{flag}.str card write
+write title unit 66
+** solvated in a triclinic cell with following parameters
+* set a @a
+* set b @a
+* set c @a
+* set alpha @alpha
+* set beta @beta
+* set gamma @gamma
+

@@ -1,0 +1,217 @@
+#!/bin/bash
+
+###################################################################
+if test -z "$1"
+then
+ echo "USAGE: Nnve input_file output_file"
+ exit 1
+else
+ input=$1
+fi
+############# job output file ####################################
+if test -z "$2"
+then
+ echo "USAGE: Nnve input_file output_file"
+ exit 1
+else
+ output=$2
+fi
+###################################################################
+#mde=(acemd) ;# MD engine; can be acemd or namd
+mde=(namd2 +p8)
+
+mkdir -p scratch
+
+psffile=struc/ssmr-eth-dmpcn.psf
+pdbfile=struc/ssmr-eth-dmpcn-m.pdb
+
+resfile_protein=struc/ssmr-eth-dmpcn-protein.res           ;# only protein restrained
+resfile_tpp=struc/ssmr-eth-dmpcn-eth.res           ;# only ligand restrained
+
+resfile=$resfile_protein ;
+
+name=ssmr;
+
+outputName=scratch/${name}
+
+hmass=1; # hydrogen mass
+freq=10000;
+
+count=12;
+
+cres=$((count-1)); # restart number
+numrun=1;
+cfin=$((count+$numrun-1));
+
+cscale=0.5 ;
+cutoff=12 ;
+#parameters="param/emr-ethidium_unopt-dmpc.prm";
+parameters="param/prm2019/smr-eth36.par";
+barostat="on";
+constraints="on" ;
+#constraints="off" ;
+
+keep_water_out="on" ;
+#keep_water_out="off" ;
+tclscript=tcl/keep_water_out_memb.acemd
+
+#nsteps=10000000; # 20ns at 2fs
+nsteps=1000000;
+#nsteps=200000;
+#nsteps=2 ;
+
+flag="npt";
+T=298; # temperature
+
+restartName=scratch/${name}${cres}${flag};
+if [ "$count" -eq 6 ] ; then
+ restartName=scratch/${name}${cres}eq; # to override
+fi
+
+if [ "$count" -eq "0" ]; then
+ restart=0;
+else
+ restart=1;
+fi
+
+while [ $count -le $cfin ]
+ do
+  script=__md$count$flag
+
+  echo '#!/bin/vmd' > $script
+  echo set mde ${mde[0]}          >>$script ;
+
+  echo set psffile  $psffile >>$script
+  echo set pdbfile  $pdbfile >>$script
+#
+  if [ "$count" -ge "56" ]; then
+   resfile=$resfile_tpp ; # keep tpp in place
+  fi
+#
+  echo set resfile  $resfile >>$script
+
+  echo set temperature $T    >>$script
+  echo set cutoff $cutoff    >>$script
+  echo set switchdist `echo $cutoff-2 | bc -l`    >>$script
+
+  if [ "$restart" -eq "0" ]; then
+   grep -i SET struc/boxsize.str |\
+     sed 's/=//' |\
+     awk '{print tolower($1)" "tolower($2)" "$3}' >>$script 
+   echo 'temperature       $temperature' >>$script
+   dt=1.0 ; #timestep
+   shake=none ;
+   restart=1 ; #future calculations
+   echo set xscfile _none_                        >>$script
+   else
+   echo set xscfile $restartName.xsc              >>$script
+# prefer not to rely on AceMD extendedsystem
+   if [ ${mde[0]} == "namd2" ]; then
+    echo extendedsystem '$xscfile'                >>$script
+   fi
+   dt=2 ; #timestep
+#   dt=0.5 ; #timestep
+#   shake=none
+   shake=all
+   echo bincoordinates     $restartName.coor  >>$script
+   echo binvelocities      $restartName.vel   >>$script
+   if [[ $mde =~ acemd ]]; then
+    echo binindex      $restartName.idx   >>$script
+   fi
+  fi
+#
+  if [ "$count" -ge "66" ]; then
+   keep_water_out="off" ;
+  fi
+#
+  if [ "$count" -ge "76" ]; then
+   constraints="off" ;
+  fi
+#
+  if [ "$count" -ge "90" ]; then # see readme for why 90
+   barostat="off" ;
+  fi
+#
+  echo set shake $shake                    >> $script
+  echo set dt $dt                          >> $script
+  echo set hydrogenmass $hmass             >> $script
+  if [ ${mde[0]} == "namd2" ]; then
+   echo set stepspercycle 15               >> $script
+  fi
+  echo set pmefreq 1                       >> $script
+  echo set parameters        $parameters   >> $script
+
+  echo set cswitch $constraints            >> $script
+  if [ "$constraints" == "on" ]; then
+   echo constraintscaling $cscale          >> $script ;
+  fi
+  echo set nsteps $nsteps                  >> $script
+  echo set freq $freq                      >> $script  ;# frequency for restrt files
+
+  echo set outputName $outputName$count$flag >> $script
+# for subsequent runs
+
+  echo set lang on                       >> $script
+  echo set lfriction 0.1                 >> $script ;# up from 0.1
+#
+  echo set baro $barostat            >> $script
+#  echo set bptime 10000              >> $script
+  echo set bptime 500              >> $script
+  echo set ministeps 0               >> $script
+  if [[ $mde =~ acemd ]]; then
+   echo wrap all                      >> $script
+  elif [ ${mde[0]} == "namd2" ]; then
+   echo wrapWater on                 >> $script
+   echo wrapAll   on                 >> $script
+  fi
+# keep water out of membrane interior, if requested
+#===================================================
+  if [ $keep_water_out == "on" ]; then
+   echo TclForces on                 >> $script
+   if [  ${mde[0]} == "namd2" ]; then
+    echo TclForcesScript {           >> $script
+   fi
+   echo set allatompdb $pdbfile      >> $script
+   echo set waterCheckFreq     1000  >> $script
+   echo set lipidCheckFreq   $nsteps >> $script ;# membrane position recomputation
+# define water and lipid names
+   echo set watResName  "TIP3"       >> $script
+   echo set watAtomName "OH2"        >> $script
+   echo set lipResName  "DMPC"       >> $script
+   echo set lipAtomName "C2"         >> $script
+#   echo set lipAtomName "P"         >> $script
+# define force constant per group (units -- Kcal/(mol*A) -- to be set in $tclscript)
+   echo set fconst 1                 >> $script ; # lowered from 1
+   echo set potential 0              >> $script
+   echo set "watexcl {}"             >> $script
+   echo source $tclscript            >> $script
+#   cat $tclscript                    >> $script
+   if [  ${mde[0]} == "namd2" ]; then
+    echo }                           >> $script
+   fi
+  fi
+#========= keep water out ==========================
+#
+  cat $input                         >> $script
+###############################################################
+time ${mde[@]} $script >& $output$count$flag
+#exit
+sleep 1;
+######################
+ if [ $? -ne 0 ];  then
+   echo Execution interrupted due to errors during run $count.
+   exit
+ else
+   qunstable=`tail $output$count$flag | grep -i unstable | wc -m`
+   if [ "$qunstable" -gt "0" ]; then
+    echo Will repeat previous run.
+    mv $output$count$flag ${output}${count}${flag}.crash
+    mv output.dcd $outputName$count$flag.crash.dcd
+   else
+# all ok : increment run count
+    restartName=$outputName$count$flag
+    mv output.dcd ${restartName}.dcd
+    count=$((count+1))
+   fi
+ fi
+ done

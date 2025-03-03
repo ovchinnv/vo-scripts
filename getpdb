@@ -12,6 +12,7 @@ log='getpdb.log'
 for PDB in ${PDBS[@]}; do
  echo $PDB
  pdb=`tr [:upper:] [:lower:] <<< $PDB` ;
- wget ftp://ftp.wwpdb.org/pub/pdb/data/structures/all/pdb/pdb${pdb}.ent.gz -a $log -O ${pdb}.pdb.gz
+# wget ftp://ftp.wwpdb.org/pub/pdb/data/structures/all/pdb/pdb${pdb}.ent.gz -a $log -O ${pdb}.pdb.gz
+ wget https://files.wwpdb.org/pub/pdb/data/structures/all/pdb/pdb${pdb}.ent.gz -a $log -O ${pdb}.pdb.gz
 done
 

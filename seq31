@@ -1,5 +1,17 @@
 #!/bin/bash
 # change 3-letter sequence to a 1-letter sequence
+#
+if [ -z $1 ] ; then
+ input=""
+else
+ input=$1
+fi
+
+if [ -z $1 ] ; then
+ input=""
+else
+ input=$1
+fi
 
 awk 'BEGIN {
 
@@ -20,4 +32,4 @@ awk 'BEGIN {
    seq=seq""A1[aa]""
  }
  print seq
-} ' $1
+} ' $input

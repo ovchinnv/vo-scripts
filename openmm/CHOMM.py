@@ -36,13 +36,58 @@ if 1:
   mini=0
 #
  try :
+  cutoff
+ except NameError:
+  cutoff=-1; # run without cutoff
+#
+ try :
   constraints
  except NameError:
   constraints=0
+ if (constraints):
+  try :
+   conscol
+  except NameError:
+   conscol=1
+  try :
+   consfile=conspdb
+   conscor=None
+  except NameError:
+   conspdb=None
+   try :
+    consfile=conscor
+   except NameError:
+    conscor=None
+    try :
+     consfile
+    except NameError:
+     consfile=pdbfile
+#
  try :
-  conscol
+  bestFitRMSD
  except NameError:
-  conscol=1
+  bestFitRMSD=0
+ if (bestFitRMSD) :
+  try :
+   bestFitCol
+  except NameError:
+   bestFitCol=1
+  try :
+   bestFitFile
+  except NameError:
+   bestFitFile=pdbfile
+  try :
+   bestFitFlag
+  except NameError:
+   bestFitFlag=1
+  try :
+   bestFitK
+  except NameError :
+   print("RMS best fit force constant \"bestFitK\" is required, but was not specified");
+  try :
+   bestFitKperAtom
+  except NameError :
+   bestFitKperAtom=0; # false by default
 #
  try :
   fixedAtoms
@@ -52,6 +97,10 @@ if 1:
   fixedcol
  except NameError:
   fixedcol=1
+ try:
+  cutoff
+ except NameError:
+  cutoff=-1; # run without cutoff
 #
  try :
   switchdist
@@ -139,7 +188,6 @@ if 1:
    mm.LengevinMiddleIntegrator()
   except AttributeError:
    newLangevin=0
-#
 #========================== Subroutines
 #==========================
  def dprint(*args):
@@ -155,7 +203,7 @@ if 1:
   print(""); # flush
 #==========================
  def printe(simulation):
-  forceGroups={'Bond':0, 'Angle':1, 'Dihed':2, 'UB':3, 'IMPR':4, 'CMAP':5, 'NBOND':6};
+  forceGroups={'Bond':0, 'Angle':1, 'Dihed':2, 'UB':3, 'IMPR':4, 'CMAP':5, 'NBOND':6, 'RESTRAINTS':7};
   ener={};
 # evaluate
   for key in forceGroups:
@@ -164,10 +212,10 @@ if 1:
 # total potential energy
   ener['PE']=simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(u.kilocalories_per_mole);
 # print
-  for key in ['Bond', 'Angle', 'Dihed', 'UB', 'IMPR', 'CMAP', 'NBOND', 'PE']:
+  for key in ['Bond', 'Angle', 'Dihed', 'UB', 'IMPR', 'CMAP', 'NBOND', 'RESTRAINTS','PE']:
    print(key, end="\t\t\t");
   print(); # newline
-  for key in ['Bond', 'Angle', 'Dihed', 'UB', 'IMPR', 'CMAP', 'NBOND', 'PE']:
+  for key in ['Bond', 'Angle', 'Dihed', 'UB', 'IMPR', 'CMAP', 'NBOND', 'RESTRAINTS','PE']:
    print(ener[key], end="\t");
   print();
 #========================== box dimensions from .str file produced during system preparation
@@ -284,7 +332,10 @@ if 1:
   cons=None
   rigidWater=False
  dprint("Initializing simulation system");
- dprint("Nonbonded cutoff is ",cutoff*u.angstrom,". Switching is active at ",switchdist*u.angstrom)
+ if (cutoff>0):
+  dprint("Nonbonded cutoff is ",cutoff*u.angstrom,". Switching is active at ",switchdist*u.angstrom)
+ else:
+  dprint("Nonbonded cutoff is infinite")
  if (hmass>1):
   dprint("Hydrogen mass is ",hmass*u.amu)
   if (implicitSolvent==1):
@@ -336,51 +387,110 @@ if 1:
 #
 #================= harmonic restraints from file, a la NAMD/ACEMD
  if (constraints) :
-  if (conscol==1): # beta
-   dprint("Adding absolute positional harmonic restraints to atoms marked in the beta column of PDB file '"+consfile+"'");
-  elif (conscol==2): #occupancy
-   dprint("Adding absolute positional harmonic restraints to atoms marked in the occupancy column of PDB file '"+consfile+"'");
-
   if (pbc) :
-   force=mm.CustomExternalForce("s*0.5*k*periodicdistance(x,y,z,x0,y0,z0)^2");
+   harmonicAtomForce=mm.CustomExternalForce("s*0.5*k*periodicdistance(x,y,z,x0,y0,z0)^2");
   else :
-   force=mm.CustomExternalForce("s*0.5*k*( (x-x0)^2 + (y-y0)^2 + (z-z0)^2 )");
+   harmonicAtomForce=mm.CustomExternalForce("s*0.5*k*( (x-x0)^2 + (y-y0)^2 + (z-z0)^2 )");
 #
-  force.addPerParticleParameter("k");
-  force.addPerParticleParameter("x0");
-  force.addPerParticleParameter("y0");
-  force.addPerParticleParameter("z0");
-  force.addGlobalParameter("s", constraintscaling);
+  harmonicAtomForce.addPerParticleParameter("k");
+  harmonicAtomForce.addPerParticleParameter("x0");
+  harmonicAtomForce.addPerParticleParameter("y0");
+  harmonicAtomForce.addPerParticleParameter("z0");
+  harmonicAtomForce.addGlobalParameter("s", constraintscaling);
 # read per atom restraints :
-  res=app.PDBFile(consfile);
-  iatom=0; icons=0;
-  for r, o, b  in zip(res.positions, res.occupancy, res.temperature_factor) :
+  if (consfile==conscor) :
+   dprint("Adding absolute positional harmonic restraints to atoms marked in the WMAIN column of CHARMM file '"+consfile+"'");
+   res=app.CharmmCrdFile(consfile);
+   iatom=0; icons=0;
+   for r, bnodim  in zip(res.positions, res.weighting) :
+    if (bnodim > 0) :
+     icons+=1;
+     k=bnodim*u.kilocalorie/u.mole/u.angstrom/u.angstrom
+     x0=r[0].value_in_unit(u.nanometer)
+     y0=r[1].value_in_unit(u.nanometer)
+     z0=r[2].value_in_unit(u.nanometer)
+     harmonicAtomForce.addParticle(iatom, [k,x0,y0,z0]);
+    iatom+=1;
+  else :
    if (conscol==1): # beta
-    bnodim=b/u.angstrom/u.angstrom; # have to deal with units, which are A^2 for B-factors
+    dprint("Adding absolute positional harmonic restraints to atoms marked in the beta column of PDB file '"+consfile+"'");
    elif (conscol==2): #occupancy
-    bnodim=o
-
-   if (bnodim > 0) :
-    icons+=1;
-    k=bnodim*u.kilocalorie/u.mole/u.angstrom/u.angstrom
-#   dprint(" Adding restraint on atom ",iatom," with force constant ", k );
-    x0=r[0].value_in_unit(u.nanometer)
-    y0=r[1].value_in_unit(u.nanometer)
-    z0=r[2].value_in_unit(u.nanometer)
-    force.addParticle(iatom, [k,x0,y0,z0]);
-   iatom+=1;
+    dprint("Adding absolute positional harmonic restraints to atoms marked in the occupancy column of PDB file '"+consfile+"'");
+#
+   res=app.PDBFile(consfile);
+   iatom=0; icons=0;
+   for r, o, b  in zip(res.positions, res.occupancy, res.temperature_factor) :
+    if (conscol==1): # beta
+     bnodim=b/u.angstrom/u.angstrom; # have to deal with units, which are A^2 for B-factors
+    elif (conscol==2): #occupancy
+     bnodim=o ;
+    else:
+     bnodim=-1 ;
+#
+    if (bnodim > 0) :
+     icons+=1;
+     k=bnodim*u.kilocalorie/u.mole/u.angstrom/u.angstrom
+#    dprint(" Adding restraint on atom ",iatom," with force constant ", k );
+     x0=r[0].value_in_unit(u.nanometer)
+     y0=r[1].value_in_unit(u.nanometer)
+     z0=r[2].value_in_unit(u.nanometer)
+     harmonicAtomForce.addParticle(iatom, [k,x0,y0,z0]);
+    iatom+=1;
+#
   dprint("Added restraints on ", icons, " atoms");
   dprint("Harmonic force constants will be scaled uniformly by x"+str(constraintscaling));
-  system.addForce(force)
+  harmonicAtomForce.setForceGroup(7)
+  system.addForce(harmonicAtomForce)
 #
-#================= string plugin (baskward compatibility)
+#================= best fit restraints from file
+ if (bestFitRMSD) :
+  if (bestFitCol==1): # beta
+   dprint("Adding RMS best-fit restraint to atoms with value ",bestFitFlag," in the beta column of PDB file '"+bestFitFile+"'");
+  elif (conscol==2): #occupancy
+   dprint("Adding RMS best-fit restraint to atoms with value ",bestFitFlag," in the occupancy column of PDB file '"+bestFitFile+"'");
+# read restrained atom indices and reference position :
+  res=app.PDBFile(bestFitFile);
+  iatom=0; ibestfit=0; bestfitatomlist=[];
+  for r, o, b  in zip(res.positions, res.occupancy, res.temperature_factor) :
+   if (bestFitCol==1): # beta
+    bnodim=b/u.angstrom/u.angstrom; # strip units, which are A^2 for B-factors
+   elif (bestFitCol==2): #occupancy
+    bnodim=o
+   else:
+    bnodim=-1
+#
+   if (bnodim == bestFitFlag) :
+    ibestfit+=1;
+#    dprint(" Including atom ",iatom," in RMS best fit restraint");
+    bestfitatomlist.append(iatom);
+   iatom+=1;
+#
+  dprint("Adding RMSD variable computed from ", ibestfit, " atom positions");
+  rmsd=mm.RMSDForce(res.positions,bestfitatomlist);
+  bestFitEnergy=f"0.5*kRMSD*RMSD*RMSD";
+  bestFitForce=mm.CustomCVForce(bestFitEnergy);
+  bestFitForce.addCollectiveVariable('RMSD', rmsd)
+  if (bestFitKperAtom==1):
+   bestFitForce.addGlobalParameter('kRMSD',bestFitK*ibestfit*u.kilocalorie/u.mole/u.angstrom/u.angstrom);
+   dprint("Added RMS best fit restraint with per-atom force constant ",bestFitK," kcal/mol/Ang^2");
+  else:
+   bestFitForce.addGlobalParameter('kRMSD',bestFitK*u.kilocalorie/u.mole/u.angstrom/u.angstrom);
+   dprint("Added RMS best fit restraint with force constant ",bestFitK," kcal/mol/Ang^2");
+  bestFitForce.setForceGroup(7)
+  system.addForce(bestFitForce);
+#
+#================= string plugin (backward compatibility, because we now have dynamo)
  if (struna==1) :
   from openmmstruna import *
-  system.addForce(StrunaForce(strunaConfig, strunaLog))
+  strunaForce=StrunaForce(strunaConfig, strunaLog);
+  strunaForce.setForceGroup(7);
+  system.addForce(strunaForce);
 #================= dynamo (master) plugin
  if (dynamo==1) :
   from openmmdynamo import *
-  system.addForce(DynamoForce(dynamoConfig, dynamoLog))
+  dynamoForce=DynamoForce(dynamoConfig, dynamoLog);
+  dynamoForce.setForceGroup(7);
+  system.addForce(dynamoForce);
 #================= add integrator :
  dprint("Configuring integrator");
 # first, add barostat if requested :
@@ -495,6 +605,8 @@ if 1:
                                                     volume=pbc, separator=' \t '));
   dprint("Running MD simulation for ",nsteps," steps");
   simulation.step(nsteps);
+  dprint("Potential energy after simulation");
+  printe(simulation);
 #==== move dcd file to destination file
   move(outdcd, outputName+'.dcd');
 
@@ -509,7 +621,20 @@ if 1:
  fxsc.write(str(nsteps)+" "+str(a[0].value_in_unit(u.angstrom))+" 0 0 0 "+str(b[1].value_in_unit(u.angstrom))+" 0 0 0 "+str(c[2].value_in_unit(u.angstrom))+" 0 0 0 0 0 0 0 0 0\n");
  fxsc.close();
 #==== reset switching distance
- del switchdist;
+# del switchdist;
+# undefine constraint file names if they were set to none, otherwise, multiple constrained runs will not work
+ try :
+  if (conscor==None):
+   del conscor;
+ except NameError:
+  pass
+
+ try :
+  if (conspdb==None):
+   del conspdb;
+ except NameError:
+  pass
+#
  if (dynamo): # dynamo is somewhat problematic upon run continuation, need a complete reinit because the end of each run destroys the dynamo object
   del system;
   del simulation;

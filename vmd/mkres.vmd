@@ -1,25 +1,43 @@
 #!/bin/vmd
-if { ![info exists "path"] } {
- set path "$env(HOME)/scripts/vmd"
-}
 
-source ${path}/gname.tcl
+if { $argc > 1 } {
+ set name [lindex $argv 0];
+} else {
+ if { ![info exists "path"] } {
+  set path "$env(HOME)/scripts/vmd"
+ }
+ source ${path}/gname.tcl
+}
 
 foreach nm ${name} {
 
 mol load psf ${nm}_sn.psf
 mol addfile ${nm}_msn.pdb
 
-# add masses to ions and OH2 atoms of water only ; note that I will set the mass of the latter at 18
+# mark restraints
 
 set all [atomselect top "all" ];
 $all set beta 0
 
-set res [atomselect top " protein and noh " ];
+# need artifice below to support blanks within arguments
+if { [ info exists env(VMDSEL)] } {
+ set selection $env(VMDSEL)
+} else {
+ set selection " protein and noh "
+}
+#
+if { [ info exists env(VMDTAG)] } {
+ set nametag $env(VMDTAG)
+} else {
+ set nametag "res"
+}
+puts $selection
+puts $nametag
+
+set res [atomselect top "$selection" ];
 $res set beta 1 ;
 
-$all writepdb ${nm}-res.pdb
+$all writepdb ${name}-${nametag}.pdb
 # note : may need to remove the unit cell line from this pdb if running without PBC :
-exec sed -i /CRYST/d ${nm}-res.pdb
-
+exec sed -i /CRYST/d ${name}-${nametag}.pdb
 }

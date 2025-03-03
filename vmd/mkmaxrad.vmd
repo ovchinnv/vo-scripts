@@ -1,0 +1,33 @@
+#!/bin/vmd
+# specify offset to shrink radii :
+if {$argc >= 1 } {
+  puts $argv
+  set offset [lindex $argv 0];
+} else {
+  set offset 0;
+}
+
+if { ![info exists "path"] } {
+ set path "$env(HOME)/scripts/vmd"
+}
+puts $path
+
+source ${path}/gname.tcl
+mol load psf ${name}_sn.psf
+mol addfile ${name}_msn.pdb
+
+source ${path}/../charmm/WSHMAXRAD.TCL ;
+
+set all [atomselect top "all" ];
+$all set occupancy 0 ;# zero out
+
+foreach resn [array names rad] {
+ puts $resn
+ set res [ atomselect top "resname $resn and name CA" ]; # makes sense to only set for CAs
+ $res set occupancy [expr { $rad($resn) + $offset } ];
+# puts [ $res get resname ] ; #check to make sure selection correct
+ puts $rad($resn)
+}
+
+$all writepdb ${name}-rad.pdb
+exec sed -i /CRYST/d ${name}-rad.pdb
