@@ -1,6 +1,6 @@
 #!/bin/vmd
 
-if { $argc > 0 } {
+if { $argc > 1 } {
  set name [lindex $argv 0];
 } else {
  if { ![info exists "path"] } {
@@ -17,7 +17,7 @@ mol addfile ${name}_msn.pdb
 set all [atomselect top "all" ];
 $all set beta 0
 
-# need artifice below to tupport blanks within arguments
+# need artifice below to support blanks within arguments
 if { [ info exists env(VMDSEL)] } {
  set selection $env(VMDSEL)
 } else {
