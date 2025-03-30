@@ -25,7 +25,7 @@ if  [[ ! -d charm ]]; then
 fi
 #
 pushd charm
- ./build charm++ multicore-linux-x86_64 --with-production -optimize
+./build charm++ multicore-linux-x86_64 --with-production -optimize
 popd
 #exit
 # 2 get plugin source
@@ -98,4 +98,5 @@ sed -i 's/version=.*$/version=2/' watershell/version.inc # specify version in co
 make --silent -j1 watershell
 make --silent -j1 plugin_master # parallel compile not supported
 popd
+# run the benchmark :
 ./run
