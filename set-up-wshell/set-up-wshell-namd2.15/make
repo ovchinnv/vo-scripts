@@ -1,0 +1,70 @@
+#!/bin/bash
+#
+# Here's what we're using :
+uname -a 
+echo
+gcc -v
+cat /proc/cpuinfo |head -n10
+echo
+#
+#
+ROOT=$PWD
+# 1 build charm
+if  [[ ! -d charm ]]; then
+ git clone https://charm.cs.illinois.edu/gerrit/charm.git
+fi
+
+pushd charm
+./build charm++ multicore-linux-x86_64 --with-production
+popd
+
+# 2 get plugin source from Karplus lab
+if  [[ ! -d karplus ]]; then
+ git clone git://128.103.92.235/projects karplus
+fi
+pushd karplus
+# make clean # optional rebuild
+# 3 build fortran library :
+# edit compilation settings
+sed -e 's/WATERSHELL=.*$/WATERSHELL=1/' -e 's/STRUNA=.*$/STRUNA=0/' -e 's/ADAPTIVE=.*$/ADAPTIVE=0/' -i plugin_master/plugins.inc
+unset MAKE_COMMAND
+make -j1 plugin_master # parallel compile not supported
+export DYNAMO_LIBDIR=$ROOT/karplus/lib
+popd
+
+# 4 download namd
+if [[ ! -d namd ]]; then
+ git clone https://charm.cs.illinois.edu/gerrit/namd.git
+fi
+#
+# apply patch to include plugin interface
+#
+pushd namd
+pfile=NAMD_2.15pre.dynamo.patch
+if [[ ! -f $pfile ]]; then
+ cp ../karplus/plugin_master/namd/$pfile .
+ patch -p0  < $pfile
+fi
+# compile patched namd
+if [[ ! -d charm ]] ; then 
+ ln -s ../charm . # link charm to this directory
+fi
+# modify some compilation settings:
+arch="Linux-x86_64"
+# change tcl paths
+sed -e 's^TCLDIR=.*$^TCLDIR=/usr^g' -e 's^ltcl8\.5^ltcl^g' -i arch/$arch.tcl
+# set cuda and fftw paths
+usecuda=1
+if [[ $usecuda -eq 1 ]] ; then
+ ./config Linux-x86_64-g++ --charm-arch multicore-linux-x86_64 --with-fftw3 --fftw-prefix /usr --with-cuda --cuda-prefix /opt/cuda
+else
+ ./config Linux-x86_64-g++ --charm-arch multicore-linux-x86_64 --with-fftw3 --fftw-prefix /usr
+fi
+pushd Linux-x86_64-g++
+make -j1 # serial compile
+popd
+popd
+
+# compilation should be finished:
+# to run the benchmark :
+./run

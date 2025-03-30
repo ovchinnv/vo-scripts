@@ -1,0 +1,18 @@
+#!/bin/bash
+ROOT=$PWD
+arch="Linux-x86_64"
+export NAMD_HOME=$ROOT/namd/${arch}-g++
+export DYNAMO_LIB_DIR=$ROOT/karplus/lib
+export LD_LIBRARY_PATH=$DYNAMO_LIB_DIR:$LD_LIBRARY_PATH:
+export PATH=$NAMD_HOME:$PATH
+
+export OMP_NUM_THREADS=2 # OpenMP cores available to the shell plugin ; this is a parameter to tune for speed
+export OMP_STACKSIZE=10M
+export OMP_SCHEDULE=static
+export OMP_NESTED=false
+
+#run dhfr benchmark
+pushd dhfr
+mkdir -p scratch
+namd2 +p8 md0.npt # run on 8 cores
+popd

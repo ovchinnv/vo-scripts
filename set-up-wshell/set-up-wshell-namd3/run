@@ -1,0 +1,40 @@
+#!/bin/bash
+NAMD_CORES=12
+DYNAMO_CORES=12
+#NAMD_CORES=8
+#DYNAMO_CORES=16
+#NAMD_CORES=8
+#DYNAMO_CORES=12
+#
+ROOT=$PWD
+arch="Linux-x86_64-g++"
+export NAMD_HOME=$ROOT/namd/${arch}
+export DYNAMO_LIB_DIR=$ROOT/vo-projects/lib
+export LD_LIBRARY_PATH=$DYNAMO_LIB_DIR:$LD_LIBRARY_PATH:
+export PATH=$NAMD_HOME:$PATH
+
+export OMP_NUM_THREADS=${DYNAMO_CORES} # OpenMP cores available to the shell plugin ; this is a parameter to tune for speed
+export OMP_STACKSIZE=10M
+export OMP_SCHEDULE=static
+export OMP_NESTED=false
+
+#run dhfr benchmark
+pushd dhfr
+mkdir -p scratch
+cmd="${ROOT}/namd/${arch}/namd3 +p${NAMD_CORES} md.in >&1 2>&1 >md.out"
+echo "Running $cmd :"
+eval " $cmd"
+# check for speed :
+samples=( $(grep PERFORMANCE md.out |  awk '{print $4}') );
+ave=0
+std=0
+for s in ${samples[@]} ; do
+ ave=`echo $ave + $s | bc -l`
+ std=`echo $std + $s*$s | bc -l`
+done
+ave=`echo $ave / ${#samples[@]} | bc -l`
+std=`echo "sqrt($std / ${#samples[@]} - $ave^2) " | bc -l`
+#std=`echo sqrt ( $std / ${#samples[@]} - $ave * $ave ) | bc -l`
+echo "Cores : $NAMD_CORES (NAMD) $DYNAMO_CORES (DYNAMO)"
+echo "Speed : $ave +/- $std ns/day"
+popd

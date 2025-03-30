@@ -1,0 +1,36 @@
+#!/bin/bash
+#SBATCH -A gc8_g
+#SBATCH -C gpu
+#SBATCH -q debug
+#SBATCH -t 0:1:00
+#SBATCH -n 1
+#SBATCH --gpus-per-task=1
+#SBATCH -c 128
+#SBATCH --ntasks-per-node=1
+
+export SLURM_CPU_BIND="cores"
+
+ROOT=$HOME/usr
+export OPENMM_HOME=$ROOT
+export DYNAMO_LIB_DIR=$ROOT/victor/lib
+export OPENMM_LIB_DIR=$OPENMM_HOME/lib
+export OPENMM_PLUGIN_DIR=$OPENMM_LIB_DIR/plugins
+export LD_LIBRARY_PATH=$OPENMM_LIB_DIR:$OPENMM_PLUGIN_DIR:$DYNAMO_LIB_DIR:$LD_LIBRARY_PATH:
+
+PYTHON=`which python`
+pyver=`$PYTHON -V | awk '{print $2}'`
+pyver=${pyver%.*}
+
+PYTHON_LOCAL=$HOME/set-up-wshell/openmm/build/python/build/lib.linux-x86_64-${pyver}:$ROOT/victor/plugin_master/openmm-dynamo/build/python/build/lib.linux-x86_64-${pyver}
+export PYTHONPATH=$PYTHON_LOCAL:$PYTHON_LOCAL
+#echo $PYTHON_LOCAL
+#echo $LD_LIBRARY_PATH
+export OMP_NUM_THREADS=12
+export OMP_STACKSIZE=10M
+export OMP_SCHEDULE=static
+export OMP_NESTED=false
+
+#run benchmark
+cd $HOME/set-up-wshell/dhfr
+mkdir -p scratch
+srun python ./md.py
