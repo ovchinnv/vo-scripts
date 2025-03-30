@@ -13,7 +13,12 @@
 
   radii=const ! radii do not matter with the mindist method "minimum_distance=yes" below (watershell v.1)
   radiiconst=2.0
-
+!
+  mass=file
+  massfile=struc/dhfr-mass.pdb
+  massfiletype=PDB
+  masscol=B
+!
   dasystat=yes ! this provides density equilibration, but can generally be turned off
 !  v only if dasystat=yes
 !  density_update_freq=500
