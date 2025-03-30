@@ -1,0 +1,2 @@
+11/20/20 : compile watershell with openmm & run dhfr test case ; tested on a linux-x86_64 running archlinux
+2/26/25 : test case updated to include watershell v2; plugin download from github

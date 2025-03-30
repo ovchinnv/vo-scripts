@@ -1,0 +1,88 @@
+#!/bin/bash
+# 3/27/25
+# SPECIFY SOURCE NAMES & PATHS:
+#==================================
+namddir=NAMD_3.0.1_Source
+charmdir=NAMD_3.0.1_Source/charm-8.0.0 # not working -- compilation problems
+patchfile=NAMD_3.0.1_Source.dynamo.patch
+extracuda="--cuda-gencode arch=compute_86,code=sm_86 --cuda-dlink arch=compute_86,code=sm_86" ;# useful to reduce NAMD compilation time
+# NOTE significant edits to the charm configuration could be required required to compile, esp older versions
+# e.g. charm/src/arch/<platform>/conv-mach.sh ;#
+#
+# nopatch=1 ;# skip patching for original compilation
+# Here's what we're using :
+uname -a
+echo
+gcc -v
+cat /proc/cpuinfo |head -n10
+echo
+#
+ROOT=$PWD
+# 1 build charm
+if  [[ ! -d charm ]]; then
+ ln -s $charmdir ./charm
+fi
+#
+pushd charm
+./build charm++ multicore-linux-x86_64 --with-production -optimize
+popd
+
+# 2 get plugin source
+PLUGINDIR=${ROOT}/vo-projects
+#PLUGINBRANCH=protforce # there are two branches, master and protforce ; protforce is often an experimental branch with functionality to apply force to protein in wsh2
+PLUGINBRANCH=master
+if  [[ ! -d "$PLUGINDIR" ]]; then
+ git clone git://128.103.92.211/projects $PLUGINDIR ;# local tracker for testing prior to publishing
+# git clone https://github.com/ovchinnv/vo-projects $PLUGINDIR
+#fi
+ pushd $PLUGINDIR
+# make clean # optional rebuild
+ git checkout $PLUGINBRANCH
+# 3 build fortran library :
+ unset MAKE_COMMAND # must compile in serial mode
+# first, compile and run with the mindist method (only in watershell v.1):
+ sed -i 's/version=.*$/version=1/' watershell/version.inc # specify version in config file:
+# (optional) edit compilation settings
+ sed -e 's/WATERSHELL=.*$/WATERSHELL=1/' -e 's/STRUNA=.*$/STRUNA=0/' -e 's/ADAPTIVE=.*$/ADAPTIVE=0/' -i plugin_master/plugins.inc
+ make --silent -j1 plugin_master # parallel compile not supported
+ popd
+fi
+export DYNAMO_LIBDIR=${PLUGINDIR}/lib # this is important because the Makefile uses this variable to link to dynamo
+
+# compile NAMD
+if [[ ! -d namd ]]; then
+ ln -s $namddir namd
+fi
+#
+pushd namd
+#
+if [ "X${nopatch}" != "X1" ] ; then
+# apply patch to include plugin interface
+if [[ ! -f ../$patchfile ]]; then
+ cp $PLUGINDIR/plugin_master/namd/$patchfile ../
+ patch -p1  < ../$patchfile
+fi
+# compile patched namd
+if [[ ! -d charm ]] ; then 
+ ln -s ../charm . # link charm to this directory
+fi
+# modify some compilation settings:
+arch="Linux-x86_64"
+# change tcl paths
+sed -e 's^TCLDIR=.*$^TCLDIR=/usr^g' -e 's^ltcl8\.5^ltcl^g' -i arch/$arch.tcl
+# set cuda and fftw paths
+usecuda=1
+model="Linux-x86_64-g++"
+if [[ $usecuda -eq 1 ]] ; then
+ ./config ${model} --charm-arch multicore-linux-x86_64 --charm-base charm --with-fftw3 --fftw-prefix /usr --with-cuda --cuda-prefix /opt/cuda ${extracuda}
+else
+ ./config ${model} --charm-arch multicore-linux-x86_64 --charm-base charm --with-fftw3 --fftw-prefix /usr
+fi
+pushd ${model}
+make -j1 # serial compile
+popd
+popd
+
+# compilation should be finished:
+# to run the benchmark :
+./run

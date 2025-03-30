@@ -1,0 +1,441 @@
+ MESSAGE (MASTER_INIT_PLUGIN): INITIALIZING MASTER PLUGIN
+ MESSAGE (FILES_OPEN): Opening FORMATTED file "watershell0.in" for reading.
+ MESSAGE (PARSE_FILE): Reading input file.
+ MESSAGE (PARSE_FILE): ======================> Switching to context "OUTPUT".
+ MESSAGE (PARSE_FILE): minwarnlev <= -1
+ MESSAGE (PARSE_FILE): ======================> Returning to main context.
+ MESSAGE (PARSE_FILE): ======================> Switching to context "MOLECULE".
+ MESSAGE (PARSE_FILE): structure_file <= struc/dhfr_msn.pdb
+ MESSAGE (PARSE_FILE): ======================> Returning to main context.
+ MESSAGE (PARSE_FILE): ======================> Switching to context "WATERSHELL".
+ MESSAGE (PARSE_FILE): radii <= const
+ MESSAGE (PARSE_FILE): radiiconst <= 2.0
+ MESSAGE (PARSE_FILE): dasystat <= yes
+ MESSAGE (PARSE_FILE): density_update_freq <= 500
+ MESSAGE (PARSE_FILE): mass <= file
+ MESSAGE (PARSE_FILE): massfile <= struc/dhfr-mass.pdb
+ MESSAGE (PARSE_FILE): massfiletype <= PDB
+ MESSAGE (PARSE_FILE): masscol <= B
+ MESSAGE (PARSE_FILE): structure_update_freq <= 7
+ MESSAGE (PARSE_FILE): surface_force_constant <= 5
+ MESSAGE (PARSE_FILE): surface_distance <= 0
+ MESSAGE (PARSE_FILE): rigid_body_restraint <= yes
+ MESSAGE (PARSE_FILE): rigid_body_force_constant <= 100
+ MESSAGE (PARSE_FILE): minimum_distance <= yes
+ MESSAGE (PARSE_FILE): surface_atoms[STRING] <= "ANAME=CA"
+ MESSAGE (PARSE_FILE): solvent_atoms[STRING] <= "ANAME=OH2 OR ANAME=SOD OR ANAME=CLA OR ANAME=MG"
+ MESSAGE (PARSE_FILE): restart_file[STRING] <= "NONE"
+ MESSAGE (PARSE_FILE): output_file[STRING] <= "watershell0.restart.txt"
+ MESSAGE (PARSE_FILE): output_freq <= 10000
+ MESSAGE (PARSE_FILE): ======================> Returning to main context.
+ MESSAGE (PARSE_FILE): Input file read.
+ MESSAGE (MASTER_INIT_PLUGIN): FOUND STRUCTURE FILE IN CONTEXT "MOLECULE"
+ NONFATAL WARNING (master_init_plugin): structure file format("structure_filetype") unspecified. Defaulting to PDB.
+ MESSAGE (MASTER_INIT_PLUGIN): READING STRUCTURE FROM FILE "struc/dhfr_msn.pdb" OF TYPE "PDB".
+ MESSAGE (FILES_OPEN): Opening FORMATTED file "struc/dhfr_msn.pdb" for reading.
+ MESSAGE (SYSTEM_PDB_INIT): Found 8756 atoms
+ MESSAGE (STATE_ADD3DF): Dimension 1 size: 3
+ MESSAGE (STATE_ADD3DF): Dimension 2 size: 8756
+ MESSAGE (STATE_ADD3DF): Dimension 3 size: 1
+ MESSAGE (STATE_ADD3DF): Variable "POSITION" added to context "MOLECULE"
+ MESSAGE (STATE_ADD3DF): Dimension 1 size: 3
+ MESSAGE (STATE_ADD3DF): Dimension 2 size: 8756
+ MESSAGE (STATE_ADD3DF): Dimension 3 size: 1
+ MESSAGE (STATE_ADD3DF): Variable "FORCE" added to context "MOLECULE"
+ MESSAGE (STATE_ADD3DF): Dimension 1 size: 8756
+ MESSAGE (STATE_ADD3DF): Dimension 2 size: 1
+ MESSAGE (STATE_ADD3DF): Dimension 3 size: 1
+ MESSAGE (STATE_ADD3DF): Variable "MASS" added to context "MOLECULE"
+ MESSAGE (STATE_ADD3DF): Dimension 1 size: 8756
+ MESSAGE (STATE_ADD3DF): Dimension 2 size: 1
+ MESSAGE (STATE_ADD3DF): Dimension 3 size: 1
+ MESSAGE (STATE_ADD3DF): Variable "CHARGE" added to context "MOLECULE"
+ MESSAGE (STATE_ADD3DF): Dimension 1 size: 8756
+ MESSAGE (STATE_ADD3DF): Dimension 2 size: 1
+ MESSAGE (STATE_ADD3DF): Dimension 3 size: 1
+ MESSAGE (STATE_ADD3DF): Variable "RADIUS" added to context "MOLECULE"
+ MESSAGE (STATE_ADD3DF): Dimension 1 size: 8756
+ MESSAGE (STATE_ADD3DF): Dimension 2 size: 1
+ MESSAGE (STATE_ADD3DF): Dimension 3 size: 1
+ MESSAGE (STATE_ADD3DF): Variable "BFACTOR" added to context "MOLECULE"
+ MESSAGE (STATE_ADD3DF): Dimension 1 size: 8756
+ MESSAGE (STATE_ADD3DF): Dimension 2 size: 1
+ MESSAGE (STATE_ADD3DF): Dimension 3 size: 1
+ MESSAGE (STATE_ADD3DF): Variable "OCCUPANCY" added to context "MOLECULE"
+ MESSAGE (STATE_ADD3DF): Dimension 1 size: 3
+ MESSAGE (STATE_ADD3DF): Dimension 2 size: 8756
+ MESSAGE (STATE_ADD3DF): Dimension 3 size: 1
+ MESSAGE (STATE_ADD3DF): Variable "AUXPOS" added to context "MOLECULE"
+ MESSAGE (STATE_ADD3DF): Dimension 1 size: 8756
+ MESSAGE (STATE_ADD3DF): Dimension 2 size: 1
+ MESSAGE (STATE_ADD3DF): Dimension 3 size: 1
+ MESSAGE (STATE_ADD3DF): Variable "AUXBFACTOR" added to context "MOLECULE"
+ MESSAGE (SYSTEM_PDB_INIT): Initialized minimal structure and coordinates from PDB (energy cannot be computed).
+ MESSAGE (watershell_initialize): Setting restart file("restart_file") to "NONE".
+ MESSAGE (watershell_initialize): Setting flag to use the (faster) minimum distance to solute method("minimum_distance") to "yes".
+ MESSAGE (watershell_initialize): WILL USE A NEIGHBOR LIST FOR SOLVENT FORCES.
+ NONFATAL WARNING (watershell_initialize): Density padding("surface_padding") unspecified. Defaulting to   3.000000000.
+ MESSAGE (watershell_initialize): Setting force constant for surface potential("surface_force_constant") to "5".
+ NONFATAL WARNING (watershell_initialize): Cutoff for density smoothing("cutoff_surf_stdev") unspecified. Defaulting to   6.000000000.
+ NONFATAL WARNING (watershell_initialize): Standard deviation of Gaussian filter for density smoothing("surf_stdev") unspecified. Defaulting to   2.000000000.
+ MESSAGE (watershell_initialize): Setting Distance of solvent surface from protein("surface_distance") to "0".
+ MESSAGE (watershell_initialize): LOCATION OF SOLVENT SURFACE WILL BE SET FROM SOLVENT COORDINATES.
+ NONFATAL WARNING (watershell_initialize): starting iteration("iteration") unspecified. Defaulting to 0.
+ MESSAGE (watershell_initialize): Setting flag to turn dasystat on/off("dasystat") to "yes".
+ MESSAGE (watershell_initialize): Setting frequency of computing solvent density("density_update_freq") to "500".
+ NONFATAL WARNING (watershell_initialize): frequency of computing solvent density("volume_compute_freq") unspecified. Defaulting to 1.
+ NONFATAL WARNING (watershell_initialize): frequency of checking grid limits for computing solvent density("volume_grid_check_freq") unspecified. Defaulting to 1.
+ NONFATAL WARNING (watershell_initialize): dasystat relaxation time (in simulation steps)("density_relax_time") unspecified. Defaulting to 100.
+ NONFATAL WARNING (watershell_initialize): domain size difference required to trigger reinitialization of volume grid("volume_grid_recompute_change") unspecified. Defaulting to   3.000000000.
+ NONFATAL WARNING (watershell_initialize): target density in g/mL("density_target") unspecified. Defaulting to   1.001999974.
+ NONFATAL WARNING (watershell_initialize): grid spacing for volume computation("volume_grid_spacing") unspecified. Defaulting to   1.000000000.
+ NONFATAL WARNING (watershell_initialize): grid buffer for volume computation("volume_grid_buffer") unspecified. Defaulting to   3.000000000.
+ NONFATAL WARNING (watershell_initialize): Distance from protein to bulk boundary("bulk_boundary_distance") unspecified. Defaulting to   0.000000000.
+ MESSAGE (watershell_initialize): LOCATION OF BULK BOUNDARY WILL BE SET FROM SURFACE BOUNDARY.
+ NONFATAL WARNING (watershell_initialize): constant for updating target distance from surface("distance_update_step") unspecified. Defaulting to  0.1000000000E-02.
+ NONFATAL WARNING (watershell_initialize): frequency of updating target distance from surface("distance_update_freq") unspecified. Defaulting to 10.
+ MESSAGE (watershell_initialize): Setting frequency of updating reference structure("structure_update_freq") to "7".
+ MESSAGE (watershell_initialize): Setting frequency for writing output("output_freq") to "10000".
+ NONFATAL WARNING (watershell_initialize): frequency for writing restart file("restart_freq") unspecified. Defaulting to 10000.
+ MESSAGE (watershell_initialize): Setting surface atoms("surface_atoms") to "ANAME=CA".
+ MESSAGE (watershell_initialize): Setting solvent atoms("solvent_atoms") to "ANAME=OH2 OR ANAME=SOD OR ANAME=CLA OR ANAME=MG".
+ MESSAGE (watershell_initialize): Setting watershell output file("output_file") to "watershell0.restart.txt".
+ NONFATAL WARNING (watershell_initialize): memory constant for reference structure update("structure_update_memory") unspecified. Defaulting to  0.9990000000.
+ MESSAGE (watershell_initialize): Setting flag to restrict rigid-body motions of surface atoms("rigid_body_restraint") to "yes".
+ MESSAGE (watershell_initialize): Setting force constant for rigid-body restraint("rigid_body_force_constant") to "100".
+ MESSAGE (SYSTEM_INIT_MOL_SCALAR): Will initialize variable mass from file "struc/dhfr-mass.pdb"
+ MESSAGE (SYSTEM_INIT_MOL_SCALAR): PDB format will be used
+ MESSAGE (SYSTEM_INIT_MOL_SCALAR): Reading data for variable "mass" from column BETA of file struc/dhfr-mass.pdb
+ MESSAGE (FILES_OPEN): Opening FORMATTED file "struc/dhfr-mass.pdb" for reading.
+ MESSAGE (PDB_READ): PDB file read.
+ MESSAGE (SYSTEM_GETIND): Processing selection "ANAME=CA"
+ MESSAGE (SYSTEM_GETIND): 159 atoms were selected.
+ MESSAGE (SYSTEM_GETIND): Processing selection "ANAME=OH2 OR ANAME=SOD OR ANAME=CLA OR ANAME=MG"
+ MESSAGE (SYSTEM_GETIND): 2099 atoms were selected.
+ MESSAGE (watershell_initialize): WILL USE 12 OPENMP THREADS
+ MESSAGE (ugrid_initialize):  Initialized grid in 3 dimensions
+ ===================
+  domain size (possibly adjusted) :
+              1  :   -27.031399371069185      -   26.968600628930815
+              2  :   -26.192468553459122      -   20.807531446540878
+              3  :   -21.622075471698114      -   20.377924528301886
+  discretization :
+              1  :           55
+              2  :           48
+              3  :           43
+  spacing (possibly adjusted) :
+              1  :    1.0000000000000000
+              2  :    1.0000000000000000
+              3  :    1.0000000000000000
+ ===================
+ NONFATAL WARNING (RANDOM_INIT):  SEEDS NOT SPECIFIED, USING [           1           2           3           4 ]
+ MESSAGE (watershell_main): COMPUTED SURFACE DISTANCE AT  -10.85955690     A FROM PROTEIN.
+ MESSAGE (watershell_main): COMPUTING INITIAL LOCATION OF BULK BOUNDARY FROM SURFACE BOUNDARY:
+ MESSAGE (watershell_main): LOCATION OF BULK BOUNDARY SET TO  -8.144667679     A FROM PROTEIN.
+ MESSAGE (watershell_main): REINITIALIZING VOLUME COMPUTATION GRID.
+ MESSAGE (ugrid_initialize):  Initialized grid in 3 dimensions
+ ===================
+  domain size (possibly adjusted) :
+              1  :   -38.040858712166269      -   37.959141287833731
+              2  :   -37.194634187099787      -   31.805365812900213
+              3  :   -32.107048226118366      -   30.892951773881634
+  discretization :
+              1  :           77
+              2  :           70
+              3  :           64
+  spacing (possibly adjusted) :
+              1  :    1.0000000000000000
+              2  :    1.0000000000000000
+              3  :    1.0000000000000000
+ ===================
+ ==========================================================================================
+ Iteration:                10000
+ Target distance to protein:        -10.852982306294649
+ Current avg. distance to protein:  -11.086973879879194
+ Surface energy:                     17.619413503153609
+ # Solute atoms used for density:          159
+ # Solvent atoms outside / total:           76 /        2099
+ ======= FORCE STATISTICS =======
+ Total force applied to surface atoms:     8.3498663708267422       -10.142217361719073       -13.220005035469040
+ RMS of surface atom forces:              0.15972813248076689
+ Largest force acting on a surface atom:  0.27911592238127031
+ Total force applied to solvent atoms:     7.4966867413235088        14.220047620060415        15.136503899481431
+ RMS of solvent atom forces:              0.28972735703707947
+ Largest force acting on a solvent atom:   5.2698877050633977
+ Rotational restraint energy:           1.4861433050395014
+ Translational restraint energy:        1.7367668728042280
+ Total rigid-body restraint energy:     3.2229101778437297
+ ================================
+ Solute neighbor list search depth (min:ave:max): (          16 :   16.000000000000000      :          16 )
+ Target density (g/mL):              1.0019999742507935
+ Simulation density (g/mL):         0.99809223946471060
+ Instantaneous density (g/mL):      0.99813174280336647
+ Volume of bulk solvent (Ang^3):     12158.000000000000
+ Mass of bulk solvent (amu):         7308.0399999999972
+ Inner bulk boundary distance:      -8.1446676786970080
+ Outer bulk boundary distance:      -9.5021122918131766
+ ================================
+ MESSAGE (watershell_main): WRITING RESTART FILE TO ("watershell0.restart.txt")
+ MESSAGE (FILES_OPEN): Opening FORMATTED file "watershell0.restart.txt" for writing.
+ ==========================================================================================
+ Iteration:                20000
+ Target distance to protein:        -10.849460513682514
+ Current avg. distance to protein:  -11.105811003569965
+ Surface energy:                     23.624989469310247
+ # Solute atoms used for density:          159
+ # Solvent atoms outside / total:           96 /        2099
+ ======= FORCE STATISTICS =======
+ Total force applied to surface atoms:    -6.9284037004985048       -5.2475083129229958       -19.573837994542757
+ RMS of surface atom forces:              0.16984357944801190
+ Largest force acting on a surface atom:  0.31565247120683348
+ Total force applied to solvent atoms:   -0.74260317066159787        11.985749663899183        1.9352874534262001
+ RMS of solvent atom forces:              0.33549000995692380
+ Largest force acting on a solvent atom:   4.8745245686597194
+ Rotational restraint energy:           1.3531993439351533
+ Translational restraint energy:        2.2933712758394127
+ Total rigid-body restraint energy:     3.6465706197745660
+ ================================
+ Solute neighbor list search depth (min:ave:max): (          16 :   16.000000000000000      :          16 )
+ Target density (g/mL):              1.0019999742507935
+ Simulation density (g/mL):         0.99967762895264278
+ Instantaneous density (g/mL):       1.0260735561083896
+ Volume of bulk solvent (Ang^3):     12183.000000000000
+ Mass of bulk solvent (amu):         7528.0699999999924
+ Inner bulk boundary distance:      -8.1446676786970080
+ Outer bulk boundary distance:      -9.5021122918131766
+ ================================
+ MESSAGE (watershell_main): WRITING RESTART FILE TO ("watershell0.restart.txt")
+ MESSAGE (FILES_OPEN): Opening FORMATTED file "watershell0.restart.txt" for writing.
+ NONFATAL WARNING (watershell_compute_mindist_grad): DETECTED 1 POSSIBLE NEIGHBOR LIST MISS (INDEX DIFF=6). NEIGHBOR LIST FACTOR IS   8.056200000
+ ==========================================================================================
+ Iteration:                30000
+ Target distance to protein:        -10.845734886003617
+ Current avg. distance to protein:  -11.095685138199878
+ Surface energy:                     25.716691708413482
+ # Solute atoms used for density:          159
+ # Solvent atoms outside / total:           93 /        2099
+ ======= FORCE STATISTICS =======
+ Total force applied to surface atoms:    -4.7054657938188145        2.4278828817825291       0.84702265461055204
+ RMS of surface atom forces:               4.3640078693668219E-002
+ Largest force acting on a surface atom:   6.6916060632721180E-002
+ Total force applied to solvent atoms:     6.8927425442973735        3.6689350735098811        15.412133083952481
+ RMS of solvent atom forces:              0.35002682608971097
+ Largest force acting on a solvent atom:   4.5385426612943469
+ Rotational restraint energy:           9.6973798558772764E-002
+ Translational restraint energy:       0.14376735500937537
+ Total rigid-body restraint energy:    0.24074115356814813
+ ================================
+ Solute neighbor list search depth (min:ave:max): (           8 :   8.0000000000000000      :           8 )
+ Target density (g/mL):              1.0019999742507935
+ Simulation density (g/mL):         0.99968627510334140
+ Instantaneous density (g/mL):       1.0042299791196971
+ Volume of bulk solvent (Ang^3):     12261.000000000000
+ Mass of bulk solvent (amu):         7414.9799999999959
+ Inner bulk boundary distance:      -8.1446676786970080
+ Outer bulk boundary distance:      -9.5021122918131766
+ ================================
+ MESSAGE (watershell_main): WRITING RESTART FILE TO ("watershell0.restart.txt")
+ MESSAGE (FILES_OPEN): Opening FORMATTED file "watershell0.restart.txt" for writing.
+ ==========================================================================================
+ Iteration:                40000
+ Target distance to protein:        -10.843142965400066
+ Current avg. distance to protein:  -11.065815311551537
+ Surface energy:                     14.127178439437548
+ # Solute atoms used for density:          159
+ # Solvent atoms outside / total:           69 /        2099
+ ======= FORCE STATISTICS =======
+ Total force applied to surface atoms:   -0.41718596864600049        2.3925075836795036        20.112464142354920
+ RMS of surface atom forces:              0.13566602817965284
+ Largest force acting on a surface atom:  0.21313919584901822
+ Total force applied to solvent atoms:    -1.7767051252355095       -9.2960591779338824        16.434770625009669
+ RMS of solvent atom forces:              0.25943077682306381
+ Largest force acting on a solvent atom:   3.5531121769184089
+ Rotational restraint energy:          0.27781152402676246
+ Translational restraint energy:        2.0520467527395603
+ Total rigid-body restraint energy:     2.3298582767663225
+ ================================
+ Solute neighbor list search depth (min:ave:max): (          16 :   16.000000000000000      :          16 )
+ Target density (g/mL):              1.0019999742507935
+ Simulation density (g/mL):         0.99922731789138752
+ Instantaneous density (g/mL):       1.0181495928875086
+ Volume of bulk solvent (Ang^3):     12220.000000000000
+ Mass of bulk solvent (amu):         7492.6199999999844
+ Inner bulk boundary distance:      -8.1446676786970080
+ Outer bulk boundary distance:      -9.5021122918131766
+ ================================
+ MESSAGE (watershell_main): WRITING RESTART FILE TO ("watershell0.restart.txt")
+ MESSAGE (FILES_OPEN): Opening FORMATTED file "watershell0.restart.txt" for writing.
+ ==========================================================================================
+ Iteration:                50000
+ Target distance to protein:        -10.840019257322226
+ Current avg. distance to protein:  -11.090170605759871
+ Surface energy:                     19.911308226920841
+ # Solute atoms used for density:          159
+ # Solvent atoms outside / total:           77 /        2099
+ ======= FORCE STATISTICS =======
+ Total force applied to surface atoms:    0.25754348907908003       -3.2402627571698970      -0.59526434077090151
+ RMS of surface atom forces:               9.9009884216011396E-002
+ Largest force acting on a surface atom:  0.20313711236383641
+ Total force applied to solvent atoms:     4.0311987674363330       -2.6585556509379442      -0.40983227032819436
+ RMS of solvent atom forces:              0.30799500861334250
+ Largest force acting on a solvent atom:   5.0713001259378476
+ Rotational restraint energy:           1.1937756708869056
+ Translational restraint energy:        5.4599855098313561E-002
+ Total rigid-body restraint energy:     1.2483755259852192
+ ================================
+ Solute neighbor list search depth (min:ave:max): (          16 :   16.000000000000000      :          16 )
+ Target density (g/mL):              1.0019999742507935
+ Simulation density (g/mL):         0.99702236376641262
+ Instantaneous density (g/mL):      0.98784685062060873
+ Volume of bulk solvent (Ang^3):     12224.000000000000
+ Mass of bulk solvent (amu):         7271.9999999999891
+ Inner bulk boundary distance:      -8.1446676786970080
+ Outer bulk boundary distance:      -9.5021122918131766
+ ================================
+ MESSAGE (watershell_main): WRITING RESTART FILE TO ("watershell0.restart.txt")
+ MESSAGE (FILES_OPEN): Opening FORMATTED file "watershell0.restart.txt" for writing.
+ ==========================================================================================
+ Iteration:                60000
+ Target distance to protein:        -10.833037104276174
+ Current avg. distance to protein:  -11.098388733307708
+ Surface energy:                     23.729568687131572
+ # Solute atoms used for density:          159
+ # Solvent atoms outside / total:           89 /        2099
+ ======= FORCE STATISTICS =======
+ Total force applied to surface atoms:     2.8073126407941964        4.1304808719391719      -0.67521538494121736
+ RMS of surface atom forces:               9.3284089239219478E-002
+ Largest force acting on a surface atom:  0.18682219448291598
+ Total force applied to solvent atoms:    -12.144898832200077        7.4950932517773756        7.6705050168480264
+ RMS of solvent atom forces:              0.33623173602487033
+ Largest force acting on a solvent atom:   3.9679955007253831
+ Rotational restraint energy:          0.98816065617533999
+ Translational restraint energy:       0.12698896156339773
+ Total rigid-body restraint energy:     1.1151496177387377
+ ================================
+ Solute neighbor list search depth (min:ave:max): (           8 :   8.0000000000000000      :           8 )
+ Target density (g/mL):              1.0019999742507935
+ Simulation density (g/mL):         0.99326641895885337
+ Instantaneous density (g/mL):      0.96833304927046904
+ Volume of bulk solvent (Ang^3):     12399.000000000000
+ Mass of bulk solvent (amu):         7230.3999999999869
+ Inner bulk boundary distance:      -8.1446676786970080
+ Outer bulk boundary distance:      -9.5021122918131766
+ ================================
+ MESSAGE (watershell_main): WRITING RESTART FILE TO ("watershell0.restart.txt")
+ MESSAGE (FILES_OPEN): Opening FORMATTED file "watershell0.restart.txt" for writing.
+ ==========================================================================================
+ Iteration:                70000
+ Target distance to protein:        -10.822153761347801
+ Current avg. distance to protein:  -11.068945877460315
+ Surface energy:                     19.870078254186296
+ # Solute atoms used for density:          159
+ # Solvent atoms outside / total:           85 /        2099
+ ======= FORCE STATISTICS =======
+ Total force applied to surface atoms:     4.9500777337869772       -4.1626108760686353       -4.5306001684800696
+ RMS of surface atom forces:              0.11687665193651522
+ Largest force acting on a surface atom:  0.20389401704241192
+ Total force applied to solvent atoms:    -11.625536799041928       -1.9028563437862807       -3.0251297392996981
+ RMS of solvent atom forces:              0.30767596362194466
+ Largest force acting on a solvent atom:   3.6584248516336002
+ Rotational restraint energy:           1.4298594771512874
+ Translational restraint energy:       0.31178468381365065
+ Total rigid-body restraint energy:     1.7416441609649380
+ ================================
+ Solute neighbor list search depth (min:ave:max): (          16 :   16.000000000000000      :          16 )
+ Target density (g/mL):              1.0019999742507935
+ Simulation density (g/mL):         0.98990329940489996
+ Instantaneous density (g/mL):       1.0357386083404372
+ Volume of bulk solvent (Ang^3):     12389.000000000000
+ Mass of bulk solvent (amu):         7727.4699999999866
+ Inner bulk boundary distance:      -8.1446676786970080
+ Outer bulk boundary distance:      -9.5021122918131766
+ ================================
+ MESSAGE (watershell_main): WRITING RESTART FILE TO ("watershell0.restart.txt")
+ MESSAGE (FILES_OPEN): Opening FORMATTED file "watershell0.restart.txt" for writing.
+ ==========================================================================================
+ Iteration:                80000
+ Target distance to protein:        -10.810338296328887
+ Current avg. distance to protein:  -11.045465227757063
+ Surface energy:                     16.302268558215420
+ # Solute atoms used for density:          159
+ # Solvent atoms outside / total:           76 /        2099
+ ======= FORCE STATISTICS =======
+ Total force applied to surface atoms:     1.9472354791943280        4.4395255255900059       -11.105820625119360
+ RMS of surface atom forces:              0.11237332746482168
+ Largest force acting on a surface atom:  0.17420998621117501
+ Total force applied to solvent atoms:    -4.5513413958018152        21.152704259895259        3.3708087269000813
+ RMS of solvent atom forces:              0.27868770063300868
+ Largest force acting on a solvent atom:   3.8980740742456099
+ Rotational restraint energy:          0.87323849813429111
+ Translational restraint energy:       0.73420182330562511
+ Total rigid-body restraint energy:     1.6074403214399162
+ ================================
+ Solute neighbor list search depth (min:ave:max): (          16 :   16.000000000000000      :          16 )
+ Target density (g/mL):              1.0019999742507935
+ Simulation density (g/mL):         0.99153803726308620
+ Instantaneous density (g/mL):      0.98342209479487908
+ Volume of bulk solvent (Ang^3):     12279.000000000000
+ Mass of bulk solvent (amu):         7271.9999999999891
+ Inner bulk boundary distance:      -8.1446676786970080
+ Outer bulk boundary distance:      -9.5021122918131766
+ ================================
+ MESSAGE (watershell_main): WRITING RESTART FILE TO ("watershell0.restart.txt")
+ MESSAGE (FILES_OPEN): Opening FORMATTED file "watershell0.restart.txt" for writing.
+ ==========================================================================================
+ Iteration:                90000
+ Target distance to protein:        -10.800507782358707
+ Current avg. distance to protein:  -11.027163775064215
+ Surface energy:                     17.621503274557664
+ # Solute atoms used for density:          159
+ # Solvent atoms outside / total:           76 /        2099
+ ======= FORCE STATISTICS =======
+ Total force applied to surface atoms:    -3.9839117602318459       -3.4596067100145471        6.3391587173735324
+ RMS of surface atom forces:              0.10631514847101635
+ Largest force acting on a surface atom:  0.21049654245573582
+ Total force applied to solvent atoms:     12.636129069978658        4.8752048458165742       -16.914422260330124
+ RMS of solvent atom forces:              0.28974453825578805
+ Largest force acting on a solvent atom:   4.2373900676915435
+ Rotational restraint energy:           1.1000975357188612
+ Translational restraint energy:       0.34012682372672054
+ Total rigid-body restraint energy:     1.4402243594455817
+ ================================
+ Solute neighbor list search depth (min:ave:max): (           7 :   7.0000000000000000      :           7 )
+ Target density (g/mL):              1.0019999742507935
+ Simulation density (g/mL):         0.99387349421105831
+ Instantaneous density (g/mL):       1.0494129152773539
+ Volume of bulk solvent (Ang^3):     12378.000000000000
+ Mass of bulk solvent (amu):         7822.5399999999863
+ Inner bulk boundary distance:      -8.1446676786970080
+ Outer bulk boundary distance:      -9.5021122918131766
+ ================================
+ MESSAGE (watershell_main): WRITING RESTART FILE TO ("watershell0.restart.txt")
+ MESSAGE (FILES_OPEN): Opening FORMATTED file "watershell0.restart.txt" for writing.
+ ==========================================================================================
+ Iteration:               100000
+ Target distance to protein:        -10.791302249177281
+ Current avg. distance to protein:  -11.019618446518287
+ Surface energy:                     16.471796196166327
+ # Solute atoms used for density:          159
+ # Solvent atoms outside / total:           81 /        2099
+ ======= FORCE STATISTICS =======
+ Total force applied to surface atoms:    -1.9753379405375215       -3.6127841038073814       -4.0422334880008952
+ RMS of surface atom forces:               9.8002432802148320E-002
+ Largest force acting on a surface atom:  0.21705906856478022
+ Total force applied to solvent atoms:    -4.0284370613753868        18.396884675138196       -8.7545314580343234
+ RMS of solvent atom forces:              0.28013299261261893
+ Largest force acting on a solvent atom:   4.3693678556009807
+ Rotational restraint energy:           1.0630619937086625
+ Translational restraint energy:       0.16646910265783105
+ Total rigid-body restraint energy:     1.2295310963664936
+ ================================
+ Solute neighbor list search depth (min:ave:max): (          15 :   15.000000000000000      :          15 )
+ Target density (g/mL):              1.0019999742507935
+ Simulation density (g/mL):         0.99188284806970861
+ Instantaneous density (g/mL):      0.97122244093845123
+ Volume of bulk solvent (Ang^3):     12310.000000000000
+ Mass of bulk solvent (amu):         7199.9199999999910
+ Inner bulk boundary distance:      -8.1446676786970080
+ Outer bulk boundary distance:      -9.5021122918131766
+ ================================
+ MESSAGE (watershell_main): WRITING RESTART FILE TO ("watershell0.restart.txt")
+ MESSAGE (FILES_OPEN): Opening FORMATTED file "watershell0.restart.txt" for writing.
