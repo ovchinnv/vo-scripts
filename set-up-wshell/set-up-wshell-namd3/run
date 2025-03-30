@@ -1,9 +1,9 @@
 #!/bin/bash
-NAMD_CORES=12
-DYNAMO_CORES=12
+NAMD_CORES=1
+DYNAMO_CORES=15
 #NAMD_CORES=8
 #DYNAMO_CORES=16
-#NAMD_CORES=8
+#NAMD_CORES=12
 #DYNAMO_CORES=12
 #
 ROOT=$PWD
@@ -22,10 +22,12 @@ export OMP_NESTED=false
 pushd dhfr
 mkdir -p scratch
 cmd="${ROOT}/namd/${arch}/namd3 +p${NAMD_CORES} md.in >&1 2>&1 >md.out"
+#cmd="${ROOT}/namd/${arch}/namd3 +p${NAMD_CORES} md.in"
 echo "Running $cmd :"
 eval " $cmd"
 # check for speed :
-samples=( $(grep PERFORMANCE md.out |  awk '{print $4}') );
+samples=( $(grep 'PERFORMANCE:' md.out |  awk '{print $4}') );
+echo ${samples[@]}
 ave=0
 std=0
 for s in ${samples[@]} ; do

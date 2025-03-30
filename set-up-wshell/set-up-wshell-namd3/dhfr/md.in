@@ -4,8 +4,9 @@ set pdbfile struc/dhfr_msn.pdb
 set resfile struc/dhfr_msn.pdb
 set temperature 300
 set cutoff 9
-set switchdist 8.5
-set pairlistdist 10
+set switchdist 8
+set pairlistdist 12
+set margin 2
 set a 63
 set b 63
 set c 63
@@ -30,6 +31,7 @@ DynamoPlugin on
 DynamoConfigFile watershell0.in
 DynamoLogFile watershell0.log
 #!/bin/vmd
+GPUResident on
 #############################################################
 structure          $psffile
 coordinates        $pdbfile
@@ -56,8 +58,8 @@ exclude             scaled1-4
 cutoff              $cutoff
 switching           on
 switchdist          $switchdist
-#pairlistdist        $pairlistdist ; # does not always help
-#margin 1
+pairlistdist        $pairlistdist ; # does not always help
+margin              $margin
 #
 if [info exists pmefreq] {
 fullelectfrequency  $pmefreq
