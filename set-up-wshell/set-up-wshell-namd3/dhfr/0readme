@@ -1,0 +1,35 @@
+MD simulation of DHFR solvated in a shell of water. The MD calculation
+uses NAMD2 and the dynamo plugin library (paths set in "run" script); the
+main simulation config is "md0.npt"
+
+Solvent shell forces are configured in the separate input file
+watershell0.in.
+
+The md0.npt file turns on the shell plugin with "DynamoPlugin=on", which
+tells NAMD to initialize the plugin with the from config file with name
+stored in the variable "DynamoConfigFile" ; the output from the plugin is
+sent to the file with name in the variable "DynamoLogFile"
+
+NOTE : The watershell/dynamo plugin requires its own restart scheme
+(because the shell adjusts to the simulation, and is therefore
+time-dependent). Restart files can be specified in the shell config file.
+
+The shell plugin provides a crude method of density equilibration; this
+is accomplished with the flag "dasystat=yes" in the plugin input. To
+compute the solvent density, solvent masses are needed ;
+the following parameters in the shell input describe how to obtain them
+
+  mass=file
+  massfile=struc/dhfr-mass.pdb
+  massfiletype=PDB
+  masscol=B
+
+a vmd script to compute the mass file dhfr-mass.pdb is provided in struc/
+Note that, because only water oxygens are considered solvent atoms  (to
+increase speed since waters a rigid, only the mass of water oxygens is
+considered in the plugin code); therefore, to have the correct density,
+mkmass.vmd assigns the oxygen mass to 18amu (i.e. not 16) to include
+hydrogen masses. With dasystat=off, no masses are needed.
+
+
+

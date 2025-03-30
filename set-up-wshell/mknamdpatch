@@ -1,0 +1,16 @@
+#!/bin/bash
+# I have fixed the dynamo plugin compilation with namd3 (offload, not resident) ; now watnt to regenerate the patch, rather than mod the old one
+new=stash/NAMD_3.0.1_Source
+old=NAMD_3.0.1_Source
+
+outfile=$old.dynamo.patch
+
+items=( src Makefile Make.depends ) ;# only consider these files
+
+echo -n > $outfile
+for item in ${items[@]}; do
+ echo "${old}/$item ==> ${new}/$item"
+ diff ${old}/$item ${new}/$item -ruN -x 'stash' -x 'bkp' -x '*.orig' -x '*.rej' >> $outfile
+done
+sed -i -e '/diff -ruN.*$/d' -e 's/stash\///g' $outfile
+

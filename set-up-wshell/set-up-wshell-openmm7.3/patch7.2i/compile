@@ -1,0 +1,45 @@
+#!/bin/bash
+ommver="7.3.0"
+PYTHON=`which python`
+ROOT=/usr/local/openmm-git
+#export CUDA_cufft_LIBRARY=$CUDA_HOME/../../math_libs/lib64
+# 1 build openmm
+
+if [[ 1 -eq 1 ]] ; then
+
+git checkout tags/$ommver
+cp -f /home/surgeon/scripts/openmm/patch7.2i/generateWrappers.py wrappers ;# dirty but good enough-- update for swig 4
+rm -fr build-$ommver
+mkdir -p build-$ommver
+pushd build-$ommver
+cmake ../ -DCMAKE_CXX_COMPILER=/usr/bin/c++-8 -DCMAKE_C_COMPILER=/usr/bin/cc-8 -DCMAKE_INSTALL_PREFIX=${ROOT}-${ommver} \
+ -DPYTHON_EXECUTABLE=$PYTHON -DOPENMM_BUILD_C_AND_FORTRAN_WRAPPERS=ON \
+#-DCUDA_NVCC_FLAGS='-gencode arch=compute_61,code=sm_61' \
+# -DCUDA_cufft_LIBRARY=$CUDA_HOME/../../math_libs/lib64/libcufft.so
+#cmake ../ -DCMAKE_INSTALL_PREFIX=${ROOT}-${ommver} -DCUDA_NVCC_FLAGS='-gencode arch=compute_86,code=sm_86' \
+# -DCUDAToolkit_ROOT=$CUDA_HOME -DPYTHON_EXECUTABLE=$PYTHON -DOPENMM_BUILD_C_AND_FORTRAN_WRAPPERS=OFF
+# -DCUDA_nvrtc_LIBRARY=$CUDA_HOME/lib64/libnvrtc.so
+#
+#exit
+# run twice
+#cmake ../ -DCMAKE_INSTALL_PREFIX=${ROOT}-${ommver} -DCUDA_NVCC_FLAGS='-gencode arch=compute_86,code=sm_86' \
+# -DPYTHON_EXECUTABLE=$PYTHON -DOPENMM_BUILD_C_AND_FORTRAN_WRAPPERS=OFF \
+# -DCUDA_cufft_LIBRARY=$CUDA_HOME/../../math_libs/lib64/libcufft.so
+#exit
+make -j24
+sudo make install
+sudo make PythonInstall
+popd
+fi
+# patch :
+# get python version:
+pyver=`python --version | tr '.' ' ' | awk '{print $2"."$3}'`
+# descend into the correct dir
+pushd /usr/lib/python${pyver}/site-packages/simtk/openmm/app
+# patch from here using file in scripts
+patch < /home/surgeon/scripts/openmm/patch7.2i/pdbfile.diff
+patch < /home/surgeon/scripts/openmm/patch7.2i/charmmcrdfiles.diff
+patch < /home/surgeon/scripts/openmm/patch7.2i/charmmpsffile.diff
+popd
+pushd ${ROOT}-${ommver}/include/swig
+patch < /home/surgeon/scripts/openmm/patch7.2i/OpenMMSwigHeaders.diff

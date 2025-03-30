@@ -1,0 +1,76 @@
+3.22 : recompile, because openmm runs mode slowly after perlmutter update
+
+
+2.22 : newest is set-up-wshell2, which uses omm7.6 OOB ; however, it seems to be slower, which is why I want to run this
+
+11/20/20 : compile watershell with openmm & run dhfr test case ; tested on a linux-x86_64 running archlinux
+
+1.22 : after some difficulties, managed to compiled locally ; 
+
+
+get error : name _object is not defined in openmm.py line 1465 ; removed '_' ; ok
+get error : mo module openmmdynamo ; path was wrong, ok
+get error : Error loading CUDA module : CUDA error (218)
+OPENCL code does not run (does not exist)
+CPU code seems to run but is very slow
+CUDA ?
+Even if I submit via a pbs/slurm, I get the sam error
+
+NOTE : to compile with cudatoolkits, need to change cmake config, specifically, findcuda routines; dd this by inspecting openmm-git on r3
+ok, did that, recompiled with the default environment ; when running, get 218 error again
+
+OK, I compiled 7.3.0, with cmake CUDA tweaks ; running very slowly on the login nodes ! IN the end, not sure what made a difference !
+
+
+DYNAMO=OFF (openmm only)
+1 OMM THREAD: 	47.2 ns/day
+16	:	47.3
+GPU bound, but the GPU is probably being used
+Submit to slurm : OK, however, there is no watershell output (DYNAMO OFF)
+
+Cores		Speed
+---------------------
+16	:	1.72e3
+
+
+DYNAMO=ON :
+(c=128 in submission)
+4	:	694
+6	:	690
+8	:	730
+12	:	730
+16	:	689
+24	:	668
+32	:	699
+
+(c=16 in submission)
+8	:	773
+8	:	762
+
+
+(c=12 in submission)
+4	:	773
+4	:	771
+8	:	702
+12	:	537
+
+(c=32 in submission)
+8	:	735
+12	:	730
+16	:	720
+24	:	655
+
+
+(c=8 in submission)
+4	:	704
+
+no stacksize export
+(c=128 in submission, dynamic scheduling)
+12	:	480
+12(static):	665
+12static,stk20:	729
+12static,stk5:	724
+12static,stk10:	724
+
+9/22 : recompiling after perlmutter "update"
+no longer compiles; possibly because of cuda version changes
