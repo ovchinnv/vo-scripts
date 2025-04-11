@@ -91,4 +91,11 @@ popd
 # compilation should be finished:
 # to run the benchmark :
 ./run
-#
+# rebuild plugin to provide watershell v2 and rerun :
+pushd $PLUGINDIR
+# make clean # optional rebuild
+sed -i 's/version=.*$/version=2/' watershell/version.inc # specify version in config file:
+make --silent -j1 watershell
+make --silent -j1 plugin_master # parallel compile not supported
+popd
+./run
