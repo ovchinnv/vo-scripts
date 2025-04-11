@@ -21,12 +21,13 @@ export OMP_NESTED=false
 #run dhfr benchmark
 pushd dhfr
 mkdir -p scratch
-cmd="${ROOT}/namd/${arch}/namd3 +p${NAMD_CORES} md.in >&1 2>&1 >md.out"
+cmd="${ROOT}/namd/${arch}/namd3 +p${NAMD_CORES} mdhh.in >&1 2>&1 >mdhh.out"
+#cmd="${ROOT}/namd/${arch}/namd3 +p${NAMD_CORES} md.in >&1 2>&1 >md.out"
 #cmd="${ROOT}/namd/${arch}/namd3 +p${NAMD_CORES} md.in"
 echo "Running $cmd :"
 eval " $cmd"
 # check for speed :
-samples=( $(grep 'PERFORMANCE:' md.out |  awk '{print $4}') );
+samples=( $(grep 'PERFORMANCE:' mdhh.out |  awk '{print $4}') );
 echo ${samples[@]}
 ave=0
 std=0
