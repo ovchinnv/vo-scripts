@@ -28,7 +28,7 @@ label segs
  mini abnr nsteps 20
  energy
  write psf card name ligands/@seg@@iseg.psf
- write coor pdb name ligands/@seg@@iseg.pdb ! overwrite
+ write coor pdb name ligands/@seg@@iseg.pdb ! overwrite ; 4/25 : OK, but where are we supposed to get the initiali PDB files ?
  delete atom select all end
  incr iseg
  if @iseg .le. @nseg -

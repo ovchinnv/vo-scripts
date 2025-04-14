@@ -1,0 +1,39 @@
+#!/bin/bash
+# amino acid files for psilcs
+clib=~/scripts
+charmm=charmm_umich
+aas="ACDEFGHIKLMNPQRSTVWY"
+
+for i in `seq 1 ${#aas}` ; do 
+ im=$((i-1))
+ aa1=${aas:$im:1}
+ aa3=`echo ${aa1} | ${clib}/seq13 | tail -n1 | tr -d " "`
+ echo \"$aa3\"
+#
+$charmm << EOF
+* create a pdb file for a single aa
+*
+
+stream ~/scripts/charmm/readpsf36m.str
+read sequ card
+* title
+*
+3
+ALA $aa3 ALA
+
+generate $aa1 first none last none setup warn
+ic param
+ic seed 1 N 1 CA 1 C
+ic build
+coor init sele hydr end
+hbuild
+! residues and and 3 will have undefined atoms, but we do not need them :
+delete atom sele resid 1 .or. resid 3 end
+print coor sele .not. init end
+write coor pdb name ${aa3}.pdb
+*
+
+!write psf card name ${aa3}.psf ! there is a bug that requires to write a "title"
+!*
+EOF
+done
