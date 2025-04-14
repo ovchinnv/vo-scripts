@@ -14,7 +14,8 @@ if @{nion_int} .ne. @ionsneeded goto skip_ion
 
 ! proceed with replication
 read sequence @ion @ionsneeded ! generate @nion of @ion
-gene @{ionseg}
+!gene @{ionseg}
+gene @{ionseg} first none last none
 ! if coordinates are provided, in a pdb file, then read them here
 ! (this allows making solutions other than ionic)
 if @?ionpdb .ne. 0 then
