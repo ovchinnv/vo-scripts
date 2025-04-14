@@ -11,7 +11,16 @@ set resid
 !set topparcgenff ~/charmm/parameters/cgenff31
 stream @{clib}/readpsf36m.str
 
-stream psilcs-def.str
+stream psilcs-def.str ! put seg definitions into file
+!set seg1 PHE
+!set seg2 TRP
+!set seg3 LYS
+!set seg4 LEU
+!set seg5 ASP
+!set seg6 HSD
+!set seg7 MET
+!set seg8 TYR
+!set nseg 8
 
 set iseg 1
 label segs

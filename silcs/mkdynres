@@ -1,5 +1,5 @@
 #!/bin/bash
-# make pdb file with marked restraintsusing vmd:
+# make pdb file with marked restraint susing vmd:
 name=chi3-apo
 psffile=${name}_sn-psilcs.psf
 pdbfile=${name}_msn-psilcs.pdb
@@ -38,7 +38,6 @@ echo " corresponding to a distance restraint centered on $fbcenter with flat-bot
 echo " All groups are additionally restrained to remain within $sphere_rad of point ${sphere_center[@]} (protein RB motion must be restrained)"
 echo " Restraint force constants are $kfdist and $kfsphere kcal/mol/AA for pairwise and spherical restraints, respectively."
 echo " Will write restraint specification to file $config"
-
 echo "
 output {
  minwarnlev=-1 ! more permissive warnings
