@@ -19,6 +19,8 @@ if { $argc == 2 } {
 mol load psf $psffile
 mol addfile $pdbfile
 
+# mark restraints
+
 set all [atomselect top "all" ];
 $all set beta 0
 
@@ -44,4 +46,3 @@ set outfile [ file rootname $pdbfile ]-${nametag} ;
 $all writepdb ${outfile}.pdb
 # note : may need to remove the unit cell line from this pdb if running without PBC :
 exec sed -i /CRYST/d ${outfile}.pdb
-
