@@ -1,0 +1,7 @@
+4/15/25 : note that there are some unclear choices to make ; for example, should the peptide be included in surface atoms 
+(which means also the orientation set, unless specifically excluded, via rigid_body_weights file spec) ? 
+
+Exclufing the peptides from surface atoms might mean that the peptides could get dehydrated, so
+we would heave to restrain them to a sphere that is entirely within the solvated region ;
+
+A better possibility is to retain the peptides as surface atoms, but exclude them from the RGB set as above
