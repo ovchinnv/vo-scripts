@@ -20,9 +20,9 @@ fbwidth=`echo "$maxdist - $mindist" | bc -l` ;
 fbcenter=`echo "0.5 * ( $maxdist + $mindist )" | bc -l`
 
 sphere_center=( 42 36 18 );
-sphere_diam=20 ; # the diameter corresponds to the flat-bottom region
-# NOTE : it makes sense to make this sphere of diameter equal to the max distance between the CBs, so :
-sphere_diam=$maxdist
+sphere_diam=23 ; # the diameter corresponds to the flat-bottom region
+# NOTE : it makes sense to make this sphere of diameter no smaller than the max distance between the CBs, so :
+sphere_diam=`echo "if ( $maxdist > $sphere_diam ) { $maxdist } else { $sphere_diam }" |bc -l`
 #
 sphere_rad=`echo "$sphere_diam / 2" |bc -l`; 
 kfdist=20 ; # force constant for pairwise distance restraint
