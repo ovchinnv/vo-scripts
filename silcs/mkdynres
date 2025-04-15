@@ -3,57 +3,68 @@
 name=chi3-apo
 psffile=${name}_sn-psilcs.psf
 pdbfile=${name}_msn-psilcs.pdb
-outfile=${name}_msn-psilcs-res.pdb
-#vmd -dispdev text -args $psffile $pdbfile $outfile < mkpsilcres.vmd
+outfile=${name}_msn-psilcs-occu.pdb
+vmd -dispdev text -args $psffile $pdbfile $outfile < mkpsilcres.vmd
 numsilcs=`head -n1 $outfile | awk '{print $2}'`
 #echo $numsilcs
 #exit
 # create dynamo input file
 config="$name-psilcs.dyn"
-maxcv=`echo "$numsilcs + ( $numsilcs - 1 ) * $numsilcs / 2 " |bc -l` ; # number of restraints (absolute & relative, respectively)
+echo -n > $config
+cat watershell.dyn > $config
+#
+maxcv=`echo "$numsilcs + ( $numsilcs - 1 ) * $numsilcs / 2 " |bc` ; # number of restraints (absolute & relative, respectively)
 mindist=3.7 ; # minimum distance between any two residues
 maxdist=`echo "( ${numsilcs} -1 ) / 2 * $mindist" | bc -l` # maximum dist, e.g. assuming a beta-sheet like structure ; subtract two res for hairpin bends
 fbwidth=`echo "$maxdist - $mindist" | bc -l` ;
 fbcenter=`echo "0.5 * ( $maxdist + $mindist )" | bc -l`
 
 sphere_center=( 42 36 18 );
-sphere_rad=10 ; # the diameter corresponds to the flat-bottom region
-sphere_diam=`echo "$sphere_rad * 2" |bc`; 
-kforce=10 ;
+sphere_diam=20 ; # the diameter corresponds to the flat-bottom region
+# NOTE : it makes sense to make this sphere of diameter equal to the max distance between the CBs, so :
+sphere_diam=$maxdist
+#
+sphere_rad=`echo "$sphere_diam / 2" |bc -l`; 
+kfdist=20 ; # force constant for pairwise distance restraint
+kfsphere=100 ;# force constant for sphere restraint
 # summarize :
 echo " There are $numsilcs PSILCS groups with $maxcv total distance CVs ; the min/max distances are ${mindist}/${maxdist}"
 echo " corresponding to a distance restraint centered on $fbcenter with flat-bottom width $fbwidth"
 echo " All groups are additionally restrained to remain within $sphere_rad of point ${sphere_center[@]} (protein RB motion must be restrained)"
-echo " Restraint force constants are $kforce kcal/mol/AA"
+echo " Restraint force constants are $kfdist and $kfsphere kcal/mol/AA for pairwise and spherical restraints, respectively."
 echo " Will write restraint specification to file $config"
 
-echo -n > $config
 echo "
 output {
  minwarnlev=-1 ! more permissive warnings
 }
-
+structure_file=struc/${outfile}
 smcv_init {
- structure=${outfile}
  defer_init_dyna=yes
- : init maxcv=${maxcv}
+ : init maxcv ${maxcv}
 " >> $config
 cvind=0
 for i in `seq 1 $numsilcs` ; do 
  cvind=$((cvind+1))
- echo " : add dist_com p1 sele occupancy = $i end p2 ${sphere_center[@]} force $kforce fbwidth $sphere_diam ! restraint to 'active site'" >> $config
+ echo " : add dist_com p1 sele occupancy = $i end p2 ${sphere_center[@]} force $kfsphere fbwidth $sphere_diam !#$cvind restraint to 'active site'" >> $config
  echo " : set cvz 0 ind $cvind" >> $config
  for j in `seq $((i+1)) $numsilcs` ; do
   cvind=$((cvind+1))
-  echo " : add dist_com sele occupancy = $i end sele occupancy = $j end force $kforce fbwidth $fbwidth ! pairwise distance restraint" >> $config
+  echo " : add dist_com sele occupancy = $i end sele occupancy = $j end force $kfdist fbwidth $fbwidth !#$cvind pairwise distance restraint" >> $config
   echo " : set cvz $fbcenter ind $cvind" >> $config
  done
 done
 
 echo "
+ :list
+ :fill col inst
+ :print col inst name cvs-inst0.dat
+ :print col main name cvs0.dat
+! :test grad step 0.001 ! passsed
 ! stats
- : stat rene renm rene.dat ! restraint energy
+ : stat rene renm rene.dat - ! restraint energy
+   hist hnam hist.dat hcol inst ! instantaneous CV series
 ! dynamics
- : dyna rstr stat staf 10000
+ : dyna rstr stat staf 10000 hisf 1000
 }" >> $config
 

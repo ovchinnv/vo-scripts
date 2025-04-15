@@ -1,0 +1,43 @@
+#!/bin/bash
+qgnu=0;
+
+datafile="tmp.dat"
+
+what="Total force"
+what="Total rigid-body"
+what="Volume of bulk"
+what="Mass of bulk"
+#what="Instantaneous density"
+#what="Simulation density"
+what="Surface energy"
+#what="Curvature energy"
+#what="Surface boundary distance"
+#what="on a solvent atom"
+what="Surface boundary distance"
+what="Simulation density"
+#what="Instantaneous density"
+#what="Surface curvature at solvent"
+#what="RMS of solvent atom forces"
+#what="RMS of forced solute atom forces"
+
+
+#grep -hi "$what" *in*log | awk -F '[:)]' '{print $(NF-1)}' > $datafile
+#cat $datafile
+grep -h "$what" `ls *in*log|sort -V` | awk -F ':|\\(c' '{print $2}' > $datafile
+grep -hi "$what" *in*log | awk -F ':|\\(c' '{print $2}'
+#exit
+if [[ $qgnu -eq 1 ]]; then
+gnuplot <<EOF
+#set term dumb
+plot '$datafile' with linespoints
+pause 100
+EOF
+else
+octave <<EOF
+graphics_toolkit('gnuplot') ;
+d=load("$datafile") ;
+fprintf('%12.5f +/- %12.5f [%12.5f, %12.5f] \n', mean(d), std(d), min(d), max(d))
+plot(d)
+pause
+EOF
+fi
