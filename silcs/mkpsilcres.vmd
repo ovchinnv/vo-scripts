@@ -62,6 +62,7 @@ foreach sseg $silcsegs satoms $silcatoms {
  set sel [ atomselect top $cmd ];
  puts "Found [$sel num] atoms";
  set rsel [ $sel get residue ];
+# set rsel [ $sel get resid ];
  set rsel [ lsort -integer -uniq $rsel ];  # expect to have just one residue, but can handle more
  foreach r $rsel {
   incr iflag;
