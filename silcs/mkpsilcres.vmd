@@ -45,9 +45,9 @@ $all set occupancy 0
 #
 # define selections and assign occupancy values to each residue
 #
-set silcsegs  { "ALA" "ARG" "ASP" "GLN" "LEU" "THR" "GLU" "ILE" "PHE" "LYS" "SER" "VAL" "MET" "ASN" "PRO" "TYR" "HIS" "HSD" "HSE" "GLY" "TRP" "CYS" "MSE" };
+set silcsegs  { "ALA" "ARG" "ASP" "GLN" "LEU" "THR" "GLU" "ILE" "PHE" "LYS" "SER" "VAL" "MET" "ASN" "PRO" "TYR" "HIS" "HSD" "HSE" "GLY" "TRP" "CYS" };
 # in principle, want to have the flexibility of choosing different restraint groups for different residues
-#set silcatoms { "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB" };
+#set silcatoms { "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB" };
 set silcatoms {};
 foreach seg $silcsegs {
  lappend silcatoms "CB" ;
@@ -56,7 +56,11 @@ foreach seg $silcsegs {
 set iflag 0
 foreach sseg $silcsegs satoms $silcatoms {
  puts "Processing segment $sseg ..."
- set sel [ atomselect top "segname $sseg" ];
+ set cmd "\{segname \"$sseg.*\"\}" ;# I think this is the only way to do what I want; wildcards need to be in quotes ; curly braces optional
+# puts $cmd
+# set sel [ atomselect top "segname $sseg" ];
+ set sel [ atomselect top $cmd ];
+ puts "Found [$sel num] atoms";
  set rsel [ $sel get resid ];
  set rsel [ lsort -integer -uniq $rsel ];  # expect to have just one residue, but can handle more
  foreach r $rsel {
