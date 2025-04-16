@@ -6,6 +6,8 @@ pdbfile=${name}_msn-psilcs.pdb
 outfile=${name}_msn-psilcs-occu.pdb
 vmd -dispdev text -args $psffile $pdbfile $outfile < mkpsilcres.vmd
 numsilcs=`head -n1 $outfile | awk '{print $2}'`
+peplen=${numsilcs} # length of the desird circular peptide
+#peplen=12 # setting this differently from numsilcs (usually, larger) means that the peptides are allowed to be farther from each other;
 #echo $numsilcs
 #exit
 # create dynamo input file
@@ -15,7 +17,10 @@ cat watershell.dyn > $config
 #
 maxcv=`echo "$numsilcs + ( $numsilcs - 1 ) * $numsilcs / 2 " |bc` ; # number of restraints (absolute & relative, respectively)
 mindist=3.7 ; # minimum distance between any two residues
-maxdist=`echo "( ${numsilcs} -1 ) / 2 * $mindist" | bc -l` # maximum dist, e.g. assuming a beta-sheet like structure ; subtract two res for hairpin bends
+maxdist=`echo "( ${peplen} -1 ) / 2 * $mindist" | bc -l` # maximum dist, e.g. assuming a beta-sheet like structure ; subtract two res for hairpin bends
+# ^ NOTE : the above assumes that all of the peptide residues are represented in the psilcs group, which is not necessarily optimal ; e.g. we might want to 
+# only find a few pockets (have 3-4 residues) ; with the rest of the peptide connected with linkers, like G/S/As ; so might have a peplen variable, larger than
+# numsilcs !
 fbwidth=`echo "$maxdist - $mindist" | bc -l` ;
 fbcenter=`echo "0.5 * ( $maxdist + $mindist )" | bc -l`
 
