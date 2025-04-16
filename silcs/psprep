@@ -1,0 +1,17 @@
+#!/bin/bash
+
+design=27
+
+blib=~/scripts
+clib=~/scripts/charmm
+charmm=charmm327 # _repo
+
+# create file with psilcs ligands
+octave <<< 'nsamp=8 ; qnoreplace=1 ; psampsilcs'
+# add silcs ligands to psf/pdb
+clib='.'
+name=chi3-apo
+$charmm psffile=${name}_sn corfile=${name}_msn -i ${clib}/psilcs.inp -o psilcs.out
+#
+# create dynamo restraint file
+./mkdynres

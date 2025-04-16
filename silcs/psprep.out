@@ -1,0 +1,94 @@
+Sampled LEU TRP HSD SER ASP PHE TYR THR 
+ Parameter: PSFFILE <- "CHI3-APO_SN"
+ Parameter: CORFILE <- "CHI3-APO_MSN"
+Info) VMD for LINUXAMD64, version 1.9.2a35 (October 24, 2013)
+Info) http://www.ks.uiuc.edu/Research/vmd/                         
+Info) Email questions and bug reports to vmd@ks.uiuc.edu           
+Info) Please include this reference in published work using VMD:   
+Info)    Humphrey, W., Dalke, A. and Schulten, K., `VMD - Visual   
+Info)    Molecular Dynamics', J. Molec. Graphics 1996, 14.1, 33-38.
+Info) -------------------------------------------------------------
+Info) Multithreading available, 8 CPUs detected.
+Info) Free system memory: 13539MB (85%)
+Info) Creating CUDA device pool and initializing hardware...
+Info) Detected 1 available CUDA accelerator:
+Info) [0] GeForce GT 650M     2 SM_3.0 @ 0.83 GHz, 2.0GB RAM, KTO, OIO, ZCP
+Info) Dynamically loaded 2 plugins in directory:
+Info) /usr/local/lib/vmd/plugins/LINUXAMD64/molfile
+ERROR) Illegal stereo mode: SideBySide
+chi3-apo
+chi3-apo_sn-psilcs.psf
+chi3-apo_msn-psilcs.pdb
+chi3-apo_msn-psilcs-occu.pdb
+psfplugin) Detected a Charmm PSF file
+psfplugin) Detected a Charmm PSF EXTEnded file
+Info) Using plugin psf for structure file chi3-apo_sn-psilcs.psf
+Info) Analyzing structure ...
+Info)    Atoms: 14109
+Info)    Bonds: 14178
+Info)    Angles: 13286  Dihedrals: 15429  Impropers: 988  Cross-terms: 360
+Info)    Bondtypes: 0  Angletypes: 0  Dihedraltypes: 0  Impropertypes: 0
+Info)    Residues: 3149
+Info)    Waters: 2773
+Info)    Segments: 13
+Info)    Fragments: 2788   Protein: 9   Nucleic: 0
+Info) Using plugin pdb for coordinates from file chi3-apo_msn-psilcs.pdb
+Info) Finished with coordinate file chi3-apo_msn-psilcs.pdb.
+0
+atomselect0
+ "ALA" "ARG" "ASP" "GLN" "LEU" "THR" "GLU" "ILE" "PHE" "LYS" "SER" "VAL" "MET" "ASN" "PRO" "TYR" "HIS" "HSD" "HSE" "GLY" "TRP" "CYS" 
+0
+Processing segment ALA ...
+Found 0 atoms
+Processing segment ARG ...
+Found 0 atoms
+Processing segment ASP ...
+Found 12 atoms
+Processing segment GLN ...
+Found 0 atoms
+Processing segment LEU ...
+Found 19 atoms
+Processing segment THR ...
+Found 14 atoms
+Processing segment GLU ...
+Found 0 atoms
+Processing segment ILE ...
+Found 0 atoms
+Processing segment PHE ...
+Found 20 atoms
+Processing segment LYS ...
+Found 0 atoms
+Processing segment SER ...
+Found 11 atoms
+Processing segment VAL ...
+Found 0 atoms
+Processing segment MET ...
+Found 0 atoms
+Processing segment ASN ...
+Found 0 atoms
+Processing segment PRO ...
+Found 0 atoms
+Processing segment TYR ...
+Found 21 atoms
+Processing segment HIS ...
+Found 0 atoms
+Processing segment HSD ...
+Found 17 atoms
+Processing segment HSE ...
+Found 0 atoms
+Processing segment GLY ...
+Found 0 atoms
+Processing segment TRP ...
+Found 24 atoms
+Processing segment CYS ...
+Found 0 atoms
+Info) Opened coordinate file chi3-apo_msn-psilcs-occu.pdb for writing.
+Info) Finished with coordinate file chi3-apo_msn-psilcs-occu.pdb.
+1
+Info) VMD for LINUXAMD64, version 1.9.2a35 (October 24, 2013)
+Info) Exiting normally.
+ There are 8 PSILCS groups with 36 total distance CVs ; the min/max distances are 3.7/12.95000000000000000000
+ corresponding to a distance restraint centered on 8.32500000000000000000 with flat-bottom width 9.25000000000000000000
+ All groups are additionally restrained to remain within 11.50000000000000000000 of point 42 36 18 (protein RB motion must be restrained)
+ Restraint force constants are 20 and 100 kcal/mol/AA for pairwise and spherical restraints, respectively.
+ Will write restraint specification to file chi3-apo-psilcs.dyn

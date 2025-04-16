@@ -5,7 +5,9 @@ end
 %
 outfile='psilcs-def.str';
 %
-qnoreplace=1; % default is to draw with replacement ; however, it might yet be useful to draw without replacement for more aa diversity
+if (~exist('qnoreplace'))
+ qnoreplace=1; % default is to draw with replacement ; however, it might yet be useful to draw without replacement for more aa diversity
+end
 % array of all residues that can be sampled to create a psilcs group (e.g. peptide)
 allpsilcs={ 'ALA' 'ARG' 'ASP' 'GLN' 'LEU' 'THR' 'GLU' 'ILE' 'PHE' 'LYS' 'SER' 'VAL' 'MET' 'ASN' 'PRO' 'TYR' 'HSD' 'GLY' 'TRP' 'CYS' };
 % Now, define the probabilities with which the above residues will be chosen ; this is far from an easy task; at minimum, I do not want astronomical possibilities
