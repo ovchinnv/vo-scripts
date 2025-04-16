@@ -1,0 +1,3874 @@
+1
+                 Chemistry at HARvard Macromolecular Mechanics
+           (CHARMM) - Developmental Version 40a1     August 15, 2014            
+                             Git commit ID 626857b                              
+       Copyright(c) 1984-2014  President and Fellows of Harvard College
+                              All Rights Reserved
+        Current operating system: Linux-6.12.12-1-lts(x86_64)@localhost         
+                 Created on  4/16/25 at 16:16:56 by user: taly        
+
+            Maximum number of ATOMS:    360720, and RESidues:      120240
+ RDTITL> * ADD PSILCS LIGANDS (AAS) TO A SOLVATED PROTEIN
+ RDTITL> *
+  
+ CHARMM>     
+  
+ CHARMM>    set version 36
+ Parameter: VERSION <- "36"
+  
+ CHARMM>     
+  
+ CHARMM>    set clib ~/scripts/charmm
+ Parameter: CLIB <- "~/SCRIPTS/CHARMM"
+  
+ CHARMM>     
+  
+ CHARMM>    set resid
+ Parameter: RESID <- "" <empty>
+  
+ CHARMM>    !set cgenff
+ CHARMM>    !set xplor
+ CHARMM>    !set topparcgenff ~/charmm/parameters/cgenff31
+ CHARMM>    stream @{clib}/readpsf36m.str
+ Parameter: CLIB -> "~/SCRIPTS/CHARMM"
+ VOPEN> Attempting to open::/home/taly/scripts/charmm/readpsf36m.str::
+ OPNLGU> Unit 99 opened for READONLY access to /home/taly/scripts/charmm/readpsf36m.str
+
+                    INPUT STREAM SWITCHING TO UNIT    99
+ RDTITL> * READS PSF FILE & SETS UP FOR DYNAMICS OR MINIMIZATION
+ RDTITL> *
+ Parameter: IN1 <- "" <empty>
+  
+ CHARMM>     
+  
+ CHARMM>    nobomb
+  
+ CHARMM>    set wrnlev ?wrnlev
+ RDCMND substituted energy or value "?WRNLEV" to "5"
+ Parameter: WRNLEV <- "5"
+  
+ CHARMM>    wrnlev 2
+  
+ CHARMM>     
+  
+ CHARMM>    if @?version eq 0 set version 36-jul18
+ Comparing "1" and "0".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @version ne 36 error WRONG PARAMETER VERSION : REQUESTED @version, PROVIDING 36-jul18
+ Parameter: VERSION -> "36"
+ Parameter: VERSION -> "36"
+ Comparing "36" and "36".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @?resid eq 0 then
+ Comparing "1" and "0".
+ IF test evaluated as false.  Skip to ELSE or ENDIF
+  
+ CHARMM>     set resid resid
+ Parameter: RESID <- "RESID"
+  
+ CHARMM>    endif
+  
+ CHARMM>     
+  
+ CHARMM>    if @?xplor eq 0 then
+ Comparing "0" and "0".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>     set xplor
+ Parameter: XPLOR <- "" <empty>
+  
+ CHARMM>    else
+ Skip commands until next ENDIF
+  
+ CHARMM>     
+  
+ CHARMM>    if @?toppar eq 0 set toppar   ~/charmm/parameters/c36-jul18
+ Comparing "0" and "0".
+ IF test evaluated as true.  Performing command
+ Parameter: TOPPAR <- "~/CHARMM/PARAMETERS/C36-JUL18"
+  
+ CHARMM>    if @?topparcgenff eq 0 set topparcgenff   ~/charmm/parameters/cgenff2b8
+ Comparing "0" and "0".
+ IF test evaluated as true.  Performing command
+ Parameter: TOPPARCGENFF <- "~/CHARMM/PARAMETERS/CGENFF2B8"
+  
+ CHARMM>    !
+ CHARMM>    if @?format eq 0 set format card
+ Comparing "0" and "0".
+ IF test evaluated as true.  Performing command
+ Parameter: FORMAT <- "CARD"
+  
+ CHARMM>    !
+ CHARMM>    if @?string eq 0 then
+ Comparing "0" and "0".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>     set string
+ Parameter: STRING <- "" <empty>
+  
+ CHARMM>    else
+ Skip commands until next ENDIF
+  
+ CHARMM>    !
+ CHARMM>    !!!!!!!! read files
+ CHARMM>    !==============================================================
+ CHARMM>    ! protein
+ CHARMM>    if @?imm1 eq 0 then
+ Comparing "0" and "0".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>     @string open unit 1 read form name @TOPPAR/top_all36_prot.rtf
+ Parameter: STRING -> "" <empty>
+ Parameter: TOPPAR -> "~/CHARMM/PARAMETERS/C36-JUL18"
+ VOPEN> Attempting to open::/home/taly/charmm/parameters/c36-jul18/top_all36_prot.rtf::
+ OPNLGU> Unit  1 opened for READONLY access to /home/taly/charmm/parameters/c36-jul18/top_all36_prot.rtf
+  
+ CHARMM>     read rtf card unit 1
+ MAINIO> Residue topology file being read from unit   1.
+ TITLE> *>>>>>>>>CHARMM36 ALL-HYDROGEN TOPOLOGY FILE FOR PROTEINS <<<<<<
+ TITLE> *>>>>> INCLUDES PHI, PSI CROSS TERM MAP (CMAP) CORRECTION <<<<<<<
+ TITLE> *>>>>>>>>>>>>>>>>>>>>>>>>>> MAY 2011 <<<<<<<<<<<<<<<<<<<<<<<<<<<<
+ TITLE> * ALL COMMENTS TO THE CHARMM WEB SITE: WWW.CHARMM.ORG
+ TITLE> *             PARAMETER SET DISCUSSION FORUM
+ TITLE> *
+  
+ CHARMM>     @string close unit 1
+ Parameter: STRING -> "" <empty>
+ VCLOSE: Closing unit    1 with status "KEEP"
+  
+ CHARMM>     @string open unit 1 read form name @TOPPAR/par_all36_prot.prm
+ Parameter: STRING -> "" <empty>
+ Parameter: TOPPAR -> "~/CHARMM/PARAMETERS/C36-JUL18"
+ VOPEN> Attempting to open::/home/taly/charmm/parameters/c36-jul18/par_all36_prot.prm::
+ OPNLGU> Unit  1 opened for READONLY access to /home/taly/charmm/parameters/c36-jul18/par_all36_prot.prm
+  
+ CHARMM>     read param card flex unit 1
+
+          PARAMETER FILE BEING READ FROM UNIT  1
+ TITLE> *>>>> CHARMM36 ALL-HYDROGEN PARAMETER FILE FOR PROTEINS <<<<<<<<<<
+ TITLE> *>>>>> INCLUDES PHI, PSI CROSS TERM MAP (CMAP) CORRECTION <<<<<<<<
+ TITLE> *>>>>>>>>>>>>>>>>>>>>>>>>>> FEB. 2012 <<<<<<<<<<<<<<<<<<<<<<<<<<<<
+ TITLE> * ALL COMMENTS TO THE CHARMM WEB SITE: WWW.CHARMM.ORG
+ TITLE> *             PARAMETER SET DISCUSSION FORUM
+ TITLE> *
+ PARMIO> NONBOND, HBOND lists and IMAGE atoms cleared.
+  
+ CHARMM>     @string close unit 1
+ Parameter: STRING -> "" <empty>
+ VCLOSE: Closing unit    1 with status "KEEP"
+  
+ CHARMM>    else
+ Skip commands until next ENDIF
+  
+ CHARMM>    !
+ CHARMM>    !stop
+ CHARMM>    !===============================================================
+ CHARMM>    ! lipids, if needed
+ CHARMM>    label lipid
+  
+ CHARMM>    if @?lipid eq 0 then
+ Comparing "0" and "0".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>     set lipid 0
+ Parameter: LIPID <- "0"
+  
+ CHARMM>    else
+ Skip commands until next ENDIF
+  
+ CHARMM>    !===============================================================
+ CHARMM>    ! carbohydrates, if needed
+ CHARMM>    label carb
+  
+ CHARMM>    if @?carb eq 0 then
+ Comparing "0" and "0".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>     set carb 0
+ Parameter: CARB <- "0"
+  
+ CHARMM>    else
+ Skip commands until next ENDIF
+  
+ CHARMM>    !===============================================================
+ CHARMM>    ! nucleotides, if needed
+ CHARMM>    label nucl
+  
+ CHARMM>    if @?nucl eq 0 then
+ Comparing "0" and "0".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>     set nucl 0
+ Parameter: NUCL <- "0"
+  
+ CHARMM>    else
+ Skip commands until next ENDIF
+  
+ CHARMM>    !===============================================================
+ CHARMM>    ! nucleic acids, if needed
+ CHARMM>    label na
+  
+ CHARMM>    if @?na eq 0 then
+ Comparing "0" and "0".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>     set na 0
+ Parameter: NA <- "0"
+  
+ CHARMM>    else
+ Skip commands until next ENDIF
+  
+ CHARMM>    if @na eq 1 then
+ Parameter: NA -> "0"
+ Comparing "0" and "1".
+ IF test evaluated as false.  Skip to ELSE or ENDIF
+  
+ CHARMM>    !
+ CHARMM>    if @lipid eq 1 then
+ Parameter: LIPID -> "0"
+ Comparing "0" and "1".
+ IF test evaluated as false.  Skip to ELSE or ENDIF
+  
+ CHARMM>    !
+ CHARMM>    if @carb eq 1 then
+ Parameter: CARB -> "0"
+ Comparing "0" and "1".
+ IF test evaluated as false.  Skip to ELSE or ENDIF
+  
+ CHARMM>    !
+ CHARMM>    if @nucl eq 1 then
+ Parameter: NUCL -> "0"
+ Comparing "0" and "1".
+ IF test evaluated as false.  Skip to ELSE or ENDIF
+  
+ CHARMM>    !
+ CHARMM>    !==============================================================
+ CHARMM>    ! cgenff
+ CHARMM>    label cgenff
+  
+ CHARMM>    if @?cgenff eq 0 then
+ Comparing "0" and "0".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>     set cgenff 0
+ Parameter: CGENFF <- "0"
+  
+ CHARMM>    else
+ Skip commands until next ENDIF
+  
+ CHARMM>    if @cgenff eq 1 then
+ Parameter: CGENFF -> "0"
+ Comparing "0" and "1".
+ IF test evaluated as false.  Skip to ELSE or ENDIF
+  
+ CHARMM>    !
+ CHARMM>    !======= water and ions ========================================
+ CHARMM>    label water
+  
+ CHARMM>    if @?nowat eq 0 then
+ Comparing "0" and "0".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>     @string open read card unit 11 name @TOPPAR/toppar_water_ions.str
+ Parameter: STRING -> "" <empty>
+ Parameter: TOPPAR -> "~/CHARMM/PARAMETERS/C36-JUL18"
+ VOPEN> Attempting to open::/home/taly/charmm/parameters/c36-jul18/toppar_water_ions.str::
+ OPNLGU> Unit 11 opened for READONLY access to /home/taly/charmm/parameters/c36-jul18/toppar_water_ions.str
+  
+ CHARMM>     stream unit 11 parser local
+
+                    INPUT STREAM SWITCHING TO UNIT    11
+ RDTITL> * TOPLOGY AND PARAMETER INFORMATION FOR WATER AND IONS.
+ RDTITL> *
+ Parameter: IN1 <- "PARSER"
+ Parameter: IN2 <- "LOCAL"
+  
+ CHARMM>     
+  
+ CHARMM>    !Testcase
+ CHARMM>    !test_water_ions.inp
+ CHARMM>     
+  
+ CHARMM>    ! IMPORTANT NOTE: this file contains NBFixes between carboxylates and sodium,
+ CHARMM>    ! which will only apply if the main files containing carboxylate atom types
+ CHARMM>    ! have been read in first!
+ CHARMM>     
+  
+ CHARMM>    !references
+ CHARMM>    !
+ CHARMM>    !TIP3P water model
+ CHARMM>    !
+ CHARMM>    !W.L. Jorgensen; J.Chandrasekhar; J.D. Madura; R.W. Impey;
+ CHARMM>    !M.L. Klein; "Comparison of simple potential functions for
+ CHARMM>    !simulating liquid water", J. Chem. Phys. 79 926-935 (1983).
+ CHARMM>    !
+ CHARMM>    !IONS
+ CHARMM>    !
+ CHARMM>    !Ions from Roux and coworkers
+ CHARMM>    !
+ CHARMM>    !Beglov, D. and Roux, B., Finite Representation of an Infinite
+ CHARMM>    !Bulk System: Solvent Boundary Potential for Computer Simulations,
+ CHARMM>    !Journal of Chemical Physics, 1994, 100: 9050-9063
+ CHARMM>    !
+ CHARMM>    !ZINC
+ CHARMM>    !
+ CHARMM>    !Stote, R.H. and Karplus, M. Zinc Binding in Proteins and
+ CHARMM>    !Solution: A Simple but Accurate Nonbonded Representation, PROTEINS:
+ CHARMM>    !Structure, Function, and Genetics 23:12-31 (1995)
+ CHARMM>     
+  
+ CHARMM>    !test "append" to determine if previous toppar files have been read and
+ CHARMM>    !add append to "read rtf card" if true
+ CHARMM>    set nat ?NATC
+ RDCMND substituted energy or value "?NATC" to "53"
+ Parameter: NAT <- "53"
+  
+ CHARMM>    set app
+ Parameter: APP <- "" <empty>
+  
+ CHARMM>    !We're exploiting what is arguably a bug in the parser. On the left hand side,
+ CHARMM>    !the quotes have priority, so NAT is correctly substituted. On the right hand
+ CHARMM>    !side, the ? has priority and NATC" (sic) is not a valid substitution...
+ CHARMM>    if "@NAT" ne "?NATC" if @nat ne 0 set app append
+ Parameter: NAT -> "53"
+ Parameter: NAT -> "53"
+ RDCMND: can not substitute energy "?NATC""
+ Comparing ""53"" and ""?NATC"".
+ IF test evaluated as true.  Performing command
+ Comparing "53" and "0".
+ IF test evaluated as true.  Performing command
+ Parameter: APP <- "APPEND"
+  
+ CHARMM>     
+  
+ CHARMM>    read rtf card @app
+ Parameter: APP -> "APPEND"
+ MAINIO> Residue topology file being read from unit  11.
+ RDTITL> * TOPOLOGY FOR WATER AND IONS
+ RDTITL> *
+  
+ CHARMM>     
+  
+ CHARMM>    read para card flex @app
+ Parameter: APP -> "APPEND"
+
+          PARAMETER FILE BEING READ FROM UNIT 11
+ RDTITL> * PARAMETERS FOR WATER AND IONS
+ RDTITL> *
+ PARMIO> NONBOND, HBOND lists and IMAGE atoms cleared.
+  
+ CHARMM>     
+  
+ CHARMM>    ! The following section contains NBFixes for sodium interacting with
+ CHARMM>    ! carboxylate oxygens of various CHARMM force fields. It will generate
+ CHARMM>    ! level -1 warnings whenever any of these force fields have not been
+ CHARMM>    ! read prior to the current stream file. Since we don't want to force
+ CHARMM>    ! the user to always read all the force fields, we're suppressing the
+ CHARMM>    ! warnings. The only side effect is that you will have "most severe
+ CHARMM>    ! warning was at level 0" at the end of your output. Also note that
+ CHARMM>    ! the user is responsible for reading the current file last if they
+ CHARMM>    ! want the NBFixes to apply. A more elegant solution would require new
+ CHARMM>    ! features to be added to CHARMM.
+ CHARMM>    ! parallel fix, to avoid duplicated messages in the log
+ CHARMM>    set para
+ Parameter: PARA <- "" <empty>
+  
+ CHARMM>    if ?NUMNODE gt 1 set para node 0
+ RDCMND substituted energy or value "?NUMNODE" to "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    set wrn ?WRNLEV
+ RDCMND substituted energy or value "?WRNLEV" to "2"
+ Parameter: WRN <- "2"
+  
+ CHARMM>    ! Some versions of CHARMM don't seem to initialize wrnlev...
+ CHARMM>    if "@WRN" eq "?WRNLEV" set wrn 5
+ Parameter: WRN -> "2"
+ RDCMND: can not substitute energy "?WRNLEV""
+ Comparing ""2"" and ""?WRNLEV"".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    set bom ?bomlev
+ RDCMND substituted energy or value "?BOMLEV" to "-1"
+ Parameter: BOM <- "-1"
+  
+ CHARMM>    WRNLEV -1 @PARA
+ Parameter: PARA -> "" <empty>
+  
+ CHARMM>    BOMLEV -1 @PARA
+ Parameter: PARA -> "" <empty>
+  
+ CHARMM>    read para card flex append
+
+          PARAMETER FILE BEING READ FROM UNIT 11
+ RDTITL> * NBFIX BETWEEN CARBOXYLATE AND SODIUM
+ RDTITL> *
+ PARMIO> NONBOND, HBOND lists and IMAGE atoms cleared.
+  
+ CHARMM>    BOMLEV @bom @PARA
+ Parameter: BOM -> "-1"
+ Parameter: PARA -> "" <empty>
+  
+ CHARMM>    WRNLEV @wrn @PARA
+ Parameter: WRN -> "2"
+ Parameter: PARA -> "" <empty>
+  
+ CHARMM>     
+  
+ CHARMM>    return
+ VCLOSE: Closing unit   11 with status "KEEP"
+
+                    RETURNING TO INPUT STREAM    99
+  
+ CHARMM>    endif
+  
+ CHARMM>    !
+ CHARMM>    !====== additional parameters if requested =====================
+ CHARMM>    if @?adpar ne 0 then
+ Comparing "0" and "0".
+ IF test evaluated as false.  Skip to ELSE or ENDIF
+  
+ CHARMM>    !===============================================================
+ CHARMM>    if @?adstr ne 0 then
+ Comparing "0" and "0".
+ IF test evaluated as false.  Skip to ELSE or ENDIF
+  
+ CHARMM>    !===============================================================
+ CHARMM>    if @?adstr1 ne 0 then
+ Comparing "0" and "0".
+ IF test evaluated as false.  Skip to ELSE or ENDIF
+  
+ CHARMM>    !===============================================================
+ CHARMM>    if @?adstr2 ne 0 then
+ Comparing "0" and "0".
+ IF test evaluated as false.  Skip to ELSE or ENDIF
+  
+ CHARMM>    !===============================================================
+ CHARMM>    if @?adstr3 ne 0 then
+ Comparing "0" and "0".
+ IF test evaluated as false.  Skip to ELSE or ENDIF
+  
+ CHARMM>    !===============================================================
+ CHARMM>    !
+ CHARMM>    label read_psf
+  
+ CHARMM>    if @?psffile eq 0 return
+ Comparing "1" and "0".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    @string open unit 1 read @format name @psffile.psf
+ Parameter: STRING -> "" <empty>
+ Parameter: FORMAT -> "CARD"
+ Parameter: PSFFILE -> "CHI3-APO_SN"
+ VOPEN> Attempting to open::chi3-apo_sn.psf::
+ OPNLGU> Unit  1 opened for READONLY access to chi3-apo_sn.psf
+  
+ CHARMM>    read psf @format unit 1 @xplor
+ Parameter: FORMAT -> "CARD"
+ Parameter: XPLOR -> "" <empty>
+ MAINIO> Protein structure file being read from unit   1.
+ PSFRD2> Reading PSF in the expanded format.
+ TITLE>  * SCRIPT TO ADD IONS INTO A SOLVATED BOX BY REPLACING SOME WATERS
+ TITLE>  *  DATE:     4/13/25     13:30:12      CREATED BY USER: taly
+ TITLE>  *
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        5   Number of residues   =     3149
+         Number of atoms         =    13995   Number of groups     =     4493
+         Number of bonds         =    14067   Number of angles     =    13076
+         Number of dihedrals     =    15131   Number of impropers  =      981
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3320   Number of HB donors  =     6209
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>    @string close unit 1
+ Parameter: STRING -> "" <empty>
+ VCLOSE: Closing unit    1 with status "KEEP"
+  
+ CHARMM>    if @?cor eq 0 set cor 1
+ Comparing "0" and "0".
+ IF test evaluated as true.  Performing command
+ Parameter: COR <- "1"
+  
+ CHARMM>    if @?crd eq 0 set crd 1
+ Comparing "0" and "0".
+ IF test evaluated as true.  Performing command
+ Parameter: CRD <- "1"
+  
+ CHARMM>    if @?pdb eq 0 set pdb 1
+ Comparing "0" and "0".
+ IF test evaluated as true.  Performing command
+ Parameter: PDB <- "1"
+  
+ CHARMM>     
+  
+ CHARMM>    if @?corfile eq 0 set cor 0
+ Comparing "1" and "0".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @?crdfile eq 0 set crd 0
+ Comparing "0" and "0".
+ IF test evaluated as true.  Performing command
+ Parameter: CRD <- "0"
+  
+ CHARMM>    if @?pdbfile eq 0 set pdb 0
+ Comparing "0" and "0".
+ IF test evaluated as true.  Performing command
+ Parameter: PDB <- "0"
+  
+ CHARMM>     
+  
+ CHARMM>    if @cor ne 0 @string open unit 1 read @format name @corfile.cor
+ Parameter: COR -> "1"
+ Parameter: STRING -> "" <empty>
+ Parameter: FORMAT -> "CARD"
+ Parameter: CORFILE -> "CHI3-APO_MSN"
+ Comparing "1" and "0".
+ IF test evaluated as true.  Performing command
+ VOPEN> Attempting to open::chi3-apo_msn.cor::
+ OPNLGU> Unit  1 opened for READONLY access to chi3-apo_msn.cor
+  
+ CHARMM>    if @cor ne 0 read coords @format unit 1
+ Parameter: COR -> "1"
+ Parameter: FORMAT -> "CARD"
+ Comparing "1" and "0".
+ IF test evaluated as true.  Performing command
+          SPATIAL COORDINATES BEING READ FROM UNIT  1
+ TITLE> * SCRIPT TO ADD IONS INTO A SOLVATED BOX BY REPLACING SOME WATERS
+ TITLE> *  DATE:     4/13/25     13:30:13      CREATED BY USER: TALY
+ TITLE> *
+  
+ CHARMM>    !
+ CHARMM>    if @crd ne 0 @string open unit 1 read @format name @corfile.crd
+ Parameter: CRD -> "0"
+ Parameter: STRING -> "" <empty>
+ Parameter: FORMAT -> "CARD"
+ Parameter: CORFILE -> "CHI3-APO_MSN"
+ Comparing "0" and "0".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @crd ne 0 read coords @format unit 1
+ Parameter: CRD -> "0"
+ Parameter: FORMAT -> "CARD"
+ Comparing "0" and "0".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    !
+ CHARMM>    if @pdb ne 0 @string open unit 1 card read name @pdbfile.pdb
+ Parameter: PDB -> "0"
+ Parameter: STRING -> "" <empty>
+  * WARNING * <PARSUB> Command ignored. Token not found: >PDBFILE<
+
+      ***** LEVEL  0 WARNING FROM <PARSE1> *****
+      ***** Error in parameter substitution.
+      ******************************************
+      BOMLEV ( -1) IS NOT REACHED. WRNLEV IS  2
+
+  
+ CHARMM>    if @pdb ne 0 read coords pdb unit 1 @resid
+ Parameter: PDB -> "0"
+ Parameter: RESID -> "RESID"
+ Comparing "0" and "0".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    @string close unit 1
+ Parameter: STRING -> "" <empty>
+ VCLOSE: Closing unit    1 with status "KEEP"
+  
+ CHARMM>     
+  
+ CHARMM>    wrnlev @wrnlev
+ Parameter: WRNLEV -> "5"
+  
+ CHARMM>    return
+ VCLOSE: Closing unit   99 with status "KEEP"
+
+                    RETURNING TO INPUT STREAM     5
+  
+ CHARMM>     
+  
+ CHARMM>    stream psilcs-def.str
+ VOPEN> Attempting to open::psilcs-def.str::
+ OPNLGU> Unit 99 opened for READONLY access to psilcs-def.str
+
+                    INPUT STREAM SWITCHING TO UNIT    99
+ RDTITL> * PSILCS RESIDUES
+ RDTITL> *
+ Parameter: IN1 <- "" <empty>
+  
+ CHARMM>     
+  
+ CHARMM>    set seg1 LEU
+ Parameter: SEG1 <- "LEU"
+  
+ CHARMM>    set seg2 TRP
+ Parameter: SEG2 <- "TRP"
+  
+ CHARMM>    set seg3 HSD
+ Parameter: SEG3 <- "HSD"
+  
+ CHARMM>    set seg4 SER
+ Parameter: SEG4 <- "SER"
+  
+ CHARMM>    set seg5 ASP
+ Parameter: SEG5 <- "ASP"
+  
+ CHARMM>    set seg6 PHE
+ Parameter: SEG6 <- "PHE"
+  
+ CHARMM>    set seg7 TYR
+ Parameter: SEG7 <- "TYR"
+  
+ CHARMM>    set seg8 THR
+ Parameter: SEG8 <- "THR"
+  
+ CHARMM>    set nseg 8
+ Parameter: NSEG <- "8"
+  
+ CHARMM>    return
+ VCLOSE: Closing unit   99 with status "KEEP"
+
+                    RETURNING TO INPUT STREAM     5
+  
+ CHARMM>     
+  
+ CHARMM>    set iseg 1
+ Parameter: ISEG <- "1"
+  
+ CHARMM>    label segs
+  
+ CHARMM>    ! set candidates  .byres. ( ( point 44 43 19 cut 11 ) .and. segid wat )
+ CHARMM>     set candidates  .byres. ( ( point 42 36 18 cut 11 ) .and. segid wat ) ! replace waters in the vicinity of a putative active site
+ Parameter: CANDIDATES <- ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+  
+ CHARMM>    !
+ CHARMM>    ! add ligands using ionization scripts
+ CHARMM>     set ionsneeded 1
+ Parameter: IONSNEEDED <- "1"
+  
+ CHARMM>     set ion @seg@@iseg
+ Parameter: ISEG -> "1"
+ Parameter: SEG1 -> "LEU"
+ Parameter: ION <- "LEU"
+  
+ CHARMM>     set ionseg @seg@@iseg ! note that, to avoid duplicate segnames, may need to append @iseg to segment name, and/or to modify it further
+ Parameter: ISEG -> "1"
+ Parameter: SEG1 -> "LEU"
+ Parameter: IONSEG <- "LEU"
+  
+ CHARMM>     set ionpdb ligands/@seg@@iseg.pdb
+ Parameter: ISEG -> "1"
+ Parameter: SEG1 -> "LEU"
+ Parameter: IONPDB <- "LIGANDS/LEU.PDB"
+  
+ CHARMM>     stream @{clib}/addions.str
+ Parameter: CLIB -> "~/SCRIPTS/CHARMM"
+ VOPEN> Attempting to open::/home/taly/scripts/charmm/addions.str::
+ OPNLGU> Unit 99 opened for READONLY access to /home/taly/scripts/charmm/addions.str
+
+                    INPUT STREAM SWITCHING TO UNIT    99
+ RDTITL> * SCRIPT TO REPLACE SOME WATERS WITH IONS
+ RDTITL> *
+ Parameter: IN1 <- "" <empty>
+  
+ CHARMM>     
+  
+ CHARMM>    define replacement select @candidates .and. type OH2 end ! select num of water molecules
+ Parameter: CANDIDATES -> ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+ SELRPN>     76 atoms have been selected out of  13995
+  
+ CHARMM>    set repl ?nsel ! number of replacement candidates
+ RDCMND substituted energy or value "?NSEL" to "76"
+ Parameter: REPL <- "76"
+  
+ CHARMM>    if @repl .lt. @ionsneeded system "echo ADD_ION ERROR: SELECTION NOT BIG ENOUGH TO ACCOMODATE @IONSNEEDED IONS, SKIPPING..."
+ Parameter: REPL -> "76"
+ Parameter: IONSNEEDED -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "76" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @repl .lt. @ionsneeded goto skip_ion
+ Parameter: REPL -> "76"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "76" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    calc nion_int = INT ( @ionsneeded )
+ Parameter: IONSNEEDED -> "1"
+Evaluating: INT(1)
+ Parameter: NION_INT <- "1"
+  
+ CHARMM>     
+  
+ CHARMM>    if @ionsneeded .eq. 0 goto skip_ion   ! nothing to do: system is neutral
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "0".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @{nion_int} .ne. @ionsneeded system "echo ADD_ION ERROR: SYSTEM CHARGE NOT AN INTEGER, SKIPPING..."
+ Parameter: NION_INT -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @{nion_int} .ne. @ionsneeded goto skip_ion
+ Parameter: NION_INT -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    ! proceed with replication
+ CHARMM>    read sequence @ion @ionsneeded ! generate @nion of @ion
+ Parameter: ION -> "LEU"
+ Parameter: IONSNEEDED -> "1"
+  
+ CHARMM>    !gene @{ionseg}
+ CHARMM>    gene @{ionseg} first none last none
+ Parameter: IONSEG -> "LEU"
+ NO PATCHING WILL BE DONE ON THE FIRST RESIDUE
+ NO PATCHING WILL BE DONE ON THE LAST  RESIDUE
+ GENPSF> Segment   6 has been generated. Its identifier is LEU.
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        6   Number of residues   =     3150
+         Number of atoms         =    14014   Number of groups     =     4499
+         Number of bonds         =    14085   Number of angles     =    13108
+         Number of dihedrals     =    15173   Number of impropers  =      981
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3321   Number of HB donors  =     6210
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>    ! if coordinates are provided, in a pdb file, then read them here
+ CHARMM>    ! (this allows making solutions other than ionic)
+ CHARMM>    if @?ionpdb .ne. 0 then
+ Comparing "1" and "0".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>    ! read coor pdb sele segid @{ionseg} end name @{ionpdb} resid
+ CHARMM>     read coor pdb name @{ionpdb} resid
+ Parameter: IONPDB -> "LIGANDS/LEU.PDB"
+ VOPEN> Attempting to open::ligands/leu.pdb::
+  read CHARMM-pdb format
+          SPATIAL COORDINATES BEING READ FROM UNIT 90
+ TITLE>   CREATE A PDB FILE FOR A SINGLE AA
+ TITLE>    DATE:     4/13/25     15:51: 4      CREATED BY USER: TALY
+ TITLE>  *
+ VCLOSE: Closing unit   90 with status "KEEP"
+  
+ CHARMM>    ! copy to all residues
+ CHARMM>     if @ionsneeded .gt. 1 then
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skip to ELSE or ENDIF
+  
+ CHARMM>    else
+ Skip commands until next ENDIF
+  
+ CHARMM>    !
+ CHARMM>    ! next three commands put the water segment at the end of PSF
+ CHARMM>    replicate nrep 1 X select segid WAT end ! replicate water segment
+ SELRPN>   7956 atoms have been selected out of  14014
+ REPLIcate> Segments 7 to 7 have been generated.
+ REPLIcate> Their identifiers are X       1 to 1
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        7   Number of residues   =     5802
+         Number of atoms         =    21970   Number of groups     =     7151
+         Number of bonds         =    22041   Number of angles     =    15760
+         Number of dihedrals     =    15173   Number of impropers  =      981
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     5973   Number of HB donors  =    11514
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>    delete atom select segid WAT end        ! this deletes the solvent segment
+ SELRPN>   7956 atoms have been selected out of  21970
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:       2652 residues deleted.
+
+ Message from MAPIC:          1 segments deleted.
+ DELTIC:      7956 bonds deleted
+ DELTIC:      2652 angles deleted
+ DELTIC:      5304 donors deleted
+ DELTIC:      2652 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        6   Number of residues   =     3150
+         Number of atoms         =    14014   Number of groups     =     4499
+         Number of bonds         =    14085   Number of angles     =    13108
+         Number of dihedrals     =    15173   Number of impropers  =      981
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3321   Number of HB donors  =     6210
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>    rename segid WAT select segid X1 end    ! put the waters back at the end of the file
+ SELRPN>   7956 atoms have been selected out of  14014
+ SEGMENT 'X1      ' IS RENAMED TO 'WAT     '
+  
+ CHARMM>     
+  
+ CHARMM>    define candidates select @candidates end ! save selection (in case it takes a while to compute)
+ Parameter: CANDIDATES -> ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+ SELRPN>    228 atoms have been selected out of  14014
+  
+ CHARMM>    replicate nrep 1 X select candidates end ! duplicate all replaceable waters into a new segment
+ SELRPN>    228 atoms have been selected out of  14014
+ REPLIcate> Segments 7 to 7 have been generated.
+ REPLIcate> Their identifiers are X       1 to 1
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        7   Number of residues   =     3226
+         Number of atoms         =    14242   Number of groups     =     4575
+         Number of bonds         =    14313   Number of angles     =    13184
+         Number of dihedrals     =    15173   Number of impropers  =      981
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3397   Number of HB donors  =     6362
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>    rename segid wrpl select segid X1 end
+ SELRPN>    228 atoms have been selected out of  14242
+ SEGMENT 'X1      ' IS RENAMED TO 'WRPL    '
+  
+ CHARMM>    delete atom select candidates end      ! delete replaceable atoms from original water group
+ SELRPN>    228 atoms have been selected out of  14242
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:         76 residues deleted.
+ DELTIC:       228 bonds deleted
+ DELTIC:        76 angles deleted
+ DELTIC:       152 donors deleted
+ DELTIC:        76 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        7   Number of residues   =     3150
+         Number of atoms         =    14014   Number of groups     =     4499
+         Number of bonds         =    14085   Number of angles     =    13108
+         Number of dihedrals     =    15173   Number of impropers  =      981
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3321   Number of HB donors  =     6210
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>     
+  
+ CHARMM>    join wrpl renu ! renumber residues
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        7   Number of residues   =     3150
+         Number of atoms         =    14014   Number of groups     =     4499
+         Number of bonds         =    14085   Number of angles     =    13108
+         Number of dihedrals     =    15173   Number of impropers  =      981
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3321   Number of HB donors  =     6210
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>     
+  
+ CHARMM>    set inum 1
+ Parameter: INUM <- "1"
+  
+ CHARMM>    label add_ion
+  
+ CHARMM>     calc j = int ( ?rand * @repl ) + 1
+ Parameter: REPL -> "76"
+ RDCMND substituted energy or value "?RAND" to "4.809859E-02"
+Evaluating: INT(4.809859E-02*76)+1
+ Parameter: J <- "4"
+  
+ CHARMM>     coor axis sele segid @{ionseg} .and. resid @inum end sele atom wrpl @j OH2 end
+ Parameter: IONSEG -> "LEU"
+ Parameter: INUM -> "1"
+ Parameter: J -> "4"
+ SELRPN>     19 atoms have been selected out of  14014
+ SELRPN>      1 atoms have been selected out of  14014
+ AXIS DEFINED FROM THE MAIN COORDINATES.
+  XAXIs=   43.467000  YAXIs=   27.058368  ZAXIs=    9.614474  RAXIs=   52.095811
+  
+ CHARMM>     coor trans axis sele segid @{ionseg} .and. resid @inum end
+ Parameter: IONSEG -> "LEU"
+ Parameter: INUM -> "1"
+ SELRPN>     19 atoms have been selected out of  14014
+ TRANSLATION VECTOR    43.467000   27.058368    9.614474
+ SELECTED COORDINATES TRANSLATED IN THE MAIN SET.
+
+  
+ CHARMM>     delete atom select atom wrpl @j * end ! delete that water residue
+ Parameter: J -> "4"
+ SELRPN>      3 atoms have been selected out of  14014
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:          1 residues deleted.
+ DELTIC:         3 bonds deleted
+ DELTIC:         1 angles deleted
+ DELTIC:         2 donors deleted
+ DELTIC:         1 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        7   Number of residues   =     3149
+         Number of atoms         =    14011   Number of groups     =     4498
+         Number of bonds         =    14082   Number of angles     =    13107
+         Number of dihedrals     =    15173   Number of impropers  =      981
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3320   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>     
+  
+ CHARMM>     incr repl by -1
+ Parameter: REPL <- "75"
+  
+ CHARMM>     incr inum by 1
+ Parameter: INUM <- "2"
+  
+ CHARMM>     join wrpl renumber ! renumber waters so there are no gaps
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        7   Number of residues   =     3149
+         Number of atoms         =    14011   Number of groups     =     4498
+         Number of bonds         =    14082   Number of angles     =    13107
+         Number of dihedrals     =    15173   Number of impropers  =      981
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3320   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>     
+  
+ CHARMM>     if @inum .le. @ionsneeded -
+ CHARMM>    goto add_ion
+ Parameter: INUM -> "2"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "2" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    if @repl .ne. 0 join WAT wrpl renu
+ Parameter: REPL -> "75"
+ Comparing "75" and "0".
+ IF test evaluated as true.  Performing command
+ SEGMENTS "WAT     " AND "WRPL    " HAVE BEEN JOINED.
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        6   Number of residues   =     3149
+         Number of atoms         =    14011   Number of groups     =     4498
+         Number of bonds         =    14082   Number of angles     =    13107
+         Number of dihedrals     =    15173   Number of impropers  =      981
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3320   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>     
+  
+ CHARMM>    label skip_ion
+  
+ CHARMM>     
+  
+ VCLOSE: Closing unit   99 with status "KEEP"
+
+                    RETURNING TO INPUT STREAM     5
+  
+ CHARMM>     print coor sele .not. init end
+ SELRPN>      0 atoms have been selected out of  14011
+
+      ***** LEVEL  2 WARNING FROM <COORIO> *****
+      ***** ZERO ATOMS SPECIFIED TO WRITE. NO FILE CREATED
+      ******************************************
+      BOMLEV ( -1) IS NOT REACHED. WRNLEV IS  5
+
+  
+ CHARMM>     rename segid @{seg@@iseg}@iseg sele segid @ionseg end ! to avoid duplicate names (but make sure to read coords first, as above) ; note that could overrun the 4 chars
+ Parameter: ISEG -> "1"
+ Parameter: ISEG -> "1"
+ Parameter: IONSEG -> "LEU"
+ Parameter: SEG1 -> "LEU"
+ SELRPN>     19 atoms have been selected out of  14011
+ SEGMENT 'LEU     ' IS RENAMED TO 'LEU1    '
+  
+ CHARMM>     incr iseg
+ Parameter: ISEG <- "2"
+  
+ CHARMM>     if @iseg .le. @nseg -
+ CHARMM>    goto segs
+ Parameter: ISEG -> "2"
+ Parameter: NSEG -> "8"
+ Comparing "2" and "8".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>    ! set candidates  .byres. ( ( point 44 43 19 cut 11 ) .and. segid wat )
+ CHARMM>     set candidates  .byres. ( ( point 42 36 18 cut 11 ) .and. segid wat ) ! replace waters in the vicinity of a putative active site
+ Parameter: CANDIDATES <- ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+  
+ CHARMM>    !
+ CHARMM>    ! add ligands using ionization scripts
+ CHARMM>     set ionsneeded 1
+ Parameter: IONSNEEDED <- "1"
+  
+ CHARMM>     set ion @seg@@iseg
+ Parameter: ISEG -> "2"
+ Parameter: SEG2 -> "TRP"
+ Parameter: ION <- "TRP"
+  
+ CHARMM>     set ionseg @seg@@iseg ! note that, to avoid duplicate segnames, may need to append @iseg to segment name, and/or to modify it further
+ Parameter: ISEG -> "2"
+ Parameter: SEG2 -> "TRP"
+ Parameter: IONSEG <- "TRP"
+  
+ CHARMM>     set ionpdb ligands/@seg@@iseg.pdb
+ Parameter: ISEG -> "2"
+ Parameter: SEG2 -> "TRP"
+ Parameter: IONPDB <- "LIGANDS/TRP.PDB"
+  
+ CHARMM>     stream @{clib}/addions.str
+ Parameter: CLIB -> "~/SCRIPTS/CHARMM"
+ VOPEN> Attempting to open::/home/taly/scripts/charmm/addions.str::
+ OPNLGU> Unit 99 opened for READONLY access to /home/taly/scripts/charmm/addions.str
+
+                    INPUT STREAM SWITCHING TO UNIT    99
+ RDTITL> * SCRIPT TO REPLACE SOME WATERS WITH IONS
+ RDTITL> *
+ Parameter: IN1 <- "" <empty>
+  
+ CHARMM>     
+  
+ CHARMM>    define replacement select @candidates .and. type OH2 end ! select num of water molecules
+ Parameter: CANDIDATES -> ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+ SELRPN>     75 atoms have been selected out of  14011
+  
+ CHARMM>    set repl ?nsel ! number of replacement candidates
+ RDCMND substituted energy or value "?NSEL" to "75"
+ Parameter: REPL <- "75"
+  
+ CHARMM>    if @repl .lt. @ionsneeded system "echo ADD_ION ERROR: SELECTION NOT BIG ENOUGH TO ACCOMODATE @IONSNEEDED IONS, SKIPPING..."
+ Parameter: REPL -> "75"
+ Parameter: IONSNEEDED -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "75" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @repl .lt. @ionsneeded goto skip_ion
+ Parameter: REPL -> "75"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "75" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    calc nion_int = INT ( @ionsneeded )
+ Parameter: IONSNEEDED -> "1"
+Evaluating: INT(1)
+ Parameter: NION_INT <- "1"
+  
+ CHARMM>     
+  
+ CHARMM>    if @ionsneeded .eq. 0 goto skip_ion   ! nothing to do: system is neutral
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "0".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @{nion_int} .ne. @ionsneeded system "echo ADD_ION ERROR: SYSTEM CHARGE NOT AN INTEGER, SKIPPING..."
+ Parameter: NION_INT -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @{nion_int} .ne. @ionsneeded goto skip_ion
+ Parameter: NION_INT -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    ! proceed with replication
+ CHARMM>    read sequence @ion @ionsneeded ! generate @nion of @ion
+ Parameter: ION -> "TRP"
+ Parameter: IONSNEEDED -> "1"
+  
+ CHARMM>    !gene @{ionseg}
+ CHARMM>    gene @{ionseg} first none last none
+ Parameter: IONSEG -> "TRP"
+ NO PATCHING WILL BE DONE ON THE FIRST RESIDUE
+ NO PATCHING WILL BE DONE ON THE LAST  RESIDUE
+ GENPSF> Segment   7 has been generated. Its identifier is TRP.
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        7   Number of residues   =     3150
+         Number of atoms         =    14035   Number of groups     =     4502
+         Number of bonds         =    14107   Number of angles     =    13148
+         Number of dihedrals     =    15234   Number of impropers  =      981
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3321   Number of HB donors  =     6210
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>    ! if coordinates are provided, in a pdb file, then read them here
+ CHARMM>    ! (this allows making solutions other than ionic)
+ CHARMM>    if @?ionpdb .ne. 0 then
+ Comparing "1" and "0".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>    ! read coor pdb sele segid @{ionseg} end name @{ionpdb} resid
+ CHARMM>     read coor pdb name @{ionpdb} resid
+ Parameter: IONPDB -> "LIGANDS/TRP.PDB"
+ VOPEN> Attempting to open::ligands/trp.pdb::
+  read CHARMM-pdb format
+          SPATIAL COORDINATES BEING READ FROM UNIT 90
+ TITLE>   CREATE A PDB FILE FOR A SINGLE AA
+ TITLE>    DATE:     4/13/25     15:51:16      CREATED BY USER: TALY
+ TITLE>  *
+ VCLOSE: Closing unit   90 with status "KEEP"
+  
+ CHARMM>    ! copy to all residues
+ CHARMM>     if @ionsneeded .gt. 1 then
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skip to ELSE or ENDIF
+  
+ CHARMM>    else
+ Skip commands until next ENDIF
+  
+ CHARMM>    !
+ CHARMM>    ! next three commands put the water segment at the end of PSF
+ CHARMM>    replicate nrep 1 X select segid WAT end ! replicate water segment
+ SELRPN>   7953 atoms have been selected out of  14035
+ REPLIcate> Segments 8 to 8 have been generated.
+ REPLIcate> Their identifiers are X       1 to 1
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        8   Number of residues   =     5801
+         Number of atoms         =    21988   Number of groups     =     7153
+         Number of bonds         =    22060   Number of angles     =    15799
+         Number of dihedrals     =    15234   Number of impropers  =      981
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     5972   Number of HB donors  =    11512
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>    delete atom select segid WAT end        ! this deletes the solvent segment
+ SELRPN>   7953 atoms have been selected out of  21988
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:       2651 residues deleted.
+
+ Message from MAPIC:          1 segments deleted.
+ DELTIC:      7953 bonds deleted
+ DELTIC:      2651 angles deleted
+ DELTIC:      5302 donors deleted
+ DELTIC:      2651 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        7   Number of residues   =     3150
+         Number of atoms         =    14035   Number of groups     =     4502
+         Number of bonds         =    14107   Number of angles     =    13148
+         Number of dihedrals     =    15234   Number of impropers  =      981
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3321   Number of HB donors  =     6210
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>    rename segid WAT select segid X1 end    ! put the waters back at the end of the file
+ SELRPN>   7953 atoms have been selected out of  14035
+ SEGMENT 'X1      ' IS RENAMED TO 'WAT     '
+  
+ CHARMM>     
+  
+ CHARMM>    define candidates select @candidates end ! save selection (in case it takes a while to compute)
+ Parameter: CANDIDATES -> ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+ SELRPN>    225 atoms have been selected out of  14035
+  
+ CHARMM>    replicate nrep 1 X select candidates end ! duplicate all replaceable waters into a new segment
+ SELRPN>    225 atoms have been selected out of  14035
+ REPLIcate> Segments 8 to 8 have been generated.
+ REPLIcate> Their identifiers are X       1 to 1
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        8   Number of residues   =     3225
+         Number of atoms         =    14260   Number of groups     =     4577
+         Number of bonds         =    14332   Number of angles     =    13223
+         Number of dihedrals     =    15234   Number of impropers  =      981
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3396   Number of HB donors  =     6360
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>    rename segid wrpl select segid X1 end
+ SELRPN>    225 atoms have been selected out of  14260
+ SEGMENT 'X1      ' IS RENAMED TO 'WRPL    '
+  
+ CHARMM>    delete atom select candidates end      ! delete replaceable atoms from original water group
+ SELRPN>    225 atoms have been selected out of  14260
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:         75 residues deleted.
+ DELTIC:       225 bonds deleted
+ DELTIC:        75 angles deleted
+ DELTIC:       150 donors deleted
+ DELTIC:        75 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        8   Number of residues   =     3150
+         Number of atoms         =    14035   Number of groups     =     4502
+         Number of bonds         =    14107   Number of angles     =    13148
+         Number of dihedrals     =    15234   Number of impropers  =      981
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3321   Number of HB donors  =     6210
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>     
+  
+ CHARMM>    join wrpl renu ! renumber residues
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        8   Number of residues   =     3150
+         Number of atoms         =    14035   Number of groups     =     4502
+         Number of bonds         =    14107   Number of angles     =    13148
+         Number of dihedrals     =    15234   Number of impropers  =      981
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3321   Number of HB donors  =     6210
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>     
+  
+ CHARMM>    set inum 1
+ Parameter: INUM <- "1"
+  
+ CHARMM>    label add_ion
+  
+ CHARMM>     calc j = int ( ?rand * @repl ) + 1
+ Parameter: REPL -> "75"
+ RDCMND substituted energy or value "?RAND" to "0.879611"
+Evaluating: INT(0.879611*75)+1
+ Parameter: J <- "66"
+  
+ CHARMM>     coor axis sele segid @{ionseg} .and. resid @inum end sele atom wrpl @j OH2 end
+ Parameter: IONSEG -> "TRP"
+ Parameter: INUM -> "1"
+ Parameter: J -> "66"
+ SELRPN>     24 atoms have been selected out of  14035
+ SELRPN>      1 atoms have been selected out of  14035
+ AXIS DEFINED FROM THE MAIN COORDINATES.
+  XAXIs=   39.066542  YAXIs=   27.266875  ZAXIs=    7.389417  RAXIs=   48.210794
+  Angle with previous axis:    3.480481
+
+  
+ CHARMM>     coor trans axis sele segid @{ionseg} .and. resid @inum end
+ Parameter: IONSEG -> "TRP"
+ Parameter: INUM -> "1"
+ SELRPN>     24 atoms have been selected out of  14035
+ TRANSLATION VECTOR    39.066542   27.266875    7.389417
+ SELECTED COORDINATES TRANSLATED IN THE MAIN SET.
+
+  
+ CHARMM>     delete atom select atom wrpl @j * end ! delete that water residue
+ Parameter: J -> "66"
+ SELRPN>      3 atoms have been selected out of  14035
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:          1 residues deleted.
+ DELTIC:         3 bonds deleted
+ DELTIC:         1 angles deleted
+ DELTIC:         2 donors deleted
+ DELTIC:         1 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        8   Number of residues   =     3149
+         Number of atoms         =    14032   Number of groups     =     4501
+         Number of bonds         =    14104   Number of angles     =    13147
+         Number of dihedrals     =    15234   Number of impropers  =      981
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3320   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>     
+  
+ CHARMM>     incr repl by -1
+ Parameter: REPL <- "74"
+  
+ CHARMM>     incr inum by 1
+ Parameter: INUM <- "2"
+  
+ CHARMM>     join wrpl renumber ! renumber waters so there are no gaps
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        8   Number of residues   =     3149
+         Number of atoms         =    14032   Number of groups     =     4501
+         Number of bonds         =    14104   Number of angles     =    13147
+         Number of dihedrals     =    15234   Number of impropers  =      981
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3320   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>     
+  
+ CHARMM>     if @inum .le. @ionsneeded -
+ CHARMM>    goto add_ion
+ Parameter: INUM -> "2"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "2" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    if @repl .ne. 0 join WAT wrpl renu
+ Parameter: REPL -> "74"
+ Comparing "74" and "0".
+ IF test evaluated as true.  Performing command
+ SEGMENTS "WAT     " AND "WRPL    " HAVE BEEN JOINED.
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        7   Number of residues   =     3149
+         Number of atoms         =    14032   Number of groups     =     4501
+         Number of bonds         =    14104   Number of angles     =    13147
+         Number of dihedrals     =    15234   Number of impropers  =      981
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3320   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>     
+  
+ CHARMM>    label skip_ion
+  
+ CHARMM>     
+  
+ VCLOSE: Closing unit   99 with status "KEEP"
+
+                    RETURNING TO INPUT STREAM     5
+  
+ CHARMM>     print coor sele .not. init end
+ SELRPN>      0 atoms have been selected out of  14032
+
+      ***** LEVEL  2 WARNING FROM <COORIO> *****
+      ***** ZERO ATOMS SPECIFIED TO WRITE. NO FILE CREATED
+      ******************************************
+      BOMLEV ( -1) IS NOT REACHED. WRNLEV IS  5
+
+  
+ CHARMM>     rename segid @{seg@@iseg}@iseg sele segid @ionseg end ! to avoid duplicate names (but make sure to read coords first, as above) ; note that could overrun the 4 chars
+ Parameter: ISEG -> "2"
+ Parameter: ISEG -> "2"
+ Parameter: IONSEG -> "TRP"
+ Parameter: SEG2 -> "TRP"
+ SELRPN>     24 atoms have been selected out of  14032
+ SEGMENT 'TRP     ' IS RENAMED TO 'TRP2    '
+  
+ CHARMM>     incr iseg
+ Parameter: ISEG <- "3"
+  
+ CHARMM>     if @iseg .le. @nseg -
+ CHARMM>    goto segs
+ Parameter: ISEG -> "3"
+ Parameter: NSEG -> "8"
+ Comparing "3" and "8".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>    ! set candidates  .byres. ( ( point 44 43 19 cut 11 ) .and. segid wat )
+ CHARMM>     set candidates  .byres. ( ( point 42 36 18 cut 11 ) .and. segid wat ) ! replace waters in the vicinity of a putative active site
+ Parameter: CANDIDATES <- ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+  
+ CHARMM>    !
+ CHARMM>    ! add ligands using ionization scripts
+ CHARMM>     set ionsneeded 1
+ Parameter: IONSNEEDED <- "1"
+  
+ CHARMM>     set ion @seg@@iseg
+ Parameter: ISEG -> "3"
+ Parameter: SEG3 -> "HSD"
+ Parameter: ION <- "HSD"
+  
+ CHARMM>     set ionseg @seg@@iseg ! note that, to avoid duplicate segnames, may need to append @iseg to segment name, and/or to modify it further
+ Parameter: ISEG -> "3"
+ Parameter: SEG3 -> "HSD"
+ Parameter: IONSEG <- "HSD"
+  
+ CHARMM>     set ionpdb ligands/@seg@@iseg.pdb
+ Parameter: ISEG -> "3"
+ Parameter: SEG3 -> "HSD"
+ Parameter: IONPDB <- "LIGANDS/HSD.PDB"
+  
+ CHARMM>     stream @{clib}/addions.str
+ Parameter: CLIB -> "~/SCRIPTS/CHARMM"
+ VOPEN> Attempting to open::/home/taly/scripts/charmm/addions.str::
+ OPNLGU> Unit 99 opened for READONLY access to /home/taly/scripts/charmm/addions.str
+
+                    INPUT STREAM SWITCHING TO UNIT    99
+ RDTITL> * SCRIPT TO REPLACE SOME WATERS WITH IONS
+ RDTITL> *
+ Parameter: IN1 <- "" <empty>
+  
+ CHARMM>     
+  
+ CHARMM>    define replacement select @candidates .and. type OH2 end ! select num of water molecules
+ Parameter: CANDIDATES -> ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+ SELRPN>     74 atoms have been selected out of  14032
+  
+ CHARMM>    set repl ?nsel ! number of replacement candidates
+ RDCMND substituted energy or value "?NSEL" to "74"
+ Parameter: REPL <- "74"
+  
+ CHARMM>    if @repl .lt. @ionsneeded system "echo ADD_ION ERROR: SELECTION NOT BIG ENOUGH TO ACCOMODATE @IONSNEEDED IONS, SKIPPING..."
+ Parameter: REPL -> "74"
+ Parameter: IONSNEEDED -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "74" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @repl .lt. @ionsneeded goto skip_ion
+ Parameter: REPL -> "74"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "74" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    calc nion_int = INT ( @ionsneeded )
+ Parameter: IONSNEEDED -> "1"
+Evaluating: INT(1)
+ Parameter: NION_INT <- "1"
+  
+ CHARMM>     
+  
+ CHARMM>    if @ionsneeded .eq. 0 goto skip_ion   ! nothing to do: system is neutral
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "0".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @{nion_int} .ne. @ionsneeded system "echo ADD_ION ERROR: SYSTEM CHARGE NOT AN INTEGER, SKIPPING..."
+ Parameter: NION_INT -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @{nion_int} .ne. @ionsneeded goto skip_ion
+ Parameter: NION_INT -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    ! proceed with replication
+ CHARMM>    read sequence @ion @ionsneeded ! generate @nion of @ion
+ Parameter: ION -> "HSD"
+ Parameter: IONSNEEDED -> "1"
+  
+ CHARMM>    !gene @{ionseg}
+ CHARMM>    gene @{ionseg} first none last none
+ Parameter: IONSEG -> "HSD"
+ NO PATCHING WILL BE DONE ON THE FIRST RESIDUE
+ NO PATCHING WILL BE DONE ON THE LAST  RESIDUE
+ GENPSF> Segment   8 has been generated. Its identifier is HSD.
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        8   Number of residues   =     3150
+         Number of atoms         =    14049   Number of groups     =     4505
+         Number of bonds         =    14121   Number of angles     =    13174
+         Number of dihedrals     =    15271   Number of impropers  =      987
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3322   Number of HB donors  =     6210
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>    ! if coordinates are provided, in a pdb file, then read them here
+ CHARMM>    ! (this allows making solutions other than ionic)
+ CHARMM>    if @?ionpdb .ne. 0 then
+ Comparing "1" and "0".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>    ! read coor pdb sele segid @{ionseg} end name @{ionpdb} resid
+ CHARMM>     read coor pdb name @{ionpdb} resid
+ Parameter: IONPDB -> "LIGANDS/HSD.PDB"
+ VOPEN> Attempting to open::ligands/hsd.pdb::
+  read CHARMM-pdb format
+          SPATIAL COORDINATES BEING READ FROM UNIT 90
+ TITLE>   CREATE A PDB FILE FOR A SINGLE AA
+ TITLE>    DATE:     4/13/25     15:50:59      CREATED BY USER: TALY
+ TITLE>  *
+ VCLOSE: Closing unit   90 with status "KEEP"
+  
+ CHARMM>    ! copy to all residues
+ CHARMM>     if @ionsneeded .gt. 1 then
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skip to ELSE or ENDIF
+  
+ CHARMM>    else
+ Skip commands until next ENDIF
+  
+ CHARMM>    !
+ CHARMM>    ! next three commands put the water segment at the end of PSF
+ CHARMM>    replicate nrep 1 X select segid WAT end ! replicate water segment
+ SELRPN>   7950 atoms have been selected out of  14049
+ REPLIcate> Segments 9 to 9 have been generated.
+ REPLIcate> Their identifiers are X       1 to 1
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        9   Number of residues   =     5800
+         Number of atoms         =    21999   Number of groups     =     7155
+         Number of bonds         =    22071   Number of angles     =    15824
+         Number of dihedrals     =    15271   Number of impropers  =      987
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     5972   Number of HB donors  =    11510
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>    delete atom select segid WAT end        ! this deletes the solvent segment
+ SELRPN>   7950 atoms have been selected out of  21999
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:       2650 residues deleted.
+
+ Message from MAPIC:          1 segments deleted.
+ DELTIC:      7950 bonds deleted
+ DELTIC:      2650 angles deleted
+ DELTIC:      5300 donors deleted
+ DELTIC:      2650 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        8   Number of residues   =     3150
+         Number of atoms         =    14049   Number of groups     =     4505
+         Number of bonds         =    14121   Number of angles     =    13174
+         Number of dihedrals     =    15271   Number of impropers  =      987
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3322   Number of HB donors  =     6210
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>    rename segid WAT select segid X1 end    ! put the waters back at the end of the file
+ SELRPN>   7950 atoms have been selected out of  14049
+ SEGMENT 'X1      ' IS RENAMED TO 'WAT     '
+  
+ CHARMM>     
+  
+ CHARMM>    define candidates select @candidates end ! save selection (in case it takes a while to compute)
+ Parameter: CANDIDATES -> ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+ SELRPN>    222 atoms have been selected out of  14049
+  
+ CHARMM>    replicate nrep 1 X select candidates end ! duplicate all replaceable waters into a new segment
+ SELRPN>    222 atoms have been selected out of  14049
+ REPLIcate> Segments 9 to 9 have been generated.
+ REPLIcate> Their identifiers are X       1 to 1
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        9   Number of residues   =     3224
+         Number of atoms         =    14271   Number of groups     =     4579
+         Number of bonds         =    14343   Number of angles     =    13248
+         Number of dihedrals     =    15271   Number of impropers  =      987
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3396   Number of HB donors  =     6358
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>    rename segid wrpl select segid X1 end
+ SELRPN>    222 atoms have been selected out of  14271
+ SEGMENT 'X1      ' IS RENAMED TO 'WRPL    '
+  
+ CHARMM>    delete atom select candidates end      ! delete replaceable atoms from original water group
+ SELRPN>    222 atoms have been selected out of  14271
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:         74 residues deleted.
+ DELTIC:       222 bonds deleted
+ DELTIC:        74 angles deleted
+ DELTIC:       148 donors deleted
+ DELTIC:        74 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        9   Number of residues   =     3150
+         Number of atoms         =    14049   Number of groups     =     4505
+         Number of bonds         =    14121   Number of angles     =    13174
+         Number of dihedrals     =    15271   Number of impropers  =      987
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3322   Number of HB donors  =     6210
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>     
+  
+ CHARMM>    join wrpl renu ! renumber residues
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        9   Number of residues   =     3150
+         Number of atoms         =    14049   Number of groups     =     4505
+         Number of bonds         =    14121   Number of angles     =    13174
+         Number of dihedrals     =    15271   Number of impropers  =      987
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3322   Number of HB donors  =     6210
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>     
+  
+ CHARMM>    set inum 1
+ Parameter: INUM <- "1"
+  
+ CHARMM>    label add_ion
+  
+ CHARMM>     calc j = int ( ?rand * @repl ) + 1
+ Parameter: REPL -> "74"
+ RDCMND substituted energy or value "?RAND" to "0.186409"
+Evaluating: INT(0.186409*74)+1
+ Parameter: J <- "14"
+  
+ CHARMM>     coor axis sele segid @{ionseg} .and. resid @inum end sele atom wrpl @j OH2 end
+ Parameter: IONSEG -> "HSD"
+ Parameter: INUM -> "1"
+ Parameter: J -> "14"
+ SELRPN>     17 atoms have been selected out of  14049
+ SELRPN>      1 atoms have been selected out of  14049
+ AXIS DEFINED FROM THE MAIN COORDINATES.
+  XAXIs=   39.651118  YAXIs=   23.190765  ZAXIs=   14.375529  RAXIs=   48.131887
+  Angle with previous axis:    9.656410
+
+  
+ CHARMM>     coor trans axis sele segid @{ionseg} .and. resid @inum end
+ Parameter: IONSEG -> "HSD"
+ Parameter: INUM -> "1"
+ SELRPN>     17 atoms have been selected out of  14049
+ TRANSLATION VECTOR    39.651118   23.190765   14.375529
+ SELECTED COORDINATES TRANSLATED IN THE MAIN SET.
+
+  
+ CHARMM>     delete atom select atom wrpl @j * end ! delete that water residue
+ Parameter: J -> "14"
+ SELRPN>      3 atoms have been selected out of  14049
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:          1 residues deleted.
+ DELTIC:         3 bonds deleted
+ DELTIC:         1 angles deleted
+ DELTIC:         2 donors deleted
+ DELTIC:         1 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        9   Number of residues   =     3149
+         Number of atoms         =    14046   Number of groups     =     4504
+         Number of bonds         =    14118   Number of angles     =    13173
+         Number of dihedrals     =    15271   Number of impropers  =      987
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3321   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>     
+  
+ CHARMM>     incr repl by -1
+ Parameter: REPL <- "73"
+  
+ CHARMM>     incr inum by 1
+ Parameter: INUM <- "2"
+  
+ CHARMM>     join wrpl renumber ! renumber waters so there are no gaps
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        9   Number of residues   =     3149
+         Number of atoms         =    14046   Number of groups     =     4504
+         Number of bonds         =    14118   Number of angles     =    13173
+         Number of dihedrals     =    15271   Number of impropers  =      987
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3321   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>     
+  
+ CHARMM>     if @inum .le. @ionsneeded -
+ CHARMM>    goto add_ion
+ Parameter: INUM -> "2"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "2" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    if @repl .ne. 0 join WAT wrpl renu
+ Parameter: REPL -> "73"
+ Comparing "73" and "0".
+ IF test evaluated as true.  Performing command
+ SEGMENTS "WAT     " AND "WRPL    " HAVE BEEN JOINED.
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        8   Number of residues   =     3149
+         Number of atoms         =    14046   Number of groups     =     4504
+         Number of bonds         =    14118   Number of angles     =    13173
+         Number of dihedrals     =    15271   Number of impropers  =      987
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3321   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>     
+  
+ CHARMM>    label skip_ion
+  
+ CHARMM>     
+  
+ VCLOSE: Closing unit   99 with status "KEEP"
+
+                    RETURNING TO INPUT STREAM     5
+  
+ CHARMM>     print coor sele .not. init end
+ SELRPN>      0 atoms have been selected out of  14046
+
+      ***** LEVEL  2 WARNING FROM <COORIO> *****
+      ***** ZERO ATOMS SPECIFIED TO WRITE. NO FILE CREATED
+      ******************************************
+      BOMLEV ( -1) IS NOT REACHED. WRNLEV IS  5
+
+  
+ CHARMM>     rename segid @{seg@@iseg}@iseg sele segid @ionseg end ! to avoid duplicate names (but make sure to read coords first, as above) ; note that could overrun the 4 chars
+ Parameter: ISEG -> "3"
+ Parameter: ISEG -> "3"
+ Parameter: IONSEG -> "HSD"
+ Parameter: SEG3 -> "HSD"
+ SELRPN>     17 atoms have been selected out of  14046
+ SEGMENT 'HSD     ' IS RENAMED TO 'HSD3    '
+  
+ CHARMM>     incr iseg
+ Parameter: ISEG <- "4"
+  
+ CHARMM>     if @iseg .le. @nseg -
+ CHARMM>    goto segs
+ Parameter: ISEG -> "4"
+ Parameter: NSEG -> "8"
+ Comparing "4" and "8".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>    ! set candidates  .byres. ( ( point 44 43 19 cut 11 ) .and. segid wat )
+ CHARMM>     set candidates  .byres. ( ( point 42 36 18 cut 11 ) .and. segid wat ) ! replace waters in the vicinity of a putative active site
+ Parameter: CANDIDATES <- ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+  
+ CHARMM>    !
+ CHARMM>    ! add ligands using ionization scripts
+ CHARMM>     set ionsneeded 1
+ Parameter: IONSNEEDED <- "1"
+  
+ CHARMM>     set ion @seg@@iseg
+ Parameter: ISEG -> "4"
+ Parameter: SEG4 -> "SER"
+ Parameter: ION <- "SER"
+  
+ CHARMM>     set ionseg @seg@@iseg ! note that, to avoid duplicate segnames, may need to append @iseg to segment name, and/or to modify it further
+ Parameter: ISEG -> "4"
+ Parameter: SEG4 -> "SER"
+ Parameter: IONSEG <- "SER"
+  
+ CHARMM>     set ionpdb ligands/@seg@@iseg.pdb
+ Parameter: ISEG -> "4"
+ Parameter: SEG4 -> "SER"
+ Parameter: IONPDB <- "LIGANDS/SER.PDB"
+  
+ CHARMM>     stream @{clib}/addions.str
+ Parameter: CLIB -> "~/SCRIPTS/CHARMM"
+ VOPEN> Attempting to open::/home/taly/scripts/charmm/addions.str::
+ OPNLGU> Unit 99 opened for READONLY access to /home/taly/scripts/charmm/addions.str
+
+                    INPUT STREAM SWITCHING TO UNIT    99
+ RDTITL> * SCRIPT TO REPLACE SOME WATERS WITH IONS
+ RDTITL> *
+ Parameter: IN1 <- "" <empty>
+  
+ CHARMM>     
+  
+ CHARMM>    define replacement select @candidates .and. type OH2 end ! select num of water molecules
+ Parameter: CANDIDATES -> ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+ SELRPN>     73 atoms have been selected out of  14046
+  
+ CHARMM>    set repl ?nsel ! number of replacement candidates
+ RDCMND substituted energy or value "?NSEL" to "73"
+ Parameter: REPL <- "73"
+  
+ CHARMM>    if @repl .lt. @ionsneeded system "echo ADD_ION ERROR: SELECTION NOT BIG ENOUGH TO ACCOMODATE @IONSNEEDED IONS, SKIPPING..."
+ Parameter: REPL -> "73"
+ Parameter: IONSNEEDED -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "73" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @repl .lt. @ionsneeded goto skip_ion
+ Parameter: REPL -> "73"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "73" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    calc nion_int = INT ( @ionsneeded )
+ Parameter: IONSNEEDED -> "1"
+Evaluating: INT(1)
+ Parameter: NION_INT <- "1"
+  
+ CHARMM>     
+  
+ CHARMM>    if @ionsneeded .eq. 0 goto skip_ion   ! nothing to do: system is neutral
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "0".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @{nion_int} .ne. @ionsneeded system "echo ADD_ION ERROR: SYSTEM CHARGE NOT AN INTEGER, SKIPPING..."
+ Parameter: NION_INT -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @{nion_int} .ne. @ionsneeded goto skip_ion
+ Parameter: NION_INT -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    ! proceed with replication
+ CHARMM>    read sequence @ion @ionsneeded ! generate @nion of @ion
+ Parameter: ION -> "SER"
+ Parameter: IONSNEEDED -> "1"
+  
+ CHARMM>    !gene @{ionseg}
+ CHARMM>    gene @{ionseg} first none last none
+ Parameter: IONSEG -> "SER"
+ NO PATCHING WILL BE DONE ON THE FIRST RESIDUE
+ NO PATCHING WILL BE DONE ON THE LAST  RESIDUE
+ GENPSF> Segment   9 has been generated. Its identifier is SER.
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        9   Number of residues   =     3150
+         Number of atoms         =    14057   Number of groups     =     4507
+         Number of bonds         =    14128   Number of angles     =    13188
+         Number of dihedrals     =    15289   Number of impropers  =      987
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3323   Number of HB donors  =     6210
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>    ! if coordinates are provided, in a pdb file, then read them here
+ CHARMM>    ! (this allows making solutions other than ionic)
+ CHARMM>    if @?ionpdb .ne. 0 then
+ Comparing "1" and "0".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>    ! read coor pdb sele segid @{ionseg} end name @{ionpdb} resid
+ CHARMM>     read coor pdb name @{ionpdb} resid
+ Parameter: IONPDB -> "LIGANDS/SER.PDB"
+ VOPEN> Attempting to open::ligands/ser.pdb::
+  read CHARMM-pdb format
+          SPATIAL COORDINATES BEING READ FROM UNIT 90
+ TITLE>   CREATE A PDB FILE FOR A SINGLE AA
+ TITLE>    DATE:     4/13/25     15:51:12      CREATED BY USER: TALY
+ TITLE>  *
+ VCLOSE: Closing unit   90 with status "KEEP"
+  
+ CHARMM>    ! copy to all residues
+ CHARMM>     if @ionsneeded .gt. 1 then
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skip to ELSE or ENDIF
+  
+ CHARMM>    else
+ Skip commands until next ENDIF
+  
+ CHARMM>    !
+ CHARMM>    ! next three commands put the water segment at the end of PSF
+ CHARMM>    replicate nrep 1 X select segid WAT end ! replicate water segment
+ SELRPN>   7947 atoms have been selected out of  14057
+ REPLIcate> Segments 10 to 10 have been generated.
+ REPLIcate> Their identifiers are X       1 to 1
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       10   Number of residues   =     5799
+         Number of atoms         =    22004   Number of groups     =     7156
+         Number of bonds         =    22075   Number of angles     =    15837
+         Number of dihedrals     =    15289   Number of impropers  =      987
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     5972   Number of HB donors  =    11508
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>    delete atom select segid WAT end        ! this deletes the solvent segment
+ SELRPN>   7947 atoms have been selected out of  22004
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:       2649 residues deleted.
+
+ Message from MAPIC:          1 segments deleted.
+ DELTIC:      7947 bonds deleted
+ DELTIC:      2649 angles deleted
+ DELTIC:      5298 donors deleted
+ DELTIC:      2649 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        9   Number of residues   =     3150
+         Number of atoms         =    14057   Number of groups     =     4507
+         Number of bonds         =    14128   Number of angles     =    13188
+         Number of dihedrals     =    15289   Number of impropers  =      987
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3323   Number of HB donors  =     6210
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>    rename segid WAT select segid X1 end    ! put the waters back at the end of the file
+ SELRPN>   7947 atoms have been selected out of  14057
+ SEGMENT 'X1      ' IS RENAMED TO 'WAT     '
+  
+ CHARMM>     
+  
+ CHARMM>    define candidates select @candidates end ! save selection (in case it takes a while to compute)
+ Parameter: CANDIDATES -> ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+ SELRPN>    219 atoms have been selected out of  14057
+  
+ CHARMM>    replicate nrep 1 X select candidates end ! duplicate all replaceable waters into a new segment
+ SELRPN>    219 atoms have been selected out of  14057
+ REPLIcate> Segments 10 to 10 have been generated.
+ REPLIcate> Their identifiers are X       1 to 1
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       10   Number of residues   =     3223
+         Number of atoms         =    14276   Number of groups     =     4580
+         Number of bonds         =    14347   Number of angles     =    13261
+         Number of dihedrals     =    15289   Number of impropers  =      987
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3396   Number of HB donors  =     6356
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>    rename segid wrpl select segid X1 end
+ SELRPN>    219 atoms have been selected out of  14276
+ SEGMENT 'X1      ' IS RENAMED TO 'WRPL    '
+  
+ CHARMM>    delete atom select candidates end      ! delete replaceable atoms from original water group
+ SELRPN>    219 atoms have been selected out of  14276
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:         73 residues deleted.
+ DELTIC:       219 bonds deleted
+ DELTIC:        73 angles deleted
+ DELTIC:       146 donors deleted
+ DELTIC:        73 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       10   Number of residues   =     3150
+         Number of atoms         =    14057   Number of groups     =     4507
+         Number of bonds         =    14128   Number of angles     =    13188
+         Number of dihedrals     =    15289   Number of impropers  =      987
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3323   Number of HB donors  =     6210
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>     
+  
+ CHARMM>    join wrpl renu ! renumber residues
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       10   Number of residues   =     3150
+         Number of atoms         =    14057   Number of groups     =     4507
+         Number of bonds         =    14128   Number of angles     =    13188
+         Number of dihedrals     =    15289   Number of impropers  =      987
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3323   Number of HB donors  =     6210
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>     
+  
+ CHARMM>    set inum 1
+ Parameter: INUM <- "1"
+  
+ CHARMM>    label add_ion
+  
+ CHARMM>     calc j = int ( ?rand * @repl ) + 1
+ Parameter: REPL -> "73"
+ RDCMND substituted energy or value "?RAND" to "0.628765"
+Evaluating: INT(0.628765*73)+1
+ Parameter: J <- "46"
+  
+ CHARMM>     coor axis sele segid @{ionseg} .and. resid @inum end sele atom wrpl @j OH2 end
+ Parameter: IONSEG -> "SER"
+ Parameter: INUM -> "1"
+ Parameter: J -> "46"
+ SELRPN>     11 atoms have been selected out of  14057
+ SELRPN>      1 atoms have been selected out of  14057
+ AXIS DEFINED FROM THE MAIN COORDINATES.
+  XAXIs=   38.031818  YAXIs=   41.767000  ZAXIs=   18.172000  RAXIs=   59.339052
+  Angle with previous axis:   16.545192
+
+  
+ CHARMM>     coor trans axis sele segid @{ionseg} .and. resid @inum end
+ Parameter: IONSEG -> "SER"
+ Parameter: INUM -> "1"
+ SELRPN>     11 atoms have been selected out of  14057
+ TRANSLATION VECTOR    38.031818   41.767000   18.172000
+ SELECTED COORDINATES TRANSLATED IN THE MAIN SET.
+
+  
+ CHARMM>     delete atom select atom wrpl @j * end ! delete that water residue
+ Parameter: J -> "46"
+ SELRPN>      3 atoms have been selected out of  14057
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:          1 residues deleted.
+ DELTIC:         3 bonds deleted
+ DELTIC:         1 angles deleted
+ DELTIC:         2 donors deleted
+ DELTIC:         1 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       10   Number of residues   =     3149
+         Number of atoms         =    14054   Number of groups     =     4506
+         Number of bonds         =    14125   Number of angles     =    13187
+         Number of dihedrals     =    15289   Number of impropers  =      987
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3322   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>     
+  
+ CHARMM>     incr repl by -1
+ Parameter: REPL <- "72"
+  
+ CHARMM>     incr inum by 1
+ Parameter: INUM <- "2"
+  
+ CHARMM>     join wrpl renumber ! renumber waters so there are no gaps
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       10   Number of residues   =     3149
+         Number of atoms         =    14054   Number of groups     =     4506
+         Number of bonds         =    14125   Number of angles     =    13187
+         Number of dihedrals     =    15289   Number of impropers  =      987
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3322   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>     
+  
+ CHARMM>     if @inum .le. @ionsneeded -
+ CHARMM>    goto add_ion
+ Parameter: INUM -> "2"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "2" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    if @repl .ne. 0 join WAT wrpl renu
+ Parameter: REPL -> "72"
+ Comparing "72" and "0".
+ IF test evaluated as true.  Performing command
+ SEGMENTS "WAT     " AND "WRPL    " HAVE BEEN JOINED.
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        9   Number of residues   =     3149
+         Number of atoms         =    14054   Number of groups     =     4506
+         Number of bonds         =    14125   Number of angles     =    13187
+         Number of dihedrals     =    15289   Number of impropers  =      987
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3322   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -0.00000
+  
+ CHARMM>     
+  
+ CHARMM>    label skip_ion
+  
+ CHARMM>     
+  
+ VCLOSE: Closing unit   99 with status "KEEP"
+
+                    RETURNING TO INPUT STREAM     5
+  
+ CHARMM>     print coor sele .not. init end
+ SELRPN>      0 atoms have been selected out of  14054
+
+      ***** LEVEL  2 WARNING FROM <COORIO> *****
+      ***** ZERO ATOMS SPECIFIED TO WRITE. NO FILE CREATED
+      ******************************************
+      BOMLEV ( -1) IS NOT REACHED. WRNLEV IS  5
+
+  
+ CHARMM>     rename segid @{seg@@iseg}@iseg sele segid @ionseg end ! to avoid duplicate names (but make sure to read coords first, as above) ; note that could overrun the 4 chars
+ Parameter: ISEG -> "4"
+ Parameter: ISEG -> "4"
+ Parameter: IONSEG -> "SER"
+ Parameter: SEG4 -> "SER"
+ SELRPN>     11 atoms have been selected out of  14054
+ SEGMENT 'SER     ' IS RENAMED TO 'SER4    '
+  
+ CHARMM>     incr iseg
+ Parameter: ISEG <- "5"
+  
+ CHARMM>     if @iseg .le. @nseg -
+ CHARMM>    goto segs
+ Parameter: ISEG -> "5"
+ Parameter: NSEG -> "8"
+ Comparing "5" and "8".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>    ! set candidates  .byres. ( ( point 44 43 19 cut 11 ) .and. segid wat )
+ CHARMM>     set candidates  .byres. ( ( point 42 36 18 cut 11 ) .and. segid wat ) ! replace waters in the vicinity of a putative active site
+ Parameter: CANDIDATES <- ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+  
+ CHARMM>    !
+ CHARMM>    ! add ligands using ionization scripts
+ CHARMM>     set ionsneeded 1
+ Parameter: IONSNEEDED <- "1"
+  
+ CHARMM>     set ion @seg@@iseg
+ Parameter: ISEG -> "5"
+ Parameter: SEG5 -> "ASP"
+ Parameter: ION <- "ASP"
+  
+ CHARMM>     set ionseg @seg@@iseg ! note that, to avoid duplicate segnames, may need to append @iseg to segment name, and/or to modify it further
+ Parameter: ISEG -> "5"
+ Parameter: SEG5 -> "ASP"
+ Parameter: IONSEG <- "ASP"
+  
+ CHARMM>     set ionpdb ligands/@seg@@iseg.pdb
+ Parameter: ISEG -> "5"
+ Parameter: SEG5 -> "ASP"
+ Parameter: IONPDB <- "LIGANDS/ASP.PDB"
+  
+ CHARMM>     stream @{clib}/addions.str
+ Parameter: CLIB -> "~/SCRIPTS/CHARMM"
+ VOPEN> Attempting to open::/home/taly/scripts/charmm/addions.str::
+ OPNLGU> Unit 99 opened for READONLY access to /home/taly/scripts/charmm/addions.str
+
+                    INPUT STREAM SWITCHING TO UNIT    99
+ RDTITL> * SCRIPT TO REPLACE SOME WATERS WITH IONS
+ RDTITL> *
+ Parameter: IN1 <- "" <empty>
+  
+ CHARMM>     
+  
+ CHARMM>    define replacement select @candidates .and. type OH2 end ! select num of water molecules
+ Parameter: CANDIDATES -> ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+ SELRPN>     72 atoms have been selected out of  14054
+  
+ CHARMM>    set repl ?nsel ! number of replacement candidates
+ RDCMND substituted energy or value "?NSEL" to "72"
+ Parameter: REPL <- "72"
+  
+ CHARMM>    if @repl .lt. @ionsneeded system "echo ADD_ION ERROR: SELECTION NOT BIG ENOUGH TO ACCOMODATE @IONSNEEDED IONS, SKIPPING..."
+ Parameter: REPL -> "72"
+ Parameter: IONSNEEDED -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "72" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @repl .lt. @ionsneeded goto skip_ion
+ Parameter: REPL -> "72"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "72" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    calc nion_int = INT ( @ionsneeded )
+ Parameter: IONSNEEDED -> "1"
+Evaluating: INT(1)
+ Parameter: NION_INT <- "1"
+  
+ CHARMM>     
+  
+ CHARMM>    if @ionsneeded .eq. 0 goto skip_ion   ! nothing to do: system is neutral
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "0".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @{nion_int} .ne. @ionsneeded system "echo ADD_ION ERROR: SYSTEM CHARGE NOT AN INTEGER, SKIPPING..."
+ Parameter: NION_INT -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @{nion_int} .ne. @ionsneeded goto skip_ion
+ Parameter: NION_INT -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    ! proceed with replication
+ CHARMM>    read sequence @ion @ionsneeded ! generate @nion of @ion
+ Parameter: ION -> "ASP"
+ Parameter: IONSNEEDED -> "1"
+  
+ CHARMM>    !gene @{ionseg}
+ CHARMM>    gene @{ionseg} first none last none
+ Parameter: IONSEG -> "ASP"
+ NO PATCHING WILL BE DONE ON THE FIRST RESIDUE
+ NO PATCHING WILL BE DONE ON THE LAST  RESIDUE
+ GENPSF> Segment  10 has been generated. Its identifier is ASP.
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       10   Number of residues   =     3150
+         Number of atoms         =    14066   Number of groups     =     4509
+         Number of bonds         =    14136   Number of angles     =    13204
+         Number of dihedrals     =    15310   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3325   Number of HB donors  =     6209
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>    ! if coordinates are provided, in a pdb file, then read them here
+ CHARMM>    ! (this allows making solutions other than ionic)
+ CHARMM>    if @?ionpdb .ne. 0 then
+ Comparing "1" and "0".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>    ! read coor pdb sele segid @{ionseg} end name @{ionpdb} resid
+ CHARMM>     read coor pdb name @{ionpdb} resid
+ Parameter: IONPDB -> "LIGANDS/ASP.PDB"
+ VOPEN> Attempting to open::ligands/asp.pdb::
+  read CHARMM-pdb format
+          SPATIAL COORDINATES BEING READ FROM UNIT 90
+ TITLE>   CREATE A PDB FILE FOR A SINGLE AA
+ TITLE>    DATE:     4/13/25     15:50:54      CREATED BY USER: TALY
+ TITLE>  *
+ VCLOSE: Closing unit   90 with status "KEEP"
+  
+ CHARMM>    ! copy to all residues
+ CHARMM>     if @ionsneeded .gt. 1 then
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skip to ELSE or ENDIF
+  
+ CHARMM>    else
+ Skip commands until next ENDIF
+  
+ CHARMM>    !
+ CHARMM>    ! next three commands put the water segment at the end of PSF
+ CHARMM>    replicate nrep 1 X select segid WAT end ! replicate water segment
+ SELRPN>   7944 atoms have been selected out of  14066
+ REPLIcate> Segments 11 to 11 have been generated.
+ REPLIcate> Their identifiers are X       1 to 1
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       11   Number of residues   =     5798
+         Number of atoms         =    22010   Number of groups     =     7157
+         Number of bonds         =    22080   Number of angles     =    15852
+         Number of dihedrals     =    15310   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     5973   Number of HB donors  =    11505
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>    delete atom select segid WAT end        ! this deletes the solvent segment
+ SELRPN>   7944 atoms have been selected out of  22010
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:       2648 residues deleted.
+
+ Message from MAPIC:          1 segments deleted.
+ DELTIC:      7944 bonds deleted
+ DELTIC:      2648 angles deleted
+ DELTIC:      5296 donors deleted
+ DELTIC:      2648 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       10   Number of residues   =     3150
+         Number of atoms         =    14066   Number of groups     =     4509
+         Number of bonds         =    14136   Number of angles     =    13204
+         Number of dihedrals     =    15310   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3325   Number of HB donors  =     6209
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>    rename segid WAT select segid X1 end    ! put the waters back at the end of the file
+ SELRPN>   7944 atoms have been selected out of  14066
+ SEGMENT 'X1      ' IS RENAMED TO 'WAT     '
+  
+ CHARMM>     
+  
+ CHARMM>    define candidates select @candidates end ! save selection (in case it takes a while to compute)
+ Parameter: CANDIDATES -> ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+ SELRPN>    216 atoms have been selected out of  14066
+  
+ CHARMM>    replicate nrep 1 X select candidates end ! duplicate all replaceable waters into a new segment
+ SELRPN>    216 atoms have been selected out of  14066
+ REPLIcate> Segments 11 to 11 have been generated.
+ REPLIcate> Their identifiers are X       1 to 1
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       11   Number of residues   =     3222
+         Number of atoms         =    14282   Number of groups     =     4581
+         Number of bonds         =    14352   Number of angles     =    13276
+         Number of dihedrals     =    15310   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3397   Number of HB donors  =     6353
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>    rename segid wrpl select segid X1 end
+ SELRPN>    216 atoms have been selected out of  14282
+ SEGMENT 'X1      ' IS RENAMED TO 'WRPL    '
+  
+ CHARMM>    delete atom select candidates end      ! delete replaceable atoms from original water group
+ SELRPN>    216 atoms have been selected out of  14282
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:         72 residues deleted.
+ DELTIC:       216 bonds deleted
+ DELTIC:        72 angles deleted
+ DELTIC:       144 donors deleted
+ DELTIC:        72 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       11   Number of residues   =     3150
+         Number of atoms         =    14066   Number of groups     =     4509
+         Number of bonds         =    14136   Number of angles     =    13204
+         Number of dihedrals     =    15310   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3325   Number of HB donors  =     6209
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>     
+  
+ CHARMM>    join wrpl renu ! renumber residues
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       11   Number of residues   =     3150
+         Number of atoms         =    14066   Number of groups     =     4509
+         Number of bonds         =    14136   Number of angles     =    13204
+         Number of dihedrals     =    15310   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3325   Number of HB donors  =     6209
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>     
+  
+ CHARMM>    set inum 1
+ Parameter: INUM <- "1"
+  
+ CHARMM>    label add_ion
+  
+ CHARMM>     calc j = int ( ?rand * @repl ) + 1
+ Parameter: REPL -> "72"
+ RDCMND substituted energy or value "?RAND" to "1.58263E-02"
+Evaluating: INT(1.58263E-02*72)+1
+ Parameter: J <- "2"
+  
+ CHARMM>     coor axis sele segid @{ionseg} .and. resid @inum end sele atom wrpl @j OH2 end
+ Parameter: IONSEG -> "ASP"
+ Parameter: INUM -> "1"
+ Parameter: J -> "2"
+ SELRPN>     12 atoms have been selected out of  14066
+ SELRPN>      1 atoms have been selected out of  14066
+ AXIS DEFINED FROM THE MAIN COORDINATES.
+  XAXIs=   38.836083  YAXIs=   25.654417  ZAXIs=   10.434833  RAXIs=   47.699855
+  Angle with previous axis:   14.674457
+
+  
+ CHARMM>     coor trans axis sele segid @{ionseg} .and. resid @inum end
+ Parameter: IONSEG -> "ASP"
+ Parameter: INUM -> "1"
+ SELRPN>     12 atoms have been selected out of  14066
+ TRANSLATION VECTOR    38.836083   25.654417   10.434833
+ SELECTED COORDINATES TRANSLATED IN THE MAIN SET.
+
+  
+ CHARMM>     delete atom select atom wrpl @j * end ! delete that water residue
+ Parameter: J -> "2"
+ SELRPN>      3 atoms have been selected out of  14066
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:          1 residues deleted.
+ DELTIC:         3 bonds deleted
+ DELTIC:         1 angles deleted
+ DELTIC:         2 donors deleted
+ DELTIC:         1 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       11   Number of residues   =     3149
+         Number of atoms         =    14063   Number of groups     =     4508
+         Number of bonds         =    14133   Number of angles     =    13203
+         Number of dihedrals     =    15310   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3324   Number of HB donors  =     6207
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>     
+  
+ CHARMM>     incr repl by -1
+ Parameter: REPL <- "71"
+  
+ CHARMM>     incr inum by 1
+ Parameter: INUM <- "2"
+  
+ CHARMM>     join wrpl renumber ! renumber waters so there are no gaps
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       11   Number of residues   =     3149
+         Number of atoms         =    14063   Number of groups     =     4508
+         Number of bonds         =    14133   Number of angles     =    13203
+         Number of dihedrals     =    15310   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3324   Number of HB donors  =     6207
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>     
+  
+ CHARMM>     if @inum .le. @ionsneeded -
+ CHARMM>    goto add_ion
+ Parameter: INUM -> "2"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "2" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    if @repl .ne. 0 join WAT wrpl renu
+ Parameter: REPL -> "71"
+ Comparing "71" and "0".
+ IF test evaluated as true.  Performing command
+ SEGMENTS "WAT     " AND "WRPL    " HAVE BEEN JOINED.
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       10   Number of residues   =     3149
+         Number of atoms         =    14063   Number of groups     =     4508
+         Number of bonds         =    14133   Number of angles     =    13203
+         Number of dihedrals     =    15310   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3324   Number of HB donors  =     6207
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>     
+  
+ CHARMM>    label skip_ion
+  
+ CHARMM>     
+  
+ VCLOSE: Closing unit   99 with status "KEEP"
+
+                    RETURNING TO INPUT STREAM     5
+  
+ CHARMM>     print coor sele .not. init end
+ SELRPN>      0 atoms have been selected out of  14063
+
+      ***** LEVEL  2 WARNING FROM <COORIO> *****
+      ***** ZERO ATOMS SPECIFIED TO WRITE. NO FILE CREATED
+      ******************************************
+      BOMLEV ( -1) IS NOT REACHED. WRNLEV IS  5
+
+  
+ CHARMM>     rename segid @{seg@@iseg}@iseg sele segid @ionseg end ! to avoid duplicate names (but make sure to read coords first, as above) ; note that could overrun the 4 chars
+ Parameter: ISEG -> "5"
+ Parameter: ISEG -> "5"
+ Parameter: IONSEG -> "ASP"
+ Parameter: SEG5 -> "ASP"
+ SELRPN>     12 atoms have been selected out of  14063
+ SEGMENT 'ASP     ' IS RENAMED TO 'ASP5    '
+  
+ CHARMM>     incr iseg
+ Parameter: ISEG <- "6"
+  
+ CHARMM>     if @iseg .le. @nseg -
+ CHARMM>    goto segs
+ Parameter: ISEG -> "6"
+ Parameter: NSEG -> "8"
+ Comparing "6" and "8".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>    ! set candidates  .byres. ( ( point 44 43 19 cut 11 ) .and. segid wat )
+ CHARMM>     set candidates  .byres. ( ( point 42 36 18 cut 11 ) .and. segid wat ) ! replace waters in the vicinity of a putative active site
+ Parameter: CANDIDATES <- ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+  
+ CHARMM>    !
+ CHARMM>    ! add ligands using ionization scripts
+ CHARMM>     set ionsneeded 1
+ Parameter: IONSNEEDED <- "1"
+  
+ CHARMM>     set ion @seg@@iseg
+ Parameter: ISEG -> "6"
+ Parameter: SEG6 -> "PHE"
+ Parameter: ION <- "PHE"
+  
+ CHARMM>     set ionseg @seg@@iseg ! note that, to avoid duplicate segnames, may need to append @iseg to segment name, and/or to modify it further
+ Parameter: ISEG -> "6"
+ Parameter: SEG6 -> "PHE"
+ Parameter: IONSEG <- "PHE"
+  
+ CHARMM>     set ionpdb ligands/@seg@@iseg.pdb
+ Parameter: ISEG -> "6"
+ Parameter: SEG6 -> "PHE"
+ Parameter: IONPDB <- "LIGANDS/PHE.PDB"
+  
+ CHARMM>     stream @{clib}/addions.str
+ Parameter: CLIB -> "~/SCRIPTS/CHARMM"
+ VOPEN> Attempting to open::/home/taly/scripts/charmm/addions.str::
+ OPNLGU> Unit 99 opened for READONLY access to /home/taly/scripts/charmm/addions.str
+
+                    INPUT STREAM SWITCHING TO UNIT    99
+ RDTITL> * SCRIPT TO REPLACE SOME WATERS WITH IONS
+ RDTITL> *
+ Parameter: IN1 <- "" <empty>
+  
+ CHARMM>     
+  
+ CHARMM>    define replacement select @candidates .and. type OH2 end ! select num of water molecules
+ Parameter: CANDIDATES -> ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+ SELRPN>     71 atoms have been selected out of  14063
+  
+ CHARMM>    set repl ?nsel ! number of replacement candidates
+ RDCMND substituted energy or value "?NSEL" to "71"
+ Parameter: REPL <- "71"
+  
+ CHARMM>    if @repl .lt. @ionsneeded system "echo ADD_ION ERROR: SELECTION NOT BIG ENOUGH TO ACCOMODATE @IONSNEEDED IONS, SKIPPING..."
+ Parameter: REPL -> "71"
+ Parameter: IONSNEEDED -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "71" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @repl .lt. @ionsneeded goto skip_ion
+ Parameter: REPL -> "71"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "71" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    calc nion_int = INT ( @ionsneeded )
+ Parameter: IONSNEEDED -> "1"
+Evaluating: INT(1)
+ Parameter: NION_INT <- "1"
+  
+ CHARMM>     
+  
+ CHARMM>    if @ionsneeded .eq. 0 goto skip_ion   ! nothing to do: system is neutral
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "0".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @{nion_int} .ne. @ionsneeded system "echo ADD_ION ERROR: SYSTEM CHARGE NOT AN INTEGER, SKIPPING..."
+ Parameter: NION_INT -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @{nion_int} .ne. @ionsneeded goto skip_ion
+ Parameter: NION_INT -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    ! proceed with replication
+ CHARMM>    read sequence @ion @ionsneeded ! generate @nion of @ion
+ Parameter: ION -> "PHE"
+ Parameter: IONSNEEDED -> "1"
+  
+ CHARMM>    !gene @{ionseg}
+ CHARMM>    gene @{ionseg} first none last none
+ Parameter: IONSEG -> "PHE"
+ NO PATCHING WILL BE DONE ON THE FIRST RESIDUE
+ NO PATCHING WILL BE DONE ON THE LAST  RESIDUE
+ GENPSF> Segment  11 has been generated. Its identifier is PHE.
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       11   Number of residues   =     3150
+         Number of atoms         =    14083   Number of groups     =     4517
+         Number of bonds         =    14153   Number of angles     =    13235
+         Number of dihedrals     =    15355   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3325   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>    ! if coordinates are provided, in a pdb file, then read them here
+ CHARMM>    ! (this allows making solutions other than ionic)
+ CHARMM>    if @?ionpdb .ne. 0 then
+ Comparing "1" and "0".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>    ! read coor pdb sele segid @{ionseg} end name @{ionpdb} resid
+ CHARMM>     read coor pdb name @{ionpdb} resid
+ Parameter: IONPDB -> "LIGANDS/PHE.PDB"
+ VOPEN> Attempting to open::ligands/phe.pdb::
+  read CHARMM-pdb format
+          SPATIAL COORDINATES BEING READ FROM UNIT 90
+ TITLE>   CREATE A PDB FILE FOR A SINGLE AA
+ TITLE>    DATE:     4/13/25     15:50:57      CREATED BY USER: TALY
+ TITLE>  *
+ VCLOSE: Closing unit   90 with status "KEEP"
+  
+ CHARMM>    ! copy to all residues
+ CHARMM>     if @ionsneeded .gt. 1 then
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skip to ELSE or ENDIF
+  
+ CHARMM>    else
+ Skip commands until next ENDIF
+  
+ CHARMM>    !
+ CHARMM>    ! next three commands put the water segment at the end of PSF
+ CHARMM>    replicate nrep 1 X select segid WAT end ! replicate water segment
+ SELRPN>   7941 atoms have been selected out of  14083
+ REPLIcate> Segments 12 to 12 have been generated.
+ REPLIcate> Their identifiers are X       1 to 1
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       12   Number of residues   =     5797
+         Number of atoms         =    22024   Number of groups     =     7164
+         Number of bonds         =    22094   Number of angles     =    15882
+         Number of dihedrals     =    15355   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     5972   Number of HB donors  =    11502
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>    delete atom select segid WAT end        ! this deletes the solvent segment
+ SELRPN>   7941 atoms have been selected out of  22024
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:       2647 residues deleted.
+
+ Message from MAPIC:          1 segments deleted.
+ DELTIC:      7941 bonds deleted
+ DELTIC:      2647 angles deleted
+ DELTIC:      5294 donors deleted
+ DELTIC:      2647 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       11   Number of residues   =     3150
+         Number of atoms         =    14083   Number of groups     =     4517
+         Number of bonds         =    14153   Number of angles     =    13235
+         Number of dihedrals     =    15355   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3325   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>    rename segid WAT select segid X1 end    ! put the waters back at the end of the file
+ SELRPN>   7941 atoms have been selected out of  14083
+ SEGMENT 'X1      ' IS RENAMED TO 'WAT     '
+  
+ CHARMM>     
+  
+ CHARMM>    define candidates select @candidates end ! save selection (in case it takes a while to compute)
+ Parameter: CANDIDATES -> ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+ SELRPN>    213 atoms have been selected out of  14083
+  
+ CHARMM>    replicate nrep 1 X select candidates end ! duplicate all replaceable waters into a new segment
+ SELRPN>    213 atoms have been selected out of  14083
+ REPLIcate> Segments 12 to 12 have been generated.
+ REPLIcate> Their identifiers are X       1 to 1
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       12   Number of residues   =     3221
+         Number of atoms         =    14296   Number of groups     =     4588
+         Number of bonds         =    14366   Number of angles     =    13306
+         Number of dihedrals     =    15355   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3396   Number of HB donors  =     6350
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>    rename segid wrpl select segid X1 end
+ SELRPN>    213 atoms have been selected out of  14296
+ SEGMENT 'X1      ' IS RENAMED TO 'WRPL    '
+  
+ CHARMM>    delete atom select candidates end      ! delete replaceable atoms from original water group
+ SELRPN>    213 atoms have been selected out of  14296
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:         71 residues deleted.
+ DELTIC:       213 bonds deleted
+ DELTIC:        71 angles deleted
+ DELTIC:       142 donors deleted
+ DELTIC:        71 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       12   Number of residues   =     3150
+         Number of atoms         =    14083   Number of groups     =     4517
+         Number of bonds         =    14153   Number of angles     =    13235
+         Number of dihedrals     =    15355   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3325   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>     
+  
+ CHARMM>    join wrpl renu ! renumber residues
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       12   Number of residues   =     3150
+         Number of atoms         =    14083   Number of groups     =     4517
+         Number of bonds         =    14153   Number of angles     =    13235
+         Number of dihedrals     =    15355   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3325   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>     
+  
+ CHARMM>    set inum 1
+ Parameter: INUM <- "1"
+  
+ CHARMM>    label add_ion
+  
+ CHARMM>     calc j = int ( ?rand * @repl ) + 1
+ Parameter: REPL -> "71"
+ RDCMND substituted energy or value "?RAND" to "0.578308"
+Evaluating: INT(0.578308*71)+1
+ Parameter: J <- "42"
+  
+ CHARMM>     coor axis sele segid @{ionseg} .and. resid @inum end sele atom wrpl @j OH2 end
+ Parameter: IONSEG -> "PHE"
+ Parameter: INUM -> "1"
+ Parameter: J -> "42"
+ SELRPN>     20 atoms have been selected out of  14083
+ SELRPN>      1 atoms have been selected out of  14083
+ AXIS DEFINED FROM THE MAIN COORDINATES.
+  XAXIs=   39.829700  YAXIs=   35.523700  ZAXIs=   19.343200  RAXIs=   56.767047
+  Angle with previous axis:   10.777992
+
+  
+ CHARMM>     coor trans axis sele segid @{ionseg} .and. resid @inum end
+ Parameter: IONSEG -> "PHE"
+ Parameter: INUM -> "1"
+ SELRPN>     20 atoms have been selected out of  14083
+ TRANSLATION VECTOR    39.829700   35.523700   19.343200
+ SELECTED COORDINATES TRANSLATED IN THE MAIN SET.
+
+  
+ CHARMM>     delete atom select atom wrpl @j * end ! delete that water residue
+ Parameter: J -> "42"
+ SELRPN>      3 atoms have been selected out of  14083
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:          1 residues deleted.
+ DELTIC:         3 bonds deleted
+ DELTIC:         1 angles deleted
+ DELTIC:         2 donors deleted
+ DELTIC:         1 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       12   Number of residues   =     3149
+         Number of atoms         =    14080   Number of groups     =     4516
+         Number of bonds         =    14150   Number of angles     =    13234
+         Number of dihedrals     =    15355   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3324   Number of HB donors  =     6206
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>     
+  
+ CHARMM>     incr repl by -1
+ Parameter: REPL <- "70"
+  
+ CHARMM>     incr inum by 1
+ Parameter: INUM <- "2"
+  
+ CHARMM>     join wrpl renumber ! renumber waters so there are no gaps
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       12   Number of residues   =     3149
+         Number of atoms         =    14080   Number of groups     =     4516
+         Number of bonds         =    14150   Number of angles     =    13234
+         Number of dihedrals     =    15355   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3324   Number of HB donors  =     6206
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>     
+  
+ CHARMM>     if @inum .le. @ionsneeded -
+ CHARMM>    goto add_ion
+ Parameter: INUM -> "2"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "2" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    if @repl .ne. 0 join WAT wrpl renu
+ Parameter: REPL -> "70"
+ Comparing "70" and "0".
+ IF test evaluated as true.  Performing command
+ SEGMENTS "WAT     " AND "WRPL    " HAVE BEEN JOINED.
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       11   Number of residues   =     3149
+         Number of atoms         =    14080   Number of groups     =     4516
+         Number of bonds         =    14150   Number of angles     =    13234
+         Number of dihedrals     =    15355   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3324   Number of HB donors  =     6206
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>     
+  
+ CHARMM>    label skip_ion
+  
+ CHARMM>     
+  
+ VCLOSE: Closing unit   99 with status "KEEP"
+
+                    RETURNING TO INPUT STREAM     5
+  
+ CHARMM>     print coor sele .not. init end
+ SELRPN>      0 atoms have been selected out of  14080
+
+      ***** LEVEL  2 WARNING FROM <COORIO> *****
+      ***** ZERO ATOMS SPECIFIED TO WRITE. NO FILE CREATED
+      ******************************************
+      BOMLEV ( -1) IS NOT REACHED. WRNLEV IS  5
+
+  
+ CHARMM>     rename segid @{seg@@iseg}@iseg sele segid @ionseg end ! to avoid duplicate names (but make sure to read coords first, as above) ; note that could overrun the 4 chars
+ Parameter: ISEG -> "6"
+ Parameter: ISEG -> "6"
+ Parameter: IONSEG -> "PHE"
+ Parameter: SEG6 -> "PHE"
+ SELRPN>     20 atoms have been selected out of  14080
+ SEGMENT 'PHE     ' IS RENAMED TO 'PHE6    '
+  
+ CHARMM>     incr iseg
+ Parameter: ISEG <- "7"
+  
+ CHARMM>     if @iseg .le. @nseg -
+ CHARMM>    goto segs
+ Parameter: ISEG -> "7"
+ Parameter: NSEG -> "8"
+ Comparing "7" and "8".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>    ! set candidates  .byres. ( ( point 44 43 19 cut 11 ) .and. segid wat )
+ CHARMM>     set candidates  .byres. ( ( point 42 36 18 cut 11 ) .and. segid wat ) ! replace waters in the vicinity of a putative active site
+ Parameter: CANDIDATES <- ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+  
+ CHARMM>    !
+ CHARMM>    ! add ligands using ionization scripts
+ CHARMM>     set ionsneeded 1
+ Parameter: IONSNEEDED <- "1"
+  
+ CHARMM>     set ion @seg@@iseg
+ Parameter: ISEG -> "7"
+ Parameter: SEG7 -> "TYR"
+ Parameter: ION <- "TYR"
+  
+ CHARMM>     set ionseg @seg@@iseg ! note that, to avoid duplicate segnames, may need to append @iseg to segment name, and/or to modify it further
+ Parameter: ISEG -> "7"
+ Parameter: SEG7 -> "TYR"
+ Parameter: IONSEG <- "TYR"
+  
+ CHARMM>     set ionpdb ligands/@seg@@iseg.pdb
+ Parameter: ISEG -> "7"
+ Parameter: SEG7 -> "TYR"
+ Parameter: IONPDB <- "LIGANDS/TYR.PDB"
+  
+ CHARMM>     stream @{clib}/addions.str
+ Parameter: CLIB -> "~/SCRIPTS/CHARMM"
+ VOPEN> Attempting to open::/home/taly/scripts/charmm/addions.str::
+ OPNLGU> Unit 99 opened for READONLY access to /home/taly/scripts/charmm/addions.str
+
+                    INPUT STREAM SWITCHING TO UNIT    99
+ RDTITL> * SCRIPT TO REPLACE SOME WATERS WITH IONS
+ RDTITL> *
+ Parameter: IN1 <- "" <empty>
+  
+ CHARMM>     
+  
+ CHARMM>    define replacement select @candidates .and. type OH2 end ! select num of water molecules
+ Parameter: CANDIDATES -> ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+ SELRPN>     70 atoms have been selected out of  14080
+  
+ CHARMM>    set repl ?nsel ! number of replacement candidates
+ RDCMND substituted energy or value "?NSEL" to "70"
+ Parameter: REPL <- "70"
+  
+ CHARMM>    if @repl .lt. @ionsneeded system "echo ADD_ION ERROR: SELECTION NOT BIG ENOUGH TO ACCOMODATE @IONSNEEDED IONS, SKIPPING..."
+ Parameter: REPL -> "70"
+ Parameter: IONSNEEDED -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "70" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @repl .lt. @ionsneeded goto skip_ion
+ Parameter: REPL -> "70"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "70" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    calc nion_int = INT ( @ionsneeded )
+ Parameter: IONSNEEDED -> "1"
+Evaluating: INT(1)
+ Parameter: NION_INT <- "1"
+  
+ CHARMM>     
+  
+ CHARMM>    if @ionsneeded .eq. 0 goto skip_ion   ! nothing to do: system is neutral
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "0".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @{nion_int} .ne. @ionsneeded system "echo ADD_ION ERROR: SYSTEM CHARGE NOT AN INTEGER, SKIPPING..."
+ Parameter: NION_INT -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @{nion_int} .ne. @ionsneeded goto skip_ion
+ Parameter: NION_INT -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    ! proceed with replication
+ CHARMM>    read sequence @ion @ionsneeded ! generate @nion of @ion
+ Parameter: ION -> "TYR"
+ Parameter: IONSNEEDED -> "1"
+  
+ CHARMM>    !gene @{ionseg}
+ CHARMM>    gene @{ionseg} first none last none
+ Parameter: IONSEG -> "TYR"
+ NO PATCHING WILL BE DONE ON THE FIRST RESIDUE
+ NO PATCHING WILL BE DONE ON THE LAST  RESIDUE
+ GENPSF> Segment  12 has been generated. Its identifier is TYR.
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       12   Number of residues   =     3150
+         Number of atoms         =    14101   Number of groups     =     4525
+         Number of bonds         =    14171   Number of angles     =    13267
+         Number of dihedrals     =    15402   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3326   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>    ! if coordinates are provided, in a pdb file, then read them here
+ CHARMM>    ! (this allows making solutions other than ionic)
+ CHARMM>    if @?ionpdb .ne. 0 then
+ Comparing "1" and "0".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>    ! read coor pdb sele segid @{ionseg} end name @{ionpdb} resid
+ CHARMM>     read coor pdb name @{ionpdb} resid
+ Parameter: IONPDB -> "LIGANDS/TYR.PDB"
+ VOPEN> Attempting to open::ligands/tyr.pdb::
+  read CHARMM-pdb format
+          SPATIAL COORDINATES BEING READ FROM UNIT 90
+ TITLE>   CREATE A PDB FILE FOR A SINGLE AA
+ TITLE>    DATE:     4/13/25     15:51:18      CREATED BY USER: TALY
+ TITLE>  *
+ VCLOSE: Closing unit   90 with status "KEEP"
+  
+ CHARMM>    ! copy to all residues
+ CHARMM>     if @ionsneeded .gt. 1 then
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skip to ELSE or ENDIF
+  
+ CHARMM>    else
+ Skip commands until next ENDIF
+  
+ CHARMM>    !
+ CHARMM>    ! next three commands put the water segment at the end of PSF
+ CHARMM>    replicate nrep 1 X select segid WAT end ! replicate water segment
+ SELRPN>   7938 atoms have been selected out of  14101
+ REPLIcate> Segments 13 to 13 have been generated.
+ REPLIcate> Their identifiers are X       1 to 1
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       13   Number of residues   =     5796
+         Number of atoms         =    22039   Number of groups     =     7171
+         Number of bonds         =    22109   Number of angles     =    15913
+         Number of dihedrals     =    15402   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     5972   Number of HB donors  =    11500
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>    delete atom select segid WAT end        ! this deletes the solvent segment
+ SELRPN>   7938 atoms have been selected out of  22039
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:       2646 residues deleted.
+
+ Message from MAPIC:          1 segments deleted.
+ DELTIC:      7938 bonds deleted
+ DELTIC:      2646 angles deleted
+ DELTIC:      5292 donors deleted
+ DELTIC:      2646 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       12   Number of residues   =     3150
+         Number of atoms         =    14101   Number of groups     =     4525
+         Number of bonds         =    14171   Number of angles     =    13267
+         Number of dihedrals     =    15402   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3326   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>    rename segid WAT select segid X1 end    ! put the waters back at the end of the file
+ SELRPN>   7938 atoms have been selected out of  14101
+ SEGMENT 'X1      ' IS RENAMED TO 'WAT     '
+  
+ CHARMM>     
+  
+ CHARMM>    define candidates select @candidates end ! save selection (in case it takes a while to compute)
+ Parameter: CANDIDATES -> ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+ SELRPN>    210 atoms have been selected out of  14101
+  
+ CHARMM>    replicate nrep 1 X select candidates end ! duplicate all replaceable waters into a new segment
+ SELRPN>    210 atoms have been selected out of  14101
+ REPLIcate> Segments 13 to 13 have been generated.
+ REPLIcate> Their identifiers are X       1 to 1
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       13   Number of residues   =     3220
+         Number of atoms         =    14311   Number of groups     =     4595
+         Number of bonds         =    14381   Number of angles     =    13337
+         Number of dihedrals     =    15402   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3396   Number of HB donors  =     6348
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>    rename segid wrpl select segid X1 end
+ SELRPN>    210 atoms have been selected out of  14311
+ SEGMENT 'X1      ' IS RENAMED TO 'WRPL    '
+  
+ CHARMM>    delete atom select candidates end      ! delete replaceable atoms from original water group
+ SELRPN>    210 atoms have been selected out of  14311
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:         70 residues deleted.
+ DELTIC:       210 bonds deleted
+ DELTIC:        70 angles deleted
+ DELTIC:       140 donors deleted
+ DELTIC:        70 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       13   Number of residues   =     3150
+         Number of atoms         =    14101   Number of groups     =     4525
+         Number of bonds         =    14171   Number of angles     =    13267
+         Number of dihedrals     =    15402   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3326   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>     
+  
+ CHARMM>    join wrpl renu ! renumber residues
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       13   Number of residues   =     3150
+         Number of atoms         =    14101   Number of groups     =     4525
+         Number of bonds         =    14171   Number of angles     =    13267
+         Number of dihedrals     =    15402   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3326   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>     
+  
+ CHARMM>    set inum 1
+ Parameter: INUM <- "1"
+  
+ CHARMM>    label add_ion
+  
+ CHARMM>     calc j = int ( ?rand * @repl ) + 1
+ Parameter: REPL -> "70"
+ RDCMND substituted energy or value "?RAND" to "0.886931"
+Evaluating: INT(0.886931*70)+1
+ Parameter: J <- "63"
+  
+ CHARMM>     coor axis sele segid @{ionseg} .and. resid @inum end sele atom wrpl @j OH2 end
+ Parameter: IONSEG -> "TYR"
+ Parameter: INUM -> "1"
+ Parameter: J -> "63"
+ SELRPN>     21 atoms have been selected out of  14101
+ SELRPN>      1 atoms have been selected out of  14101
+ AXIS DEFINED FROM THE MAIN COORDINATES.
+  XAXIs=   32.946095  YAXIs=   31.720048  ZAXIs=    7.441190  RAXIs=   46.335493
+  Angle with previous axis:   10.887509
+
+  
+ CHARMM>     coor trans axis sele segid @{ionseg} .and. resid @inum end
+ Parameter: IONSEG -> "TYR"
+ Parameter: INUM -> "1"
+ SELRPN>     21 atoms have been selected out of  14101
+ TRANSLATION VECTOR    32.946095   31.720048    7.441190
+ SELECTED COORDINATES TRANSLATED IN THE MAIN SET.
+
+  
+ CHARMM>     delete atom select atom wrpl @j * end ! delete that water residue
+ Parameter: J -> "63"
+ SELRPN>      3 atoms have been selected out of  14101
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:          1 residues deleted.
+ DELTIC:         3 bonds deleted
+ DELTIC:         1 angles deleted
+ DELTIC:         2 donors deleted
+ DELTIC:         1 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       13   Number of residues   =     3149
+         Number of atoms         =    14098   Number of groups     =     4524
+         Number of bonds         =    14168   Number of angles     =    13266
+         Number of dihedrals     =    15402   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3325   Number of HB donors  =     6206
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>     
+  
+ CHARMM>     incr repl by -1
+ Parameter: REPL <- "69"
+  
+ CHARMM>     incr inum by 1
+ Parameter: INUM <- "2"
+  
+ CHARMM>     join wrpl renumber ! renumber waters so there are no gaps
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       13   Number of residues   =     3149
+         Number of atoms         =    14098   Number of groups     =     4524
+         Number of bonds         =    14168   Number of angles     =    13266
+         Number of dihedrals     =    15402   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3325   Number of HB donors  =     6206
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>     
+  
+ CHARMM>     if @inum .le. @ionsneeded -
+ CHARMM>    goto add_ion
+ Parameter: INUM -> "2"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "2" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    if @repl .ne. 0 join WAT wrpl renu
+ Parameter: REPL -> "69"
+ Comparing "69" and "0".
+ IF test evaluated as true.  Performing command
+ SEGMENTS "WAT     " AND "WRPL    " HAVE BEEN JOINED.
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       12   Number of residues   =     3149
+         Number of atoms         =    14098   Number of groups     =     4524
+         Number of bonds         =    14168   Number of angles     =    13266
+         Number of dihedrals     =    15402   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3325   Number of HB donors  =     6206
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>     
+  
+ CHARMM>    label skip_ion
+  
+ CHARMM>     
+  
+ VCLOSE: Closing unit   99 with status "KEEP"
+
+                    RETURNING TO INPUT STREAM     5
+  
+ CHARMM>     print coor sele .not. init end
+ SELRPN>      0 atoms have been selected out of  14098
+
+      ***** LEVEL  2 WARNING FROM <COORIO> *****
+      ***** ZERO ATOMS SPECIFIED TO WRITE. NO FILE CREATED
+      ******************************************
+      BOMLEV ( -1) IS NOT REACHED. WRNLEV IS  5
+
+  
+ CHARMM>     rename segid @{seg@@iseg}@iseg sele segid @ionseg end ! to avoid duplicate names (but make sure to read coords first, as above) ; note that could overrun the 4 chars
+ Parameter: ISEG -> "7"
+ Parameter: ISEG -> "7"
+ Parameter: IONSEG -> "TYR"
+ Parameter: SEG7 -> "TYR"
+ SELRPN>     21 atoms have been selected out of  14098
+ SEGMENT 'TYR     ' IS RENAMED TO 'TYR7    '
+  
+ CHARMM>     incr iseg
+ Parameter: ISEG <- "8"
+  
+ CHARMM>     if @iseg .le. @nseg -
+ CHARMM>    goto segs
+ Parameter: ISEG -> "8"
+ Parameter: NSEG -> "8"
+ Comparing "8" and "8".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>    ! set candidates  .byres. ( ( point 44 43 19 cut 11 ) .and. segid wat )
+ CHARMM>     set candidates  .byres. ( ( point 42 36 18 cut 11 ) .and. segid wat ) ! replace waters in the vicinity of a putative active site
+ Parameter: CANDIDATES <- ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+  
+ CHARMM>    !
+ CHARMM>    ! add ligands using ionization scripts
+ CHARMM>     set ionsneeded 1
+ Parameter: IONSNEEDED <- "1"
+  
+ CHARMM>     set ion @seg@@iseg
+ Parameter: ISEG -> "8"
+ Parameter: SEG8 -> "THR"
+ Parameter: ION <- "THR"
+  
+ CHARMM>     set ionseg @seg@@iseg ! note that, to avoid duplicate segnames, may need to append @iseg to segment name, and/or to modify it further
+ Parameter: ISEG -> "8"
+ Parameter: SEG8 -> "THR"
+ Parameter: IONSEG <- "THR"
+  
+ CHARMM>     set ionpdb ligands/@seg@@iseg.pdb
+ Parameter: ISEG -> "8"
+ Parameter: SEG8 -> "THR"
+ Parameter: IONPDB <- "LIGANDS/THR.PDB"
+  
+ CHARMM>     stream @{clib}/addions.str
+ Parameter: CLIB -> "~/SCRIPTS/CHARMM"
+ VOPEN> Attempting to open::/home/taly/scripts/charmm/addions.str::
+ OPNLGU> Unit 99 opened for READONLY access to /home/taly/scripts/charmm/addions.str
+
+                    INPUT STREAM SWITCHING TO UNIT    99
+ RDTITL> * SCRIPT TO REPLACE SOME WATERS WITH IONS
+ RDTITL> *
+ Parameter: IN1 <- "" <empty>
+  
+ CHARMM>     
+  
+ CHARMM>    define replacement select @candidates .and. type OH2 end ! select num of water molecules
+ Parameter: CANDIDATES -> ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+ SELRPN>     69 atoms have been selected out of  14098
+  
+ CHARMM>    set repl ?nsel ! number of replacement candidates
+ RDCMND substituted energy or value "?NSEL" to "69"
+ Parameter: REPL <- "69"
+  
+ CHARMM>    if @repl .lt. @ionsneeded system "echo ADD_ION ERROR: SELECTION NOT BIG ENOUGH TO ACCOMODATE @IONSNEEDED IONS, SKIPPING..."
+ Parameter: REPL -> "69"
+ Parameter: IONSNEEDED -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "69" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @repl .lt. @ionsneeded goto skip_ion
+ Parameter: REPL -> "69"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "69" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    calc nion_int = INT ( @ionsneeded )
+ Parameter: IONSNEEDED -> "1"
+Evaluating: INT(1)
+ Parameter: NION_INT <- "1"
+  
+ CHARMM>     
+  
+ CHARMM>    if @ionsneeded .eq. 0 goto skip_ion   ! nothing to do: system is neutral
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "0".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @{nion_int} .ne. @ionsneeded system "echo ADD_ION ERROR: SYSTEM CHARGE NOT AN INTEGER, SKIPPING..."
+ Parameter: NION_INT -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    if @{nion_int} .ne. @ionsneeded goto skip_ion
+ Parameter: NION_INT -> "1"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    ! proceed with replication
+ CHARMM>    read sequence @ion @ionsneeded ! generate @nion of @ion
+ Parameter: ION -> "THR"
+ Parameter: IONSNEEDED -> "1"
+  
+ CHARMM>    !gene @{ionseg}
+ CHARMM>    gene @{ionseg} first none last none
+ Parameter: IONSEG -> "THR"
+ NO PATCHING WILL BE DONE ON THE FIRST RESIDUE
+ NO PATCHING WILL BE DONE ON THE LAST  RESIDUE
+ GENPSF> Segment  13 has been generated. Its identifier is THR.
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       13   Number of residues   =     3150
+         Number of atoms         =    14112   Number of groups     =     4528
+         Number of bonds         =    14181   Number of angles     =    13287
+         Number of dihedrals     =    15429   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3327   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>    ! if coordinates are provided, in a pdb file, then read them here
+ CHARMM>    ! (this allows making solutions other than ionic)
+ CHARMM>    if @?ionpdb .ne. 0 then
+ Comparing "1" and "0".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>    ! read coor pdb sele segid @{ionseg} end name @{ionpdb} resid
+ CHARMM>     read coor pdb name @{ionpdb} resid
+ Parameter: IONPDB -> "LIGANDS/THR.PDB"
+ VOPEN> Attempting to open::ligands/thr.pdb::
+  read CHARMM-pdb format
+          SPATIAL COORDINATES BEING READ FROM UNIT 90
+ TITLE>   CREATE A PDB FILE FOR A SINGLE AA
+ TITLE>    DATE:     4/13/25     15:51:14      CREATED BY USER: TALY
+ TITLE>  *
+ VCLOSE: Closing unit   90 with status "KEEP"
+  
+ CHARMM>    ! copy to all residues
+ CHARMM>     if @ionsneeded .gt. 1 then
+ Parameter: IONSNEEDED -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skip to ELSE or ENDIF
+  
+ CHARMM>    else
+ Skip commands until next ENDIF
+  
+ CHARMM>    !
+ CHARMM>    ! next three commands put the water segment at the end of PSF
+ CHARMM>    replicate nrep 1 X select segid WAT end ! replicate water segment
+ SELRPN>   7935 atoms have been selected out of  14112
+ REPLIcate> Segments 14 to 14 have been generated.
+ REPLIcate> Their identifiers are X       1 to 1
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       14   Number of residues   =     5795
+         Number of atoms         =    22047   Number of groups     =     7173
+         Number of bonds         =    22116   Number of angles     =    15932
+         Number of dihedrals     =    15429   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     5972   Number of HB donors  =    11498
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>    delete atom select segid WAT end        ! this deletes the solvent segment
+ SELRPN>   7935 atoms have been selected out of  22047
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:       2645 residues deleted.
+
+ Message from MAPIC:          1 segments deleted.
+ DELTIC:      7935 bonds deleted
+ DELTIC:      2645 angles deleted
+ DELTIC:      5290 donors deleted
+ DELTIC:      2645 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       13   Number of residues   =     3150
+         Number of atoms         =    14112   Number of groups     =     4528
+         Number of bonds         =    14181   Number of angles     =    13287
+         Number of dihedrals     =    15429   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3327   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>    rename segid WAT select segid X1 end    ! put the waters back at the end of the file
+ SELRPN>   7935 atoms have been selected out of  14112
+ SEGMENT 'X1      ' IS RENAMED TO 'WAT     '
+  
+ CHARMM>     
+  
+ CHARMM>    define candidates select @candidates end ! save selection (in case it takes a while to compute)
+ Parameter: CANDIDATES -> ".BYRES. ( ( POINT 42 36 18 CUT 11 ) .AND. SEGID WAT )"
+ SELRPN>    207 atoms have been selected out of  14112
+  
+ CHARMM>    replicate nrep 1 X select candidates end ! duplicate all replaceable waters into a new segment
+ SELRPN>    207 atoms have been selected out of  14112
+ REPLIcate> Segments 14 to 14 have been generated.
+ REPLIcate> Their identifiers are X       1 to 1
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       14   Number of residues   =     3219
+         Number of atoms         =    14319   Number of groups     =     4597
+         Number of bonds         =    14388   Number of angles     =    13356
+         Number of dihedrals     =    15429   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3396   Number of HB donors  =     6346
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>    rename segid wrpl select segid X1 end
+ SELRPN>    207 atoms have been selected out of  14319
+ SEGMENT 'X1      ' IS RENAMED TO 'WRPL    '
+  
+ CHARMM>    delete atom select candidates end      ! delete replaceable atoms from original water group
+ SELRPN>    207 atoms have been selected out of  14319
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:         69 residues deleted.
+ DELTIC:       207 bonds deleted
+ DELTIC:        69 angles deleted
+ DELTIC:       138 donors deleted
+ DELTIC:        69 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       14   Number of residues   =     3150
+         Number of atoms         =    14112   Number of groups     =     4528
+         Number of bonds         =    14181   Number of angles     =    13287
+         Number of dihedrals     =    15429   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3327   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>     
+  
+ CHARMM>    join wrpl renu ! renumber residues
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       14   Number of residues   =     3150
+         Number of atoms         =    14112   Number of groups     =     4528
+         Number of bonds         =    14181   Number of angles     =    13287
+         Number of dihedrals     =    15429   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3327   Number of HB donors  =     6208
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>     
+  
+ CHARMM>    set inum 1
+ Parameter: INUM <- "1"
+  
+ CHARMM>    label add_ion
+  
+ CHARMM>     calc j = int ( ?rand * @repl ) + 1
+ Parameter: REPL -> "69"
+ RDCMND substituted energy or value "?RAND" to "0.688906"
+Evaluating: INT(0.688906*69)+1
+ Parameter: J <- "48"
+  
+ CHARMM>     coor axis sele segid @{ionseg} .and. resid @inum end sele atom wrpl @j OH2 end
+ Parameter: IONSEG -> "THR"
+ Parameter: INUM -> "1"
+ Parameter: J -> "48"
+ SELRPN>     14 atoms have been selected out of  14112
+ SELRPN>      1 atoms have been selected out of  14112
+ AXIS DEFINED FROM THE MAIN COORDINATES.
+  XAXIs=   36.419357  YAXIs=   44.045714  ZAXIs=   16.320429  RAXIs=   59.436949
+  Angle with previous axis:    9.221046
+
+  
+ CHARMM>     coor trans axis sele segid @{ionseg} .and. resid @inum end
+ Parameter: IONSEG -> "THR"
+ Parameter: INUM -> "1"
+ SELRPN>     14 atoms have been selected out of  14112
+ TRANSLATION VECTOR    36.419357   44.045714   16.320429
+ SELECTED COORDINATES TRANSLATED IN THE MAIN SET.
+
+  
+ CHARMM>     delete atom select atom wrpl @j * end ! delete that water residue
+ Parameter: J -> "48"
+ SELRPN>      3 atoms have been selected out of  14112
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:          1 residues deleted.
+ DELTIC:         3 bonds deleted
+ DELTIC:         1 angles deleted
+ DELTIC:         2 donors deleted
+ DELTIC:         1 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       14   Number of residues   =     3149
+         Number of atoms         =    14109   Number of groups     =     4527
+         Number of bonds         =    14178   Number of angles     =    13286
+         Number of dihedrals     =    15429   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3326   Number of HB donors  =     6206
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>     
+  
+ CHARMM>     incr repl by -1
+ Parameter: REPL <- "68"
+  
+ CHARMM>     incr inum by 1
+ Parameter: INUM <- "2"
+  
+ CHARMM>     join wrpl renumber ! renumber waters so there are no gaps
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       14   Number of residues   =     3149
+         Number of atoms         =    14109   Number of groups     =     4527
+         Number of bonds         =    14178   Number of angles     =    13286
+         Number of dihedrals     =    15429   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3326   Number of HB donors  =     6206
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>     
+  
+ CHARMM>     if @inum .le. @ionsneeded -
+ CHARMM>    goto add_ion
+ Parameter: INUM -> "2"
+ Parameter: IONSNEEDED -> "1"
+ Comparing "2" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    if @repl .ne. 0 join WAT wrpl renu
+ Parameter: REPL -> "68"
+ Comparing "68" and "0".
+ IF test evaluated as true.  Performing command
+ SEGMENTS "WAT     " AND "WRPL    " HAVE BEEN JOINED.
+ THE RESIDUE IDENTIFIERS HAVE BEEN RENUMBERED
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =       13   Number of residues   =     3149
+         Number of atoms         =    14109   Number of groups     =     4527
+         Number of bonds         =    14178   Number of angles     =    13286
+         Number of dihedrals     =    15429   Number of impropers  =      988
+         Number of cross-terms   =      360
+         Number of HB acceptors  =     3326   Number of HB donors  =     6206
+         Number of NB exclusions =        0   Total charge =   -1.00000
+  
+ CHARMM>     
+  
+ CHARMM>    label skip_ion
+  
+ CHARMM>     
+  
+ VCLOSE: Closing unit   99 with status "KEEP"
+
+                    RETURNING TO INPUT STREAM     5
+  
+ CHARMM>     print coor sele .not. init end
+ SELRPN>      0 atoms have been selected out of  14109
+
+      ***** LEVEL  2 WARNING FROM <COORIO> *****
+      ***** ZERO ATOMS SPECIFIED TO WRITE. NO FILE CREATED
+      ******************************************
+      BOMLEV ( -1) IS NOT REACHED. WRNLEV IS  5
+
+  
+ CHARMM>     rename segid @{seg@@iseg}@iseg sele segid @ionseg end ! to avoid duplicate names (but make sure to read coords first, as above) ; note that could overrun the 4 chars
+ Parameter: ISEG -> "8"
+ Parameter: ISEG -> "8"
+ Parameter: IONSEG -> "THR"
+ Parameter: SEG8 -> "THR"
+ SELRPN>     14 atoms have been selected out of  14109
+ SEGMENT 'THR     ' IS RENAMED TO 'THR8    '
+  
+ CHARMM>     incr iseg
+ Parameter: ISEG <- "9"
+  
+ CHARMM>     if @iseg .le. @nseg -
+ CHARMM>    goto segs
+ Parameter: ISEG -> "9"
+ Parameter: NSEG -> "8"
+ Comparing "9" and "8".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    !
+ CHARMM>    mini abnr nstep 100
+
+ NONBOND OPTION FLAGS: 
+     ELEC     VDW      ATOMs    CDIElec  FSHIft   VATOm    VFSWIt  
+     BYGRoup  NOEXtnd  NOEWald 
+ CUTNB  = 14.000 CTEXNB =999.000 CTONNB = 10.000 CTOFNB = 12.000
+ CGONNB =  0.000 CGOFNB = 10.000
+ WMIN   =  1.500 WRNMXD =  0.500 E14FAC =  1.000 EPS    =  1.000
+ NBXMOD =      5
+ There are        0 atom  pairs and        0 atom  exclusions.
+ There are        0 group pairs and        0 group exclusions.
+ <MAKINB> with mode   5 found  24691 exclusions and  15115 interactions(1-4)
+ <MAKGRP> found   5129 group exclusions.
+ Generating nonbond list with Exclusion mode = 5
+ == PRIMARY == SPACE FOR  4054244 ATOM PAIRS AND        0 GROUP PAIRS
+ == PRIMARY == SPACE FOR  6081386 ATOM PAIRS AND        0 GROUP PAIRS
+
+ General atom nonbond list generation found:
+  6077784 ATOM PAIRS WERE FOUND FOR ATOM LIST
+   353097 GROUP PAIRS REQUIRED ATOM SEARCHES
+
+        0 REPLICA ATOM  PAIRS EXCLUDED
+
+
+
+ ABNER> An energy minimization has been requested.
+
+ EIGRNG =    0.0005000   MINDIM =            5
+ NPRINT =           10   NSTEP  =          100
+ PSTRCT =    0.0000000   SDSTP  =    0.0200000
+ STPLIM =    1.0000000   STRICT =    0.1000000
+ TOLFUN =    0.0000000   TOLGRD =    0.0000000
+ TOLITR =          100   TOLSTP =    0.0000000
+ FMEM   =    0.0000000
+MINI MIN: Cycle      ENERgy      Delta-E         GRMS    Step-size
+MINI INTERN:          BONDs       ANGLes       UREY-b    DIHEdrals    IMPRopers
+MINI CROSS:           CMAPs        PMF1D        PMF2D        PRIMO
+MINI EXTERN:        VDWaals         ELEC       HBONds          ASP         USER
+ ----------       ---------    ---------    ---------    ---------    ---------
+MINI>        0  0.29519E+12  0.00000E+00  0.65443E+11  0.00000E+00
+MINI INTERN>     1218.11736   1527.01485     64.57184   3333.92338     42.42997
+MINI CROSS>      -191.62274      0.00000      0.00000      0.00000
+MINI EXTERN>    0.29519E+12 -0.39394E+05  0.00000E+00  0.00000E+00  0.00000E+00
+ ----------       ---------    ---------    ---------    ---------    ---------
+MINI>       10  0.59106E+10  0.28928E+12  0.17359E+10  0.26874E-01
+MINI INTERN>     1222.14670   1527.04794     65.07768   3333.97114     43.11361
+MINI CROSS>      -191.62274      0.00000      0.00000      0.00000
+MINI EXTERN>   5910609304.2     -39561.5          0.0          0.0          0.0
+ ----------       ---------    ---------    ---------    ---------    ---------
+MINI>       20  198399269.6 5712176472.9   23680574.5          0.0
+MINI INTERN>     1231.23255   1528.74556     65.46696   3334.13711     43.32953
+MINI CROSS>      -191.62274      0.00000      0.00000      0.00000
+MINI EXTERN>   198432652.37    -39394.06         0.00         0.00         0.00
+ ----------       ---------    ---------    ---------    ---------    ---------
+MINI>       30   9446317.27 188952952.33    589922.15         0.03
+MINI INTERN>     1376.75801   1532.90888     67.35295   3334.74022     44.56094
+MINI CROSS>      -191.62274      0.00000      0.00000      0.00000
+MINI EXTERN>   9479549.0136  -39396.4457       0.0000       0.0000       0.0000
+ ----------       ---------    ---------    ---------    ---------    ---------
+ UPDECI: Nonbond update at step        36
+ Generating nonbond list with Exclusion mode = 5
+ == PRIMARY == SPACE FOR  6081386 ATOM PAIRS AND        0 GROUP PAIRS
+
+ General atom nonbond list generation found:
+  6077809 ATOM PAIRS WERE FOUND FOR ATOM LIST
+   353113 GROUP PAIRS REQUIRED ATOM SEARCHES
+
+        0 REPLICA ATOM  PAIRS EXCLUDED
+
+MINI>       40  122450.0502 9323867.2159    1225.4853       0.2323
+MINI INTERN>     3384.96476   1891.10824    128.29156   3352.04295     43.58691
+MINI CROSS>      -191.62307      0.00000      0.00000      0.00000
+MINI EXTERN>   153250.49253 -39408.81365      0.00000      0.00000      0.00000
+ ----------       ---------    ---------    ---------    ---------    ---------
+ UPDECI: Nonbond update at step        42
+ Generating nonbond list with Exclusion mode = 5
+ == PRIMARY == SPACE FOR  6081386 ATOM PAIRS AND        0 GROUP PAIRS
+
+ General atom nonbond list generation found:
+  6077719 ATOM PAIRS WERE FOUND FOR ATOM LIST
+   353367 GROUP PAIRS REQUIRED ATOM SEARCHES
+
+        0 REPLICA ATOM  PAIRS EXCLUDED
+
+ EPHI: WARNING. bent improper torsion angle is 
+
+far from minimum for;
+    IPHI=  988  with deltaPHI= 128.4634 MIN=   0.0000 ATOMS: 6118 6115 6120 6119
+ EPHI: WARNING. bent improper torsion angle is 
+
+far from minimum for;
+    IPHI=  988  with deltaPHI= 133.1407 MIN=   0.0000 ATOMS: 6118 6115 6120 6119
+ EPHI: WARNING. bent improper torsion angle is 
+
+far from minimum for;
+    IPHI=  988  with deltaPHI= 109.0271 MIN=   0.0000 ATOMS: 6118 6115 6120 6119
+ UPDECI: Nonbond update at step        49
+ Generating nonbond list with Exclusion mode = 5
+ == PRIMARY == SPACE FOR  6081386 ATOM PAIRS AND        0 GROUP PAIRS
+
+ General atom nonbond list generation found:
+  6077513 ATOM PAIRS WERE FOUND FOR ATOM LIST
+   353370 GROUP PAIRS REQUIRED ATOM SEARCHES
+
+        0 REPLICA ATOM  PAIRS EXCLUDED
+
+MINI>       50 -19774.61997 142224.67021     56.22398      0.74084
+MINI INTERN>     5975.49003   2390.61132    362.19744   3419.95779     49.36474
+MINI CROSS>      -191.52856      0.00000      0.00000      0.00000
+MINI EXTERN>     7699.11256 -39479.82530      0.00000      0.00000      0.00000
+ ----------       ---------    ---------    ---------    ---------    ---------
+ UPDECI: Nonbond update at step        52
+ Generating nonbond list with Exclusion mode = 5
+ == PRIMARY == SPACE FOR  6081386 ATOM PAIRS AND        0 GROUP PAIRS
+
+ General atom nonbond list generation found:
+  6077514 ATOM PAIRS WERE FOUND FOR ATOM LIST
+   353081 GROUP PAIRS REQUIRED ATOM SEARCHES
+
+        0 REPLICA ATOM  PAIRS EXCLUDED
+
+ UPDECI: Nonbond update at step        57
+ Generating nonbond list with Exclusion mode = 5
+ == PRIMARY == SPACE FOR  6081386 ATOM PAIRS AND        0 GROUP PAIRS
+
+ General atom nonbond list generation found:
+  6077509 ATOM PAIRS WERE FOUND FOR ATOM LIST
+   352936 GROUP PAIRS REQUIRED ATOM SEARCHES
+
+        0 REPLICA ATOM  PAIRS EXCLUDED
+
+MINI>       60 -24762.78934   4988.16937    189.91513      1.11989
+MINI INTERN>     1565.66560   2225.37813    139.69368   3427.93186     46.48765
+MINI CROSS>      -191.64325      0.00000      0.00000      0.00000
+MINI EXTERN>     7488.90940 -39465.21242      0.00000      0.00000      0.00000
+ ----------       ---------    ---------    ---------    ---------    ---------
+ UPDECI: Nonbond update at step        64
+ Generating nonbond list with Exclusion mode = 5
+ == PRIMARY == SPACE FOR  6081386 ATOM PAIRS AND        0 GROUP PAIRS
+
+ General atom nonbond list generation found:
+  6077568 ATOM PAIRS WERE FOUND FOR ATOM LIST
+   352903 GROUP PAIRS REQUIRED ATOM SEARCHES
+
+        0 REPLICA ATOM  PAIRS EXCLUDED
+
+MINI>       70 -30680.24416   5917.45482      3.55795      0.90288
+MINI INTERN>     1279.56955   1920.09301     97.30349   3436.98290     47.90564
+MINI CROSS>      -191.58064      0.00000      0.00000      0.00000
+MINI EXTERN>     2344.48787 -39615.00598      0.00000      0.00000      0.00000
+ ----------       ---------    ---------    ---------    ---------    ---------
+ UPDECI: Nonbond update at step        71
+ Generating nonbond list with Exclusion mode = 5
+ == PRIMARY == SPACE FOR  6081386 ATOM PAIRS AND        0 GROUP PAIRS
+
+ General atom nonbond list generation found:
+  6077600 ATOM PAIRS WERE FOUND FOR ATOM LIST
+   353045 GROUP PAIRS REQUIRED ATOM SEARCHES
+
+        0 REPLICA ATOM  PAIRS EXCLUDED
+
+ UPDECI: Nonbond update at step        77
+ Generating nonbond list with Exclusion mode = 5
+ == PRIMARY == SPACE FOR  6081386 ATOM PAIRS AND        0 GROUP PAIRS
+
+ General atom nonbond list generation found:
+  6077655 ATOM PAIRS WERE FOUND FOR ATOM LIST
+   352952 GROUP PAIRS REQUIRED ATOM SEARCHES
+
+        0 REPLICA ATOM  PAIRS EXCLUDED
+
+MINI>       80 -32218.14657   1537.90241      1.83661      0.87448
+MINI INTERN>     1226.51276   1666.07914     71.85641   3375.52535     42.09118
+MINI CROSS>      -190.89856      0.00000      0.00000      0.00000
+MINI EXTERN>     1732.55526 -40141.86812      0.00000      0.00000      0.00000
+ ----------       ---------    ---------    ---------    ---------    ---------
+ UPDECI: Nonbond update at step        87
+ Generating nonbond list with Exclusion mode = 5
+ == PRIMARY == SPACE FOR  6081386 ATOM PAIRS AND        0 GROUP PAIRS
+
+ General atom nonbond list generation found:
+  6078640 ATOM PAIRS WERE FOUND FOR ATOM LIST
+   352992 GROUP PAIRS REQUIRED ATOM SEARCHES
+
+        0 REPLICA ATOM  PAIRS EXCLUDED
+
+MINI>       90 -33058.83580    840.68923      1.14408      0.50819
+MINI INTERN>     1251.33593   1604.97182     67.49859   3349.02724     42.04896
+MINI CROSS>      -189.61983      0.00000      0.00000      0.00000
+MINI EXTERN>     1723.74765 -40907.84616      0.00000      0.00000      0.00000
+ ----------       ---------    ---------    ---------    ---------    ---------
+MINI>      100 -33602.13137    543.29557      1.20171      0.49221
+MINI INTERN>     1285.39069   1612.55970     65.46397   3355.10605     39.99109
+MINI CROSS>      -188.73842      0.00000      0.00000      0.00000
+MINI EXTERN>     1891.79600 -41663.70044      0.00000      0.00000      0.00000
+ ----------       ---------    ---------    ---------    ---------    ---------
+
+ ABNER> Minimization exiting with number of steps limit (  100) exceeded.
+
+ABNR MIN: Cycle      ENERgy      Delta-E         GRMS    Step-size
+ABNR INTERN:          BONDs       ANGLes       UREY-b    DIHEdrals    IMPRopers
+ABNR CROSS:           CMAPs        PMF1D        PMF2D        PRIMO
+ABNR EXTERN:        VDWaals         ELEC       HBONds          ASP         USER
+ ----------       ---------    ---------    ---------    ---------    ---------
+ABNR>      100 -33602.13137    543.29557      1.20171      0.44298
+ABNR INTERN>     1285.39069   1612.55970     65.46397   3355.10605     39.99109
+ABNR CROSS>      -188.73842      0.00000      0.00000      0.00000
+ABNR EXTERN>     1891.79600 -41663.70044      0.00000      0.00000      0.00000
+ ----------       ---------    ---------    ---------    ---------    ---------
+  
+ CHARMM>    !mini conj nstep 100
+ CHARMM>    !mini sd nstep 100
+ CHARMM>    !
+ CHARMM>    write psf @format name @{psffile}-psilcs.psf xplor
+ Parameter: FORMAT -> "CARD"
+ Parameter: PSFFILE -> "CHI3-APO_SN"
+ VOPEN> Attempting to open::chi3-apo_sn-psilcs.psf::
+ RDTITL> WRITE COOR CARD NAME CHI3-APO_MSN-PSILCS.COR
+ RDTITL> No title read.
+ VCLOSE: Closing unit   90 with status "KEEP"
+  
+ CHARMM>    write coor @format name @{corfile}-psilcs.cor
+ Parameter: FORMAT -> "CARD"
+ Parameter: CORFILE -> "CHI3-APO_MSN"
+ VOPEN> Attempting to open::chi3-apo_msn-psilcs.cor::
+ RDTITL> WRITE COOR PDB NAME CHI3-APO_MSN-PSILCS.PDB
+ RDTITL> No title read.
+ VCLOSE: Closing unit   90 with status "KEEP"
+ VCLOSE: Closing unit   90 with status "KEEP"
+  
+ CHARMM>    write coor pdb name @{corfile}-psilcs.pdb
+ Parameter: CORFILE -> "CHI3-APO_MSN"
+ VOPEN> Attempting to open::chi3-apo_msn-psilcs.pdb::
+ RDTITL>  
+ RDTITL> No title read.
+  Write CHARMM-pdb format
+ VCLOSE: Closing unit   90 with status "KEEP"
+  
+ CHARMM>     
+  
+
+      $$$$$$  New timer profile Local node$$$$$
+
+      Heuristic check                 0.00 Other:            0.00
+      NBONDS                         11.78 Other:            0.00
+   List time                      11.78 Other:            0.00
+      Nonbond force                  71.18 Other:            0.00
+         Bond energy                     0.15 Other:            0.00
+         Angle energy                    0.39 Other:            0.00
+         Dihedral energy                 0.81 Other:            0.00
+         Restraints energy               0.00 Other:            0.00
+      INTRNL energy                   1.37 Other:            0.02
+      Comm energy                     0.00 Other:            0.00
+      Comm force                      0.00 Other:            0.00
+   Energy time                    72.67 Other:            0.12
+ Total time                     91.62 Other:            7.16
+
+         $$$$$$  Average   profile $$$$$
+
+      Heuristic check                 0.00 Other:            0.00
+      NBONDS                         11.78 Other:            0.00
+   List time                      11.78 Other:            0.00
+      Nonbond force                  71.18 Other:            0.00
+         Bond energy                     0.15 Other:            0.00
+         Angle energy                    0.39 Other:            0.00
+         Dihedral energy                 0.81 Other:            0.00
+         Restraints energy               0.00 Other:            0.00
+      INTRNL energy                   1.37 Other:            0.02
+      Comm energy                     0.00 Other:            0.00
+      Comm force                      0.00 Other:            0.00
+   Energy time                    72.67 Other:            0.12
+ Total time                     91.62 Other:            7.16
+
+                    NORMAL TERMINATION BY END OF FILE
+                    MOST SEVERE WARNING WAS AT LEVEL  0
+
+                    $$$$$ JOB ACCOUNTING INFORMATION $$$$$
+                     ELAPSED TIME:     1.53  MINUTES 
+                         CPU TIME:     1.52  MINUTES 

@@ -65,7 +65,7 @@ echo "
  :fill col inst
  :print col inst name cvs-inst0.dat
  :print col main name cvs0.dat
-! :test grad step 0.001 ! passsed
+! :test grad step 0.001 ! passed
 ! stats
  : stat rene renm rene.dat - ! restraint energy
    hist hnam hist.dat hcol inst ! instantaneous CV series
