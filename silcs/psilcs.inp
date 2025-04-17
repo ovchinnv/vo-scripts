@@ -11,15 +11,7 @@ set resid
 !set topparcgenff ~/charmm/parameters/cgenff31
 stream @{clib}/readpsf36m.str
 
-set seg1 PHE
-set seg2 TRP
-set seg3 LYS
-set seg4 LEU
-set seg5 ASP
-set seg6 HSD
-set seg7 MET
-set seg8 TYR
-set nseg 8
+stream psilcs-def.str
 
 set iseg 1
 label segs
@@ -29,10 +21,11 @@ label segs
 ! add ligands using ionization scripts
  set ionsneeded 1
  set ion @seg@@iseg
- set ionseg @seg@@iseg
+ set ionseg @seg@@iseg ! note that, to avoid duplicate segnames, may need to append @iseg to segment name, and/or to modify it further
  set ionpdb ligands/@seg@@iseg.pdb
  stream @{clib}/addions.str
  print coor sele .not. init end
+ rename segid @{seg@@iseg}@iseg sele segid @ionseg end ! to avoid duplicate names (but make sure to read coords first, as above) ; note that could overrun the 4 chars
  incr iseg
  if @iseg .le. @nseg -
 goto segs
