@@ -12,7 +12,8 @@ end
 allpsilcs={ 'ALA' 'ARG' 'ASP' 'GLN' 'LEU' 'THR' 'GLU' 'ILE' 'PHE' 'LYS' 'SER' 'VAL' 'MET' 'ASN' 'PRO' 'TYR' 'HSD' 'GLY' 'TRP' 'CYS' };
 % Now, define the probabilities with which the above residues will be chosen ; this is far from an easy task; at minimum, I do not want astronomical possibilities
 % rather, would prefer to identify classes of resiudes that would approximately cover the space of 'hit' peptides
-pdfpsilcs=[  0     0     1     0     2     1     0     0     2     1     1     0     0     0     0     2     1     0     2     0    ];
+% also, I now believe that basic or acidic residues are not useful
+pdfpsilcs=[  0     0     0     0     2     1     0     0     2     0     1     1     0     0     0     2     1     0     2     0    ];
 %
 %=======================
 % check pdf for positivity
@@ -55,7 +56,3 @@ end
 fprintf(fout,'set nseg %d\nreturn\n',nsamp);
 %
 fclose(fout);
-
-
-
-
