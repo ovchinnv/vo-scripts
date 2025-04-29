@@ -37,7 +37,7 @@ puts $nametag
 set res [atomselect top "$selection" ];
 $res set beta 1 ;
 
-$all writepdb ${name}-${nametag}.pdb
+$all writepdb ${nm}-${nametag}.pdb
 # note : may need to remove the unit cell line from this pdb if running without PBC :
-exec sed -i /CRYST/d ${name}-${nametag}.pdb
+exec sed -i /CRYST/d ${nm}-${nametag}.pdb
 }
