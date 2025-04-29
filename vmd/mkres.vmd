@@ -1,12 +1,19 @@
 #!/bin/vmd
 
-if { $argc > 1 } {
- set name [lindex $argv 0];
+if { $argc == 2 } {
+ set psffile [ lindex $argv 0 ] ;
+ set pdbfile [ lindex $argv 1 ] ;
 } else {
- if { ![info exists "path"] } {
-  set path "$env(HOME)/scripts/vmd"
+ if { $argc == 1 } {
+  set name [lindex $argv 0];
+ } else {
+  if { ![info exists "path"] } {
+   set path "$env(HOME)/scripts/vmd"
+  }
+  source ${path}/gname.tcl
  }
- source ${path}/gname.tcl
+ set psffile ${name}_sn.psf
+ set pdbfile ${name}_msn.pdb
 }
 
 foreach nm ${name} {
