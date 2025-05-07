@@ -13,4 +13,4 @@ typeOH2=ismember(aname,'OH2');
 typeOH2=ismember(aname,'OH2'); % water oxygen TIP3P
 >>>>>>> 777f639 (local changes before merge)
 backbone = typeCA | typeC | typeN | typeO | typeH ;
-
+noh=element~='H';

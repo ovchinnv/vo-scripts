@@ -66,7 +66,7 @@ while qchanged
      r4=resid2(l); % 2nd link atom in jth cluster
      c4=chainid2(l);
      i4=insertion2(l);
-     if ( (r1==r3 & c1==c3 & i1==i3)|(r1==r4 & c1==c4 & i1==i4)|(r2==r3 & c2==c3 & i2==i3)|(r2==r4 & c2==c4 & i2==i4) )
+     if ( (r1==r3 && c1==c3 && i1==i3)||(r1==r4 && c1==c4 && i1==i4)||(r2==r3 && c2==c3 && i2==i3)||(r2==r4 && c2==c4 && i2==i4) )
 % absorb cluster j into cluster i ; set cluster j to empty
       clusters{i}=[ (clusters{i}) (clusters{j}) ];
       clusters{j}=[];
@@ -184,6 +184,7 @@ for i=1:nc
   end
  end
 %
+ fclose(fpatch);
  inds=find(inds);
  for ii=inds'
   pdbh(ii).segID=segid;
