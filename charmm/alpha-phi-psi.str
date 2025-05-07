@@ -1,5 +1,5 @@
-* apply restraints to protein omega angles to
-* keep them near the trans conformation
+* apply restraints to protein phi & psi angles to
+* keep them near alpha helical values
 *
 
 !cons cldh

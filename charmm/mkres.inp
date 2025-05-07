@@ -1,16 +1,35 @@
-! make coordinate file with heavy protein atoms marked in wmain for openmm restraints with large atom numbers
+! to make restraint files with large atom numbers
 !
+dimens chsize 1000000
 
-if @?name eq 0  set name b12 
+if @?clib eq 0 set clib ~/scripts/charmm
 
-read rtf card name sosip36.top
-read param card name sosip36.par
+!set adpar ../inhib/@{drugfile}/@{drugfile}i
+!set cgenff
 
-read psf card name @{name}_sn.psf
-read coor card name @{name}_msn.cor
+if @?version eq 0 set version 36
+
+if @?nopar eq 0 set nopar 0
+if @nopar ne 0 goto skippar
+
+if @version eq 36 then
+ stream @{clib}/readpsf36.str
+else
+ stream @{clib}/readpsf.str
+endif
 
 scalar wmain set 0 sele all end
-scalar wmain set 1 sele .not.  ( segid ION* .or. segid *WAT* .or. hydrogen ) end
+if @?selection eq 0 set selection type CA end ! choose CAs by default
+scalar wmain set 1 sele ( @{selection} ) end
 
-write coor card name @{name}-res.cor
+if @?corfile ne 0 set name @{corfile}
+if @?pdbfile ne 0 set name @{pdbfile}
+
+if @?tag eq 0 set tag -res
+if @?qpdb ne 0 set qpdb 1
+if @{qpdb} gt 0 then
+ write coor pdb name @{name}@{tag}.pdb
+else
+ write coor card name @{name}@{tag}.cor
+endif
 

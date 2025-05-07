@@ -15,12 +15,12 @@ for i=find(resHIS)'
 end
 %
 for i=find(resUNK)'
- warning ['renaming residue #',num2str(i),' "UNK" to "GLY"']; 
+ warning(['renaming residue #',num2str(i),' "UNK" to "GLY"']); 
  pdb(i).resName='GLY';
 end
 %
 for i=find(resMSE)'
- warning ['renaming residue #',num2str(i),' "MSE" to "MET"']; 
+ warning(['renaming residue #',num2str(i),' "MSE" to "MET"']);
  pdb(i).resName='MET';
 end
 %
