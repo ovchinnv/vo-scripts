@@ -119,6 +119,15 @@ if ~isempty(filename)
 end
 
 %----------------------------------------------------------%
+function mesg=message(varargin)
+ qoct=1;%exist('OCTAVE_VERSION','builtin');
+ if (qoct)
+  mesg=[];
+  for i=1:nargin
+   mesg=[mesg,' ',varargin{i}];
+  end
+ end
+%----------------------------------------------------------%
 function pdbout = getPDBRecord(pdb_struct)
 % Returns a character array where each row corresponds to a line in a PDB record.
 
@@ -173,9 +182,9 @@ if(isfield(pdb_struct,'Journal'))
 end
 %write REMARK
 remarks = regexp(fieldnames(pdb_struct),'Remark[0-9]*','match');
-remarks =[remarks{:}]
+remarks =[remarks{:}];
 for i = 1:length(remarks)
-    remarkNo = sscanf(remarks{i},'Remark%d')
+    remarkNo = sscanf(remarks{i},'Remark%d');
     if (~isempty(remarkNo))
       switch remarkNo
         case 1
@@ -293,6 +302,8 @@ end
 %write MODEL and ATOM records
 if(isfield(pdb_struct,'Model'))
     if numel(pdb_struct.Model) == 1 && ~isfield(pdb_struct.Model, 'MDLSerNo')
+%pdbout
+%writeModel(pdb_struct.Model)
         pdbout = [pdbout;writeModel(pdb_struct.Model)];
     else
         modelLine = blanks(80);
@@ -1240,8 +1251,9 @@ end_count = type_counts(1);
 count = 1;
 for i = start_count:end_count
     x = model_struct.Atom(count);
+% NOTE: use %- to left justify
     atomRecords(i,:) = ['ATOM  ',...
-        sprintf('%5d %2s%1s%1s%1s%3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s%2s',...
+        sprintf('%5d %2s%1s%1s%1s%3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %-4s%2s%2s',...
         x.AtomSerNo,...
         x.AtomNameStruct.chemSymbol,...
         x.AtomNameStruct.remoteInd,...

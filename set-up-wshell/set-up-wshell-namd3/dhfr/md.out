@@ -1,0 +1,940 @@
+Charm++: standalone mode (not using charmrun)
+Charm++> Running in Multicore mode: 12 threads (PEs)
+Charm++> Using recursive bisection (scheme 3) for topology aware partitions
+Converse/Charm++ Commit ID: v80000
+CharmLB> Load balancer assumes all CPUs are same.
+Charm++> Running on 1 hosts (1 sockets x 12 cores x 2 PUs = 24-way SMP)
+Charm++> cpu topology info is gathered in 0.000 seconds.
+Info: Built with CUDA version 12060
+Did not find +devices i,j,k,... argument, using all
+Pe 0 physical rank 0 will use CUDA device of pe 8
+Pe 5 physical rank 5 will use CUDA device of pe 8
+Pe 3 physical rank 3 will use CUDA device of pe 8
+Pe 11 physical rank 11 will use CUDA device of pe 8
+Pe 1 physical rank 1 will use CUDA device of pe 8
+Pe 7 physical rank 7 will use CUDA device of pe 8
+Pe 9 physical rank 9 will use CUDA device of pe 8
+Pe 10 physical rank 10 will use CUDA device of pe 8
+Pe 4 physical rank 4 will use CUDA device of pe 8
+Pe 6 physical rank 6 will use CUDA device of pe 8
+Pe 2 physical rank 2 will use CUDA device of pe 8
+Pe 8 physical rank 8 binding to CUDA device 0 on tesla.mk.harvard.edu: 'NVIDIA GeForce RTX 3080 Ti'  Mem: 11941MB  Rev: 8.6  PCI: 0:1:0
+CharmLB> Load balancing instrumentation for communication is off.
+Info: NAMD 3.0.1 for Linux-x86_64-multicore-CUDA
+Info: 
+Info: Please visit http://www.ks.uiuc.edu/Research/namd/
+Info: for updates, documentation, and support information.
+Info: 
+Info: Please cite Phillips et al., J. Chem. Phys. 153:044130 (2020) doi:10.1063/5.0014475
+Info: in all publications reporting results obtained with NAMD.
+Info: 
+Info: Based on Charm++/Converse 80000 for multicore-linux-x86_64
+Info: Built Fri Mar 28 03:33:02 PM EDT 2025 by surgeon on tesla.mk.harvard.edu
+Info: 1 NAMD  3.0.1  Linux-x86_64-multicore-CUDA  12    tesla.mk.harvard.edu  surgeon
+Info: Running on 12 processors, 1 nodes, 1 physical nodes.
+Info: CPU topology information available.
+Info: Charm++/Converse parallel runtime startup completed at 0.238118 s
+CkLoopLib is used in SMP with simple dynamic scheduling (converse-level notification)
+Info: 120.32 MB of memory in use based on /proc/self/stat
+Info: Configuration file is md.in
+Info: Working in the current directory /home/surgeon/trash/set-up-wshell-namd/dhfr
+TCL: Suspending until startup complete.
+Warning: The following variables were set in the
+Warning: configuration file but will be ignored:
+Warning:    consref (constraints)
+Warning:    conskfile (constraints)
+Warning: Option "1-4scaling" has been deprecated. Instead use "oneFourScaling".
+Warning: Always using force tables for GPU nonbonded kernel due to unsupported config parameters.
+Info: SIMULATION PARAMETERS:
+Info: TIMESTEP               2
+Info: NUMBER OF STEPS        0
+Info: STEPS PER CYCLE        20
+Info: LOAD BALANCER  Centralized
+Info: LOAD BALANCING STRATEGY  New Load Balancers -- DEFAULT
+Info: LDB PERIOD             4000 steps
+Info: FIRST LDB TIMESTEP     100
+Info: LAST LDB TIMESTEP     -1
+Info: LDB BACKGROUND SCALING 1
+Info: HOM BACKGROUND SCALING 1
+Info: MIN ATOMS PER PATCH    40
+Info: EMPTY PATCH LOAD       40 ATOMS
+Info: INITIAL TEMPERATURE    300
+Info: CENTER OF MASS MOVING INITIALLY? NO
+Info: DIELECTRIC             1
+Info: EXCLUDE                SCALED ONE-FOUR
+Info: 1-4 ELECTROSTATICS SCALED BY 1
+Info: MODIFIED 1-4 VDW PARAMETERS WILL BE USED
+Info: DCD FILENAME           scratch/dhfr0npt.dcd
+Info: DCD FREQUENCY          10000
+Info: DCD FIRST STEP         10000
+Info: XST FILENAME           scratch/dhfr0npt.xst
+Info: XST FREQUENCY          10000
+Info: NO VELOCITY DCD OUTPUT
+Info: NO FORCE DCD OUTPUT
+Info: OUTPUT FILENAME        scratch/dhfr0npt
+Info: BINARY OUTPUT FILES WILL BE USED
+Info: RESTART FILENAME       scratch/dhfr0npt.restart
+Info: RESTART FREQUENCY      50000
+Info: BINARY RESTART FILES WILL BE USED
+Info: SWITCHING ACTIVE
+Info: VDW FORCE SWITCHING ACTIVE
+Info: SWITCHING ON           8.5
+Info: SWITCHING OFF          9
+Info: PAIRLIST DISTANCE      9
+Info: PAIRLIST SHRINK RATE   0.01
+Info: PAIRLIST GROW RATE     0.01
+Info: PAIRLIST TRIGGER       0.3
+Info: PAIRLISTS PER CYCLE    2
+Info: PAIRLISTS ENABLED
+Info: MARGIN                 0
+Info: HYDROGEN GROUP CUTOFF  2.5
+Info: PATCH DIMENSION        11.5
+Info: ENERGY OUTPUT STEPS    10000
+Info: ENERGY EVALUATION STEPS    10000
+Info: OUTPUT ENERGY PRECISION 4
+Info: CROSSTERM ENERGY INCLUDED IN DIHEDRAL
+Info: TIMING OUTPUT STEPS    10000
+Info: DYNAMO PLUGIN ACTIVE
+Info: LANGEVIN DYNAMICS ACTIVE
+Info: LANGEVIN TEMPERATURE   300
+Info: LANGEVIN USING BBK INTEGRATOR
+Info: LANGEVIN DAMPING COEFFICIENT IS 1 INVERSE PS
+Info: LANGEVIN DYNAMICS APPLIED TO HYDROGENS
+Info: USING VERLET I (r-RESPA) MTS SCHEME.
+Info: C1 SPLITTING OF LONG RANGE ELECTROSTATICS
+Info: PLACING ATOMS IN PATCHES BY HYDROGEN GROUPS
+Info: RIGID BONDS TO HYDROGEN : ALL
+Info:         ERROR TOLERANCE : 1e-08
+Info:          MAX ITERATIONS : 100
+Info: RIGID WATER USING SETTLE ALGORITHM
+Info: RANDOM NUMBER SEED     1743190722
+Info: USE HYDROGEN BONDS?    NO
+Info: COORDINATE PDB         struc/dhfr_msn.pdb
+Info: STRUCTURE FILE         struc/dhfr_sn.psf
+Info: PARAMETER file: CHARMM format! 
+Info: PARAMETERS             struc/dhfr36.par
+Info: USING ARITHMETIC MEAN TO COMBINE L-J SIGMA PARAMETERS
+Info: SUMMARY OF PARAMETERS:
+Info: 134 BONDS
+Info: 352 ANGLES
+Info: 672 DIHEDRAL
+Info: 35 IMPROPER
+Info: 6 CROSSTERM
+Info: 68 VDW
+Info: 3 VDW_PAIRS
+Info: 0 NBTHOLE_PAIRS
+Warning: Ignored 2083 bonds with zero force constants.
+Warning: Will get H-H distance in rigid H2O from H-O-H angle.
+Info: TIME FOR READING PSF FILE: 0.0308935
+Info: Reading pdb file struc/dhfr_msn.pdb
+Info: TIME FOR READING PDB FILE: 0.00521123
+Info: 
+Info: ****************************
+Info: STRUCTURE SUMMARY:
+Info: 8756 ATOMS
+Info: 6691 BONDS
+Info: 6647 ANGLES
+Info: 6705 DIHEDRALS
+Info: 439 IMPROPERS
+Info: 157 CROSSTERMS
+Info: 0 EXCLUSIONS
+Info: 7472 RIGID BONDS
+Info: 18796 DEGREES OF FREEDOM
+Info: 3367 HYDROGEN GROUPS
+Info: 4 ATOMS IN LARGEST HYDROGEN GROUP
+Info: 3367 MIGRATION GROUPS
+Info: 4 ATOMS IN LARGEST MIGRATION GROUP
+Info: TOTAL MASS = 55920.6 amu
+Info: TOTAL CHARGE = 2.03587e-06 e
+Info: *****************************
+Info: 
+Info: Entering startup at 0.280575 s, 2.43644e+07 MB of memory in use
+Info: Startup phase 0 took 6.7708e-05 s, 2.43644e+07 MB of memory in use
+Info: ADDED 19898 IMPLICIT EXCLUSIONS
+Info: Startup phase 1 took 0.0018894 s, 2.43729e+07 MB of memory in use
+Info: NONBONDED TABLE R-SQUARED SPACING: 0.0625
+Info: NONBONDED TABLE SIZE: 705 POINTS
+Info: ABSOLUTE IMPRECISION IN FAST TABLE ENERGY: 1.69407e-21 AT 8.99653
+Info: RELATIVE IMPRECISION IN FAST TABLE ENERGY: 1.14472e-16 AT 8.99653
+Info: INCONSISTENCY IN FAST TABLE ENERGY VS FORCE: 0.000290117 AT 0.251946
+Info: INCONSISTENCY IN VDWA TABLE ENERGY VS FORCE: 0.0040507 AT 0.251946
+Info: INCONSISTENCY IN VDWB TABLE ENERGY VS FORCE: 0.0065923 AT 8.51102
+Info: Startup phase 2 took 0.00026342 s, 2.43743e+07 MB of memory in use
+Info: Startup phase 3 took 5.1678e-05 s, 2.43743e+07 MB of memory in use
+Info: Startup phase 4 took 6.8219e-05 s, 2.43743e+07 MB of memory in use
+Info: Startup phase 5 took 4.6228e-05 s, 2.43743e+07 MB of memory in use
+Info: ORIGINAL ATOMS MINMAX IS -33.082 -32.575 -27.495  31.454 25.912 25.663
+Info: ADJUSTED ATOMS MINMAX IS -24.4471 -21.5749 -19.4809  24.6341 20.2539 18.1179
+Info: PATCH GRID IS 5 BY 4 BY 4
+Info: PATCH GRID IS 1-AWAY BY 1-AWAY BY 1-AWAY
+Info: REMOVING COM VELOCITY 0.0157053 -0.102346 0.0386326
+Info: LARGEST PATCH (21) HAS 245 ATOMS
+Info: TORUS A SIZE 1 USING 0
+Info: TORUS B SIZE 1 USING 0
+Info: TORUS C SIZE 1 USING 0
+Info: TORUS MINIMAL MESH SIZE IS 1 BY 1 BY 1
+Info: Placed 100% of base nodes on same physical node as patch
+Info: Startup phase 6 took 0.00279086 s, 2.43816e+07 MB of memory in use
+Info: Startup phase 7 took 5.5666e-05 s, 2.43816e+07 MB of memory in use
+Info: Updated CUDA force table with 4096 elements.
+Info: Updated CUDA LJ table with 68 x 68 elements.
+Info: Startup phase 8 took 0.000328233 s, 2.43816e+07 MB of memory in use
+Info: Startup phase 9 took 5.8101e-05 s, 2.43816e+07 MB of memory in use
+Info: Startup phase 10 took 5.0556e-05 s, 2.43816e+07 MB of memory in use
+Info: Startup phase 11 took 0.000144424 s, 2.43816e+07 MB of memory in use
+LDB: Central LB being created...
+Info: Startup phase 12 took 6.1426e-05 s, 2.43816e+07 MB of memory in use
+Info: CREATING 1278 COMPUTE OBJECTS
+# DYNAMO PLUGIN: Initializing ...
+# DYNAMO PLUGIN: input file is 'watershell0.in'
+# DYNAMO PLUGIN: log file is 'watershell0.log'
+Info: Found 277 unique exclusion lists needing 864 bytes
+Info: useSync: 0 useProxySync: 0
+Info: Startup phase 13 took 0.118643 s, 2.4448e+07 MB of memory in use
+Info: Startup phase 14 took 5.246e-05 s, 2.4448e+07 MB of memory in use
+Info: Startup phase 15 took 8.0072e-05 s, 2.44531e+07 MB of memory in use
+Info: Finished startup at 0.405226 s, 2.44531e+07 MB of memory in use
+
+TCL: Minimizing for 100 steps
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:       0       145.7827       479.7521      1426.0223        19.8667         -28937.6152      1984.6647         0.0000         0.0000         0.0000         -24881.5266         0.0000    -24881.5266    -24881.5266         0.0000
+
+OPENING EXTENDED SYSTEM TRAJECTORY FILE
+MINIMIZER STARTING CONJUGATE GRADIENT ALGORITHM
+LINE MINIMIZER REDUCING GRADIENT FROM 4.17657e+06 TO 4176.57
+ENERGY:       1       261.5593       506.9991      1425.8423        21.0778         -29143.9525      1993.5865         0.0000         0.0000         0.0000         -24934.8876         0.0000    -24934.8876    -24934.8876         0.0000
+
+ENERGY:       2       721.4397       601.3096      1427.0187        24.2999         -29327.5350      2009.3607         0.0000         0.0000         0.0000         -24544.1064         0.0000    -24544.1064    -24544.1064         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.00157429 0.00157429 DU -53.361 390.781 DUDX -4.17657e+06 94576.3 376038 
+ENERGY:       3       178.6905       489.2887      1425.7500        20.4051         -29069.3103      1989.5147         0.0000         0.0000         0.0000         -24965.6611         0.0000    -24965.6611    -24965.6611         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000994821 0.000579468 DU -84.1345 30.7735 DUDX -4.17657e+06 -9530.21 94576.3 
+ENERGY:       4       184.8708       490.6525      1425.7509        20.4604         -29076.8062      1989.8794         0.0000         0.0000         0.0000         -24965.1922         0.0000    -24965.1922    -24965.1922         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000994821 5.79468e-05 DU -84.1345 0.46892 DUDX -4.17657e+06 -9530.21 855.014 
+MINIMIZER RESTARTING CONJUGATE GRADIENT ALGORITHM
+LINE MINIMIZER REDUCING GRADIENT FROM 336260 TO 336.26
+ENERGY:       5       238.9067       501.2394      1426.0817        20.5966         -29153.9807      1993.2157         0.0000         0.0000         0.0000         -24973.9407         0.0000    -24973.9407    -24973.9407         0.0000
+
+ENERGY:       6       782.5603       585.3899      1427.2370        21.0249         -29226.1789      2000.6481         0.0000         0.0000         0.0000         -24409.3187         0.0000    -24409.3187    -24409.3187         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000910246 0.000910246 DU -8.74849 564.622 DUDX -336260 293370 922155 
+ENERGY:       7       151.6376       486.8654      1425.8104        20.4939         -29117.0215      1991.0857         0.0000         0.0000         0.0000         -25041.1286         0.0000    -25041.1286    -25041.1286         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.00046956 0.000440686 DU -75.9364 67.1879 DUDX -336260 -11708.4 293370 
+ENERGY:       8       155.1967       487.5180      1425.8282        20.5011         -29120.7644      1991.2590         0.0000         0.0000         0.0000         -25040.4614         0.0000    -25040.4614    -25040.4614         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.00046956 4.40686e-05 DU -75.9364 0.667209 DUDX -336260 -11708.4 18780 
+ENERGY:       9       152.3159       486.9929      1425.8141        20.4954         -29117.8449      1991.1250         0.0000         0.0000         0.0000         -25041.1016         0.0000    -25041.1016    -25041.1016         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.00046956 9.60893e-06 DU -75.9364 0.0270014 DUDX -336260 -11708.4 -5060.68 
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:      10       151.6376       486.8654      1425.8104        20.4939         -29117.0213      1991.0857         0.0000         0.0000         0.0000         -25041.1284         0.0000    -25041.1284    -25041.1284         0.0000
+
+MINIMIZER RESTARTING CONJUGATE GRADIENT ALGORITHM
+LINE MINIMIZER REDUCING GRADIENT FROM 130650 TO 130.65
+ENERGY:      11       269.0690       514.2752      1426.0684        20.8156         -29297.3395      2011.8868         0.0000         0.0000         0.0000         -25055.2245         0.0000    -25055.2245    -25055.2245         0.0000
+
+ENERGY:      12       743.6920       597.8774      1427.0637        21.4971         -29454.3066      2040.0081         0.0000         0.0000         0.0000         -24624.1683         0.0000    -24624.1683    -24624.1683         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.00198414 0.00198414 DU -14.0961 431.056 DUDX -130650 93424.1 318026 
+ENERGY:      13       169.9824       494.6074      1425.8463        20.6226         -29215.0808      2001.3420         0.0000         0.0000         0.0000         -25102.6801         0.0000    -25102.6801    -25102.6801         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.00106218 0.00092196 DU -61.5516 47.4555 DUDX -130650 -11074.3 93424.1 
+ENERGY:      14       176.4140       496.0278      1425.8608        20.6385         -29223.4585      2002.3234         0.0000         0.0000         0.0000         -25102.1938         0.0000    -25102.1938    -25102.1938         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.00106218 9.2196e-05 DU -61.5516 0.486264 DUDX -130650 -11074.3 -658.346 
+ENERGY:      15       169.9824       494.6073      1425.8463        20.6226         -29215.0811      2001.3420         0.0000         0.0000         0.0000         -25102.6803         0.0000    -25102.6803    -25102.6803         0.0000
+
+LINE MINIMIZER REDUCING GRADIENT FROM 266542 TO 266.542
+ENERGY:      16       148.8352       495.8429      1425.9628        20.8699         -29375.0226      2018.6293         0.0000         0.0000         0.0000         -25264.8824         0.0000    -25264.8824    -25264.8824         0.0000
+
+ENERGY:      17       157.6003       502.0054      1426.2553        21.2100         -29513.2490      2041.2081         0.0000         0.0000         0.0000         -25364.9698         0.0000    -25364.9698    -25364.9698         0.0000
+
+ENERGY:      18       196.2766       513.0819      1426.7231        21.6428         -29629.6919      2070.1013         0.0000         0.0000         0.0000         -25401.8663         0.0000    -25401.8663    -25401.8663         0.0000
+
+ENERGY:      19       264.8577       529.0631      1427.3613        22.1685         -29725.3179      2107.0326         0.0000         0.0000         0.0000         -25374.8347         0.0000    -25374.8347    -25374.8347         0.0000
+
+LDB: ============= START OF LOAD BALANCING ============== 0.42362
+LDB: ============== END OF LOAD BALANCING =============== 0.42365
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 0.423698
+LINE MINIMIZER BRACKET: DX 0.00080996 0.00080996 DU -36.8964 27.0316 DUDX -112234 -33084.2 46705.7 
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:      20       210.5520       516.6011      1426.8661        21.7649         -29655.2687      2078.4239         0.0000         0.0000         0.0000         -25401.0608         0.0000    -25401.0608    -25401.0608         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.00080996 0.000201607 DU -36.8964 0.805505 DUDX -112234 -33084.2 -13664.5 
+ENERGY:      21       196.2766       513.0814      1426.7230        21.6428         -29629.4968      2070.0684         0.0000         0.0000         0.0000         -25401.7046         0.0000    -25401.7046    -25401.7046         0.0000
+
+LINE MINIMIZER REDUCING GRADIENT FROM 402348 TO 402.348
+ENERGY:      22       153.7264       514.7341      1426.8151        21.9190         -29731.8747      2102.6354         0.0000         0.0000         0.0000         -25512.0447         0.0000    -25512.0447    -25512.0447         0.0000
+
+ENERGY:      23       197.3798       528.8713      1427.1958        22.2791         -29818.3650      2142.8490         0.0000         0.0000         0.0000         -25499.7900         0.0000    -25499.7900    -25499.7900         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000481459 0.000481459 DU -110.34 12.2547 DUDX -402348 -148892 107489 
+ENERGY:      24       161.8315       519.2323      1426.9432        22.0625         -29770.6470      2118.7596         0.0000         0.0000         0.0000         -25521.8179         0.0000    -25521.8179    -25521.8179         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000205585 0.000275875 DU -9.77321 22.0279 DUDX -148892 -39867.1 107489 
+ENERGY:      25       165.7893       520.5498      1426.9790        22.0966         -29778.9889      2122.5682         0.0000         0.0000         0.0000         -25521.0058         0.0000    -25521.0058    -25521.0058         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000205585 4.59356e-05 DU -9.77321 0.812101 DUDX -148892 -39867.1 -15408.6 
+ENERGY:      26       161.8315       519.2323      1426.9432        22.0625         -29770.6429      2118.7596         0.0000         0.0000         0.0000         -25521.8138         0.0000    -25521.8138    -25521.8138         0.0000
+
+LINE MINIMIZER REDUCING GRADIENT FROM 111895 TO 111.895
+ENERGY:      27       164.6713       515.1813      1426.8577        21.8831         -29849.4178      2135.4514         0.0000         0.0000         0.0000         -25585.3730         0.0000    -25585.3730    -25585.3730         0.0000
+
+ENERGY:      28       217.0747       518.9630      1427.0515        21.9135         -29923.2171      2156.5795         0.0000         0.0000         0.0000         -25581.6350         0.0000    -25581.6350    -25581.6350         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.00105387 0.00105387 DU -63.5591 3.73797 DUDX -111895 -48402.2 16165.3 
+ENERGY:      29       182.9101       515.9761      1426.9147        21.8714         -29884.4664      2144.6788         0.0000         0.0000         0.0000         -25592.1153         0.0000    -25592.1153    -25592.1153         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000490958 0.000562912 DU -6.74231 10.4803 DUDX -48402.2 -18479.8 16165.3 
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:      30       190.0948       516.5134      1426.9417        21.8764         -29894.2226      2147.5072         0.0000         0.0000         0.0000         -25591.2891         0.0000    -25591.2891    -25591.2891         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000490958 0.000140204 DU -6.74231 0.826123 DUDX -48402.2 -18479.8 -9886.86 
+ENERGY:      31       182.9101       515.9761      1426.9147        21.8714         -29884.4641      2144.6789         0.0000         0.0000         0.0000         -25592.1129         0.0000    -25592.1129    -25592.1129         0.0000
+
+LINE MINIMIZER REDUCING GRADIENT FROM 219159 TO 219.159
+ENERGY:      32       161.4493       512.8308      1427.0592        21.8079         -29957.4821      2159.3084         0.0000         0.0000         0.0000         -25675.0265         0.0000    -25675.0265    -25675.0265         0.0000
+
+ENERGY:      33       172.9330       514.7169      1427.3966        21.8834         -30026.3508      2179.0386         0.0000         0.0000         0.0000         -25710.3822         0.0000    -25710.3822    -25710.3822         0.0000
+
+ENERGY:      34       217.2934       521.7108      1427.9211        22.0993         -30090.9097      2205.1995         0.0000         0.0000         0.0000         -25696.6856         0.0000    -25696.6856    -25696.6856         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000578851 0.000578851 DU -35.3557 13.6967 DUDX -137938 -54354 32215.5 
+ENERGY:      35       184.6583       516.5692      1427.5588        21.9426         -30049.3006      2187.3400         0.0000         0.0000         0.0000         -25711.2317         0.0000    -25711.2317    -25711.2317         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000201644 0.000377207 DU -0.849492 14.5461 DUDX -54354 -24592.7 32215.5 
+ENERGY:      36       189.9193       517.3987      1427.6233        21.9684         -30057.5764      2190.5661         0.0000         0.0000         0.0000         -25710.1005         0.0000    -25710.1005    -25710.1005         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000201644 7.34421e-05 DU -0.849492 1.13121 DUDX -54354 -24592.7 -13649.4 
+ENERGY:      37       184.6583       516.5692      1427.5588        21.9426         -30049.3026      2187.3402         0.0000         0.0000         0.0000         -25711.2336         0.0000    -25711.2336    -25711.2336         0.0000
+
+LINE MINIMIZER REDUCING GRADIENT FROM 240094 TO 240.094
+ENERGY:      38       160.7083       512.0683      1427.7673        21.8739         -30113.0662      2204.0466         0.0000         0.0000         0.0000         -25786.6018         0.0000    -25786.6018    -25786.6018         0.0000
+
+ENERGY:      39       162.7041       511.7880      1428.1415        21.8513         -30171.9525      2227.4755         0.0000         0.0000         0.0000         -25819.9922         0.0000    -25819.9922    -25819.9922         0.0000
+
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:      40       190.7249       515.6457      1428.6756        21.8736         -30225.9935      2259.2387         0.0000         0.0000         0.0000         -25809.8349         0.0000    -25809.8349    -25809.8349         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000487727 0.000487727 DU -33.3903 10.1573 DUDX -155467 -67766.7 24074.4 
+ENERGY:      41       170.3436       512.7788      1428.3277        21.8546         -30193.2095      2238.5295         0.0000         0.0000         0.0000         -25821.3753         0.0000    -25821.3753    -25821.3753         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000186538 0.000301189 DU -1.38317 11.5404 DUDX -67766.7 -33221.6 24074.4 
+ENERGY:      42       174.1897       513.3055      1428.4034        21.8575         -30201.0626      2243.0077         0.0000         0.0000         0.0000         -25820.2988         0.0000    -25820.2988    -25820.2988         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000186538 6.9935e-05 DU -1.38317 1.07658 DUDX -67766.7 -33221.6 -20094.2 
+ENERGY:      43       170.3436       512.7788      1428.3277        21.8546         -30193.2076      2238.5297         0.0000         0.0000         0.0000         -25821.3732         0.0000    -25821.3732    -25821.3732         0.0000
+
+LINE MINIMIZER REDUCING GRADIENT FROM 168487 TO 168.487
+ENERGY:      44       155.3522       512.2371      1428.7937        21.6835         -30250.5676      2247.5195         0.0000         0.0000         0.0000         -25884.9816         0.0000    -25884.9816    -25884.9816         0.0000
+
+ENERGY:      45       176.4037       517.7018      1429.5484        21.6434         -30302.6191      2264.0889         0.0000         0.0000         0.0000         -25893.2330         0.0000    -25893.2330    -25893.2330         0.0000
+
+ENERGY:      46       233.2958       529.3967      1430.5615        21.7381         -30349.4326      2289.6142         0.0000         0.0000         0.0000         -25844.8264         0.0000    -25844.8264    -25844.8264         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000673003 0.000673003 DU -8.2514 48.4066 DUDX -87148.9 -3881.47 81811.8 
+ENERGY:      47       180.4836       518.5869      1429.6388        21.6468         -30307.5739      2266.2167         0.0000         0.0000         0.0000         -25891.0012         0.0000    -25891.0012    -25891.0012         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000673003 6.73003e-05 DU -8.2514 2.23178 DUDX -87148.9 -3881.47 4538.07 
+ENERGY:      48       176.7954       517.7875      1429.5573        21.6437         -30303.1298      2264.3019         0.0000         0.0000         0.0000         -25893.0440         0.0000    -25893.0440    -25893.0440         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000673003 6.73003e-06 DU -8.2514 0.188986 DUDX -87148.9 -3881.47 -3069.93 
+ENERGY:      49       176.4036       517.7018      1429.5483        21.6434         -30302.6135      2264.0931         0.0000         0.0000         0.0000         -25893.2233         0.0000    -25893.2233    -25893.2233         0.0000
+
+LINE MINIMIZER REDUCING GRADIENT FROM 222419 TO 222.419
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:      50       157.7860       516.7402      1429.8179        21.6271         -30352.1735      2268.2798         0.0000         0.0000         0.0000         -25957.9227         0.0000    -25957.9227    -25957.9227         0.0000
+
+ENERGY:      51       153.6826       518.3536      1430.2294        21.7780         -30395.7834      2279.9456         0.0000         0.0000         0.0000         -25991.7943         0.0000    -25991.7943    -25991.7943         0.0000
+
+ENERGY:      52       164.1469       522.4779      1430.7863        22.0959         -30433.4968      2299.8367         0.0000         0.0000         0.0000         -25994.1532         0.0000    -25994.1532    -25994.1532         0.0000
+
+ENERGY:      53       189.2284       529.0547      1431.4854        22.5807         -30465.4009      2329.4454         0.0000         0.0000         0.0000         -25963.6064         0.0000    -25963.6064    -25963.6064         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000470782 0.000470782 DU -2.35893 30.5468 DUDX -90950.9 -22606.2 49391.1 
+ENERGY:      54       166.5639       523.1906      1430.8687        22.1491         -30438.0253      2303.0812         0.0000         0.0000         0.0000         -25992.1718         0.0000    -25992.1718    -25992.1718         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000470782 6.08207e-05 DU -2.35893 1.98143 DUDX -90950.9 -22606.2 -13622.3 
+ENERGY:      55       164.1469       522.4778      1430.7863        22.0959         -30433.5746      2299.8463         0.0000         0.0000         0.0000         -25994.2215         0.0000    -25994.2215    -25994.2215         0.0000
+
+LINE MINIMIZER REDUCING GRADIENT FROM 173628 TO 173.628
+ENERGY:      56       154.4763       521.2731      1431.2935        21.9090         -30470.1317      2288.1938         0.0000         0.0000         0.0000         -26052.9859         0.0000    -26052.9859    -26052.9859         0.0000
+
+ENERGY:      57       179.0169       525.4503      1432.0531        21.7788         -30502.5066      2287.5852         0.0000         0.0000         0.0000         -26056.6223         0.0000    -26056.6223    -26056.6223         0.0000
+
+ENERGY:      58       237.4741       535.3280      1433.0306        21.7103         -30531.1055      2299.5283         0.0000         0.0000         0.0000         -26004.0341         0.0000    -26004.0341    -26004.0341         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000647288 0.000647288 DU -3.63638 52.5882 DUDX -87845.2 -2427.82 87662.2 
+ENERGY:      59       183.3413       526.1760      1432.1418        21.7691         -30505.6329      2288.1695         0.0000         0.0000         0.0000         -26054.0353         0.0000    -26054.0353    -26054.0353         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000647288 6.47288e-05 DU -3.63638 2.58697 DUDX -87845.2 -2427.82 6217.87 
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:      60       179.4340       525.5203      1432.0618        21.7778         -30502.9450      2287.6509         0.0000         0.0000         0.0000         -26056.5002         0.0000    -26056.5002    -26056.5002         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000647288 6.47288e-06 DU -3.63638 0.122112 DUDX -87845.2 -2427.82 -1604.71 
+ENERGY:      61       179.0169       525.4503      1432.0531        21.7788         -30502.6327      2287.5981         0.0000         0.0000         0.0000         -26056.7355         0.0000    -26056.7355    -26056.7355         0.0000
+
+MINIMIZER RESTARTING CONJUGATE GRADIENT ALGORITHM
+LINE MINIMIZER REDUCING GRADIENT FROM 229197 TO 229.197
+ENERGY:      62       159.3301       520.3477      1431.2763        21.5340         -30510.3708      2276.4478         0.0000         0.0000         0.0000         -26101.4348         0.0000    -26101.4348    -26101.4348         0.0000
+
+ENERGY:      63       243.0017       530.0845      1431.1329        21.4426         -30517.9374      2267.9111         0.0000         0.0000         0.0000         -26024.3646         0.0000    -26024.3646    -26024.3646         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.00046722 0.00046722 DU -44.6993 77.0702 DUDX -229197 31936.8 291960 
+ENERGY:      64       156.1654       520.1434      1431.3374        21.5560         -30509.4143      2277.6927         0.0000         0.0000         0.0000         -26102.5195         0.0000    -26102.5195    -26102.5195         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000408753 5.84664e-05 DU -45.7839 1.08466 DUDX -229197 -693.376 31936.8 
+ENERGY:      65       156.4091       520.1533      1431.3308        21.5537         -30509.5183      2277.5658         0.0000         0.0000         0.0000         -26102.5056         0.0000    -26102.5056    -26102.5056         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000408753 5.84664e-06 DU -45.7839 0.0138651 DUDX -229197 -693.376 2570.16 
+ENERGY:      66       156.1921       520.1444      1431.3366        21.5557         -30509.4335      2277.6799         0.0000         0.0000         0.0000         -26102.5247         0.0000    -26102.5247    -26102.5247         0.0000
+
+LINE MINIMIZER BRACKET: DX 6.61359e-07 5.18528e-06 DU -0.00525854 0.0191237 DUDX -693.376 -324.695 2570.16 
+ENERGY:      67       156.2133       520.1451      1431.3360        21.5555         -30509.4451      2277.6669         0.0000         0.0000         0.0000         -26102.5282         0.0000    -26102.5282    -26102.5282         0.0000
+
+LINE MINIMIZER BRACKET: DX 5.18528e-07 4.66676e-06 DU -0.00349344 0.0226171 DUDX -324.695 -35.3895 2570.16 
+LINE MINIMIZER REDUCING GRADIENT FROM 54837.3 TO 54.8373
+ENERGY:      68       158.0592       514.2941      1430.4746        21.1341         -30544.0809      2255.8234         0.0000         0.0000         0.0000         -26164.2954         0.0000    -26164.2954    -26164.2954         0.0000
+
+ENERGY:      69       162.4795       511.3075      1429.8321        21.3702         -30574.6609      2245.1539         0.0000         0.0000         0.0000         -26204.5177         0.0000    -26204.5177    -26204.5177         0.0000
+
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:      70       169.4885       511.1896      1429.4079        22.2638         -30600.9990      2242.5544         0.0000         0.0000         0.0000         -26226.0948         0.0000    -26226.0948    -26226.0948         0.0000
+
+MINIMIZER RESTARTING CONJUGATE GRADIENT ALGORITHM DUE TO POOR PROGRESS
+LINE MINIMIZER REDUCING GRADIENT FROM 60912.8 TO 60.9128
+ENERGY:      71       226.3772       538.6701      1430.3622        21.2712         -30626.8803      2235.6844         0.0000         0.0000         0.0000         -26174.5152         0.0000    -26174.5152    -26174.5152         0.0000
+
+LINE MINIMIZER BRACKET: DX 0 0.00197547 DU 0 51.5796 DUDX -60912.8 -60912.8 105424 
+ENERGY:      72       162.0272       512.3566      1429.5109        21.3115         -30610.0679      2239.3450         0.0000         0.0000         0.0000         -26245.5166         0.0000    -26245.5166    -26245.5166         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000691378 0.00128409 DU -19.4218 71.0015 DUDX -60912.8 -2339.11 105424 
+ENERGY:      73       163.8992       513.5683      1429.5577        21.2070         -30611.7703      2238.8454         0.0000         0.0000         0.0000         -26244.6928         0.0000    -26244.6928    -26244.6928         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000691378 0.000128409 DU -19.4218 0.823829 DUDX -60912.8 -2339.11 8507.08 
+ENERGY:      74       162.2184       512.5002      1429.5167        21.2962         -30610.3781      2239.2752         0.0000         0.0000         0.0000         -26245.5713         0.0000    -26245.5713    -26245.5713         0.0000
+
+LINE MINIMIZER BRACKET: DX 1.71543e-05 0.000111255 DU -0.0546118 0.878441 DUDX -2339.11 -889.617 8507.08 
+ENERGY:      75       162.3521       512.5965      1429.5205        21.2866         -30610.4813      2239.2301         0.0000         0.0000         0.0000         -26245.4956         0.0000    -26245.4956    -26245.4956         0.0000
+
+LINE MINIMIZER BRACKET: DX 1.71543e-05 1.11255e-05 DU -0.0546118 0.0757005 DUDX -2339.11 -889.617 50.6383 
+LINE MINIMIZER REDUCING GRADIENT FROM 45586.6 TO 45.5866
+ENERGY:      76       165.1992       545.8226      1432.0210        24.7174         -30674.4807      2236.1898         0.0000         0.0000         0.0000         -26270.5307         0.0000    -26270.5307    -26270.5307         0.0000
+
+ENERGY:      77       227.3416       625.3549      1438.2129        39.9162         -30736.0021      2243.7511         0.0000         0.0000         0.0000         -26161.4255         0.0000    -26161.4255    -26161.4255         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.00235468 0.00235468 DU -25.0351 109.105 DUDX -45586.6 11884.7 68448.8 
+ENERGY:      78       158.6778       532.5467      1430.9997        22.6811         -30657.7161      2235.8650         0.0000         0.0000         0.0000         -26276.9458         0.0000    -26276.9458    -26276.9458         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.00173326 0.000621418 DU -31.4502 6.41507 DUDX -45586.6 -3172.99 11884.7 
+ENERGY:      79       159.2300       533.9391      1431.1063        22.8780         -30659.6895      2235.8627         0.0000         0.0000         0.0000         -26276.6735         0.0000    -26276.6735    -26276.6735         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.00173326 7.30481e-05 DU -31.4502 0.272256 DUDX -45586.6 -3172.99 -1401.54 
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:      80       158.6778       532.5467      1430.9997        22.6811         -30657.7175      2235.8649         0.0000         0.0000         0.0000         -26276.9472         0.0000    -26276.9472    -26276.9472         0.0000
+
+LINE MINIMIZER REDUCING GRADIENT FROM 69603.8 TO 69.6038
+ENERGY:      81       179.9919       549.8968      1432.8477        27.1439         -30746.3925      2241.5960         0.0000         0.0000         0.0000         -26314.9161         0.0000    -26314.9161    -26314.9161         0.0000
+
+ENERGY:      82       277.2815       597.8205      1436.0357        35.1547         -30829.2756      2257.9252         0.0000         0.0000         0.0000         -26225.0580         0.0000    -26225.0580    -26225.0580         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.00177751 0.00177751 DU -37.969 89.8581 DUDX -69603.8 2379.17 74367.1 
+ENERGY:      83       174.4242       546.7876      1432.6022        26.5369         -30737.6544      2240.5328         0.0000         0.0000         0.0000         -26316.7708         0.0000    -26316.7708    -26316.7708         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.00159976 0.000177751 DU -39.8236 1.85462 DUDX -69603.8 -4860.63 2379.17 
+ENERGY:      84       175.2573       547.2606      1432.6403        26.6309         -30739.0587      2240.6922         0.0000         0.0000         0.0000         -26316.5774         0.0000    -26316.5774    -26316.5774         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.00159976 2.8245e-05 DU -39.8236 0.193361 DUDX -69603.8 -4860.63 -3718.28 
+ENERGY:      85       174.4242       546.7876      1432.6022        26.5369         -30737.6547      2240.5328         0.0000         0.0000         0.0000         -26316.7711         0.0000    -26316.7711    -26316.7711         0.0000
+
+LINE MINIMIZER REDUCING GRADIENT FROM 118643 TO 118.643
+ENERGY:      86       170.8064       535.4380      1432.2045        24.2081         -30812.3875      2257.5400         0.0000         0.0000         0.0000         -26392.1904         0.0000    -26392.1904    -26392.1904         0.0000
+
+ENERGY:      87       205.6553       533.3070      1432.3139        22.7116         -30881.1810      2283.2755         0.0000         0.0000         0.0000         -26403.9176         0.0000    -26403.9176    -26403.9176         0.0000
+
+ENERGY:      88       278.6855       540.6364      1432.9244        22.0471         -30943.8029      2320.2126         0.0000         0.0000         0.0000         -26349.2969         0.0000    -26349.2969    -26349.2969         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.00110447 0.00110447 DU -11.7272 54.6207 DUDX -61683.9 -2800.54 58858.8 
+ENERGY:      89       211.2444       533.6091      1432.3527        22.6077         -30887.6639      2286.3964         0.0000         0.0000         0.0000         -26401.4536         0.0000    -26401.4536    -26401.4536         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.00110447 0.000110447 DU -11.7272 2.464 DUDX -61683.9 -2800.54 3169.64 
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:      90       206.1963       533.3323      1432.3176        22.7008         -30881.7812      2283.5648         0.0000         0.0000         0.0000         -26403.6694         0.0000    -26403.6694    -26403.6694         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.00110447 1.10447e-05 DU -11.7272 0.248208 DUDX -61683.9 -2800.54 -2255.96 
+ENERGY:      91       205.6544       533.3062      1432.3139        22.7116         -30881.1487      2283.2572         0.0000         0.0000         0.0000         -26403.9052         0.0000    -26403.9052    -26403.9052         0.0000
+
+LINE MINIMIZER REDUCING GRADIENT FROM 334827 TO 334.827
+ENERGY:      92       159.8069       511.0536      1431.4225        20.2499         -30935.7930      2302.9712         0.0000         0.0000         0.0000         -26510.2890         0.0000    -26510.2890    -26510.2890         0.0000
+
+ENERGY:      93       265.1571       522.6048      1431.6285        19.6905         -30985.3798      2331.8910         0.0000         0.0000         0.0000         -26414.4079         0.0000    -26414.4079    -26414.4079         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000692789 0.000692789 DU -106.384 95.881 DUDX -334827 -44564.4 250032 
+ENERGY:      94       164.4987       510.6863      1431.3900        20.0805         -30942.0693      2305.9544         0.0000         0.0000         0.0000         -26509.4594         0.0000    -26509.4594    -26509.4594         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.000692789 8.43714e-05 DU -106.384 0.829556 DUDX -334827 -44564.4 -8980.56 
+ENERGY:      95       159.8075       511.0482      1431.4226        20.2499         -30935.7521      2302.9685         0.0000         0.0000         0.0000         -26510.2555         0.0000    -26510.2555    -26510.2555         0.0000
+
+LINE MINIMIZER REDUCING GRADIENT FROM 92001.2 TO 92.0012
+ENERGY:      96       210.4460       513.0369      1429.3168        21.0367         -30997.0381      2296.3812         0.0000         0.0000         0.0000         -26526.8206         0.0000    -26526.8206    -26526.8206         0.0000
+
+ENERGY:      97       436.9304       564.2650      1429.2978        26.9838         -31056.8906      2303.4659         0.0000         0.0000         0.0000         -26295.9477         0.0000    -26295.9477    -26295.9477         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.0018031 0.0018031 DU -16.5651 230.873 DUDX -92001.2 46365.5 182884 
+ENERGY:      98       167.7538       506.3866      1429.9380        20.0935         -30971.5677      2297.2672         0.0000         0.0000         0.0000         -26550.1287         0.0000    -26550.1287    -26550.1287         0.0000
+
+LINE MINIMIZER BRACKET: DX 0.00105064 0.000752455 DU -39.8731 23.3081 DUDX -92001.2 -11070.7 46365.5 
+ENERGY:      99       171.6144       506.7787      1429.8352        20.1669         -30974.9330      2297.0102         0.0000         0.0000         0.0000         -26549.5277         0.0000    -26549.5277    -26549.5277         0.0000
+
+LDB: ============= START OF LOAD BALANCING ============== 0.471238
+LDB: Partitioning computes with target load 0.000000
+LDB: Increased migratable compute count from 0 to 0
+LDB: Largest unpartitionable compute is 0.000000
+LDB: ============== END OF LOAD BALANCING =============== 0.471327
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 0.471575
+LINE MINIMIZER BRACKET: DX 0.00105064 9.90589e-05 DU -39.8731 0.600986 DUDX -92001.2 -11070.7 -3490.93 
+Info: Initial time: 12 CPUs 0.000597722 s/step 0.00345904 days/ns 2.77908e+07 MB memory
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:     100       167.7538       506.3866      1429.9380        20.0935         -30971.5687      2297.2672         0.0000         0.0000         0.0000         -26550.1296         0.0000    -26550.1296    -26550.1296         0.0000
+
+TCL: Running for 100000 steps
+LDB: ============= START OF LOAD BALANCING ============== 0.482283
+LDB: ============== END OF LOAD BALANCING =============== 0.482312
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 0.482367
+LDB: ============= START OF LOAD BALANCING ============== 0.522078
+LDB: TIME 0.522145 LOAD: AVG 0.0137067 MAX 0.0244977  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.77908e+07 MB
+LDB: TIME 0.522166 LOAD: AVG 0.0137067 MAX 0.0244977  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 TorusLB MEM: 2.77908e+07 MB
+LDB: Reverting to original mapping
+LDB: ============== END OF LOAD BALANCING =============== 0.522212
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 0.522449
+Info: Initial time: 12 CPUs 0.000509624 s/step 0.00294921 days/ns 2.77908e+07 MB memory
+LDB: ============= START OF LOAD BALANCING ============== 0.573152
+LDB: TIME 0.573225 LOAD: AVG 0.0170975 MAX 0.0302815  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.77908e+07 MB
+LDB: TIME 0.573244 LOAD: AVG 0.0170975 MAX 0.0302815  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.77908e+07 MB
+LDB: TIME 0.573255 LOAD: AVG 0.0170975 MAX 0.0302815  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.77908e+07 MB
+LDB: Reverting to original mapping
+LDB: ============== END OF LOAD BALANCING =============== 0.573294
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 0.573522
+Info: Initial time: 12 CPUs 0.000506259 s/step 0.00292974 days/ns 2.77908e+07 MB memory
+ERROR: Margin is too small for 1 atoms during timestep 359.
+ERROR: Incorrect nonbonded forces and energies may be calculated!
+LDB: ============= START OF LOAD BALANCING ============== 0.626121
+LDB: TIME 0.62619 LOAD: AVG 0.0171689 MAX 0.030406  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.77908e+07 MB
+LDB: TIME 0.626212 LOAD: AVG 0.0171689 MAX 0.030406  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.77908e+07 MB
+LDB: TIME 0.626223 LOAD: AVG 0.0171689 MAX 0.030406  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.77908e+07 MB
+LDB: Reverting to original mapping
+LDB: ============== END OF LOAD BALANCING =============== 0.626264
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 0.626483
+Info: Benchmark time: 12 CPUs 0.000526437 s/step 0.00304651 days/ns 2.77908e+07 MB memory
+Info: Benchmark time: 12 CPUs 0.000526478 s/step 0.00304675 days/ns 2.78226e+07 MB memory
+Info: Benchmark time: 12 CPUs 0.000525837 s/step 0.00304304 days/ns 2.78226e+07 MB memory
+Info: Benchmark time: 12 CPUs 0.000515167 s/step 0.00298129 days/ns 2.78226e+07 MB memory
+Info: Benchmark time: 12 CPUs 0.000516069 s/step 0.00298651 days/ns 2.78226e+07 MB memory
+Info: Benchmark time: 12 CPUs 0.000544026 s/step 0.0031483 days/ns 2.78226e+07 MB memory
+LDB: ============= START OF LOAD BALANCING ============== 2.66596
+LDB: ============== END OF LOAD BALANCING =============== 2.66601
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 2.66607
+LDB: ============= START OF LOAD BALANCING ============== 2.71804
+LDB: TIME 2.71812 LOAD: AVG 0.0173132 MAX 0.0299709  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 2.71815 LOAD: AVG 0.0173132 MAX 0.0299709  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 2.71816 LOAD: AVG 0.0173132 MAX 0.0299709  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: ============== END OF LOAD BALANCING =============== 2.71821
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 2.71844
+LDB: ============= START OF LOAD BALANCING ============== 4.77456
+LDB: ============== END OF LOAD BALANCING =============== 4.77461
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 4.77466
+LDB: ============= START OF LOAD BALANCING ============== 4.82916
+LDB: TIME 4.82924 LOAD: AVG 0.0174819 MAX 0.0318699  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 4.82927 LOAD: AVG 0.0174819 MAX 0.0318699  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 4.82929 LOAD: AVG 0.0174819 MAX 0.0318699  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: ============== END OF LOAD BALANCING =============== 4.82933
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 4.82956
+ERROR: 133 margin violations detected since previous energy output.
+ENERGY:   10000       557.7454      1449.8083      1565.6618        93.2486         -31503.4447      2077.9653         0.0000         0.0000      5670.0253         -20088.9900       303.6057    -25759.0153    -20062.8157       293.6463
+
+OPENING COORDINATE DCD FILE
+WRITING COORDINATES TO DCD FILE scratch/dhfr0npt.dcd AT STEP 10000
+The last position output (seq=10000) takes 0.000 seconds, 27822608.000 MB of memory in use
+ERROR: Margin is too small for 1 atoms during timestep 10554.
+ERROR: Incorrect nonbonded forces and energies may be calculated!
+LDB: ============= START OF LOAD BALANCING ============== 6.87699
+LDB: ============== END OF LOAD BALANCING =============== 6.87703
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 6.87709
+LDB: ============= START OF LOAD BALANCING ============== 6.92394
+LDB: TIME 6.92401 LOAD: AVG 0.0173431 MAX 0.0305042  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 6.92404 LOAD: AVG 0.0173431 MAX 0.0305042  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 6.92405 LOAD: AVG 0.0173431 MAX 0.0305042  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: ============== END OF LOAD BALANCING =============== 6.9241
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 6.92435
+LDB: ============= START OF LOAD BALANCING ============== 8.87146
+LDB: ============== END OF LOAD BALANCING =============== 8.87152
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 8.87157
+LDB: ============= START OF LOAD BALANCING ============== 8.92421
+LDB: TIME 8.92429 LOAD: AVG 0.0172226 MAX 0.0309072  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 8.92432 LOAD: AVG 0.0172226 MAX 0.0309072  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 8.92433 LOAD: AVG 0.0172226 MAX 0.0309072  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: Reverting to original mapping
+LDB: ============== END OF LOAD BALANCING =============== 8.92438
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 8.92462
+TIMING: 20000  CPU: 10.3991, 0.000515811/step  Wall: 10.477, 0.000519774/step, 0.011565 hours remaining, 27822608.000000 MB of memory in use.
+PERFORMANCE: 20000  averaging 332.452 ns/day, 0.000519774 sec/step with standard deviation 0
+ERROR: 129 margin violations detected since previous energy output.
+ENERGY:   20000       506.9039      1414.3977      1583.4193        75.7948         -31573.7230      2146.8408         0.0000         0.0000      5601.1998         -20245.1667       299.9204    -25846.3666    -20217.9121       300.0426
+
+WRITING COORDINATES TO DCD FILE scratch/dhfr0npt.dcd AT STEP 20000
+The last position output (seq=20000) takes 0.000 seconds, 27822608.000 MB of memory in use
+ERROR: Margin is too small for 1 atoms during timestep 20090.
+ERROR: Incorrect nonbonded forces and energies may be calculated!
+LDB: ============= START OF LOAD BALANCING ============== 11.0401
+LDB: ============== END OF LOAD BALANCING =============== 11.0401
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 11.0401
+LDB: ============= START OF LOAD BALANCING ============== 11.0937
+LDB: TIME 11.0938 LOAD: AVG 0.017074 MAX 0.0313576  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 11.0938 LOAD: AVG 0.017074 MAX 0.0313576  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 11.0938 LOAD: AVG 0.017074 MAX 0.0313576  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: ============== END OF LOAD BALANCING =============== 11.0939
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 11.0941
+LDB: ============= START OF LOAD BALANCING ============== 13.1989
+LDB: ============== END OF LOAD BALANCING =============== 13.1989
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 13.199
+LDB: ============= START OF LOAD BALANCING ============== 13.25
+LDB: TIME 13.2501 LOAD: AVG 0.0167682 MAX 0.0285099  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 13.2501 LOAD: AVG 0.0167682 MAX 0.0285099  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 13.2501 LOAD: AVG 0.0167682 MAX 0.0285099  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: ============== END OF LOAD BALANCING =============== 13.2502
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 13.2504
+LDB: ============= START OF LOAD BALANCING ============== 15.4438
+LDB: ============== END OF LOAD BALANCING =============== 15.4441
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 15.4442
+LDB: ============= START OF LOAD BALANCING ============== 15.4983
+LDB: TIME 15.4983 LOAD: AVG 0.0177698 MAX 0.0316873  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 15.4984 LOAD: AVG 0.0177698 MAX 0.0316873  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 15.4984 LOAD: AVG 0.0177698 MAX 0.0316873  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: Reverting to original mapping
+LDB: ============== END OF LOAD BALANCING =============== 15.4984
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 15.4987
+TIMING: 30000  CPU: 15.8421, 0.000544297/step  Wall: 15.961, 0.000548398/step, 0.0106785 hours remaining, 27822608.000000 MB of memory in use.
+PERFORMANCE: 30000  averaging 323.544 ns/day, 0.000534086 sec/step with standard deviation 2.024e-05
+ERROR: 116 margin violations detected since previous energy output.
+ENERGY:   30000       556.5568      1485.2116      1557.2939        84.0406         -31556.3633      2125.9703         0.0000         0.0000      5489.9544         -20257.3355       293.9637    -25747.2899    -20232.4248       300.5292
+
+WRITING COORDINATES TO DCD FILE scratch/dhfr0npt.dcd AT STEP 30000
+The last position output (seq=30000) takes 0.000 seconds, 27822608.000 MB of memory in use
+ERROR: Margin is too small for 1 atoms during timestep 30116.
+ERROR: Incorrect nonbonded forces and energies may be calculated!
+LDB: ============= START OF LOAD BALANCING ============== 17.6347
+LDB: ============== END OF LOAD BALANCING =============== 17.6348
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 17.6348
+LDB: ============= START OF LOAD BALANCING ============== 17.6901
+LDB: TIME 17.6901 LOAD: AVG 0.0175033 MAX 0.0320043  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 17.6902 LOAD: AVG 0.0175033 MAX 0.0320043  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 17.6902 LOAD: AVG 0.0175033 MAX 0.0320043  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: Reverting to original mapping
+LDB: ============== END OF LOAD BALANCING =============== 17.6902
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 17.6904
+LDB: ============= START OF LOAD BALANCING ============== 19.8457
+LDB: ============== END OF LOAD BALANCING =============== 19.8457
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 19.8458
+LDB: ============= START OF LOAD BALANCING ============== 19.9017
+LDB: TIME 19.9018 LOAD: AVG 0.0174661 MAX 0.0322049  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 19.9018 LOAD: AVG 0.0174661 MAX 0.0322049  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 19.9019 LOAD: AVG 0.0174661 MAX 0.0322049  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: Reverting to original mapping
+LDB: ============== END OF LOAD BALANCING =============== 19.9019
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 19.9021
+TIMING: 40000  CPU: 21.3344, 0.000549235/step  Wall: 21.4887, 0.000552766/step, 0.00922813 hours remaining, 27822608.000000 MB of memory in use.
+PERFORMANCE: 40000  averaging 319.815 ns/day, 0.000540313 sec/step with standard deviation 1.79207e-05
+ERROR: 130 margin violations detected since previous energy output.
+ENERGY:   40000       534.6307      1473.5217      1558.5403        95.6252         -31563.5590      2121.1555         0.0000         0.0000      5693.6289         -20086.4567       304.8696    -25780.0856    -20049.7370       299.6324
+
+WRITING COORDINATES TO DCD FILE scratch/dhfr0npt.dcd AT STEP 40000
+The last position output (seq=40000) takes 0.000 seconds, 27822608.000 MB of memory in use
+ERROR: Margin is too small for 1 atoms during timestep 40118.
+ERROR: Incorrect nonbonded forces and energies may be calculated!
+LDB: ============= START OF LOAD BALANCING ============== 22.0562
+LDB: ============== END OF LOAD BALANCING =============== 22.0562
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 22.0563
+LDB: ============= START OF LOAD BALANCING ============== 22.1111
+LDB: TIME 22.1111 LOAD: AVG 0.0176383 MAX 0.0318575  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 22.1112 LOAD: AVG 0.0176383 MAX 0.0318575  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 22.1112 LOAD: AVG 0.0176383 MAX 0.0318575  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: ============== END OF LOAD BALANCING =============== 22.1112
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 22.1115
+LDB: ============= START OF LOAD BALANCING ============== 24.2381
+LDB: ============== END OF LOAD BALANCING =============== 24.2382
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 24.2382
+LDB: ============= START OF LOAD BALANCING ============== 24.2935
+LDB: TIME 24.2936 LOAD: AVG 0.0175956 MAX 0.0319951  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 24.2936 LOAD: AVG 0.0175956 MAX 0.0319951  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 24.2936 LOAD: AVG 0.0175956 MAX 0.0319951  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: Reverting to original mapping
+LDB: ============== END OF LOAD BALANCING =============== 24.2937
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 24.2939
+LDB: ============= START OF LOAD BALANCING ============== 26.425
+LDB: ============== END OF LOAD BALANCING =============== 26.4251
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 26.4252
+LDB: ============= START OF LOAD BALANCING ============== 26.4795
+LDB: TIME 26.4796 LOAD: AVG 0.0174953 MAX 0.0316276  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 26.4796 LOAD: AVG 0.0174953 MAX 0.0316276  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 26.4796 LOAD: AVG 0.0174953 MAX 0.0316276  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: Reverting to original mapping
+LDB: ============== END OF LOAD BALANCING =============== 26.4797
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 26.4799
+TIMING: 50000  CPU: 26.7598, 0.000542537/step  Wall: 26.9533, 0.000546459/step, 0.00760489 hours remaining, 27822608.000000 MB of memory in use.
+PERFORMANCE: 50000  averaging 318.908 ns/day, 0.000541849 sec/step with standard deviation 1.49514e-05
+ERROR: 88 margin violations detected since previous energy output.
+ENERGY:   50000       524.9668      1505.5755      1527.5970        95.6542         -31586.4205      2122.7871         0.0000         0.0000      5519.9316         -20289.9081       295.5688    -25809.8398    -20256.0344       300.3716
+
+WRITING EXTENDED SYSTEM TO RESTART FILE AT STEP 50000
+WRITING COORDINATES TO DCD FILE scratch/dhfr0npt.dcd AT STEP 50000
+WRITING COORDINATES TO RESTART FILE AT STEP 50000
+FINISHED WRITING RESTART COORDINATES
+The last position output (seq=50000) takes 0.000 seconds, 27822608.000 MB of memory in use
+WRITING VELOCITIES TO RESTART FILE AT STEP 50000
+FINISHED WRITING RESTART VELOCITIES
+The last velocity output (seq=50000) takes 0.000 seconds, 27822608.000 MB of memory in use
+ERROR: Margin is too small for 1 atoms during timestep 50097.
+ERROR: Incorrect nonbonded forces and energies may be calculated!
+LDB: ============= START OF LOAD BALANCING ============== 28.6106
+LDB: ============== END OF LOAD BALANCING =============== 28.6106
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 28.6107
+LDB: ============= START OF LOAD BALANCING ============== 28.6655
+LDB: TIME 28.6655 LOAD: AVG 0.017343 MAX 0.0311096  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 28.6656 LOAD: AVG 0.017343 MAX 0.0311096  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 28.6656 LOAD: AVG 0.017343 MAX 0.0311096  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: Reverting to original mapping
+LDB: ============== END OF LOAD BALANCING =============== 28.6656
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 28.6659
+LDB: ============= START OF LOAD BALANCING ============== 30.8023
+LDB: ============== END OF LOAD BALANCING =============== 30.8024
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 30.8024
+LDB: ============= START OF LOAD BALANCING ============== 30.8583
+LDB: TIME 30.8584 LOAD: AVG 0.0172322 MAX 0.031923  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 30.8584 LOAD: AVG 0.0172322 MAX 0.031923  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 30.8584 LOAD: AVG 0.0172322 MAX 0.031923  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: Reverting to original mapping
+LDB: ============== END OF LOAD BALANCING =============== 30.8585
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 30.8587
+TIMING: 60000  CPU: 32.1588, 0.0005399/step  Wall: 32.3875, 0.000543427/step, 0.00605317 hours remaining, 27822608.000000 MB of memory in use.
+PERFORMANCE: 60000  averaging 318.722 ns/day, 0.000542165 sec/step with standard deviation 1.29675e-05
+ERROR: 97 margin violations detected since previous energy output.
+ENERGY:   60000       546.0245      1468.5063      1578.2651        92.5409         -31521.5826      2022.8124         0.0000         0.0000      5603.9842         -20209.4492       300.0695    -25813.4334    -20173.8976       299.7986
+
+WRITING COORDINATES TO DCD FILE scratch/dhfr0npt.dcd AT STEP 60000
+The last position output (seq=60000) takes 0.000 seconds, 27822608.000 MB of memory in use
+ERROR: Margin is too small for 1 atoms during timestep 60178.
+ERROR: Incorrect nonbonded forces and energies may be calculated!
+LDB: ============= START OF LOAD BALANCING ============== 32.9506
+LDB: ============== END OF LOAD BALANCING =============== 32.9506
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 32.9507
+LDB: ============= START OF LOAD BALANCING ============== 33.0043
+LDB: TIME 33.0044 LOAD: AVG 0.0177276 MAX 0.0312761  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 33.0044 LOAD: AVG 0.0177276 MAX 0.0312761  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 33.0044 LOAD: AVG 0.0177276 MAX 0.0312761  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: ============== END OF LOAD BALANCING =============== 33.0045
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 33.0047
+LDB: ============= START OF LOAD BALANCING ============== 35.1315
+LDB: ============== END OF LOAD BALANCING =============== 35.1316
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 35.1316
+LDB: ============= START OF LOAD BALANCING ============== 35.1889
+LDB: TIME 35.189 LOAD: AVG 0.0183404 MAX 0.0338486  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 35.189 LOAD: AVG 0.0183404 MAX 0.0338486  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 35.189 LOAD: AVG 0.0183404 MAX 0.0338486  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: ============== END OF LOAD BALANCING =============== 35.1891
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 35.1893
+LDB: ============= START OF LOAD BALANCING ============== 37.4517
+LDB: ============== END OF LOAD BALANCING =============== 37.4517
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 37.4518
+LDB: ============= START OF LOAD BALANCING ============== 37.509
+LDB: TIME 37.5091 LOAD: AVG 0.018717 MAX 0.0343951  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 37.5091 LOAD: AVG 0.018717 MAX 0.0343951  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 37.5091 LOAD: AVG 0.018717 MAX 0.0343951  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: ============== END OF LOAD BALANCING =============== 37.5092
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 37.5094
+TIMING: 70000  CPU: 37.7684, 0.000560967/step  Wall: 38.0315, 0.000564395/step, 0.00471897 hours remaining, 27822608.000000 MB of memory in use.
+PERFORMANCE: 70000  averaging 316.559 ns/day, 0.00054587 sec/step with standard deviation 1.47272e-05
+ERROR: 112 margin violations detected since previous energy output.
+ENERGY:   70000       555.8613      1438.6770      1566.8864        82.8304         -31603.6382      2079.8975         0.0000         0.0000      5607.7819         -20271.7037       300.2728    -25879.4856    -20236.6517       300.2987
+
+WRITING COORDINATES TO DCD FILE scratch/dhfr0npt.dcd AT STEP 70000
+The last position output (seq=70000) takes 0.000 seconds, 27822608.000 MB of memory in use
+ERROR: Margin is too small for 1 atoms during timestep 70271.
+ERROR: Incorrect nonbonded forces and energies may be calculated!
+LDB: ============= START OF LOAD BALANCING ============== 39.7487
+LDB: ============== END OF LOAD BALANCING =============== 39.7488
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 39.7488
+LDB: ============= START OF LOAD BALANCING ============== 39.8064
+LDB: TIME 39.8065 LOAD: AVG 0.0186263 MAX 0.033634  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 39.8065 LOAD: AVG 0.0186263 MAX 0.033634  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 39.8065 LOAD: AVG 0.0186263 MAX 0.033634  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: ============== END OF LOAD BALANCING =============== 39.8066
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 39.8068
+LDB: ============= START OF LOAD BALANCING ============== 42.0982
+LDB: ============== END OF LOAD BALANCING =============== 42.0983
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 42.0984
+LDB: ============= START OF LOAD BALANCING ============== 42.1561
+LDB: TIME 42.1562 LOAD: AVG 0.0187761 MAX 0.0340956  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 42.1562 LOAD: AVG 0.0187761 MAX 0.0340956  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 42.1562 LOAD: AVG 0.0187761 MAX 0.0340956  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: ============== END OF LOAD BALANCING =============== 42.1563
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 42.1565
+TIMING: 80000  CPU: 43.55, 0.000578152/step  Wall: 43.8477, 0.000581625/step, 0.00324741 hours remaining, 27822608.000000 MB of memory in use.
+PERFORMANCE: 80000  averaging 313.624 ns/day, 0.000550978 sec/step with standard deviation 1.90625e-05
+ERROR: 131 margin violations detected since previous energy output.
+ENERGY:   80000       529.7096      1460.7350      1567.1040        87.9383         -31529.9437      2102.7100         0.0000         0.0000      5496.7526         -20284.9942       294.3277    -25781.7467    -20257.2922       299.2700
+
+WRITING COORDINATES TO DCD FILE scratch/dhfr0npt.dcd AT STEP 80000
+The last position output (seq=80000) takes 0.000 seconds, 27822608.000 MB of memory in use
+LDB: ============= START OF LOAD BALANCING ============== 44.4238
+LDB: ============== END OF LOAD BALANCING =============== 44.4238
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 44.4239
+LDB: ============= START OF LOAD BALANCING ============== 44.482
+LDB: TIME 44.4821 LOAD: AVG 0.0185861 MAX 0.0344012  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 44.4822 LOAD: AVG 0.0185861 MAX 0.0344012  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 44.4822 LOAD: AVG 0.0185861 MAX 0.0344012  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: ============== END OF LOAD BALANCING =============== 44.4822
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 44.4824
+ERROR: Margin is too small for 1 atoms during timestep 80974.
+ERROR: Incorrect nonbonded forces and energies may be calculated!
+LDB: ============= START OF LOAD BALANCING ============== 46.7492
+LDB: ============== END OF LOAD BALANCING =============== 46.7493
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 46.7493
+LDB: ============= START OF LOAD BALANCING ============== 46.8071
+LDB: TIME 46.8072 LOAD: AVG 0.0186859 MAX 0.0343919  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 46.8073 LOAD: AVG 0.0186859 MAX 0.0343919  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 46.8073 LOAD: AVG 0.0186859 MAX 0.0343919  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: Reverting to original mapping
+LDB: ============== END OF LOAD BALANCING =============== 46.8073
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 46.8076
+LDB: ============= START OF LOAD BALANCING ============== 49.0536
+LDB: ============== END OF LOAD BALANCING =============== 49.0536
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 49.0537
+LDB: ============= START OF LOAD BALANCING ============== 49.1112
+LDB: TIME 49.1113 LOAD: AVG 0.0186762 MAX 0.0337922  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 49.1114 LOAD: AVG 0.0186762 MAX 0.0337922  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 49.1114 LOAD: AVG 0.0186762 MAX 0.0337922  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: Reverting to original mapping
+LDB: ============== END OF LOAD BALANCING =============== 49.1114
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 49.1117
+WRITING COORDINATES TO DCD FILE scratch/dhfr0npt.dcd AT STEP 90000
+The last position output (seq=90000) takes 0.000 seconds, 27822608.000 MB of memory in use
+TIMING: 90000  CPU: 49.3051, 0.000575517/step  Wall: 49.6371, 0.000578937/step, 0.00162424 hours remaining, 27822608.000000 MB of memory in use.
+PERFORMANCE: 90000  averaging 311.647 ns/day, 0.000554473 sec/step with standard deviation 2.02282e-05
+ERROR: 116 margin violations detected since previous energy output.
+ENERGY:   90000       531.0303      1430.7508      1569.6998        90.4185         -31632.3350      2084.0111         0.0000         0.0000      5727.7401         -20198.6844       306.6961    -25926.4245    -20166.0593       299.9790
+
+ERROR: Margin is too small for 1 atoms during timestep 90639.
+ERROR: Incorrect nonbonded forces and energies may be calculated!
+LDB: ============= START OF LOAD BALANCING ============== 51.3597
+LDB: ============== END OF LOAD BALANCING =============== 51.3597
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 51.3598
+LDB: ============= START OF LOAD BALANCING ============== 51.4172
+LDB: TIME 51.4173 LOAD: AVG 0.0182666 MAX 0.0331089  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 51.4174 LOAD: AVG 0.0182666 MAX 0.0331089  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 51.4174 LOAD: AVG 0.0182666 MAX 0.0331089  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: Reverting to original mapping
+LDB: ============== END OF LOAD BALANCING =============== 51.4174
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 51.4177
+LDB: ============= START OF LOAD BALANCING ============== 53.6639
+LDB: ============== END OF LOAD BALANCING =============== 53.664
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 53.664
+LDB: ============= START OF LOAD BALANCING ============== 53.7217
+LDB: TIME 53.7218 LOAD: AVG 0.0182991 MAX 0.033995  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 None MEM: 2.78226e+07 MB
+LDB: TIME 53.7219 LOAD: AVG 0.0182991 MAX 0.033995  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: TIME 53.7219 LOAD: AVG 0.0182991 MAX 0.033995  PROXIES: TOTAL 131 MAXPE 20 MAXPATCH 5 RefineTorusLB MEM: 2.78226e+07 MB
+LDB: Reverting to original mapping
+LDB: ============== END OF LOAD BALANCING =============== 53.722
+Info: useSync: 0 useProxySync: 0
+LDB: =============== DONE WITH MIGRATION ================ 53.7222
+TIMING: 100000  CPU: 55.0392, 0.000573407/step  Wall: 55.4066, 0.000576946/step, 1.60263e-05 hours remaining, 27822608.000000 MB of memory in use.
+PERFORMANCE: 100000  averaging 310.25 ns/day, 0.00055697 sec/step with standard deviation 2.03506e-05
+ERROR: 144 margin violations detected since previous energy output.
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:  100000       544.0711      1476.4750      1547.3315        78.0846         -31606.8322      2154.2771         0.0000         0.0000      5628.1129         -20178.4800       301.3615    -25806.5930    -20147.2722       301.5078
+
+WRITING EXTENDED SYSTEM TO RESTART FILE AT STEP 100000
+WRITING COORDINATES TO DCD FILE scratch/dhfr0npt.dcd AT STEP 100000
+WRITING COORDINATES TO RESTART FILE AT STEP 100000
+FINISHED WRITING RESTART COORDINATES
+The last position output (seq=100000) takes 0.000 seconds, 27822608.000 MB of memory in use
+WRITING VELOCITIES TO RESTART FILE AT STEP 100000
+FINISHED WRITING RESTART VELOCITIES
+The last velocity output (seq=100000) takes 0.000 seconds, 27822608.000 MB of memory in use
+WRITING EXTENDED SYSTEM TO OUTPUT FILE AT STEP 100100
+CLOSING EXTENDED SYSTEM TRAJECTORY FILE
+WRITING COORDINATES TO OUTPUT FILE AT STEP 100100
+CLOSING COORDINATE DCD FILE scratch/dhfr0npt.dcd
+WRITING VELOCITIES TO OUTPUT FILE AT STEP 100100
+The last velocity output (seq=-2) takes 0.000 seconds, 27822608.000 MB of memory in use
+====================================================
+
+WallClock: 55.910332  CPUTime: 55.478146  Memory: 27822608.000000 MB
+[Partition 0][Node 0] End of program

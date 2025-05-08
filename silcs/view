@@ -1,0 +1,84 @@
+#!/bin/vmd
+package require pbctools
+mol delete all
+source ~/scripts/vmd/colors.vmd
+
+set psffile chi3
+set tag -apo
+#set tag ""
+
+mol load psf ${psffile}${tag}_sn-psilcs.psf
+mol addfile ${psffile}${tag}_msn-psilcs.pdb
+
+set step 1
+set flag eq
+for {set i 1} {$i<=1} {incr i} {
+ if ($i>=1) {set flag "nvt-10" }
+# mol addfile ${psffile}${tag}${i}${flag}.dcd waitfor all step $step
+}
+#
+#mol addfile dcd/output_9173.dcd waitfor all step $step
+#mol addfile dcd/output_7686.dcd waitfor all step $step
+
+pbc set "100 100 100" -all
+
+set hiv [molinfo top]
+
+color Display {Background} gray
+axes location off
+mol delrep 0 $hiv
+display stereo SideBySide
+display rendermode GLSL
+
+set cons noh;
+set style "ribbons 10 0 4.5";
+
+source ~/scripts/vmd/align.vmd
+
+############# macros
+#source flumacros.vmd
+atomselect macro psilcs { segid "ALA.*" "CYS.*" "ASP.*" "GLU.*" "PHE.*" "GLY.*" "HSD.*" "ILE.*" "LEU.*" "LYS.*" "MET.*" "ASN.*" "PRO.*" "GLN.*" "ARG.*" "SER.*" \
+ "THR.*" "VAL.*" "TRP.*" "TYR.*" }
+####################
+mol representation $style
+mol selection $cons and segid G3BP
+mol color colorid $blue
+mol addrep $hiv
+
+mol representation $style
+mol selection $cons and segid CHI3
+mol color colorid $red
+mol addrep $hiv
+
+mol representation licorice
+mol selection psilcs and noh
+mol color name
+mol addrep $hiv
+
+mol representation licorice
+mol selection segid {"S.*"} and noh
+mol color name
+mol addrep $hiv
+
+mol representation lines
+mol selection protein and noh
+mol color name
+mol addrep $hiv
+
+mol representation lines
+mol selection water
+mol color colorid $black
+mol addrep $hiv
+
+set s 3
+for {set i 0} {$i<3} {incr i} {
+ mol smoothrep $hiv $i $s
+}
+
+# draw sphere to indicate where the ligands are confined
+# NOTE : the "draw" command does not seem to work when changing properties, so using graphics ; also, these do not appear in representations
+graphics top color $gray
+graphics top materials on
+graphics top material Transparent ;# BlownGlass
+#draw sphere {42 36 18} radius 10 resolution 100
+graphics top sphere {42 36 18} radius 11.5 resolution 100

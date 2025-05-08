@@ -1,0 +1,22 @@
+#!/bin/bash
+psffile=../../dhfr_sn
+pdbfile=../../dhfr_msn
+
+newname=new
+
+psfgen << END
+readpsf ${psffile}.psf pdb ${pdbfile}.pdb
+hmassrepart dowater 1 mass 4 ;# 1st argument specifies whether to repartition water ; second, sets the H mass (default is 3.024
+writepsf ${newname}.psf ; # the geniuses decided to write charmm-incompatible psf files; so have to try to clean up below
+writepdb ${newname}.pdb
+END
+
+sed -i 's/^\ *REMARK(\?S)*/*/' ${newname}.psf # to change remarks to stars
+sed -i '/NCRTERM/i \       0       0 !NUMLP NUMLPH\n' ${newname}.psf # insert number of lone pairs (0) ; NOTE : \n is essential for correctness
+# note that the above is still insufficient because psfgen does not read group definitions from the original PDB ; CHARMM uses them in basically _all_ versions
+# of the nonbonded routines.
+# Below, set the number of groups to zero, which make charmm run using BYCU, or BYCC (set in chmene):
+sed -i 's/.*NGRP/\       0       0 !NGRP/' ${newname}.psf
+# The better fix would be to actually recreate the group lists, e.g. by copying from the original psf :
+
+~/scripts/chmene ${newname}.psf ${newname}.pdb `ls ../../*top` `ls ../../*par`

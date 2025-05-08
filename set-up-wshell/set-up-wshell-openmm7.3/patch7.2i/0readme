@@ -1,0 +1,7 @@
+10.18
+charmmpsffile.py now has support for the drude ffield
+slight change in how atoms are stored in pdbfile.py
+
+4.23 : also need to patch swigbuilder.py with "%include factory.i"
+
+5/23 : generateWrappers needs to be updated for swig 4

@@ -1,0 +1,42 @@
+* add psilcs ligands (aas) to a solvated protein
+*
+
+set version 36
+
+set clib ~/scripts/charmm
+
+set resid
+!set cgenff
+!set xplor
+!set topparcgenff ~/charmm/parameters/cgenff31
+stream @{clib}/readpsf36m.str
+
+stream psilcs-def.str
+
+set iseg 1
+label segs
+! set candidates  .byres. ( ( point 44 43 19 cut 11 ) .and. segid wat )
+ set candidates  .byres. ( ( point 42 36 18 cut 11 ) .and. segid wat ) ! replace waters in the vicinity of a putative active site
+!
+! add ligands using ionization scripts
+ set ionsneeded 1
+ set ion @seg@@iseg
+ set ionseg @seg@@iseg ! note that, to avoid duplicate segnames, may need to append @iseg to segment name, and/or to modify it further
+ set ionpdb ligands/@seg@@iseg.pdb
+ stream @{clib}/addions.str
+ print coor sele .not. init end
+ rename segid @{seg@@iseg}@iseg sele segid @ionseg end ! to avoid duplicate names (but make sure to read coords first, as above) ; note that could overrun the 4 chars
+ incr iseg
+ if @iseg .le. @nseg -
+goto segs
+!
+mini abnr nstep 100
+!mini conj nstep 100
+!mini sd nstep 100
+!
+write psf @format name @{psffile}-psilcs.psf xplor
+! standard psf
+!write psf oldpsf @format name @{psffile}-silcso.psf
+write coor @format name @{corfile}-psilcs.cor
+write coor pdb name @{corfile}-psilcs.pdb
+

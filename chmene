@@ -1,0 +1,63 @@
+#!/bin/bash
+#!/bin/charmm
+# ^ choose what you want to highlight
+charmm=charmm327
+charmm=charmm47
+#charmm=charmm
+
+if [ -z $1 ]; then
+ psffile=`ls *psf`
+else
+ psffile=$1
+fi
+#
+if [ -z $2 ]; then
+ pdbfile=`ls *sn*pdb`
+ if [ -z $pdbfile ]; then
+  pdbfile=`ls *pdb`
+ fi
+else
+ pdbfile=$2
+fi
+#
+if [ -z $3 ]; then
+ topfile=`ls *top`
+else
+ topfile=$3
+fi
+#
+if [ -z $4 ]; then
+ parfile=`ls *par`
+else
+ parfile=$4
+fi
+
+echo PSF FILE: $psffile
+echo PDB FILE: $pdbfile
+echo TOP FILE: $topfile
+echo PAR FILE: $parfile
+
+if [ -z $psffile ] || [ -z $pdbfile ] || [ -z $topfile ] || [ -z $parfile ]; then
+ echo "SOME SIMULATION FILES ARE MISSING. STOP."
+ exit 1;
+fi
+# note that can either pass params to CHARMM or have the shell intepret the "$"
+$charmm << CHMEND
+* compute energy to make simulation is specified correctly
+*
+
+read rtf card name $topfile
+read param card name $parfile
+!print param
+read psf card name $psffile xplor
+read coor pdb name $pdbfile resid
+!bomblev -4
+!wrnlev -4
+update bycc cutnb 12 ctonnb 8 ctofnb 9 cdie eps 1
+ener
+STOP
+!
+CHMEND
+
+
+

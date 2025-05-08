@@ -1,0 +1,75 @@
+#!/bin/bash
+# make pdb file with marked restraintsusing vmd:
+name=chi3-apo
+psffile=${name}_sn-psilcs.psf
+pdbfile=${name}_msn-psilcs.pdb
+outfile=${name}_msn-psilcs-occu.pdb
+vmd -dispdev text -args $psffile $pdbfile $outfile < mkpsilcres.vmd
+numsilcs=`head -n1 $outfile | awk '{print $2}'`
+peplen=${numsilcs} # length of the desird circular peptide
+#peplen=12 # setting this differently from numsilcs (usually, larger) means that the peptides are allowed to be farther from each other;
+#echo $numsilcs
+#exit
+# create dynamo input file
+config="$name-psilcs.dyn"
+echo -n > $config
+cat watershell.dyn > $config
+#
+maxcv=`echo "$numsilcs + ( $numsilcs - 1 ) * $numsilcs / 2 " |bc` ; # number of restraints (absolute & relative, respectively)
+mindist=3.7 ; # minimum distance between any two residues
+maxdist=`echo "( ${peplen} -1 ) / 2 * $mindist" | bc -l` # maximum dist, e.g. assuming a beta-sheet like structure ; subtract two res for hairpin bends
+# ^ NOTE : the above assumes that all of the peptide residues are represented in the psilcs group, which is not necessarily optimal ; e.g. we might want to 
+# only find a few pockets (have 3-4 residues) ; with the rest of the peptide connected with linkers, like G/S/As ; so might have a peplen variable, larger than
+# numsilcs !
+fbwidth=`echo "$maxdist - $mindist" | bc -l` ;
+fbcenter=`echo "0.5 * ( $maxdist + $mindist )" | bc -l`
+
+sphere_center=( 42 36 18 );
+sphere_diam=23 ; # the diameter corresponds to the flat-bottom region
+# NOTE : it makes sense to make this sphere of diameter no smaller than the max distance between the CBs, so :
+sphere_diam=`echo "if ( $maxdist > $sphere_diam ) { $maxdist } else { $sphere_diam }" |bc -l`
+#
+sphere_rad=`echo "$sphere_diam / 2" |bc -l`; 
+kfdist=20 ; # force constant for pairwise distance restraint
+kfsphere=100 ;# force constant for sphere restraint
+# summarize :
+echo " There are $numsilcs PSILCS groups with $maxcv total distance CVs ; the min/max distances are ${mindist}/${maxdist}"
+echo " corresponding to a distance restraint centered on $fbcenter with flat-bottom width $fbwidth"
+echo " All groups are additionally restrained to remain within $sphere_rad of point ${sphere_center[@]} (protein RB motion must be restrained)"
+echo " Restraint force constants are $kfdist and $kfsphere kcal/mol/AA for pairwise and spherical restraints, respectively."
+echo " Will write restraint specification to file $config"
+
+echo "
+output {
+ minwarnlev=-1 ! more permissive warnings
+}
+structure_file=struc/${outfile}
+smcv_init {
+ defer_init_dyna=yes
+ : init maxcv ${maxcv}
+" >> $config
+cvind=0
+for i in `seq 1 $numsilcs` ; do 
+ cvind=$((cvind+1))
+ echo " : add dist_com p1 sele occupancy = $i end p2 ${sphere_center[@]} force $kfsphere fbwidth $sphere_diam !#$cvind restraint to 'active site'" >> $config
+ echo " : set cvz 0 ind $cvind" >> $config
+ for j in `seq $((i+1)) $numsilcs` ; do
+  cvind=$((cvind+1))
+  echo " : add dist_com sele occupancy = $i end sele occupancy = $j end force $kfdist fbwidth $fbwidth !#$cvind pairwise distance restraint" >> $config
+  echo " : set cvz $fbcenter ind $cvind" >> $config
+ done
+done
+
+echo "
+ :list
+ :fill col inst
+ :print col inst name cvs-inst0.dat
+ :print col main name cvs0.dat
+! :test grad step 0.001 ! passed
+! stats
+ : stat rene renm rene.dat - ! restraint energy
+   hist hnam hist.dat hcol inst ! instantaneous CV series
+! dynamics
+ : dyna rstr stat staf 10000 hisf 1000
+}" >> $config
+

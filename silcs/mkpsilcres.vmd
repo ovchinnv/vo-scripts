@@ -1,0 +1,75 @@
+#!/bin/vmd
+# write pdb file for dynamo restraint groups marked ; for use with psilcs
+#
+# load psf/pdb
+set name chi3-apo
+#
+if { $argc > 1 } {
+ set psffile [ lindex $argv 0 ] ;
+} else {
+ if { [info exists "name"] } {
+  set psffile ${name}_sn-psilcs.psf
+ } else {
+  puts " !!!!! ERROR PSF file not provided"
+  exit
+ }
+}
+#
+if { $argc > 2 } {
+ set pdbfile [ lindex $argv 1 ] ;
+} else {
+ if { [info exists "name"] } {
+  set pdbfile ${name}_msn-psilcs.pdb
+ } else {
+  puts " !!!!! ERROR PDB file not provided"
+  exit
+ }
+}
+#
+if { $argc > 3 } {
+ set outfile [ lindex $argv 2 ] ;
+} else {
+ if { [info exists "name"] } {
+  set outfile [file rootname $pdbfile]-res.pdb ;
+ } else {
+  puts " !!!!! ERROR OUTPUT PDB file not provided"
+  exit
+ }
+}
+#
+mol load psf $psffile pdb ${pdbfile}
+# reset beta and occupancy
+set all [atomselect top "all" ];
+$all set beta 0
+$all set occupancy 0
+#
+# define selections and assign occupancy values to each residue
+#
+set silcsegs  { "ALA" "ARG" "ASP" "GLN" "LEU" "THR" "GLU" "ILE" "PHE" "LYS" "SER" "VAL" "MET" "ASN" "PRO" "TYR" "HIS" "HSD" "HSE" "GLY" "TRP" "CYS" };
+# in principle, want to have the flexibility of choosing different restraint groups for different residues
+#set silcatoms { "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB"  "CB" };
+set silcatoms {};
+foreach seg $silcsegs {
+ lappend silcatoms "CB" ;
+}
+#
+set iflag 0
+foreach sseg $silcsegs satoms $silcatoms {
+ puts "Processing segment $sseg ..."
+ set cmd "\{segname \"$sseg.*\"\}" ;# I think this is the only way to do what I want; wildcards need to be in quotes ; curly braces optional
+# puts $cmd
+# set sel [ atomselect top "segname $sseg" ];
+ set sel [ atomselect top $cmd ];
+ puts "Found [$sel num] atoms";
+ set rsel [ $sel get residue ];
+ set rsel [ lsort -integer -uniq $rsel ];  # expect to have just one residue, but can handle more
+ foreach r $rsel {
+  incr iflag;
+#  puts "IFLAG=$iflag";
+  set residue [ atomselect top "residue $r and name $satoms" ]; 
+  $residue set occupancy $iflag
+ }
+}
+animate write pdb ${outfile}
+# note : may need to remove the unit cell line from this pdb if running without PBC :
+exec sed -i "s/^CRYST.*/REMARK $iflag PSILCS GROUPS/" ${outfile}

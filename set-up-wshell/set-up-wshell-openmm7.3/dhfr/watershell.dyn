@@ -1,0 +1,49 @@
+! charmm
+! watershell input script
+!
+ output {
+  minwarnlev=-1
+ }
+
+ molecule{
+  structure_file=struc/dhfr_msn.pdb
+ }
+
+ watershell {
+
+  radii=const ! radii do not matter with the mindist method "minimum_distance=yes" below (watershell v.1)
+  radiiconst=2.0
+
+  dasystat=yes ! this provides density equilibration, but can generally be turned off
+!  density_update_freq=500
+  mass=file
+  massfile=struc/dhfr-mass.pdb
+  massfiletype=PDB
+  masscol=B
+
+  structure_update_freq=7 ! how often the instantaneous shell surface is recomputed
+  structure_update_memory=0.9999 ! memory parameter for updating the (slowly-moving) shell surface (default 0.999)
+  surface_force_constant=1 !
+  surface_distance=0 ! thickness of solvent shell; use 0 to guess automatically
+!
+  rigid_body_restraint=yes
+  rigid_body_force_constant=10
+
+! specify spline file for solvent boundary forces (only for watershell v.2)
+  spline_input_file="../vo-projects/watershell/sbf-rcut8spl2dkz.dat"
+
+! use a simple minimum distance algorithm (only for watershell v.1)
+  minimum_distance=yes
+
+  surface_padding=3   ! # add this number to each radius (erf only)
+  cutoff_surf_stdev=5 ! # of gaussian filter stdevs to search for surface atoms (default=6); erf only
+
+  surface_atoms="ANAME=CA" ! atoms used to define the surface ; there should not be too many
+  solvent_atoms="ANAME=OH2 OR ANAME=SOD OR ANAME=CLA OR ANAME=MG" ! atoms used to represent solvent (there should not be too many)
+!
+  restart_file="@{restart_file}" ! these are placeholders that are populated for each run
+  output_file="@{output_file}"
+!
+  output_freq=10000
+!
+ }

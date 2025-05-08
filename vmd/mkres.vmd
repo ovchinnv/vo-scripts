@@ -1,23 +1,32 @@
 #!/bin/vmd
 
-if { $argc > 0 } {
- set name [lindex $argv 0];
+if { $argc == 2 } {
+ set psffile [ lindex $argv 0 ] ;
+ set pdbfile [ lindex $argv 1 ] ;
 } else {
- if { ![info exists "path"] } {
-  set path "$env(HOME)/scripts/vmd"
+ if { $argc == 1 } {
+  set name [lindex $argv 0];
+ } else {
+  if { ![info exists "path"] } {
+   set path "$env(HOME)/scripts/vmd"
+  }
+  source ${path}/gname.tcl
  }
- source ${path}/gname.tcl
+ set psffile ${name}_sn.psf
+ set pdbfile ${name}_msn.pdb
 }
 
-mol load psf ${name}_sn.psf
-mol addfile ${name}_msn.pdb
+foreach nm ${name} {
+
+mol load psf ${nm}_sn.psf
+mol addfile ${nm}_msn.pdb
 
 # mark restraints
 
 set all [atomselect top "all" ];
 $all set beta 0
 
-# need artifice below to tupport blanks within arguments
+# need artifice below to support blanks within arguments
 if { [ info exists env(VMDSEL)] } {
  set selection $env(VMDSEL)
 } else {
@@ -35,6 +44,7 @@ puts $nametag
 set res [atomselect top "$selection" ];
 $res set beta 1 ;
 
-$all writepdb ${name}-${nametag}.pdb
+$all writepdb ${nm}-${nametag}.pdb
 # note : may need to remove the unit cell line from this pdb if running without PBC :
-exec sed -i /CRYST/d ${name}-${nametag}.pdb
+exec sed -i /CRYST/d ${nm}-${nametag}.pdb
+}
