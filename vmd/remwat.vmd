@@ -1,0 +1,38 @@
+#!/bin/vmd
+# 5/25 : slightly different (more autonomous) version of remwat
+set name [exec ls struc | grep -E sn.psf | sed -E s/_sn.psf//] ;
+
+mol load psf struc/${name}_sn.psf ;
+#mol addfile struc/${name}_msn.pdb ;# not needed
+
+set solute  [atomselect top "protein"];
+set solvent [atomselect top "not protein"];
+set fpath scratch
+
+set step 1
+set nowfile ${fpath}/${name}-now
+set nowfiles {}
+
+set dcds [exec ls ${fpath} | grep ${name} | grep nvt.dcd | sort -V ] ;
+foreach dcd $dcds {
+ set dcdfile [ file rootname ${fpath}/$dcd ];
+ puts $dcdfile
+ animate read dcd ${dcdfile}.dcd waitfor all beg 0 skip $step
+ animate write dcd ${dcdfile}_now.dcd beg 0 skip 1 waitfor all sel $solute
+ lappend nowfiles ${dcdfile}_now
+  animate delete all
+}
+
+foreach dcdfile $nowfiles {break;}
+puts "appending file $dcdfile ..."
+exec catdcd -o $nowfile.dcd $dcdfile.dcd
+exec rm -f $dcdfile.dcd
+#
+for { set i 1 } { $i < [llength $nowfiles] } { incr i } {
+ set dcdfile [lindex $nowfiles $i];
+ puts "appending file $dcdfile ..."
+ exec mv $nowfile.dcd temp
+ exec catdcd -o $nowfile.dcd temp $dcdfile.dcd
+ exec rm -f $dcdfile.dcd
+}
+exec rm -f temp.dcd
