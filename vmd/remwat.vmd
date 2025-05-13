@@ -5,8 +5,12 @@ set name [exec ls struc | grep -E sn.psf | sed -E s/_sn.psf//] ;
 mol load psf struc/${name}_sn.psf ;
 #mol addfile struc/${name}_msn.pdb ;# not needed
 
-set solute  [atomselect top "protein"];
-set solvent [atomselect top "not protein"];
+atomselect macro solvent { water or name CLA POT SOD }
+set solvent [atomselect top "solvent"];
+set solute  [atomselect top "not solvent"];
+puts "Solvent selection {[atomselect macro solvent]} has [$solvent num] atoms";
+puts "Solute selection { [$solute text] } has [$solute num] atoms";
+#return
 set fpath scratch
 
 set step 1
