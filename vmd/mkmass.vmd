@@ -15,14 +15,6 @@ if { $argc >=2 } {
  set pdbfile ${name}_msn.pdb
 }
 
-if { $argc > 1 } {
- set name [lindex $argv 0];
-}
-
-if { ![info exists "name"] } {
- source ${path}/gname.tcl
-}
-
 foreach nm ${name} {
 
 mol load psf ${nm}_sn.psf

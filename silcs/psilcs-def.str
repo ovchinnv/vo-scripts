@@ -1,0 +1,13 @@
+* psilcs residues
+*
+
+set seg1 LEU
+set seg2 TRP
+set seg3 HSD
+set seg4 SER
+set seg5 ASP
+set seg6 PHE
+set seg7 TYR
+set seg8 THR
+set nseg 8
+return
