@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for dcd in *nvt*dcd ; do
+for dcd in *dcd ; do
  name=${dcd%%.dcd}
 #echo $name
  catdcd -o ${name}-10.dcd -stride 10 ${name}.dcd

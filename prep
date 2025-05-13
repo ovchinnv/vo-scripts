@@ -1,0 +1,44 @@
+#!/bin/bash
+
+clib=~/scripts/charmm
+
+charmm=charmm327str
+
+fname=h7-cr8020-noc15
+
+if [ 0 -eq 1 ]; then
+
+$charmm psffile=${fname} corfile=${fname}_m method=box maxdist=8.5 buffer=10 solute="( segid HA* .or. segid S* .or. segid *C* )" skipmini=1 \
+ carb=1 toppar="${HOME}/charmm/parameters/c36-jul18" -i ${clib}/boxsolv.inp \
+  adstr="${HOME}/charmm/parameters/c36/nag-bma-man-gal-fuc-sia.str" \
+  adstr1="${HOME}/charmm/parameters/c36-jul18/stream/carb/toppar_all36_carb_glycopeptide.str" \
+  -o boxsolv-ab.out
+
+
+$charmm psffile=${fname}_s corfile=${fname}_ms resid=1 \
+ carb=1 toppar="${HOME}/charmm/parameters/c36-jul18" \
+  adstr="${HOME}/charmm/parameters/c36/nag-bma-man-gal-fuc-sia.str" \
+  adstr1="${HOME}/charmm/parameters/c36-jul18/stream/carb/toppar_all36_carb_glycopeptide.str" \
+  -i ${clib}/ionize.inp -o ionize-ab.out
+
+fi
+# write restraint file(s)
+
+$charmm psffile=${fname}_sn corfile=${fname}_msn resid=1 \
+ carb=1 toppar="${HOME}/charmm/parameters/c36-jul18" \
+  adstr="${HOME}/charmm/parameters/c36/nag-bma-man-gal-fuc-sia.str" \
+  adstr1="${HOME}/charmm/parameters/c36-jul18/stream/carb/toppar_all36_carb_glycopeptide.str" \
+  selection=".not. ( segid *WAT* .or. segid *ION* .or. hydrogen)" \
+  qpdb=1 tag="-res" \
+  -i ${clib}/mkres.inp -o mkres.out
+
+#
+# extra file for openmm rgb restraint
+#
+$charmm psffile=${fname}_sn corfile=${fname}_msn resid=1 \
+ carb=1 toppar="${HOME}/charmm/parameters/c36-jul18" \
+  adstr="${HOME}/charmm/parameters/c36/nag-bma-man-gal-fuc-sia.str" \
+  adstr1="${HOME}/charmm/parameters/c36-jul18/stream/carb/toppar_all36_carb_glycopeptide.str" \
+  selection="segid HA* .and. type CA" \
+  qpdb=1 tag="-rgbres" \
+  -i ${clib}/mkres.inp -o mkrgbres.out

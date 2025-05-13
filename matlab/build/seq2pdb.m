@@ -1,9 +1,9 @@
-function seq2pdb(seq,ibeg,pdbname,mins,mchainid,msegid )
+function seq2pdb(seq,ibeg,pdbname,mins,mchainid,msegid,mx,my,mz)
  ntaa;
  mpdb=struct();
- mx=9999;
- my=mx;
- mz=mx;
+ if (~exist('mx')) ; mx=9999 * ones(1,numel(seq)); end
+ if (~exist('my')) ; my=mx; end
+ if (~exist('mz')) ; mz=mx; end
  ires=ibeg
  if (~exist('mchainid')) ; mchainid=''; end
  if (~exist('msegid')) ; msegid=''; end
@@ -24,9 +24,9 @@ function seq2pdb(seq,ibeg,pdbname,mins,mchainid,msegid )
   mpdb(ind).resSeq=ires;
 %  cins=char(mins);
   mpdb(ind).iCode=ins;
-  mpdb(ind).X=mx;
-  mpdb(ind).Y=my;
-  mpdb(ind).Z=mz;
+  mpdb(ind).X=mx(ind);
+  mpdb(ind).Y=my(ind);
+  mpdb(ind).Z=mz(ind);
   mpdb(ind).occupancy=0.0;
   mpdb(ind).tempFactor=0.0;
   mpdb(ind).element='';

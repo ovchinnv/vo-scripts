@@ -30,7 +30,7 @@ cutoff=@{cutoff};       # nonbonded cutoff
 #switchdist=@{switchdist};   # optional : default is cutoff - 1.5
 
 constraints=@{restraints};   # harmonic positional restraints for equilibration
-constraintscaling=@{restraintscale}; # to scale hatmonic restraints uniformly
+constraintscaling=@{restraintscale}; # to scale harmonic restraints uniformly
 consfile='@{restraintfile}'; # as in NAMD/ACEMD, this file must have identical atom ordering to that in the system topology
 conscol=@{restraintcol}; # 1 -- beta , 2 -- occupancy
 
@@ -45,9 +45,12 @@ membrane_on=0; # whether to use a barostat for membrane simulations (z-axis is t
 pme=0; # whether to use PME
 pbc=0; # whether periodic boundary conditions are on
 
-struna=1; # whether string plugin is active
-strunaConfig='@{sminput}'; # config name for string plugin
-strunaLog='@{smlog}'; # lof name for string plugin
+#struna=1; # whether string plugin is active
+#strunaConfig='@{sminput}'; # config name for string plugin
+#strunaLog='@{smlog}'; # lof name for string plugin
+dynamo=1; # whether string plugin is active
+dynamoConfig='@{sminput}'; # config name for string plugin
+dynamoLog='@{smlog}'; # lof name for string plugin
 
 mini=0;          # whether to minimize before dynamics
 ministeps=@{ministeps};   # number of minimization iterations

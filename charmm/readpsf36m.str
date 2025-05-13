@@ -6,7 +6,7 @@ set wrnlev ?wrnlev
 wrnlev 2
 
 if @?version eq 0 set version 36-jul18
-if @version ne 36 error WRONG PARAMETER VERSION : REQUESTED @version, PROVIDING 36-jul18
+if @version ne 36 echo WRONG PARAMETER VERSION : REQUESTED @version, PROVIDING 36-jul18
 if @?resid eq 0 then
  set resid
 else

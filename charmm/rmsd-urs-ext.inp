@@ -1,5 +1,5 @@
 * alanine dipeptide
-* RMSDs computed using uniform rotational sampling
+* RMSDs computed using uniform rotational sampling (rotations generated externally)
 *
 
 set nbox 10 ! periodic box length (Ang)
@@ -45,25 +45,31 @@ define restrained sele all end
 ! set force constant(s)
 @s set force 0 all
 ! set statistics options
-set fout rms_urs.dat
+set fout rms_urs_ext.dat
 open form write name "@FOUT" unit 1
 write title unit 1
-*%rmsd
+*%rmsd computed in charmm script file rmsd-urs-ext.inp
 @s stat hist hnam @fout hcol inst happ ! output cv history appending to file
 ! now loop over rotations in external file
-set fin rotations.dat
-set nrot = 10000 ! number of rotations
+!set fin rotations.dat
+set nrot 200 ! number of rotations to read from file
+set qinternal 1 ! whether to read a first, which I arbitrarly called "internal" rotation
+set type rand ! how angles were generated, can be rand or grid
+!set type grid
+set fin rotations-@{type}-@{nrot}.dat
 set irot 1
 set jrot 1 ! output indicator
 open form read name "@FIN" unit 1
 prnlev 1
 label lrot
+if @qinternal eq 1 then
 ! first rotation
  get unit 1 x
  get unit 1 y
  get unit 1 z
  get unit 1 phi
  coor rota xdir @x ydir @y zdir @z phi @phi
+endif
 ! second rotation
  get unit 1 x
  get unit 1 y

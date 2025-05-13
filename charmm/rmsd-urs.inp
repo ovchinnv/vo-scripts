@@ -48,7 +48,7 @@ define restrained sele all end
 set fout rms_urs.dat
 open form write name "@FOUT" unit 1
 write title unit 1
-*%rmsd
+*%rmsd computed in charmm script file rmsd-urs.inp
 @s stat hist hnam @fout hcol inst happ ! output cv history appending to file
 ! now generate rotations
 set nrot = 100000 ! number of rotations

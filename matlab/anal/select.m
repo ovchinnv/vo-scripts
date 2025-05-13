@@ -9,4 +9,4 @@ typeO=ismember(aname,'O');
 typeH=ismember(aname,'H');
 typeOH2=ismember(aname,'OH2'); % water oxygen TIP3P
 backbone = typeCA | typeC | typeN | typeO | typeH ;
-
+noh=element~='H';
