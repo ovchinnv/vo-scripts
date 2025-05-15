@@ -1,4 +1,6 @@
 #!/bin/bash
+# NOTE : I think this is slower than the VMD version
+python=python2;
 root=.
 name=( $root/*.psf )
 name=${name[0]%.psf}
@@ -54,10 +56,14 @@ fi
 # now compute sasa using the subsampled dcds
 pdbs=( ${name}_m ${name}-fab1 ${name}-notfab1 ${name}-fab2 ${name}-notfab2 ${name}-fab3 ${name}-notfab3 )
 dcds=( ${name}-now ${name}-fab1 ${name}-notfab1 ${name}-fab2 ${name}-notfab2 ${name}-fab3 ${name}-notfab3 )
+#
+#pdbs=( ${name}-fab1 )
+#dcds=( ${name}-fab1 )
 
 for i in `seq 1 ${#pdbs[@]}` ; do
  pdb=dcd/${pdbs[(($i-1))]}
  dcd=dcd/${dcds[(($i-1))]}
- ~/scripts/simonson-util/python/mdsasa.py ${pdb}.pdb ${dcd}.dcd > ${dcd}.sasa
+ $python ~/scripts/simonson-util/python/mdsasa.py ${pdb}.pdb ${dcd}.dcd > ${dcd}.sasa
+# $python ~/scripts/python/sasa.py ${pdb}.pdb ${dcd}.dcd > ${dcd}.sasa
 done
 
