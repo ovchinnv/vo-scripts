@@ -6,6 +6,7 @@ import mdtraj as md
 print("%",md.__file__)
 
 myname=argv[0];
+print(argv, len(argv))
 # ========================== Aux print functions
 def dprint(*args):
   print("% ===>",myname,": ",end="");
@@ -21,7 +22,7 @@ def derror(*args):
 # ==========================
 
 if len(argv) < 2 :
- raise ValueError("USAGE : ./mdsasa.py <struc_file> <dcd_file>(optional)")
+ raise ValueError("USAGE : ./sasa.py <struc_file> <dcd_file>(optional)")
 else:
  topfile=argv[1];
  if len(argv) < 3 :
@@ -35,16 +36,15 @@ else:
    stride=1;
 # ==============================================
 struc=md.load(topfile);
-
 # ==============================================
 if (qdcd):
  dprint("Reading simulation coordinates from file '",dcdfile,"'");
- dcd=md.load_dcd(dcdfile,stride=stride);
+ struc=md.load_dcd(dcdfile,top=struc,stride=stride);
 #
 nm2a=100 ; #convert to A from nm
 if struc.n_frames>0 :
  dprint("Computing SASA for ", struc.n_frames," frames:" );
- sasa=md.shrake_rupley(struc, mode="residue"); # mode residue means one number per resdiue (rather than mode="atom"
+ sasa=md.shrake_rupley(struc, mode="residue"); # mode residue means one number per resdiue (rather than mode="atom")
 
 for i in range(sasa.shape[0]):
  dprint("Frame ",i);
