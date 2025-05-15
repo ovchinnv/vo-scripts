@@ -10,6 +10,9 @@ if { ![info exists "selection"] } {
 if { ![info exists "proberad"] } {
  set proberad 1.4
 }
+if { ![info exists "qloud"] } {
+ set qloud 0
+}
 puts "Computing SASA for $selection using probe radius $proberad ... "
 
 set all      [atomselect $id "all"];
@@ -17,10 +20,11 @@ set sel      [atomselect $id $selection];
 set sasa {}
 #
 for { set i 0 } { $i<$nf } { incr i } {
- $all frame $i
- $all update
+# $all frame $i
+# $all update
  $sel frame $i
  $sel update
+ if { $qloud } { puts "Processing frame [expr {$i+1}] of $nf" };
  lappend sasa [measure sasa $proberad $sel]
 }
 #############################################################################

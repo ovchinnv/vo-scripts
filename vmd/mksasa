@@ -1,0 +1,70 @@
+#!/bin/bash
+root=.
+name=( $root/*_m.pdb )
+name=${name[0]%_m.pdb}
+name=${name[0]#*/}
+
+if [ 0 -eq 1 ] ; then
+
+vmd -dispdev text <<SUBS
+mol delete all
+#mol load psf ${name}.psf
+#mol addfile ${name}_m.pdb
+mol load pdb ${name}_m.pdb
+
+atomselect macro stem { segid "HA.*" } ;
+atomselect macro noloop { resid <=53 or resid >=65 }
+atomselect macro c15 { segid "C15.*" };
+atomselect macro fab1 { segid HC1 LC1 HC11 LC11 HC1A LC1A };
+atomselect macro fab2 { segid HC2 LC2 HC12 LC12 HC1B LC1B };
+atomselect macro fab3 { segid HC3 LC3 HC13 LC13 HC1C LC1C };
+atomselect macro fabs { fab1 or fab2 or fab3 };
+
+set dcds [exec ls dcd | grep ${name} | grep now | sort -V ] ;# complete dcd files
+foreach dcd \$dcds {
+ puts \$dcd
+ mol addfile dcd/\$dcd waitfor all
+}
+set id [ molinfo top ]
+set last [expr { [molinfo \$id get numframes] -1 } ];
+set fab1 [atomselect \$id "fab1"];
+set fab2 [atomselect \$id "fab2"];
+set fab3 [atomselect \$id "fab3"];
+set notfab1 [atomselect \$id "not fab1"];
+set notfab2 [atomselect \$id "not fab2"];
+set notfab3 [atomselect \$id "not fab3"];
+
+\$fab1 writepdb dcd/${name}-fab1.pdb
+\$notfab1 writepdb dcd/${name}-notfab1.pdb
+animate write dcd dcd/${name}-fab1.dcd sel \$fab1 waitfor all beg 0 end \$last \$id
+animate write dcd dcd/${name}-notfab1.dcd sel \$notfab1 waitfor all beg 0 end \$last \$id
+#
+\$fab2 writepdb dcd/${name}-fab2.pdb
+\$notfab2 writepdb dcd/${name}-notfab2.pdb
+animate write dcd dcd/${name}-fab2.dcd sel \$fab1 waitfor all beg 0 end \$last \$id
+animate write dcd dcd/${name}-notfab2.dcd sel \$notfab1 waitfor all beg 0 end \$last \$id
+#
+\$fab3 writepdb dcd/${name}-fab3.pdb
+\$notfab3 writepdb dcd/${name}-notfab3.pdb
+animate write dcd dcd/${name}-fab3.dcd sel \$fab3 waitfor all beg 0 end \$last \$id
+animate write dcd dcd/${name}-notfab3.dcd sel \$notfab3 waitfor all beg 0 end \$last \$id
+SUBS
+
+fi
+#exit
+# now compute sasa using the subsampled dcds
+pdbs=( ${name}_m ${name}-fab1 ${name}-notfab1 ${name}-fab2 ${name}-notfab2 ${name}-fab3 ${name}-notfab3 )
+dcds=( ${name}-now ${name}-fab1 ${name}-notfab1 ${name}-fab2 ${name}-notfab2 ${name}-fab3 ${name}-notfab3 )
+
+for i in `seq 1 ${#pdbs[@]}` ; do
+ pdb=dcd/${pdbs[(($i-1))]}
+ dcd=dcd/${dcds[(($i-1))]}
+vmd -dispdev text <<SASA
+mol load pdb ${pdb}.pdb
+mol addfile ${dcd}.dcd waitfor all
+set sasaname $pdb.sasa
+set qloud 1
+source ~/scripts/vmd/sasa.vmd
+SASA
+done
+
