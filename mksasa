@@ -4,7 +4,7 @@ name=( $root/*_m.pdb )
 name=${name[0]%_m.pdb}
 name=${name[0]#*/}
 
-if [ 0 -eq 1 ] ; then
+if [ 1 -eq 1 ] ; then
 
 vmd -dispdev text <<SUBS
 mol delete all
