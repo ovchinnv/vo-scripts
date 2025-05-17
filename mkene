@@ -1,0 +1,21 @@
+#!/bin/bash
+python=python
+root=.
+name=( $root/*_m.pdb )
+name=${name[0]%_m.pdb}
+name=${name[0]#*/}
+
+# now compute energy using subsampled dcds
+# NOTE : mdtraj does not work w/psf, because, when parsing the PSF file, it encounters a residue with an insertion code (52A) and crashes ; what a stupid program
+# However, using the (psf-matched) pdb file for topology seems to work !
+psfs=( ${name} ${name}-fab1 ${name}-notfab1 ${name}-fab2 ${name}-notfab2 ${name}-fab3 ${name}-notfab3 )
+pdbs=( ${name}_m ${name}-fab1 ${name}-notfab1 ${name}-fab2 ${name}-notfab2 ${name}-fab3 ${name}-notfab3 )
+dcds=( ${name}-now ${name}-fab1 ${name}-notfab1 ${name}-fab2 ${name}-notfab2 ${name}-fab3 ${name}-notfab3 )
+
+for i in `seq 1 ${#psfs[@]}` ; do
+ psf=${psfs[(($i-1))]}
+ pdb=dcd/${pdbs[(($i-1))]}
+ dcd=dcd/${dcds[(($i-1))]}
+ $python ./mdene.py $psf.psf $dcd.dcd struc $pdb.pdb > dcd/${psf}.ene
+#exit
+done

@@ -1,0 +1,43 @@
+#!/bin/bash
+# use psfgen to make psfs that correspond to the truncated systems, which are needed for running mdene
+root=.
+name=( $root/*_m.pdb )
+name=${name[0]%_m.pdb}
+name=${name[0]#*/}
+
+vmd -dispdev text << SUBS
+
+package require psfgen
+mol delete all
+
+mol load psf ${name}.psf
+
+atomselect macro fab1 { segid HC1 LC1 HC11 LC11 HC1A LC1A };
+atomselect macro fab2 { segid HC2 LC2 HC12 LC12 HC1B LC1B };
+atomselect macro fab3 { segid HC3 LC3 HC13 LC13 HC1C LC1C };
+
+set id [ molinfo top ]
+set fab1 [atomselect \$id "fab1"];
+set fab2 [atomselect \$id "fab2"];
+set fab3 [atomselect \$id "fab3"];
+set notfab1 [atomselect \$id "not fab1"];
+set notfab2 [atomselect \$id "not fab2"];
+set notfab3 [atomselect \$id "not fab3"];
+
+set selections { \${fab1} \${fab2} \${fab3} \${notfab1} \${notfab2} \${notfab3} };
+set psfnames [ split "notfab1 notfab2 notfab3 fab1 fab2 fab3"] ;
+
+foreach sel \${selections} psfname \${psfnames} {
+ resetpsf
+ readpsf ${name}.psf
+# psfgen cannot handle nonnumeric input in resid
+# foreach segid [eval \${sel} get segid] resid [eval \${sel} get resid] {
+#  delatom \${segid} \${resid}
+# }
+# this is a hack -- works only if deleting whole segids, attempting multiple deletions of the same seg, but ....
+ foreach segid [eval \${sel} get segid] {
+  delatom \${segid}
+ }
+ writepsf ${name}-\${psfname}.psf
+}
+SUBS
