@@ -18,10 +18,13 @@ if { $argc == 2 } {
 
 mol load psf $psffile
 mol addfile $pdbfile
+<<<<<<< HEAD
 
 #foreach nm ${name} {
 #mol load psf ${nm}_sn.psf
 #mol addfile ${nm}_msn.pdb
+=======
+>>>>>>> b7e42aa (some silcs files)
 
 # mark restraints
 
@@ -50,5 +53,8 @@ set outfile [ file rootname $pdbfile ]-${nametag} ;
 $all writepdb ${outfile}.pdb
 # note : may need to remove the unit cell line from this pdb if running without PBC :
 exec sed -i /CRYST/d ${outfile}.pdb
+<<<<<<< HEAD
 #}
+=======
+>>>>>>> b7e42aa (some silcs files)
 

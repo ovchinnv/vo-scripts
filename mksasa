@@ -41,8 +41,8 @@ animate write dcd dcd/${name}-notfab1.dcd sel \$notfab1 waitfor all beg 0 end \$
 #
 \$fab2 writepdb dcd/${name}-fab2.pdb
 \$notfab2 writepdb dcd/${name}-notfab2.pdb
-animate write dcd dcd/${name}-fab2.dcd sel \$fab1 waitfor all beg 0 end \$last \$id
-animate write dcd dcd/${name}-notfab2.dcd sel \$notfab1 waitfor all beg 0 end \$last \$id
+animate write dcd dcd/${name}-fab2.dcd sel \$fab2 waitfor all beg 0 end \$last \$id
+animate write dcd dcd/${name}-notfab2.dcd sel \$notfab2 waitfor all beg 0 end \$last \$id
 #
 \$fab3 writepdb dcd/${name}-fab3.pdb
 \$notfab3 writepdb dcd/${name}-notfab3.pdb

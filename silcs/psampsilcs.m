@@ -15,6 +15,7 @@ allpsilcs={ 'ALA' 'ARG' 'ASP' 'GLN' 'LEU' 'THR' 'GLU' 'ILE' 'PHE' 'LYS' 'SER' 'V
 pdfpsilcs=[  0     0     1     0     2     1     0     0     2     1     1     0     0     0     0     2     1     0     2     0    ];
 % also, I now believe that basic or acidic residues are not useful
 %pdfpsilcs=[  0     0     0     0     2     1     0     0     2     0     1     1     0     0     0     2     1     0     2     0    ];
+%pdfpsilcs=[  0     0     1     0     2     1     0     0     2     1     1     0     0     0     0     2     1     0     2     0    ];
 %
 %=======================
 % check pdf for positivity

@@ -1,9 +1,10 @@
 #!/bin/vmd
-if { $argc >=2 } {
+
+if { $argc == 2 } {
  set psffile [ lindex $argv 0 ] ;
  set pdbfile [ lindex $argv 1 ] ;
 } else {
- if { $argc >=1  } {
+ if { $argc == 1 } {
   set name [lindex $argv 0];
  } else {
   if { ![info exists "path"] } {

@@ -1,0 +1,24 @@
+#!/bin/bash
+# download consistent packages from archlinux archive
+pkgs=(python-pooch-1.8.2-1  python-scipy-1.14.1-1)
+
+baseurl="https://archive.archlinux.org/packages"
+ext1="x86_64.pkg.tar.zst"
+ext2="any.pkg.tar.zst"
+
+for pkg in ${pkgs[@]} ; do
+ first_letter=${pkg:0:1}
+ url=$baseurl/$first_letter/${pkg}-${ext1}
+ echo "Fetching $pkg @ $url"
+ response=`wget $url 2>&1`
+ notfound=`echo $response | grep 'ERROR 404'`
+ if [[ ! -z $notfound ]] ; then
+  url=$baseurl/$first_letter/${pkg}-${ext2}
+  echo "Fetching $pkg @ $url"
+  response=`wget $url 2>&1`
+  notfound=`echo $response | grep 'ERROR 404'`
+  if [[ ! -z $notfound ]] ; then
+   echo "Could not find $pkg"  
+  fi
+ fi
+done
