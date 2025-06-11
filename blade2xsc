@@ -1,0 +1,38 @@
+#!/bin/bash
+if [ -z $1 ] ; then 
+ echo "USAGE : bld2xsc blade_checkpoint_file.blc"
+ exit 1;
+else
+ bldfile=$1
+fi
+
+if [ -z $2 ]; then
+ xscfile=${bldfile%%.blc}.xsc
+else
+ xscfile=$2
+fi
+
+if [ -z $3 ]; then
+ scale=10 ; # nm to Ang
+else
+ scale=$3
+fi
+# blade checkpoint files are _almost_ xyz files; complete the conversion here
+# read # steps
+nsteps=`head -n1 $bldfile | cut -d" " -f 2`;
+#echo $nsteps
+if [ -z "$nsteps" ] ; then
+ echo "ERROR : could not read number of simulation steps from $bldfile"
+ exit 1
+fi
+#(2) read Box entry : (note will add support for other cells, as needed)
+boxline=`grep -n Box $bldfile | cut -d":" -f 1`;
+if [ -z "$boxline" ] ; then
+ echo "ERROR : could not read Box entry from $bldfile"
+ exit 1
+fi
+((boxline++)) ;# increment by one
+#echo $boxline
+read dx dy dz <<< `tail +$boxline $bldfile | head -n1`
+# assume that the angles are all 90
+echo "$nsteps $dx 0 0 0 $dy 0 0 0 $dx " > $xscfile

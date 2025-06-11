@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# combine HA1 and HA2 into 1 file for alignment
+cat alignedfluab_HA[1-2]* | grep ATOM > alignedfluab_HA.pdb
+#| grep ATOM > alignedfluab_HA.pdb
+
+# here doc does not work with pymol directly
+cat >aln.py << ALN
+from pymol import pm
+pm.delete('all')
+
+names=[ 'h7vrcc15st_A', 'fluab_HA' ]
+basename='aligned';
+for name in names:
+ obj='aligned'+name; # these will become objects for pymol selections
+ pdb=obj+'.pdb';
+ pm.load(pdb)
+
+# alignment
+aln1=pm.align(basename+names[0], basename+names[1])
+print('RMSD:' + str(aln1[0])+' based on ' + str(aln1[1]) + ' atoms')
+
+# purely strcture-based
+#aln2=pm.super(basename+names[1], basename+names[0])
+#print('RMSD:' + str(aln2[0])+' based on ' + str(aln2[1]) + ' atoms')
+#pm.quit()
+ALN
+
+pymol -c aln.py |grep RMSD

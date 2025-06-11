@@ -1,0 +1,8 @@
+#!/bin/tcl
+if { ![info exists "pbcfirst"] } {
+ set pbcfirst 1
+}
+
+pbc join res -sel "water or ion" -first $pbcfirst -last last -verbose;# unsplit water molecules (expensive)
+pbc unwrap -sel "protein" -first $pbcfirst -last last ;# unwrap protein
+pbc wrap -compound res -center com -centersel "protein and noh" -first $pbcfirst -last last -sel "water or ion" ;# wrap water preserving residues
