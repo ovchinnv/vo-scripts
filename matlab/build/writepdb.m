@@ -1,4 +1,4 @@
-% some slight mods
+% some slight mods by VO for octave, etc
 function varargout = pdbwrite(filename, pdbstruct)
 %PDBWRITE writes to file with Protein Data Bank (PDB) format.
 %

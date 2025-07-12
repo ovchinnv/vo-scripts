@@ -35,22 +35,28 @@ mol=struct('Model',{{}});
 % process different types of record based on the index above
 % add text from remark fields:
 if (qloud) ; toc ; fprintf('Processing REMARK fields\n');end
-dchar=char(data(find(iremark)));
+dchar=char(data(find(iremark))); % grab lines that begin with REMARK in header
 iremark=[];
 remark=[];
 if ~isempty(dchar)
- iremark=dchar(:,8:11); % VO changed from 8:10, and below from 11:80
- remark=dchar(:,12:80);
+ iremark=dchar(:,8:11); % remark number : VO changed from 8:10, and below from 11:80
+ remark=dchar(:,12:80); % rest of remark line
 end
 ind=0;
 for i=1:size(iremark,1);
  ir=str2num(iremark(i,:)) ;
- if(isempty(ir)) ; ir=999-ind ; ind=ind+1;
+ if(isempty(ir)) ; ir=999-ind ; ind=ind+1; % automatically generate remark number, starting from 999 (compat)
   field=['Remark',num2str(ir)];
-  mol=setfield(mol(1),field,strtrim([iremark(i,:),remark(i,:)]));
+  mol=setfield(mol(1),field,strtrim([iremark(i,:),remark(i,:)])); % restore entire line after 'REMARK'
  else
   field=['Remark',num2str(ir)];
-  mol=setfield(mol(1),field,remark(i,:));
+  if (isfield(mol(1),field))
+   fieldval=eval(['mol(1).',field,';']);
+   fieldval = [ fieldval ; remark(i,:) ]; % update field value
+  else
+   fieldval = remark(i,:); % set field value
+  end
+  mol=setfield(mol(1),field,fieldval);
  end
 end
 %=====================================================================
@@ -129,6 +135,7 @@ for iatype=1:2
 if (qloud) ; toc ; fprintf(['Processing ',afields{iatype},' records\n']);end
 if (qloud) ; toc ; fprintf('Generating character matrix\n');end
 dchar=char(data(find(iatoms{iatype})));
+if(numel(dchar)==0) ; continue ; end
 if (qloud) ; toc ; fprintf('serial...');end
 serial=dchar(:,7:11);if (~any(serial(:)=='*')) ; serial=str2num(serial) ; end
 if (qloud) ; toc ; fprintf('aname...');end
