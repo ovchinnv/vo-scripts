@@ -3,7 +3,7 @@ function tmpmol=seq2watpdb(x,y,z,mchainid,msegid,pdbname,qaddh)
  assert(numel(x)==numel(y));
  assert(numel(x)==numel(z));
  nres=numel(x);
-% 
+%
  if (nres==0);
   tmpmol=struct();
   fprintf('==> Nothing to do\n');

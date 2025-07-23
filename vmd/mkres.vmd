@@ -1,6 +1,6 @@
 #!/bin/vmd
 
-if { $argc == 2 } {
+if { $argc >= 2 } {
  set psffile [ lindex $argv 0 ] ;
  set pdbfile [ lindex $argv 1 ] ;
 } else {

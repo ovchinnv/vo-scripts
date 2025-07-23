@@ -95,14 +95,14 @@ for i=1:nc
   continue
  end
  id=id+1; % increment segment count
- segid=strtrim(sprintf('S%-3d',id));
+ segname=strtrim(sprintf('S%-3d',id));
  inds=zeros(length(pdbh),1);
  if (!qpsfgen)
-  fpatch=fopen([(segid),'.str'],'w');
+  fpatch=fopen([(segname),'.str'],'w');
   fprintf(fpatch, '* polysaccharide links\n');
   fprintf(fpatch, '*\n');
  else
-  fpatch=fopen([(segid),'.vmd'],'w');
+  fpatch=fopen([(segname),'.vmd'],'w');
   fprintf(fpatch, '# polysaccharide links\n');
   fprintf(fpatch, '#\n');
  end
@@ -117,12 +117,12 @@ for i=1:nc
   c2=chainid2(cl);
   i2=insertion2(cl);
 % code below uses fields from pdbh
-  inds1 = ismember(resid(:),r1) & ismember(chainid(:),c1) ;
-  inds2 = ismember(resid(:),r2) & ismember(chainid(:),c2) ;
+  inds1 = ismember(residh(:),r1) & ismember(chainidh(:),c1) ;
+  inds2 = ismember(residh(:),r2) & ismember(chainidh(:),c2) ;
 %
-  if ~isempty(insertion)
-   inds1=inds1 & ismember(insertion(:),i1) ;
-   inds2=inds2 & ismember(insertion(:),i2) ;
+  if ~isempty(insertionh)
+   inds1=inds1 & ismember(insertionh(:),i1) ;
+   inds2=inds2 & ismember(insertionh(:),i2) ;
   end
 %
   inds=inds | inds1 | inds2 ;
@@ -134,62 +134,62 @@ for i=1:nc
 % decide which patch to write ; cover only links that involve a 'C1'
   if (ismember(a2,'C1')) % glycan link to C1
    if     (ismember(a1,'O1'))
-    cmd=['patch 11aa ',segid,strlink1,r1s,' ',segid,strlink1,r2s,strlink2,'setup warn ! sugar link' ];
+    cmd=['patch 11aa ',segname,strlink1,r1s,' ',segname,strlink1,r2s,strlink2,'setup warn ! sugar link' ];
    elseif (ismember(a1,'O2'))
-    cmd=['patch 12aa ',segid,strlink1,r1s,' ',segid,strlink1,r2s,strlink2,'setup warn ! sugar link' ];
+    cmd=['patch 12aa ',segname,strlink1,r1s,' ',segname,strlink1,r2s,strlink2,'setup warn ! sugar link' ];
    elseif (ismember(a1,'O3'))
-    cmd=['patch 13aa ',segid,strlink1,r1s,' ',segid,strlink1,r2s,strlink2,'setup warn ! sugar link' ];
+    cmd=['patch 13aa ',segname,strlink1,r1s,' ',segname,strlink1,r2s,strlink2,'setup warn ! sugar link' ];
    elseif (ismember(a1,'O4'))
-    cmd=['patch 14aa ',segid,strlink1,r1s,' ',segid,strlink1,r2s,strlink2,'setup warn ! sugar link' ];
+    cmd=['patch 14aa ',segname,strlink1,r1s,' ',segname,strlink1,r2s,strlink2,'setup warn ! sugar link' ];
    elseif (ismember(a1,'O6'))
-    cmd=['patch 16at ',segid,strlink1,r1s,' ',segid,strlink1,r2s,strlink2,'setup warn ! sugar link' ];
+    cmd=['patch 16at ',segname,strlink1,r1s,' ',segname,strlink1,r2s,strlink2,'setup warn ! sugar link' ];
    elseif (ismember(a1,'ND2')) % link from ASN to sugar
-% to change segid to match the ASN (this hack works if the peptidoglycan link is always at the top) :
-%    segid=sprintf('a%-3d',r1);
+% to change segname to match the ASN (this hack works if the peptidoglycan link is always at the top) :
+%    segname=sprintf('a%-3d',r1);
     seg=strtrim(ch2seg(c1));
     if ~isempty(seg)
-     cmd=['patch NGLA ',seg,strlink1,r1s,' ',segid,strlink1,r2s,strlink2,'setup warn ! peptidoglycan link' ];
+     cmd=['patch NGLA ',seg,strlink1,r1s,' ',segname,strlink1,r2s,strlink2,'setup warn ! peptidoglycan link' ];
     else
-     cmd=['! patch NGLA ',seg,strlink1,r1s,' ',segid,strlink1,r2s,strlink2,'setup warn ! peptidoglycan link for an invalid segment id'];
+     cmd=['! patch NGLA ',seg,strlink1,r1s,' ',segname,strlink1,r2s,strlink2,'setup warn ! peptidoglycan link for an invalid segment id'];
     end
    elseif (ismember(a1,'NE2')) % link from GLN to sugar
-% to change segid to match the GLN (this hack works if the peptidoglycan link is always at the top) :
-%    segid=sprintf('a%-3d',r1);
+% to change segname to match the GLN (this hack works if the peptidoglycan link is always at the top) :
+%    segname=sprintf('a%-3d',r1);
     seg=strtrim(ch2seg(c1));
     if ~isempty(seg)
-     cmd=['patch QGLA ',seg,strlink1,r1s,' ',segid,strlink1,r2s,strlink2,'setup warn ! peptidoglycan link' ];
+     cmd=['patch QGLA ',seg,strlink1,r1s,' ',segname,strlink1,r2s,strlink2,'setup warn ! peptidoglycan link' ];
     else
-     cmd=['! patch QGLA ',seg,strlink1,r1s,' ',segid,strlink1,r2s,strlink2,'setup warn ! peptidoglycan link for an invalid segment id'];
+     cmd=['! patch QGLA ',seg,strlink1,r1s,' ',segname,strlink1,r2s,strlink2,'setup warn ! peptidoglycan link for an invalid segment id'];
     end
    end
   elseif (ismember(a1,'C1')) % reverse residue order
    if     (ismember(a2,'O1'))
-    cmd=['patch 11aa ',segid,strlink1,r2s,' ',segid,strlink1,r1s,strlink2,'setup warn ! sugar link' ];
+    cmd=['patch 11aa ',segname,strlink1,r2s,' ',segname,strlink1,r1s,strlink2,'setup warn ! sugar link' ];
    elseif (ismember(a2,'O2'))
-    cmd=['patch 12aa ',segid,strlink1,r2s,' ',segid,strlink1,r1s,strlink2,'setup warn ! sugar link' ];
+    cmd=['patch 12aa ',segname,strlink1,r2s,' ',segname,strlink1,r1s,strlink2,'setup warn ! sugar link' ];
    elseif (ismember(a2,'O3'))
-    cmd=['patch 13aa ',segid,strlink1,r2s,' ',segid,strlink1,r1s,strlink2,'setup warn ! sugar link' ];
+    cmd=['patch 13aa ',segname,strlink1,r2s,' ',segname,strlink1,r1s,strlink2,'setup warn ! sugar link' ];
    elseif (ismember(a2,'O4'))
-    cmd=['patch 14aa ',segid,strlink1,r2s,' ',segid,strlink1,r1s,strlink2,'setup warn ! sugar link' ];
+    cmd=['patch 14aa ',segname,strlink1,r2s,' ',segname,strlink1,r1s,strlink2,'setup warn ! sugar link' ];
    elseif (ismember(a2,'O6'))
-    cmd=['patch 16at ',segid,strlink1,r2s,' ',segid,strlink1,r1s,strlink2,'setup warn ! sugar link' ];
+    cmd=['patch 16at ',segname,strlink1,r2s,' ',segname,strlink1,r1s,strlink2,'setup warn ! sugar link' ];
    elseif (ismember(a2,'ND2')) % link from ASN to sugar
-% to change segid to match the ASN (this hack works if the peptidoglycan link is always at the top) :
-%    segid=sprintf('a%-3d',r1);
+% to change segname to match the ASN (this hack works if the peptidoglycan link is always at the top) :
+%    segname=sprintf('a%-3d',r1);
     seg=strtrim(ch2seg(c2));
     if ~isempty(seg)
-     cmd=['patch NGLA ',seg,strlink1,r2s,' ',segid,strlink1,r1s,strlink2,'setup warn ! peptidoglycan link' ];
+     cmd=['patch NGLA ',seg,strlink1,r2s,' ',segname,strlink1,r1s,strlink2,'setup warn ! peptidoglycan link' ];
     else
-     cmd=['! patch NGLA ',seg,strlink1,r2s,' ',segid,strlink1,r1s,strlink2,'setup warn ! peptidoglycan link for an invalid segment id' ];
+     cmd=['! patch NGLA ',seg,strlink1,r2s,' ',segname,strlink1,r1s,strlink2,'setup warn ! peptidoglycan link for an invalid segment id' ];
     end
    elseif (ismember(a2,'NE2')) % link from GLN to sugar
-% to change segid to match the GLN (this hack works if the peptidoglycan link is always at the top) :
-%    segid=sprintf('a%-3d',r1);
+% to change segname to match the GLN (this hack works if the peptidoglycan link is always at the top) :
+%    segname=sprintf('a%-3d',r1);
     seg=strtrim(ch2seg(c2));
     if ~isempty(seg)
-     cmd=['patch QGLA ',seg,strlink1,r2s,' ',segid,strlink1,r1s,strlink2,'setup warn ! peptidoglycan link' ];
+     cmd=['patch QGLA ',seg,strlink1,r2s,' ',segname,strlink1,r1s,strlink2,'setup warn ! peptidoglycan link' ];
     else
-     cmd=['! patch QGLA ',seg,strlink1,r2s,' ',segid,strlink1,r1s,strlink2,'setup warn ! peptidoglycan link for an invalid segment id' ];
+     cmd=['! patch QGLA ',seg,strlink1,r2s,' ',segname,strlink1,r1s,strlink2,'setup warn ! peptidoglycan link for an invalid segment id' ];
     end
    end
   end
@@ -202,9 +202,9 @@ for i=1:nc
  fclose(fpatch);
  inds=find(inds);
  for ii=inds'
-  pdbh(ii).segID=segid;
+  pdbh(ii).segID=segname;
  end
  mol3.Model.Atom=pdbh;
- pdbout(mol3,[strtrim(segid),'.pdb'],xpdb,ypdb,zpdb,[],[],inds);
+ pdbout(mol3,[strtrim(segname),'.pdb'],xpdbh,ypdbh,zpdbh,[],[],inds);
 end
 %

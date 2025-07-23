@@ -1,6 +1,8 @@
 #!/bin/vmd
 
-if { $argc == 2 } {
+puts "Found $argc command-line arguments : $argv \n";
+
+if { $argc >= 2 } {
  set psffile [ lindex $argv 0 ] ;
  set pdbfile [ lindex $argv 1 ] ;
 } else {
