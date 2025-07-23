@@ -1,0 +1,34 @@
+#!/bin/bash
+# requires VMD
+# create (1) pdb file with CV definitions for TAMD, (2) random seeds file
+name=b12;
+tag=tamd;
+
+strucdir=../struc
+
+# create (1) pdb file with V definitions for TAMD
+# note the use of escape slashes where needed
+vmd -dispdev text <<END
+mol load psf ${strucdir}/${name}_sn.psf
+mol addfile ${strucdir}/${name}_sn.pdb
+source b12macros.vmd
+
+set all [atomselect top "all" ];
+\$all set beta 0
+
+set fc   [atomselect top "fc and name CA" ];
+set fab1 [atomselect top "fab1 and name CA" ];
+set fab2 [atomselect top "fab2 and name CA" ];
+
+\$fc   set beta 1
+\$fab1 set beta 2
+\$fab2 set beta 3
+
+# equivalent commands :
+\$all writepdb ${name}-${tag}.pdb
+#animate write pdb ${name}-${tag}.pdb sel \$all
+exec sed -i /CRYST/d ${name}-${tag}.pdb
+END
+
+#(2) random seeds file
+echo "3 14 15 92" > ${name}_rng_seeds_0.dat

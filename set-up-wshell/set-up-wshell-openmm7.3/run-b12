@@ -1,0 +1,37 @@
+#!/bin/bash
+ROOT=$PWD
+OMM_HOME=`ls -d ${ROOT}/omm-*`
+PLUGINDIR=${ROOT}/vo-projects
+#
+export OPENMM_HOME=${OMM_HOME}
+export DYNAMO_LIB_DIR=$PLUGINDIR/lib
+export OPENMM_LIB_DIR=$OPENMM_HOME/lib
+export OPENMM_PLUGIN_DIR=$OPENMM_LIB_DIR/plugins
+export LD_LIBRARY_PATH=$OPENMM_LIB_DIR:$OPENMM_PLUGIN_DIR:$DYNAMO_LIB_DIR:$LD_LIBRARY_PATH:
+#
+PYTHON=`which python`
+pyver=`$PYTHON -V | awk '{print $2}'`
+pyver=${pyver%.*}
+# make sure to use the local python install :
+PYTHON_LOCAL=$ROOT/openmm/build/python/build/lib.linux-x86_64-${pyver}:$PLUGINDIR/plugin_master/openmm-dynamo/build/python/build/lib.linux-x86_64-${pyver}
+export PYTHONPATH=$PYTHON_LOCAL:$PYTHON_LOCAL
+echo $PYTHON_LOCAL
+echo $LD_LIBRARY_PATH
+export OMP_NUM_THREADS=16
+export OMP_STACKSIZE=10M
+export OMP_SCHEDULE=static
+export OMP_NESTED=false
+#exit
+#run benchmark
+pushd b12
+# regular MD
+pushd md
+mkdir -p scratch
+python md.py
+popd
+# TAMD
+pushd tamd
+mkdir -p scratch
+python md.py
+popd
+popd

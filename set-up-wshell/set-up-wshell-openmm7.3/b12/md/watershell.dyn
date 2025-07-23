@@ -1,0 +1,55 @@
+! charmm
+! watershell input script
+!
+ output {
+  minwarnlev=-1
+ }
+
+
+ watershell {
+
+  structure_file=../struc/b12_sn-bmass.pdb
+
+  radii=file
+  radiifile=../struc/b12_sn-bmass.pdb
+  radiifiletype=PDB
+  radiicol=O
+
+  dasystat=yes
+  mass=file
+  massfile=../struc/b12_sn-bmass.pdb
+  massfiletype=PDB
+  masscol=B
+! dasystat params (defaults, so commented out) :
+!  density_relax_time=100
+!  density_update_freq=500
+!  distance_update_freq=100
+
+  structure_update_memo=0.9995 ! closer to 1 for flexible structures
+  structure_update_freq=7
+  surface_force_constant=1 ! 1 and above seems to be reasonable
+  surface_distance=0 ! to guess automatically
+
+!  full_sum_freq=100
+  rigid_body_restraint=yes
+  rigid_body_force_constant=100
+  rigid_body_weights=file
+  rigid_body_weightsfile=../struc/b12_sn-rgbwgt.pdb
+  rigid_body_weightsfiletype=PDB
+  rigid_body_weightscol=B
+!
+! use a simple minimum distance algorithm
+  minimum_distance=yes
+
+! more aggressive params to increase speed (only for erf method)
+!  cutoff_surf_stdev=4
+
+  surface_atoms="ANAME=CA OR ANAME=O5"
+  solvent_atoms="ANAME=OH2 OR ANAME=SOD OR ANAME=CLA"
+
+  restart_file=@{restart_file}
+  output_file=@{output_file}
+
+  output_freq=10000
+
+ }

@@ -1,0 +1,24 @@
+#!/bin/tcl
+
+ atomselect macro heavy { segid "H.*" or chain B}
+ atomselect macro light { segid "L.*" or chain C}
+
+ atomselect macro heavy1 { segid "H.*1" }
+ atomselect macro light1 { segid "L.*1" }
+
+ atomselect macro heavy2 { segid "H.*2" }
+ atomselect macro light2 { segid "L.*2" }
+
+ atomselect macro vari { ( heavy and resid 1 to 113 ) or ( light and resid 1 to 108 ) }
+ atomselect macro const { ( heavy and resid 114 to 229 ) or ( light and resid 109 to 214) }
+
+ atomselect macro linker { heavy and resid 230 to 248 }
+ 
+ atomselect macro fc { heavy and resid 249 to 500 }
+ 
+ atomselect macro fab { vari or const }
+
+ atomselect macro fab1 { fab and ( heavy1 or light1) }
+
+ atomselect macro fab2 { fab and (heavy2 or light2) }
+

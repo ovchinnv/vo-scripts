@@ -1,6 +1,8 @@
 #!/bin/bash
 # download consistent packages from archlinux archive
-pkgs=(python-pooch-1.8.2-1  python-scipy-1.14.1-1)
+pkgs=(
+python-cffi-1.16.0-2  python-cryptography-42.0.6-1  python-pycparser-2.22-2
+)
 
 baseurl="https://archive.archlinux.org/packages"
 ext1="x86_64.pkg.tar.zst"
@@ -8,12 +10,15 @@ ext2="any.pkg.tar.zst"
 
 for pkg in ${pkgs[@]} ; do
  first_letter=${pkg:0:1}
- url=$baseurl/$first_letter/${pkg}-${ext1}
+# pkgname=${pkg%%-[0-9]*}
+#echo $pkgname
+#continue
+ url=$baseurl/$first_letter/${pkgname}/${pkg}-${ext1}
  echo "Fetching $pkg @ $url"
  response=`wget $url 2>&1`
  notfound=`echo $response | grep 'ERROR 404'`
  if [[ ! -z $notfound ]] ; then
-  url=$baseurl/$first_letter/${pkg}-${ext2}
+  url=$baseurl/$first_letter/${pkgname}/${pkg}-${ext2}
   echo "Fetching $pkg @ $url"
   response=`wget $url 2>&1`
   notfound=`echo $response | grep 'ERROR 404'`
@@ -21,4 +26,5 @@ for pkg in ${pkgs[@]} ; do
    echo "Could not find $pkg"  
   fi
  fi
+ pacman -Udd ${url##*/}
 done

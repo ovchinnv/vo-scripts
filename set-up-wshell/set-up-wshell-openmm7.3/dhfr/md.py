@@ -120,7 +120,7 @@ while irun < firstrun + numrun :
  outputName='scratch/'+name+str(irun)+flag ;
  from os.path import expanduser
 # sys.exit()
- exec(open(expanduser('CHOMM.py')).read())
+ exec(open(expanduser('../CHOMM.py')).read())
 # to do : check if run was successful, rerun if not
  irun=irun+1
  restartfile=outputName+'.xml'
