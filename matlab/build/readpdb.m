@@ -141,12 +141,15 @@ serial=dchar(:,7:11);if (~any(serial(:)=='*')) ; serial=str2num(serial) ; end
 if (qloud) ; toc ; fprintf('aname...');end
 aname=dchar(:,13:16); % this produces a string with spaces, which needs to be trimmed, which is a slow serial operation, so need to optimize
 %anmtrim=strtrim(aname) ; [~,anamelen]=find(anmtrim==' ');j=j-1; % will not work if there are no blanks !
-anmtrim=strtrim(aname) ; anamelen=sum(anmtrim~=' ',2); % convert to 0/1 sum nonzero chars (assume consecutiveness)
+%anmtrim=strtrim(aname) ; % NOTE: this is useless because there is no trimming of each row independently ; so rows can still begin with blanks !
+%anamelen=sum(aname~=' ',2); % convert to 0/1 sum nonzero chars (assume consecutiveness)
+anmflag=(aname~=' ');
 if (qloud) ; toc ; fprintf('altloc...');end
 altloc=dchar(:,17);
 if (qloud) ; toc ; fprintf('resname...');end
 resname=dchar(:,18:21);
-rnmtrim=strtrim(resname) ; rnamelen=sum(rnmtrim~=' ',2); % as above
+%rnmtrim=strtrim(resname) ; rnamelen=sum(rnmtrim~=' ',2); % as above
+rnmflag=(resname~=' ');
 if (qloud) ; toc ; fprintf('chain...');end
 chain=dchar(:,22);
 if (qloud) ; toc ; fprintf('resnum...');end
@@ -199,20 +202,26 @@ for i=1:natom
  if (qloud) ; if (mod(i,1000)==0) ; fprintf('%d / %d atoms processed\n',i,natom); end ; end
  Atom(i).AtomSerNo=serial(i,:);
 % Atom(i).AtomName=strtrim(aname(i,:)); % I think the strtrim function is very slow, esp. when used serially
- Atom(i).AtomName=anmtrim(i,1:anamelen(i));
+% Atom(i).AtomName=anmtrim(i,1:anamelen(i)); % incorrect because the beginning index may not be 1 !
+  str=aname(i,anmflag(i,:));
+  Atom(i).AtomName=str;
+%  Atom(i).AtomName=aname(i,anmflag(i,:));
 % Atom(i).AtomName
 % Atom(i).AtomName=anamec{i};
 %
 % ioff=2-abs(sign(aname(i,1)-32)) ; % allow to ignore the 1st char if it is blank
 % AtomNameStruct.chemSymbol=aname(i,ioff:2);
- AtomNameStruct.chemSymbol=anmtrim(i,1);
+% AtomNameStruct.chemSymbol=anmtrim(i,1);
+ AtomNameStruct.chemSymbol=str(1);
+% AtomNameStruct.chemSymbol=Atom(i).AtomName(1);
  AtomNameStruct.remoteInd=aname(i,3);
  AtomNameStruct.branch=aname(i,4);
 %continue
 %
  Atom(i).altLoc=altloc(i); % this ignores alternative coords
 % Atom(i).resName=strtrim(resname(i,:)); % same strategy as above for aname
- Atom(i).resName=rnmtrim(i,1:rnamelen(i));
+% Atom(i).resName=rnmtrim(i,1:rnamelen(i));
+ Atom(i).resName=resname(i,rnmflag(i,:));
 % Atom(i).resName=resname{i};
  Atom(i).chainID=chain(i);
 % Atom(i).resSeq=resnum(i);
@@ -246,19 +255,21 @@ end % iatype
 % processs terminal records
 if (qloud) ; toc ; fprintf('Processing TER records\n');end
 dchar=char(data(find(iterminal)));
-[numter,maxcol]=size(dchar);
+[numter,maxcol]=size(dchar)
+mt=' '; % empty string ('' does not behave properly in Octave)
 if (maxcol>=11) 
  serial=dchar(:,7:11);if (~any(serial(:)=='*')) ; serial=str2num(serial) ; end
 else
- serial=repmat('',numter,1);
+ serial=repmat(mt,numter,1)
 end
-if (maxcol>20) ; resname=dchar(:,18:21) ; else ; resname=repmat('',numter,1);end
-if (maxcol>21) ; chain=dchar(:,22) ; else ; chain=repmat('',numter,1);end
-if (maxcol>25) ; resnum=str2num(dchar(:,23:26)); else ; resnum=repmat('',numter,1);end
-if (maxcol>26) ; ins=dchar(:,27); else ; ins=repmat('',numter,1);end
+if (maxcol>20) ; resname=dchar(:,18:21) ; else ; resname=repmat(mt,numter,1);end
+if (maxcol>21) ; chain=dchar(:,22) ; else ; chain=repmat(mt,numter,1);end
+if (maxcol>25) ; resnum=str2num(dchar(:,23:26)); else ; resnum=repmat(mt,numter,1);end
+if (maxcol>26) ; ins=dchar(:,27); else ; ins=repmat(mt,numter,1);end
 %
 if (qloud) ; toc ; fprintf('Transforming data to match Matlab format\n');end
 Terminal=struct();
+numter
 for i=1:numter
  Terminal(i).SerialNo=serial(i,:);
  Terminal(i).resName=strtrim(resname(i,:));

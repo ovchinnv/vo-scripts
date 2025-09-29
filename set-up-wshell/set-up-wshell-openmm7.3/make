@@ -15,7 +15,7 @@ echo "Will use $ncores cores"
 ROOT=${PWD} ;# this directory
 #
 ommver="7.3.0" # other versions may require plugin updates; patches may not be needed
-dynamo_opencl=1
+dynamo_opencl=0 ;# whether to build opencl dynamo kernels
 OMM_HOME=${ROOT}/omm-${ommver}
 PYTHON=`which python`
 #

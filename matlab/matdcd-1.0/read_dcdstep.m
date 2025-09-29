@@ -6,7 +6,7 @@ function [x,y,z] = read_dcdstep(h)
 %
 
 % If this is a CHARMm file and contains an extra data block, we must skip it
-if h.charmm & h.charmm_extrablock
+if h.charmm && h.charmm_extrablock
   blocksize = fread(h.fid, 1, 'int32');
   fseek(h.fid, blocksize, 0);
   blocksize = fread(h.fid, 1, 'int32');
@@ -36,7 +36,7 @@ else
 end  
  
 % Skip the 4th dimension, if present
-if h.charmm & h.charmm_4dims
+if h.charmm && h.charmm_4dims
   blocksize = fread(h.fid, 1, 'int32');
   fseek(h.fid, blocksize, 0);
   blocksize = fread(h.fid, 1, 'int32');

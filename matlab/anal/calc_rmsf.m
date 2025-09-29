@@ -1,4 +1,4 @@
-function RMSF=rmsf(x,y,z);
+function RMSF=calc_rmsf(x,y,z);
 % compute root-mean-square flluctuations
  [natom,nframes]=size(x);
  X=[x ; y ; z; ]' ;% concatenate coordinates ; the variables must be in different columns; the observations in different rows

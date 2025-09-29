@@ -10,7 +10,9 @@ if (~exist('qpdb')) ; qpdb=0 ; end
 if (~qpdb) % read pdb file
  global molecule;
  disp(['==>Reading pdb structure file ',pdbfile,' ...']);
- if (~exist('qoctpdb')) ; qoctpdb=0 ; end
+ if (~exist('qoctpdb'))
+  qoctpdb=exist('OCTAVE_VERSION');
+ end
  if(qoctpdb)
   molecule=readpdb(pdbfile,1); % custom partial octave-compatible (faster?) ; 2nd argument for verbosity ; might need to add a path
  else

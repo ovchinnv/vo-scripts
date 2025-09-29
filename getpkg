@@ -1,7 +1,7 @@
 #!/bin/bash
 # download consistent packages from archlinux archive
 pkgs=(
-python-cffi-1.16.0-2  python-cryptography-42.0.6-1  python-pycparser-2.22-2
+wine-mono-10.0.0-1
 )
 
 baseurl="https://archive.archlinux.org/packages"

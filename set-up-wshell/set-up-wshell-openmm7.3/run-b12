@@ -32,6 +32,7 @@ popd
 # TAMD
 pushd tamd
 mkdir -p scratch
+# NOTE : if updating the b12 structure files, might need to run ./mktamd to generate a new CV file; this requires VMD
 python md.py
 popd
 popd

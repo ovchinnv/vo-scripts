@@ -38,7 +38,8 @@ function pdbout(molecule,pdbname,x,y,z,occupancy,temp,inds);
   end
  end
 %
- pdbwrite(pdbname,tempModel)
+% pdbwrite(pdbname,tempModel)
+ writepdb(pdbname,tempModel)
  fid=fopen(pdbname,'A'); fprintf(fid,'END\n'); fclose(fid); % append END to the file because CHARMM needs at least one line after the last coordinate
 %
 end
