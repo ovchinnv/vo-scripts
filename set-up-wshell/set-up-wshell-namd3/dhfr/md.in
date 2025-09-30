@@ -60,6 +60,8 @@ switching           on
 switchdist          $switchdist
 pairlistdist        $pairlistdist ; # does not always help
 margin              $margin
+#pairlistdist        $pairlistdist ; # does not always help
+#margin 1
 #
 if [info exists pmefreq] {
 fullelectfrequency  $pmefreq

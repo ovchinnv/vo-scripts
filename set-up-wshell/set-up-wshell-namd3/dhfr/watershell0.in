@@ -13,14 +13,15 @@
 
   radii=const ! radii do not matter with the mindist method "minimum_distance=yes" below (watershell v.1)
   radiiconst=2.0
-
-  dasystat=yes ! this provides density equilibration, but can generally be turned off
-!  density_update_freq=500
   mass=file
   massfile=struc/dhfr-mass.pdb
   massfiletype=PDB
   masscol=B
-
+!
+  dasystat=yes ! this provides density equilibration, but can generally be turned off
+!  v only if dasystat=yes
+!  density_update_freq=500
+!
   structure_update_freq=7 ! how often the instantaneous shell surface is recomputed
   structure_update_memory=0.9999 ! memory parameter for updating the (slowly-moving) shell surface (default 0.999)
   surface_force_constant=1 !

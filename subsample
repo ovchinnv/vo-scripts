@@ -2,6 +2,6 @@
 
 for dcd in *dcd ; do
  name=${dcd%%.dcd}
-#echo $name
+ echo $name
  catdcd -o ${name}-10.dcd -stride 10 ${name}.dcd
 done

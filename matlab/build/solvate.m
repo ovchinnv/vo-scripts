@@ -1,4 +1,4 @@
-function tmpmol=solvate(xsolu,ysolu,zsolu,solvent_pdb,buf,xovl,yovl,zovl,segname,type,overlap,density)
+function tmpmol=solvate(xsolu,ysolu,zsolu,solvent_pdb,buf,xovl,yovl,zovl,segname,shape,overlap,density)
 %
 % NOTE :xyz-ovl are optional arrays with which we compute overlap
 shell_=1; % solvate in a shell
@@ -7,7 +7,7 @@ ball_ =2; % solvate in a ball
 if ~exist('quiet') ; quiet=0 ; end
 %return
 nsolu=numel(xsolu); assert(nsolu==numel(ysolu)); assert(nsolu==numel(zsolu));
-if (exist('xovl') | exist('yovl') | exist('zovl'))
+if (exist('xovl') || exist('yovl') || exist('zovl'))
  assert(exist('xovl')>0); assert(exist('yovl')>0); assert(exist('zovl')>0);
  novl=numel(xovl);
  assert(novl==numel(yovl));
@@ -17,7 +17,6 @@ else
  qovl=0;
 end
 %
-%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if ~exist('buf') buf=9 ; end
@@ -25,7 +24,7 @@ if ~exist('overlap') overlap=2.75; end
 if ~exist('density') density=1 ; end % g/mL
 if ~exist('solvent_pdb') solvent_pdb='WAT.pdb' ; end % g/mL
 if ~exist('segname') segname='W' ; end
-if ~exist('type') type=shell_ ; end
+if ~exist('shape') shape=shell_ ; end
 
 Navogadro=6.022e23;
 mw_h20=18.02;
@@ -35,7 +34,7 @@ xmin=min(xsolu)-buf ; xmax=max(xsolu)+buf;
 ymin=min(ysolu)-buf ; ymax=max(ysolu)+buf;
 zmin=min(zsolu)-buf ; zmax=max(zsolu)+buf;
 
-if (type == ball_)
+if (shape == ball_)
  xcen=0.5*(xmin+xmax); ycen=0.5*(ymin+ymax); zcen=0.5*(zmin+zmax);
  rball=0.5*max([abs(xmax-xmin),abs(ymax-ymin),abs(zmax-zmin)])+buf; % ball radius
  r2ball=rball^2;
@@ -66,10 +65,10 @@ if (~quiet)
  fprintf('==> Number of water molecules in the initial solvation box is: %d x %d x %d = %d\n', nx,ny,nz,nx*ny*nz)
 end
 if (~quiet); 
- if (type==shell_) 
+ if (shape==shell_) 
   fprintf('==> Deleting molecules %12.5f Ang or farther from solute, or %12.5f Ang or closer to solute\n',buf,overlap);
  end
- if (type==ball_) 
+ if (shape==ball_) 
   fprintf('==> Deleting molecules %12.5f Ang or farther from solute center, or %12.5f Ang or closer to solute\n',rball,overlap);
  end
 end
@@ -78,7 +77,7 @@ overlap2=overlap.^2;
 ioks=zeros(nx*ny*nz,3) ;
 iok=0;
 
-if (type==ball_)
+if (shape==ball_)
  for i=1:nx
   if (~quiet); fprintf('==> Checking molecule #%d of %d\n',1+(i-1)*ny*nz, nx*ny*nz); end
   dxx = abs(xwat(i) - xcen) ;
@@ -104,7 +103,7 @@ if (type==ball_)
    end %k
   end %j
  end %i
-elseif (type==shell_)
+elseif (shape==shell_)
  buf2=buf.^2;
  for i=1:nx
   if (~quiet); fprintf('==> Checking molecule #%d of %d\n',1+(i-1)*ny*nz, nx*ny*nz); end
@@ -125,7 +124,7 @@ elseif (type==shell_)
     if ( mdzz>buf2 ) ; continue ; end
     dzz = dyy + dzz.^2;
     mdzz=min(dzz);
-    if ( mdzz>buf2 | mdzz < overlap2) ; continue ; end
+    if ( mdzz>buf2 || mdzz < overlap2) ; continue ; end
 % if we are still here, it is still possible that the molecule overlaps with the additional overlap set, checked next
     if (qovl) % this is only executed if the overlap set is present and we haven't been kicked out.
 %     if ( min((xwat(i) - xovl).^2 + (ywat(j) - yovl).^2 + (zwat(k) - zovl).^2) < overlap2 ) ; continue ; end
@@ -143,9 +142,10 @@ YWAT=ywat(ioks(:,2));
 ZWAT=zwat(ioks(:,3));
 
 
-if (~quiet) ; 
- fprintf('==> There are #%d molecules remaining\n',numel(XWAT)); 
+if (~quiet) ;
+ fprintf('==> There are %d molecules remaining\n',numel(XWAT)); 
  fprintf('==> Writing solvent PDB file %s\n',solvent_pdb);
 end
 %scatter3(XWAT, YWAT, ZWAT) ;
 tmpmol=seq2watpdb(XWAT,YWAT,ZWAT,'',segname,solvent_pdb,1); % best to use short segment names so that they can be appended to
+% NOTE : seq2watpdb runs very slowly in octave

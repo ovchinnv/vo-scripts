@@ -1,1 +1,1 @@
-/home/taly/scripts/matlab/build/writepdb.m
+writepdb.m

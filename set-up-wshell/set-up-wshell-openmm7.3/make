@@ -15,7 +15,7 @@ echo "Will use $ncores cores"
 ROOT=${PWD} ;# this directory
 #
 ommver="7.3.0" # other versions may require plugin updates; patches may not be needed
-dynamo_opencl=1
+dynamo_opencl=0
 OMM_HOME=${ROOT}/omm-${ommver}
 PYTHON=`which python`
 #
@@ -50,36 +50,43 @@ PLUGINDIR=${ROOT}/vo-projects
 PLUGINBRANCH=master
 if  [[ ! -d "$PLUGINDIR" ]]; then
  git clone https://github.com/ovchinnv/vo-projects $PLUGINDIR
-#fi
- pushd $PLUGINDIR
-# make clean # optional rebuild
- git checkout $PLUGINBRANCH
-# 3 build fortran library :
- unset MAKE_COMMAND # must compile in serial mode
-# first, compile and run with the mindist method (only in watershell v.1):
- sed -i 's/version=.*$/version=1/' watershell/version.inc # specify version in config file:
- make --silent -j1 plugin_master # parallel compile not supported
-# 4 build openmm wrapper
- pushd plugin_master
- pushd openmm-dynamo
- mkdir -p build
- pushd build
- if [[ $dynamo_opencl -eq 0 ]] ; then
-  EXTRAFLAGS+="-DDYNAMO_BUILD_OPENCL_LIB=OFF"
- fi
- cmake ../ -DOPENMM_DIR=$OMM_HOME -DCMAKE_INSTALL_PREFIX=$OMM_HOME -DDYNAMO_INCLUDE_DIR=$PLUGINDIR/include \
- -DDYNAMO_LIBRARY_DIR=$PLUGINDIR/lib -DPYTHON_EXECUTABLE=$PYTHON $EXTRAFLAGS
- make -j$ncores
- make install
- make PythonInstall # will build but fail to install as non-root
- popd
- popd
- popd
- popd
 fi
+pushd $PLUGINDIR
+# make clean # optional rebuild
+git checkout $PLUGINBRANCH
+#
+# 3 build fortran library :
+#
+unset MAKE_COMMAND # must compile in serial mode
+# first, compile and run with the mindist method (only in watershell v.1):
+sed -i 's/version=.*$/version=1/' watershell/version.inc # specify version in config file:
+make --silent -j1 watershell # in case we are rebuilding only the watershell
+make --silent -j1 plugin_master # parallel compile not supported
+#
+# 4 build openmm wrapper
+#
+pushd plugin_master
+pushd openmm-dynamo
+mkdir -p build
+pushd build
+if [[ $dynamo_opencl -eq 0 ]] ; then
+  EXTRAFLAGS+="-DDYNAMO_BUILD_OPENCL_LIB=OFF"
+fi
+cmake ../ -DOPENMM_DIR=$OMM_HOME -DCMAKE_INSTALL_PREFIX=$OMM_HOME -DDYNAMO_INCLUDE_DIR=$PLUGINDIR/include \
+ -DDYNAMO_LIBRARY_DIR=$PLUGINDIR/lib -DPYTHON_EXECUTABLE=$PYTHON $EXTRAFLAGS
+make -j$ncores
+make install
+make PythonInstall # will build but fail to install as non-root
+popd
+popd
+popd
+popd
+#fi
 #exit
-#run benchmark:
-./run
+#run benchmarks:
+./run-dhfr
+./run-b12
+#exit
 # rebuild plugin to provide watershell v2 and rerun :
 pushd $PLUGINDIR
 # make clean # optional rebuild
@@ -87,4 +94,4 @@ sed -i 's/version=.*$/version=2/' watershell/version.inc # specify version in co
 make --silent -j1 watershell
 make --silent -j1 plugin_master # parallel compile not supported
 popd
-./run
+./run-dhfr # b12 test case does not support watershell 2.0

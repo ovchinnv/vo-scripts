@@ -1,0 +1,97 @@
+! charmm
+! dynamo plugin input script
+!
+ output {
+  minwarnlev=-1
+ }
+
+ structure_file=b12-tamd.pdb
+
+ watershell {
+
+  radii=file
+  radiifile=../struc/b12_sn-bmass.pdb
+  radiifiletype=PDB
+  radiicol=O
+
+  dasystat=yes
+  mass=file
+  massfile=../struc/b12_sn-bmass.pdb
+  massfiletype=PDB
+  masscol=B
+! dasystat params (defaults, so commented out) :
+!  density_relax_time=100
+!  density_update_freq=500
+!  distance_update_freq=100
+
+  structure_update_memo=0.9995 ! closer to 1 for flexible structures
+  structure_update_freq=7
+  surface_force_constant=2 ! 1 and above seems to be reasonable
+  surface_distance=0 ! to guess automatically
+
+!  full_sum_freq=100
+  rigid_body_restraint=yes
+  rigid_body_force_constant=100
+  rigid_body_weights=file
+  rigid_body_weightsfile=../struc/b12_sn-rgbwgt.pdb
+  rigid_body_weightsfiletype=PDB
+  rigid_body_weightscol=B
+
+  rigid_body_restraint=yes
+  rigid_body_force_constant=1
+
+! use a simple minimum distance algorithm
+  minimum_distance=yes
+
+  surface_atoms="ANAME=CA OR ANAME=O5"
+  solvent_atoms="ANAME=OH2 OR ANAME=SOD OR ANAME=CLA"
+
+  restart_file=@{restart_file}
+  output_file=@{output_file}
+
+  output_freq=10000
+
+ }
+
+ smcv_init {
+  defer_init_dyna=yes
+  : init maxcv 6
+! frames
+  : frame add select beta=1 end ! FC
+!  : frame add select beta=2 end ! FAB1
+!  : frame add select beta=3 end ! FAB2
+  : frame list
+  : frame read name b12_frames_@{iprev}.dat
+  : frame fill
+! cvs
+  : add posi_com_x sele beta=2 end frame 1 ! X-comp of FAB1 relative to FC
+  : add posi_com_y sele beta=2 end frame 1
+  : add posi_com_z sele beta=2 end frame 1
+  : add posi_com_x sele beta=3 end frame 1 ! X-comp of FAB2 relative to FC
+  : add posi_com_y sele beta=3 end frame 1
+  : add posi_com_z sele beta=3 end frame 1
+  : fill col inst
+  : write name b12_cvs_@{irun}.inst col inst
+  : read name b12_cvs_@{iprev}.dat col main
+  : set gamma 1 forc 100 weight 1 temp @{tamdtemp} all
+  : rsee read name b12_rng_seeds_@{iprev}.dat  ! read RNG seeds for seamless restart of TAMD
+!
+  : stat -                            ! statistics
+    colv cnam b12_cv_hist_@{irun}.dat -  ! output history of CV value(s)
+    force fcnm b12_fcv_hist_@{irun}.dat  ! output forces acting on the CV(s)
+!
+  : dyna -
+        rstr reeq 50 -    ! impose restraints; switch to restraints in col main from those in col old over this many steps
+        evol bd -         ! Brownian dynamics evolution
+        evst 0.001 -      ! evolution step (note that the evolution equation for cv only depends on dt/gamma, so one can adjust either or both)
+        evos 50  -        ! samples after evolution prior to averaging
+        evof 100 -        ! evolution frequency
+        hisf 5   -        ! collect history samples after this many steps
+        stat staf 1000     ! run statistics output after this many steps
+ }
+
+ smcv_done {
+  : rsee write name b12_rng_seeds_@{irun}.dat
+  : frame write name b12_frames_@{irun}.dat
+  : write name b12_cvs_@{irun}.dat col main
+ }

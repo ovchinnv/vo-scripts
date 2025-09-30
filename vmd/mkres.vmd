@@ -1,8 +1,7 @@
 #!/bin/vmd
 # 8/8/25 : argc has different behavior depending on version ; here, we get 1 just by running vmd
 set argc [ llength $argv ]; # overwrite with desired behavior
-#
-if { $argc == 2 } {
+if { $argc >= 2 } {
  set psffile [ lindex $argv 0 ] ;
  set pdbfile [ lindex $argv 1 ] ;
 } else {
@@ -52,5 +51,3 @@ set outfile [ file rootname $pdbfile ]-${nametag} ;
 $all writepdb ${outfile}.pdb
 # note : may need to remove the unit cell line from this pdb if running without PBC :
 exec sed -i /CRYST/d ${outfile}.pdb
-#}
-

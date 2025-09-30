@@ -16,9 +16,13 @@ if isempty(ind)
 end
 
 miss=r465(i+1:end,:);
-
-[mrname, mchain, mresid]=strread(miss','%s %s %s');
-mnum=length(mrname);
+mnum=size(miss,1);
+%[mrname, mchain, mresid]=strread(miss','%s %s %s'); % OK for matlab, but not octave, so reimplement below
+mrname=cell(mnum,1);
+mchain=cell(mnum,1);
+mresid=cell(mnum,1);
+for i=1:mnum ; [mrname(i), mchain(i), mresid(i)]=strread(miss(i,:),'%s %s %s'); end
+%mnum=length(mrname);
 % define an insertion code (if any)
 mins=cell(mnum,1);
 %mins=blanks(mnum)';

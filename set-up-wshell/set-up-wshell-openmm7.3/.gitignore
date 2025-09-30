@@ -1,0 +1,12 @@
+vo-projects
+*log
+scratch
+*dcd
+*log
+*out
+*in
+*txt
+openmm
+omm-*
+*.dat
+*.inst

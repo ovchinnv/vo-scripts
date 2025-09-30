@@ -5,13 +5,13 @@ if (qoct) ; graphics_toolkit('gnuplot'); end
 %
 fpath='dcd';
 fnames={
-'h7-cr8020-noc15'
-'h7-cr8020-noc15-fab1'
-'h7-cr8020-noc15-fab2'
-'h7-cr8020-noc15-fab3'
-'h7-cr8020-noc15-notfab1'
-'h7-cr8020-noc15-notfab2'
-'h7-cr8020-noc15-notfab3'
+'h7-fi6-noc15'
+'h7-fi6-noc15-fab1'
+'h7-fi6-noc15-fab2'
+'h7-fi6-noc15-fab3'
+'h7-fi6-noc15-notfab1'
+'h7-fi6-noc15-notfab2'
+'h7-fi6-noc15-notfab3'
 }
 
 qblock=0; % obtain errors from block averaging or correlation analysis (qblock=0)
@@ -112,5 +112,5 @@ end
 binde
 bindee
 data=[binde;bindee];
-save('-ascii', ['h7-cr8020-d',labels{iene},'.dat'],'data')
+save('-ascii', ['h7-fi6-d',labels{iene},'.dat'],'data')
 % compute average BSA :

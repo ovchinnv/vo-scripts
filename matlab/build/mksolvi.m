@@ -55,6 +55,6 @@ for iseg=0:nseg-1
  wnam={watpdb.AtomName}';
 % iwat=[1:nallwat] ; % all atoms
  iwat=find(ismember(strtrim(wnam),'OH2')); % only water oxygens
- xchk=[xchk;xwat(iwat)]; ychk=[ychk;ywat(iwat)]; zchk=[zchk;zwat(iwat)];
+ xchk=[xchk;xwat(iwat)]; ychk=[ychk;ywat(iwat)]; zchk=[zchk;zwat(iwat)]; % add new waters to overlap check for next iter
 end
 %solvate(xsolu,ysolu,zsolu,solvent_pdb,buf,xsolu,ysolu,zsolu)

@@ -1,8 +1,13 @@
-function molout=combine(pdbs);
+function molout=combine_pdbs(pdbs,qoctpdb);
 % combine two PDB files into one, taking into account possible
 % isertions; useful for including missing loops
-
+if (nargin<2)
+ qoctpdb=exist('OCTAVE_VERSION','builtin');
+end
+qloud=1;
+%
 % read first pdb:
+%
 npdbs=length(pdbs);
 if (npdbs<=1)
  warning(' Number of PDBs to combine should be greater than one');
@@ -11,7 +16,11 @@ end
 
 pdbfile=char(pdbs(1));
 disp(['==>Reading pdb structure from file ',pdbfile,' ...']);
-mol1=pdbread(pdbfile);
+if (qoctpdb)
+ mol1=readpdb(pdbfile,qloud);
+else
+ mol1=pdbread(pdbfile);
+end
 pdb1=mol1.Model.Atom;
 
 % process remaining files
@@ -19,7 +28,11 @@ pdb1=mol1.Model.Atom;
 for i=2:npdbs
  pdbfile=char(pdbs(i));
  disp(['==>Reading pdb structure from file ',pdbfile,' ...']);
- mol2=pdbread(pdbfile);
+ if (qoctpdb)
+  mol2=readpdb(pdbfile,qloud);
+ else
+  mol2=pdbread(pdbfile);
+ end
  pdb2=mol2.Model.Atom;
 % combine
 % loop over records in pdb2, 

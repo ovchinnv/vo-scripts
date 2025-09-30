@@ -1,0 +1,35 @@
+#!/bin/bash
+if [ -z $1 ] ; then 
+ echo "USAGE : bld2xyz blade_checkpoint_file.blc"
+ exit 1;
+else
+ bldfile=$1
+fi
+
+if [ -z $2 ]; then
+ xyzfile=${bldfile%%.blc}.xyz
+else
+ xyzfile=$2
+fi
+
+if [ -z $3 ]; then
+ scale=10 ; # nm to Ang
+else
+ scale=$3
+fi
+# blade checkpoint files are _almost_ xyz files; complete the conversion here
+#(1) get # atoms :
+natoms=`grep Position $bldfile | awk '{print $2}'`;
+if [ -z $natoms ] ; then
+ echo "ERROR : could not determine number of atoms from $bldfile"
+ exit 1
+else
+ echo "Found $natoms atoms in file $bldfile"
+fi
+
+first=`grep -n Position $bldfile | awk -F':' '{print $1}'`; # first line
+last=`echo $first + $natoms | bc -l` ; # could also look for 'Velocity' which is after positions
+
+echo $natoms > $xyzfile
+echo "No element info available" >> $xyzfile
+head -n $last $bldfile | tail -n $natoms | awk '{print "Unk "$0}' >> $xyzfile

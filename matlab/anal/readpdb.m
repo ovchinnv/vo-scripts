@@ -1,1 +1,1 @@
-/home/taly/scripts/matlab/build/readpdb.m
+../build/readpdb.m
