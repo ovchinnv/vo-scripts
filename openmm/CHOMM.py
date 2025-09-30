@@ -33,7 +33,10 @@ if 1:
  try :
   mini
  except NameError:
-  mini=0
+  try :
+   mini=minimize
+  except NameError:
+   mini=0
 #
  try :
   cutoff

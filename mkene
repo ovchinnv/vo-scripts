@@ -13,9 +13,11 @@ pdbs=( ${name}_m ${name}-fab1 ${name}-notfab1 ${name}-fab2 ${name}-notfab2 ${nam
 dcds=( ${name}-now ${name}-fab1 ${name}-notfab1 ${name}-fab2 ${name}-notfab2 ${name}-fab3 ${name}-notfab3 )
 
 for i in `seq 1 ${#psfs[@]}` ; do
+#for i in 4 5 ; do
  psf=${psfs[(($i-1))]}
  pdb=dcd/${pdbs[(($i-1))]}
  dcd=dcd/${dcds[(($i-1))]}
- $python ./mdene.py $psf.psf $dcd.dcd struc $pdb.pdb > dcd/${psf}.ene
+# $python ./mdene.py $psf.psf $dcd.dcd struc $pdb.pdb > dcd/${psf}.ene
+ $python ~/scripts/simonson-util/python/mdene2.py $psf.psf $dcd.dcd struc $pdb.pdb > dcd/${psf}.ene
 #exit
 done

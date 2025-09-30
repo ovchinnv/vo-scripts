@@ -1,8 +1,7 @@
-#!/bin/tcl
+#!/bin/tclsh
 #set name rpol-rna
 #puts $argv
 #puts $argc
-
 
 if { $argc <= 0 } {
  exit;
