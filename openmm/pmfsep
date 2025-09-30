@@ -1,20 +1,21 @@
 #!/bin/bash
 #
 # openmp thread parameters
-export OMP_NUM_THREADS=6
+export OMP_NUM_THREADS=8
 export OMP_SCHEDULE=static
 export OMP_NESTED=false
 # load utility functions :
 source ~/scripts/struna.sh
 source system
 #
-template=template.py
-stringtemplate=template.sm
+template=template-pme.py
+stringtemplate=template.plugin
 #
 datadir=data
 dcddir=scratch
 usdir=$datadir
 #
+python=python
 #
 mkdir -p $datadir
 mkdir -p $dcddir
@@ -24,22 +25,22 @@ cutoff=9
 switchdist=7.5
 pmefreq=1
 hmass=4
-dt=4
+dt=4 # time step, might be set differently below for different sims, e.g. for equil vs production runs
 shake=1
 temperature=300
 thermostat=1
-friction=0.1
+friction=5
 barostat=0
 restraints=0
 restraintfile=$pdbfile
 restraintscale=1
 restraintcol=1
-stringpdb=cr9114-4900_sm.pdb
+stringpdb=../cr9114-4900_sm.pdb
 
 # box sizes for starting from scratch
 sizex=93
 sizey=93
-sizez=66
+sizez=93
 
 #nsteps=10000 ; # 40ps at dt=4fs
 nsteps=100000 ; # 400ps at dt=4fs
@@ -52,18 +53,33 @@ kdist=100 ;
 krmsd=10 ;
 fbw1=0.5;
 fbw2=0
+fbw3=0
 #
-index=1 # simulation "index"
+# watershell :
+qshell=1 # whether watershell restraints are on
+#
+index=1 # simulation "index" -- to be removed, as I have never used it
 #================== string replica parameters
 #
-brep=8  # first window index
+brep=0 # first window index
 erep=8 # last  window index # switching to this after 800 runs -- as of run 801
 outputbase=pmfsep$index
 
-firstrun=1 ; # index of run ; facilitates restarting
-numrun=10 ;
-#
+firstrun=110 ; # index of first run (facilitated restarting, if the restart files are numbered, as in wshell)
+numrun=10 ; # number of runs to perform
+qappend=0 ; # whether to append to stat files (otherwise will overwrite)
+# if qappend == 0, check that the data dir is empty
+if [ $qappend -eq 0 ] ; then
+ pushd $datadir >&/dev/null
+ files=(`ls *.dat`);
+ if [ ${#files[@]} -gt 0 ]; then
+  echo -e "ERROR: output directory '$datadir' contains .dat files: \n\n ${files[@]} \n\n which may be overwritten (rename or move them)"
+ fi
+ popd >&/dev/null
+ exit 1
+fi
 #==============================================================================
+exit
 #
 #outer loop over number of runs
 lastrun=$((firstrun+numrun-1))
@@ -83,54 +99,75 @@ for irun in `seq $firstrun $lastrun`; do
   echo -n > $config
   echo -n > $pluginfile
 #
-  vecs=(`cat cv.vec`)
+  vecs=(`cat ../cv.vec`)
   vec1="${vecs[@]:0:3}"
   bfha=1.0 # value of bfactor column to mark antigen
   bfab=2.0 # value of bfactor column to mark antibody
 #
   irestart=$irep
   minimize=0
+  restart=1
 # prepare config files
 # different behavior on first run :
   outputname=${outputbase}_${irep}
   outputprev=${outputbase}_${iprev}
+  restartname=$dcddir/$outputname
+#
+  windowappend="" # by default, do not append to statistics files
+  histappend=""
+  reneappend=""
   if [ $irun -gt 1 ]; then
-   windowappend=wiap # append to stat files
-   histappend=happ
-   reneappend=reap
-   ministeps=0
-   restart=1
-   restartname=$dcddir/$outputname
-  else # first run in this window
-   windowappend="" # do not append to statistics files
-   histappend=""
-   reneappend=""
-   if [ $irep -eq 0 ]; then # this is the first simulation, so start from scratch
+   if [ $qappend -ge 1 ]; then
+    windowappend=wiap
+    histappend=happ
+    reneappend=reap
+   fi
+  else # $irun =1 ( first run )
+   if [ $irep -eq 0 ]; then # if this is the first simulation, start from scratch
     restart=0 ;# start from pdb coords
     minimize=1
    else
 # take restart files from a previous window
-    restart=1
-    outputprev=${outputbase}_${iprev}
-    restartname=$dcddir/$outputprev
     irestart=$iprev # to restart from a previous window
+    restartname=$dcddir/$outputprev
    fi
   fi
   restartfile=$restartname.xml
 #
 # for string method config file
   cat $stringtemplate >> $pluginfile # use cpp to process includes
-
+#
+  if [ $qshell -eq 1 ]; then
+   watershell_output=watershell${irep}_${irun}.txt
+# determine restart temperature
+   if [ $irun -eq 1 ]; then
+    dasy=on
+    shellupdate=7 ;# note that the shell is updated in the first run to equilibrate it
+    dt=1;
+    if [ $irep -eq 0 ]; then
+     watershell_restart=NONE
+    else
+     watershell_restart=watershell$((irep-1))_${irun}.txt
+    fi
+   else
+    dasy=off
+    shellupdate=0
+    watershell_restart=watershell${irep}_$((irun-1)).txt
+    dt=2;
+   fi
+  fi
+#
   for var in \
     stringpdb \
     datadir usdir bfha bfab vec1 kdist krmsd fbw1 fbw2 \
-    windowappend histappend reneappend freq irep irestart ; \
-   do
+    windowappend histappend reneappend freq irep irestart \
+    watershell_restart watershell_output dasy shellupdate ; \
+  do
     update $pluginfile $var
   done
 #exit
 # for MD config file
-  cat template.py >> $config
+  cat $template >> $config
   update $config sminput $pluginfile
   update $config smlog $pluginout
 
@@ -149,20 +186,25 @@ for irun in `seq $firstrun $lastrun`; do
   echo "  ===> Running replica #$irep ..."
 #
 #exit
-  python $config >& $output
+  $python $config >& $output
 #exit
 ####### save dcd file
-  dcdfile=$dcddir/$outputname.dcd
-  dcdall=$dcddir/${outputname}_all.dcd
+  if [ "$savedcd" == "1" ] ; then
+   dcdfile=$dcddir/$outputname.dcd
+   dcdall=$dcddir/${outputname}_all.dcd
 # append to running dcd
-  if [ ! -f $dcdall ] || [ $irun -eq 1 ]; then
+   if [ ! -f $dcdall ] || [ $irun -eq 1 ]; then
     mv -f $dcdfile $dcdall
-  else
-    catdcd -o temp.dcd $dcdall $dcdfile > catdcd.out
-    mv -f temp.dcd $dcdall
-  fi
+   else
+     catdcd -o temp.dcd $dcdall $dcdfile > catdcd.out
+     mv -f temp.dcd $dcdall
+   fi
 # ^ save dcd
- done
+  fi
+ done # over all reps
+ brep=0 # reset to run all reps
+ erep=8
+ qappend=1; # make sure to append to data in subsequent runs, otherwise will overwrite previous run's data !
 #fi
 #
 done # over all runs
