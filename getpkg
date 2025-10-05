@@ -1,12 +1,8 @@
 #!/bin/bash
 # download consistent packages from archlinux archive
-<<<<<<< HEAD
-pkgs=(python-pooch-1.8.2-1  python-scipy-1.14.1-1)
-=======
 pkgs=(
-wine-mono-10.0.0-1
+openrgb-1.0rc2-3
 )
->>>>>>> 7d625741c416e96b9132a85500a0391bc46e7b76
 
 baseurl="https://archive.archlinux.org/packages"
 ext1="x86_64.pkg.tar.zst"
@@ -14,23 +10,15 @@ ext2="any.pkg.tar.zst"
 
 for pkg in ${pkgs[@]} ; do
  first_letter=${pkg:0:1}
-<<<<<<< HEAD
- url=$baseurl/$first_letter/${pkg}-${ext1}
-=======
-# pkgname=${pkg%%-[0-9]*}
-#echo $pkgname
+ pkgname=${pkg%%-[0-9]*}
+ echo $pkgname
 #continue
  url=$baseurl/$first_letter/${pkgname}/${pkg}-${ext1}
->>>>>>> 7d625741c416e96b9132a85500a0391bc46e7b76
  echo "Fetching $pkg @ $url"
  response=`wget $url 2>&1`
  notfound=`echo $response | grep 'ERROR 404'`
  if [[ ! -z $notfound ]] ; then
-<<<<<<< HEAD
-  url=$baseurl/$first_letter/${pkg}-${ext2}
-=======
   url=$baseurl/$first_letter/${pkgname}/${pkg}-${ext2}
->>>>>>> 7d625741c416e96b9132a85500a0391bc46e7b76
   echo "Fetching $pkg @ $url"
   response=`wget $url 2>&1`
   notfound=`echo $response | grep 'ERROR 404'`
@@ -38,8 +26,6 @@ for pkg in ${pkgs[@]} ; do
    echo "Could not find $pkg"  
   fi
  fi
-<<<<<<< HEAD
-=======
- pacman -Udd ${url##*/}
->>>>>>> 7d625741c416e96b9132a85500a0391bc46e7b76
+# pacman -Udd ${url##*/}
+ pacman -U ${url##*/}
 done
