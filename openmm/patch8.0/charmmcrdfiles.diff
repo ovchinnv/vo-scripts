@@ -1,0 +1,28 @@
+--- orig/charmmcrdfiles.py.orig	2025-12-29 17:25:56.000000000 -0500
++++ charmmcrdfiles.py	2025-12-29 18:31:30.407144249 -0500
+@@ -69,6 +69,8 @@
+         self.atomno = []                   # Atom number
+         self.resno = []                    # Residue number
+         self.resname = []                  # Residue name
++        self.resid = []                    # Residue ID
++        self.insertion = []                # Insertion Code #VO
+         self.attype = []                   # Atom type
+         self.positions = []                # 3N atomic coordinates
+         self.title = []                    # .crd file title block
+@@ -113,8 +115,15 @@
+                     pos = Vec3(float(line[4]), float(line[5]), float(line[6]))
+                     self.positions.append(pos)
+                     self.segid.append(line[7])
++                    resid=line[8] ; last=resid[-1] ; 
++                    if last.isdigit():
++                     self.insertion.append('')
++                     self.resid.append(resid)
++                    else:
++                     self.insertion.append(last)
++                     self.resid.append(resid[0:-2]) ;# can contain a letter insertion code, which will prevent integer conversion
+                     self.weighting.append(float(line[9]))
+-    
++
+                 if self.natom != len(self.positions):
+                     raise CharmmFileError("Error parsing CHARMM .crd file: %d "
+                                           "atoms requires %d positions (not %d)" %
