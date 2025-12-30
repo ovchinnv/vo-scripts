@@ -1,16 +1,23 @@
 #!/bin/python
 #
-import simtk.openmm.app as app
-import simtk.openmm as mm
-import simtk.unit as u
-from sys import stdout, stderr, exit
+#import simtk.openmm.app as app
+#import simtk.openmm as mm
+#import simtk.unit as u
+import openmm.app as app
+import openmm as mm
+import openmm.unit as u
+from sys import stdout, stderr, exit, path
 from shutil import move
 
 if (alch):
+# 12/28 : tools want to import openmm, not simtk.openmm
+# path.append('/usr/lib/python3.13/site-packages/simtk');
+ import openmmtools
 # from openmmtools.alchemy import AlchemicalState as alch
 # from openmmtools.alchemy import AbsoluteAlchemicalFactory as alchsys
- from alchemy import AlchemicalState as alch
- from alchemy import AbsoluteAlchemicalFactory as alchsys
+# from openmmtools.alchemy import AlchemicalRegion as alchreg
+# from alchemy import AlchemicalState as alch
+# from alchemy import AbsoluteAlchemicalFactory as alchsys
  from math import ceil
 #=====================================================================#
 # define parameters that may not have been defined by user
@@ -82,6 +89,11 @@ if 1:
   struna
  except NameError:
   struna=0
+#
+ try :
+  dynamo
+ except NameError:
+  dynamo=0
 #
  try :
   platformName
@@ -290,7 +302,15 @@ if 1:
 #================= string plugin
  if (struna==1) :
   from openmmstruna import *
-  system.addForce(StrunaForce(strunaConfig, strunaLog))
+  strunaForce=StrunaForce(strunaConfig, strunaLog);
+  strunaForce.setForceGroup(7);
+  system.addForce(strunaForce);
+#================= dynamo (master) plugin
+ if (dynamo==1) :
+  from openmmdynamo import *
+  dynamoForce=DynamoForce(dynamoConfig, dynamoLog);
+  dynamoForce.setForceGroup(7);
+  system.addForce(dynamoForce);
 #================= add integrator :
  dprint("Configuring integrator");
 # first, add barostat if requested :
@@ -358,28 +378,40 @@ if 1:
     alchatoms.append(ialch);
    ialch+=1;
   dprint("Found ",len(alchatoms)," atoms for alchemical annihilation/decoupling");
-  ligand_atoms=alchatoms;
   dprint("Creating alchemical system");
-  factory=alchsys(system, ligand_atoms=ligand_atoms, annihilate_sterics=(not alchdecouple), annihilate_electrostatics=(not alchdecouple));
+# 12/25 :
+  factory=openmmtools.alchemy.AbsoluteAlchemicalFactory()
+  reference_system=system
+  alchemical_region=openmmtools.alchemy.AlchemicalRegion(alchemical_atoms=alchatoms,\
+                                                         alchemical_bonds=False,\
+                                                         alchemical_angles=False,\
+                                                         alchemical_torsions=False,\
+                                                         annihilate_sterics=(not alchdecouple),\
+                                                         annihilate_electrostatics=True) ;# decoupling not possible with PME
+#                                                         annihilate_electrostatics=(not alchdecouple))
+#
+  alchsystem=factory.create_alchemical_system(reference_system, alchemical_regions=[alchemical_region])
+#  system, alchreg(ligand_atoms), );
+
 # reference lambda
   lambda0e=max(0.,2.*lambda0-1.)
   lambda0v=min(1.,2.*lambda0)
   dprint("Defining reference alchemical state with lambda_0=", lambda0,", lambda_0e=", lambda0e,", lambda_0v=", lambda0v);
-  astate0=alch();
-  astate0['lambda_restraints']=1.0
-  astate0['lambda_electrostatics']=lambda0e
-  astate0['lambda_sterics']=lambda0v
+  astate0=openmmtools.alchemy.AlchemicalState.from_system(alchsystem);
+  astate0.lambda_restraints=1.0
+  astate0.lambda_electrostatics=lambda0e
+  astate0.lambda_sterics=lambda0v
 # perturbed lambda
   lambda1e=max(0.,2.*lambda1-1.)
   lambda1v=min(1.,2.*lambda1)
   dprint("Defining perturbed alchemical state with lambda_1=", lambda1,", lambda_1e=", lambda1e,", lambda_1v=", lambda1v);
-  astate1=alch();
-  astate1['lambda_restraints']=1.0
-  astate1['lambda_electrostatics']=lambda1e
-  astate1['lambda_sterics']=lambda1v
-  dprint("Creating perturbed system");
-  alchsystem=factory.createPerturbedSystem(astate0)
-
+  astate1=openmmtools.alchemy.AlchemicalState.from_system(alchsystem);
+  astate1.lambda_restraints=1.0
+  astate1.lambda_electrostatics=lambda1e
+  astate1.lambda_sterics=lambda1v
+#  dprint("Creating perturbed system");
+#  alchsystem=factory.createPerturbedSystem(astate0)
+#
 #======================================================
  dprint("Initializing compute platform ",platformName);
  platform=mm.Platform.getPlatformByName(platformName);
@@ -388,11 +420,13 @@ if 1:
  if (platformName=="CUDA") :
   if (alch):
    simulation=app.Simulation(psf.topology, alchsystem, integrator, platform, properties);
+   astate0.apply_to_context(simulation.context);
   else:
    simulation=app.Simulation(psf.topology, system, integrator, platform, properties);
  else :
   if (alch):
    simulation=app.Simulation(psf.topology, alchsystem, integrator, platform);
+   astate0.apply_to_context(simulation.context);
   else:
    simulation=app.Simulation(psf.topology, system, integrator, platform);
 #
@@ -448,12 +482,14 @@ if 1:
     e0=pote(simulation);
 # switch to perturbed context
 #    factory.perturbSystem(alchsystem, astate1);
-    factory.perturbContext(simulation.context, astate1);
+#    factory.perturbContext(simulation.context, astate1);
+    astate1.apply_to_context(simulation.context);
 # compute perturbed energy
     e1=pote(simulation);
 # return to original context
 #    factory.perturbSystem(alchsystem, astate0);
-    factory.perturbContext(simulation.context, astate0);
+#    factory.perturbContext(simulation.context, astate0);
+    astate0.apply_to_context(simulation.context);
 # write energies to file
     falch.write("%9d %12.5f %12.5f\n" % ( (n_outer+1)*num_inner_steps, e0, e1) )
 #    falch.flush();
