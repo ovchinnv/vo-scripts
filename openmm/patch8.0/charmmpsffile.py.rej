@@ -1,0 +1,35 @@
+--- charmmpsffile.py	2018-10-30 16:01:31.000000000 -0400
++++ charmmpsffile.py	2018-10-30 17:02:04.865295608 -0400
+@@ -1358,6 +1382,9 @@
+                         for j in range(i):
+                             force.addException(excludeterm[j], excludeterm[i], 0.0, 0.1, 0.0)
+         # Exclude all bonds and angles, as well as the lonepair/Drude attached onto them
++        if verbose: print("Adding nonbonded exclusions from PSF...")
++        nbex=0; # keep track of number of exceptions
++        nbx_ptr_beg=0 ; # pointer to the beginning of the excluded atom list ; VO 2/18
+         for atom in self.atom_list:
+             for atom2 in atom.bond_partners:
+                 if atom2.idx > atom.idx:
+@@ -1374,6 +1401,22 @@
+                 if ((atom.idx, atom2.idx) in excluded_atom_pairs):
+                     continue
+                 force.addException(atom.idx, atom2.idx, 0.0, 0.1, 0.0)
++            # Add exclusions from PSF (VO)
++            idx1=atom.idx ; # index of this atom
++            nbx_ptr_end=self.nbxptr_list[idx1];
++            for i in range(nbx_ptr_beg, nbx_ptr_end):
++                atom2=self.nbx_list[i] ; # index of second atom in pairwise exception
++#                print("Adding nonbonded exception between atom #",atom.idx, "and atom #",atom2.idx);
++                # make sure that the exclusion is not already added
++                if atom2 in atom.bond_partners: continue
++                if atom2 in atom.angle_partners: continue
++                if atom2 in atom.dihedral_partners: continue # in this case, preserve scaled 1/4 interactions, rather than deleting them (rather arbitrary idea)
++                force.addException(idx1, atom2.idx, 0.0, 0.1, 0.0) ; # attempt to add exclusions as in the list, assuming no errors in PSF
++                nbex+=1;
++            nbx_ptr_beg=nbx_ptr_end; # beginning index for the next atom
++        if verbose: print("Added",nbex,"nonbonded exclusions from PSF...")
++        # End add exclusions from PSF (VO)
++
+         system.addForce(force)
+ 
+         # Add Drude particles (Drude force)

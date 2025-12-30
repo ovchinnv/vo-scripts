@@ -1,0 +1,60 @@
+#!/bin/bash
+#ommver="7.3.0"
+ommver="8.0.0rc1"
+PYTHON=`which python`
+ROOT=/usr/local/openmm-git
+#export CUDA_cufft_LIBRARY=$CUDA_HOME/../../math_libs/lib64
+# 1 build openmm
+
+if [[ 1 -eq 1 ]] ; then
+
+git checkout CMakeLists.txt
+git checkout tags/$ommver
+sed -i 's/CMAKE_POLICY(SET CMP0042 OLD)*$/#CMAKE_POLICY(SET CMP0042 OLD)/' CMakeLists.txt
+#
+cp -f /home/surgeon/scripts/openmm/patch7.2i/generateWrappers.py wrappers ;# dirty but good enough-- update for swig 4
+#rm -fr build-$ommver
+mkdir -p build-$ommver
+pushd build-$ommver
+cmake ../ -DCMAKE_CXX_COMPILER=/usr/bin/c++-8 -DCMAKE_C_COMPILER=/usr/bin/cc-8 -DCMAKE_INSTALL_PREFIX=${ROOT}-${ommver} \
+ -DPYTHON_EXECUTABLE=$PYTHON -DOPENMM_BUILD_C_AND_FORTRAN_WRAPPERS=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5\
+#-DCUDA_NVCC_FLAGS='-gencode arch=compute_61,code=sm_61' \
+# -DCUDA_cufft_LIBRARY=$CUDA_HOME/../../math_libs/lib64/libcufft.so
+#cmake ../ -DCMAKE_INSTALL_PREFIX=${ROOT}-${ommver} -DCUDA_NVCC_FLAGS='-gencode arch=compute_86,code=sm_86' \
+# -DCUDAToolkit_ROOT=$CUDA_HOME -DPYTHON_EXECUTABLE=$PYTHON -DOPENMM_BUILD_C_AND_FORTRAN_WRAPPERS=OFF
+# -DCUDA_nvrtc_LIBRARY=$CUDA_HOME/lib64/libnvrtc.so
+#
+#exit
+# run twice
+#cmake ../ -DCMAKE_INSTALL_PREFIX=${ROOT}-${ommver} -DCUDA_NVCC_FLAGS='-gencode arch=compute_86,code=sm_86' \
+# -DPYTHON_EXECUTABLE=$PYTHON -DOPENMM_BUILD_C_AND_FORTRAN_WRAPPERS=OFF \
+# -DCUDA_cufft_LIBRARY=$CUDA_HOME/../../math_libs/lib64/libcufft.so
+#exit
+make -j24 ;
+sudo make install ;
+sudo make PythonInstall
+popd
+fi
+# patch :
+# get python version:
+pyver=`python --version | tr '.' ' ' | awk '{print $2"."$3}'`
+# descend into the correct dir
+# NOTE : as of OMM 8, the simtk dir seems to be removed
+version=`printf '%s\n' "$ommver"  "8.0.0" | sort -V | head -n1`
+echo $ommver
+echo $version
+if [[ $version == "8.0.0" ]]; then # current version is greater than or equal, so no simtk dir
+ simtk=""
+else
+ simtk=simtk
+fi
+#
+pushd /usr/lib/python${pyver}/site-packages/$simtk/openmm/app
+# patch from here using file in scripts
+# NOTE : the patches depend on the version !!!
+patch < /home/surgeon/scripts/openmm/patch8.0/pdbfile.diff
+patch < /home/surgeon/scripts/openmm/patch8.0/charmmcrdfiles.diff
+patch < /home/surgeon/scripts/openmm/patch8.0/charmmpsffile.diff
+popd
+pushd ${ROOT}-${ommver}/include/swig
+patch < /home/surgeon/scripts/openmm/patch7.2i/OpenMMSwigHeaders.diff

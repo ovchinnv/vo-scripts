@@ -4,6 +4,8 @@ if ~exist('seldisu1'); seldisu1=ones(size(anum)); end
 if ~exist('seldisu2'); seldisu2=ones(size(anum)); end
 if ~exist('disucut') ; disucut=8.5 ; end
 if ~exist('qpsfgen') ; qpsfgen=0; end
+if ~exist('qamber') ; qamber=0; end
+assert(qpsfgen+qamber)<2 ;
 % need strtrim here because segids were defined with a trailng space (above)
 selcys1=seldisu1&ismember(rname,'CYS')&ismember(aname,'SG');
 selcys2=seldisu2&ismember(rname,'CYS')&ismember(aname,'SG');
@@ -19,18 +21,23 @@ idisu = ( scdist2 <= disucut^2 ) & (scdist2 > 1e-4 ) ; % no zero distances to wi
 %
 [iidisu,jjdisu]=find(idisu);
 iidisu=ic2(iidisu); jjdisu=ic1(jjdisu); % convert to indices
-indok=unique( sort([iidisu jjdisu],2), 'rows' ); % sort resids within pairs and remove redundancies
+indss=unique( sort([iidisu jjdisu],2), 'rows' ); % sort resids within pairs and remove redundancies
 if (qpsfgen);
  fp=fopen('add_disulfides.vmd', 'w');
  fprintf(fp,'#!/bin/vmd\n# disulfide bridge patches\n');
+elseif (qamber)
+ fp=fopen('add_disulfides.tlp', 'w');
+ fprintf(fp,'# disulfide bridge bonds for tleap\n#\n');
 else
  fp=fopen('add_disulfides.str', 'w');
  fprintf(fp,'* disulfide bridge patches\n*\n');
 end
-for i=1:size(indok,1)
- ii=indok(i,1); jj=indok(i,2);
+for i=1:size(indss,1)
+ ii=indss(i,1); jj=indss(i,2);
  if (qpsfgen)
   pcmd=['patch DISU ',strtrim(segid{ii}),':', num2str(resid(ii)),' ',strtrim(segid{jj}),':', num2str(resid(jj)), ' '];
+ elseif (qamber)
+  pcmd=['bond ',strtrim(segid{ii}),'.', num2str(resid(ii)),'.SG ',strtrim(segid{jj}),'.', num2str(resid(jj)), '.SG '];
  else
   pcmd=['patch disu ',strtrim(segid{ii}),' ', num2str(resid(ii)),' ',strtrim(segid{jj}),' ', num2str(resid(jj)), ' ', 'setup warn'];
  end

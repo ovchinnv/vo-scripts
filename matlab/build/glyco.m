@@ -200,11 +200,20 @@ for i=1:nc
  end
 %
  fclose(fpatch);
- inds=find(inds);
- for ii=inds'
+%
+ for ii=find(inds)'
   pdbh(ii).segID=segname;
  end
  mol3.Model.Atom=pdbh;
- pdbout(mol3,[strtrim(segname),'.pdb'],xpdbh,ypdbh,zpdbh,[],[],inds);
+%
+ if (qamber) % heavy atoms only
+  if (isempty(elementh))
+   elementh=cellfun(@(s) s(1), anameh);
+  end
+  cons=elementh~='H'; % make sure shape is correct
+ else
+  cons=ones(natomh,1);
+ end
+ pdbout(mol3,[strtrim(segname),'.pdb'],xpdbh,ypdbh,zpdbh,[],[],find(inds(:)&cons(:)));
 end
 %

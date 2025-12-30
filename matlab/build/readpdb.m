@@ -40,7 +40,9 @@ iremark=[];
 remark=[];
 if ~isempty(dchar)
  iremark=dchar(:,8:11); % remark number : VO changed from 8:10, and below from 11:80
- remark=dchar(:,12:80); % rest of remark line
+% accommodate nonstandard files with short remark lines
+ maxlen=min(size(dchar,2),80);
+ remark=dchar(:,12:maxlen); % rest of remark line
 end
 ind=0;
 for i=1:size(iremark,1);
